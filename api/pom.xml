@@ -92,6 +92,18 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.18</version>
+        </dependency>
+
+        <!-- base jooq dependency -->
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>${jooq.version}</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -117,6 +129,77 @@
     <build>
         <finalName>${project.parent.artifactId}</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/codegen/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 代码生成器插件 -->
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${jooq.version}</version>
+                <configuration>
+                    <jdbc>
+                        <driver>com.mysql.cj.jdbc.Driver</driver>
+                        <url>jdbc:mysql://localhost:3306/bella_openapi?useSSL=false</url>
+                        <user>root</user>
+                        <password>123456</password>
+                    </jdbc>
+                    <generator>
+                        <database>
+                            <inputSchema>bella_openapi</inputSchema>
+                            <outputSchemaToDefault>true</outputSchemaToDefault>
+                            <includes>openapi.*</includes>
+                            <unsignedTypes>false</unsignedTypes>
+                        </database>
+                        <strategy>
+                            <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
+                            <matchers>
+                                <tables>
+                                    <table>
+                                        <expression>openapi.*</expression>
+                                        <daoClass>
+                                            <transform>PASCAL</transform>
+                                            <expression>$0_D_B_Dao</expression>
+                                        </daoClass>
+                                        <pojoClass>
+                                            <transform>PASCAL</transform>
+                                            <expression>$0_D_B</expression>
+                                        </pojoClass>
+                                        <pojoImplements>com.ke.bella.openapi.db.repo.Operator</pojoImplements>
+                                        <recordImplements>com.ke.bella.openapi.db.repo.Operator</recordImplements>
+                                    </table>
+                                </tables>
+                            </matchers>
+                        </strategy>
+                        <generate>
+                            <deprecated>false</deprecated>
+                            <records>true</records>
+                            <pojos>true</pojos>
+                            <daos>false</daos>
+                        </generate>
+                        <target>
+                            <packageName>com.ke.bella.openapi</packageName>
+                            <directory>src/codegen/java</directory>
+                            <encoding>UTF-8</encoding>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
