@@ -9,6 +9,7 @@ import com.ke.bella.openapi.tables.OpenapiChannel;
 import com.ke.bella.openapi.tables.OpenapiEndpoint;
 import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
 import com.ke.bella.openapi.tables.OpenapiModel;
+import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
 
 import javax.annotation.Generated;
 
@@ -32,7 +33,7 @@ public class Tables {
     public static final OpenapiCategory OPENAPI_CATEGORY = com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
 
     /**
-     * openapi模型
+     * openapi通道
      */
     public static final OpenapiChannel OPENAPI_CHANNEL = com.ke.bella.openapi.tables.OpenapiChannel.OPENAPI_CHANNEL;
 
@@ -50,4 +51,9 @@ public class Tables {
      * openapi模型
      */
     public static final OpenapiModel OPENAPI_MODEL = com.ke.bella.openapi.tables.OpenapiModel.OPENAPI_MODEL;
+
+    /**
+     * openapi模型能力点
+     */
+    public static final OpenapiModelEndpointRelation OPENAPI_MODEL_ENDPOINT_RELATION = com.ke.bella.openapi.tables.OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION;
 }

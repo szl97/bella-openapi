@@ -9,6 +9,7 @@ import com.ke.bella.openapi.tables.OpenapiChannel;
 import com.ke.bella.openapi.tables.OpenapiEndpoint;
 import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
 import com.ke.bella.openapi.tables.OpenapiModel;
+import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = 139288283;
+    private static final long serialVersionUID = -2011994975;
 
     /**
      * The reference instance of <code></code>
@@ -47,7 +48,7 @@ public class DefaultSchema extends SchemaImpl {
     public final OpenapiCategory OPENAPI_CATEGORY = com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
 
     /**
-     * openapi模型
+     * openapi通道
      */
     public final OpenapiChannel OPENAPI_CHANNEL = com.ke.bella.openapi.tables.OpenapiChannel.OPENAPI_CHANNEL;
 
@@ -65,6 +66,11 @@ public class DefaultSchema extends SchemaImpl {
      * openapi模型
      */
     public final OpenapiModel OPENAPI_MODEL = com.ke.bella.openapi.tables.OpenapiModel.OPENAPI_MODEL;
+
+    /**
+     * openapi模型能力点
+     */
+    public final OpenapiModelEndpointRelation OPENAPI_MODEL_ENDPOINT_RELATION = com.ke.bella.openapi.tables.OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION;
 
     /**
      * No further instances allowed
@@ -95,6 +101,7 @@ public class DefaultSchema extends SchemaImpl {
             OpenapiChannel.OPENAPI_CHANNEL,
             OpenapiEndpoint.OPENAPI_ENDPOINT,
             OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION,
-            OpenapiModel.OPENAPI_MODEL);
+            OpenapiModel.OPENAPI_MODEL,
+            OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION);
     }
 }

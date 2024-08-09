@@ -1,9 +1,13 @@
 package com.ke.bella.openapi.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 16:52 description:
@@ -11,6 +15,9 @@ import java.util.List;
 public class MetaDataOps {
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @SuperBuilder
     public static class EndpointOp {
         private String endpoint;
         private String endpointName;
@@ -26,32 +33,32 @@ public class MetaDataOps {
     @Data
     public static class ModelOp {
         private String modelName;
+        private Set<String> endpoints;
         private String documentUrl;
         private String properties;
         private String features;
     }
 
     @Data
-    public static class ModelStatusOp {
+    public static class ModelNameOp {
         private String modelName;
     }
 
-    @Data
-    public static class ModelVisibilityOp {
-        private String modelName;
-    }
-
-
-    @Data
     @EqualsAndHashCode(callSuper = true)
-    public static class ChannelCreateOp extends ChannelUpdateOp {
+    @Data
+    public static class ModelStatusOp extends ModelNameOp {
+
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class ModelVisibilityOp extends ModelNameOp {
+    }
+
+    @Data
+    public static class ChannelCreateOp {
         private String entityType;
         private String entityCode;
-    }
-
-    @Data
-    public static class ChannelUpdateOp {
-        private String channelName;
         private String dataDestination;
         private String priority;
         private String protocol;
@@ -62,22 +69,43 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class ChannelStatusOp {
-        private String channelName;
+    public static class ChannelUpdateOp {
+        private String channelCode;
+        private String channelInfo;
+        private String priceInfo;
     }
 
+    @Data
+    public static class ChannelStatusOp {
+        private String channelCode;
+    }
+
+    @NoArgsConstructor
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    @SuperBuilder
+    public static class CategoryCreateOp extends CategoryOp {
+        private String parentCode;
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @SuperBuilder
     @Data
     public static class CategoryOp {
         private String categoryCode;
         private String categoryName;
-        private String parentCode;
     }
+
     @Data
     public static class CategoryStatusOp {
         private String categoryCode;
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
     public static class EndpointCategoryOp {
         private String endpoint;
         private String categoryCode;
@@ -86,6 +114,6 @@ public class MetaDataOps {
     @Data
     public static class EndpointUpdateCategoriesOp {
         private String endpoint;
-        private List<String> categoryCodes;
+        private Set<String> categoryCodes;
     }
 }

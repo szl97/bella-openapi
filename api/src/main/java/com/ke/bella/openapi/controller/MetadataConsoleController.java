@@ -1,9 +1,7 @@
 package com.ke.bella.openapi.controller;
 
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiChannelDB;
 import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelDB;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +17,7 @@ public class MetadataConsoleController {
     public OpenapiEndpointDB createEndpoint(@RequestBody MetaDataOps.EndpointOp op) {
         return null;
     }
+
     @PutMapping("/endpoint")
     public Boolean updateEndpoint(@RequestBody MetaDataOps.EndpointOp op) {
         return true;
@@ -65,12 +64,12 @@ public class MetadataConsoleController {
     }
 
     @PostMapping("/channel")
-    public OpenapiEndpointDB createChannel(@RequestBody MetaDataOps.ChannelCreateOp op) {
+    public OpenapiEndpointDB createChannel(@RequestBody MetaDataOps.ChannelOp op) {
         return null;
     }
 
     @PutMapping("/channel")
-    public Boolean updateChannel(@RequestBody MetaDataOps.ChannelUpdateOp op) {
+    public Boolean updateChannel(@RequestBody MetaDataOps.ChannelOp op) {
         return true;
     }
 

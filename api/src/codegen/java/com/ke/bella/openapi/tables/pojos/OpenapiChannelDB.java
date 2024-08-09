@@ -13,7 +13,7 @@ import javax.annotation.Generated;
 
 
 /**
- * openapi模型
+ * openapi通道
  */
 @Generated(
     value = {
@@ -25,12 +25,12 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpenapiChannelDB implements Operator, Serializable {
 
-    private static final long serialVersionUID = -567040309;
+    private static final long serialVersionUID = 489713832;
 
     private Long      id;
     private String    entityType;
     private String    entityCode;
-    private String    channelName;
+    private String    channelCode;
     private String    status;
     private String    dataDestination;
     private String    priority;
@@ -52,7 +52,7 @@ public class OpenapiChannelDB implements Operator, Serializable {
         this.id = value.id;
         this.entityType = value.entityType;
         this.entityCode = value.entityCode;
-        this.channelName = value.channelName;
+        this.channelCode = value.channelCode;
         this.status = value.status;
         this.dataDestination = value.dataDestination;
         this.priority = value.priority;
@@ -73,7 +73,7 @@ public class OpenapiChannelDB implements Operator, Serializable {
         Long      id,
         String    entityType,
         String    entityCode,
-        String    channelName,
+        String    channelCode,
         String    status,
         String    dataDestination,
         String    priority,
@@ -92,7 +92,7 @@ public class OpenapiChannelDB implements Operator, Serializable {
         this.id = id;
         this.entityType = entityType;
         this.entityCode = entityCode;
-        this.channelName = channelName;
+        this.channelCode = channelCode;
         this.status = status;
         this.dataDestination = dataDestination;
         this.priority = priority;
@@ -133,12 +133,12 @@ public class OpenapiChannelDB implements Operator, Serializable {
         this.entityCode = entityCode;
     }
 
-    public String getChannelName() {
-        return this.channelName;
+    public String getChannelCode() {
+        return this.channelCode;
     }
 
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
     }
 
     public String getStatus() {
@@ -260,7 +260,7 @@ public class OpenapiChannelDB implements Operator, Serializable {
         sb.append(id);
         sb.append(", ").append(entityType);
         sb.append(", ").append(entityCode);
-        sb.append(", ").append(channelName);
+        sb.append(", ").append(channelCode);
         sb.append(", ").append(status);
         sb.append(", ").append(dataDestination);
         sb.append(", ").append(priority);

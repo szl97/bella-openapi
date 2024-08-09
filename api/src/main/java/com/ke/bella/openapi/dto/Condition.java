@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 15:49 description:
@@ -25,9 +26,10 @@ public class Condition {
     @Data
     public static class EndpointCondition extends PageCondition {
         private String endpoint;
+        private String endpointCode;
         private String endpointName;
-        private List<String> categoryCode;
-        private List<String> endpoints;
+        private Set<String> categoryCode;
+        private Set<String> endpoints;
         private String maintainerCode;
         private String maintainerName;
         private String status;
@@ -37,7 +39,8 @@ public class Condition {
     @Data
     public static class ModelCondition extends PageCondition {
         private String modelName;
-        private List<String> modelNames;
+        private String endpoint;
+        private Set<String> modelNames;
         private String visibility;
         private String status;
     }
@@ -48,7 +51,6 @@ public class Condition {
     @NoArgsConstructor
     @Builder
     public static class ChannelCondition extends PageCondition {
-        private String channelName;
         private String entityType;
         private String entityCode;
         private String supplier;

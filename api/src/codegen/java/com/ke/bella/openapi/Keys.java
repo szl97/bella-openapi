@@ -9,10 +9,12 @@ import com.ke.bella.openapi.tables.OpenapiChannel;
 import com.ke.bella.openapi.tables.OpenapiEndpoint;
 import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
 import com.ke.bella.openapi.tables.OpenapiModel;
+import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
 import com.ke.bella.openapi.tables.records.OpenapiCategoryRecord;
 import com.ke.bella.openapi.tables.records.OpenapiChannelRecord;
 import com.ke.bella.openapi.tables.records.OpenapiEndpointCategoryRelationRecord;
 import com.ke.bella.openapi.tables.records.OpenapiEndpointRecord;
+import com.ke.bella.openapi.tables.records.OpenapiModelEndpointRelationRecord;
 import com.ke.bella.openapi.tables.records.OpenapiModelRecord;
 
 import javax.annotation.Generated;
@@ -45,6 +47,7 @@ public class Keys {
     public static final Identity<OpenapiEndpointRecord, Long> IDENTITY_OPENAPI_ENDPOINT = Identities0.IDENTITY_OPENAPI_ENDPOINT;
     public static final Identity<OpenapiEndpointCategoryRelationRecord, Long> IDENTITY_OPENAPI_ENDPOINT_CATEGORY_RELATION = Identities0.IDENTITY_OPENAPI_ENDPOINT_CATEGORY_RELATION;
     public static final Identity<OpenapiModelRecord, Long> IDENTITY_OPENAPI_MODEL = Identities0.IDENTITY_OPENAPI_MODEL;
+    public static final Identity<OpenapiModelEndpointRelationRecord, Long> IDENTITY_OPENAPI_MODEL_ENDPOINT_RELATION = Identities0.IDENTITY_OPENAPI_MODEL_ENDPOINT_RELATION;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -53,14 +56,16 @@ public class Keys {
     public static final UniqueKey<OpenapiCategoryRecord> KEY_OPENAPI_CATEGORY_PRIMARY = UniqueKeys0.KEY_OPENAPI_CATEGORY_PRIMARY;
     public static final UniqueKey<OpenapiCategoryRecord> KEY_OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME = UniqueKeys0.KEY_OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME;
     public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_PRIMARY = UniqueKeys0.KEY_OPENAPI_CHANNEL_PRIMARY;
-    public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_NAME = UniqueKeys0.KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_NAME;
+    public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = UniqueKeys0.KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE;
     public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_PRIMARY = UniqueKeys0.KEY_OPENAPI_ENDPOINT_PRIMARY;
     public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = UniqueKeys0.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT;
-    public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = UniqueKeys0.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME;
+    public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = UniqueKeys0.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE;
     public static final UniqueKey<OpenapiEndpointCategoryRelationRecord> KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY = UniqueKeys0.KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY;
     public static final UniqueKey<OpenapiEndpointCategoryRelationRecord> KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = UniqueKeys0.KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE;
     public static final UniqueKey<OpenapiModelRecord> KEY_OPENAPI_MODEL_PRIMARY = UniqueKeys0.KEY_OPENAPI_MODEL_PRIMARY;
     public static final UniqueKey<OpenapiModelRecord> KEY_OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME = UniqueKeys0.KEY_OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME;
+    public static final UniqueKey<OpenapiModelEndpointRelationRecord> KEY_OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY = UniqueKeys0.KEY_OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY;
+    public static final UniqueKey<OpenapiModelEndpointRelationRecord> KEY_OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL = UniqueKeys0.KEY_OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -77,19 +82,22 @@ public class Keys {
         public static Identity<OpenapiEndpointRecord, Long> IDENTITY_OPENAPI_ENDPOINT = Internal.createIdentity(OpenapiEndpoint.OPENAPI_ENDPOINT, OpenapiEndpoint.OPENAPI_ENDPOINT.ID);
         public static Identity<OpenapiEndpointCategoryRelationRecord, Long> IDENTITY_OPENAPI_ENDPOINT_CATEGORY_RELATION = Internal.createIdentity(OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.ID);
         public static Identity<OpenapiModelRecord, Long> IDENTITY_OPENAPI_MODEL = Internal.createIdentity(OpenapiModel.OPENAPI_MODEL, OpenapiModel.OPENAPI_MODEL.ID);
+        public static Identity<OpenapiModelEndpointRelationRecord, Long> IDENTITY_OPENAPI_MODEL_ENDPOINT_RELATION = Internal.createIdentity(OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.ID);
     }
 
     private static class UniqueKeys0 {
         public static final UniqueKey<OpenapiCategoryRecord> KEY_OPENAPI_CATEGORY_PRIMARY = Internal.createUniqueKey(OpenapiCategory.OPENAPI_CATEGORY, "KEY_openapi_category_PRIMARY", OpenapiCategory.OPENAPI_CATEGORY.ID);
         public static final UniqueKey<OpenapiCategoryRecord> KEY_OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME = Internal.createUniqueKey(OpenapiCategory.OPENAPI_CATEGORY, "KEY_openapi_category_uniq_idx_uni_category_name", OpenapiCategory.OPENAPI_CATEGORY.CATEGORY_NAME);
         public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_PRIMARY = Internal.createUniqueKey(OpenapiChannel.OPENAPI_CHANNEL, "KEY_openapi_channel_PRIMARY", OpenapiChannel.OPENAPI_CHANNEL.ID);
-        public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_NAME = Internal.createUniqueKey(OpenapiChannel.OPENAPI_CHANNEL, "KEY_openapi_channel_uniq_idx_uni_channel_name", OpenapiChannel.OPENAPI_CHANNEL.CHANNEL_NAME);
+        public static final UniqueKey<OpenapiChannelRecord> KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Internal.createUniqueKey(OpenapiChannel.OPENAPI_CHANNEL, "KEY_openapi_channel_uniq_idx_uni_channel_code", OpenapiChannel.OPENAPI_CHANNEL.CHANNEL_CODE);
         public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_PRIMARY = Internal.createUniqueKey(OpenapiEndpoint.OPENAPI_ENDPOINT, "KEY_openapi_endpoint_PRIMARY", OpenapiEndpoint.OPENAPI_ENDPOINT.ID);
         public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = Internal.createUniqueKey(OpenapiEndpoint.OPENAPI_ENDPOINT, "KEY_openapi_endpoint_uniq_idx_uni_endpoint", OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT);
-        public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = Internal.createUniqueKey(OpenapiEndpoint.OPENAPI_ENDPOINT, "KEY_openapi_endpoint_uniq_idx_uni_endpoint_name", OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT_NAME);
+        public static final UniqueKey<OpenapiEndpointRecord> KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = Internal.createUniqueKey(OpenapiEndpoint.OPENAPI_ENDPOINT, "KEY_openapi_endpoint_uniq_idx_uni_endpoint_code", OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT_CODE);
         public static final UniqueKey<OpenapiEndpointCategoryRelationRecord> KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY = Internal.createUniqueKey(OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, "KEY_openapi_endpoint_category_relation_PRIMARY", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.ID);
         public static final UniqueKey<OpenapiEndpointCategoryRelationRecord> KEY_OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = Internal.createUniqueKey(OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, "KEY_openapi_endpoint_category_relation_uniq_idx_uni_endpoint_category_code", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.ENDPOINT, OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE);
         public static final UniqueKey<OpenapiModelRecord> KEY_OPENAPI_MODEL_PRIMARY = Internal.createUniqueKey(OpenapiModel.OPENAPI_MODEL, "KEY_openapi_model_PRIMARY", OpenapiModel.OPENAPI_MODEL.ID);
         public static final UniqueKey<OpenapiModelRecord> KEY_OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME = Internal.createUniqueKey(OpenapiModel.OPENAPI_MODEL, "KEY_openapi_model_uniq_idx_uni_model_name", OpenapiModel.OPENAPI_MODEL.MODEL_NAME);
+        public static final UniqueKey<OpenapiModelEndpointRelationRecord> KEY_OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY = Internal.createUniqueKey(OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, "KEY_openapi_model_endpoint_relation_PRIMARY", OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.ID);
+        public static final UniqueKey<OpenapiModelEndpointRelationRecord> KEY_OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL = Internal.createUniqueKey(OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, "KEY_openapi_model_endpoint_relation_uniq_idx_uni_endpoint_model", OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.ENDPOINT, OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.MODEL_NAME);
     }
 }

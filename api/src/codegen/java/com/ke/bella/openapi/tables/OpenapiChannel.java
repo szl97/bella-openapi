@@ -30,7 +30,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * openapi模型
+ * openapi通道
  */
 @Generated(
     value = {
@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
 
-    private static final long serialVersionUID = -1015825112;
+    private static final long serialVersionUID = 1941990425;
 
     /**
      * The reference instance of <code>openapi_channel</code>
@@ -73,9 +73,9 @@ public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
     public final TableField<OpenapiChannelRecord, String> ENTITY_CODE = createField("entity_code", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "实体编码");
 
     /**
-     * The column <code>openapi_channel.channel_name</code>. 渠道名称
+     * The column <code>openapi_channel.channel_code</code>. 渠道编码
      */
-    public final TableField<OpenapiChannelRecord, String> CHANNEL_NAME = createField("channel_name", org.jooq.impl.SQLDataType.VARCHAR(128).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "渠道名称");
+    public final TableField<OpenapiChannelRecord, String> CHANNEL_CODE = createField("channel_code", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "渠道编码");
 
     /**
      * The column <code>openapi_channel.status</code>. 状态状态(active/inactive)
@@ -105,7 +105,7 @@ public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
     /**
      * The column <code>openapi_channel.url</code>. 请求通道的url
      */
-    public final TableField<OpenapiChannelRecord, String> URL = createField("url", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "请求通道的url");
+    public final TableField<OpenapiChannelRecord, String> URL = createField("url", org.jooq.impl.SQLDataType.VARCHAR(512).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "请求通道的url");
 
     /**
      * The column <code>openapi_channel.channel_info</code>. 渠道信息
@@ -173,7 +173,7 @@ public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
     }
 
     private OpenapiChannel(Name alias, Table<OpenapiChannelRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("openapi模型"));
+        super(alias, null, aliased, parameters, DSL.comment("openapi通道"));
     }
 
     public <O extends Record> OpenapiChannel(Table<O> child, ForeignKey<O, OpenapiChannelRecord> key) {
@@ -193,7 +193,7 @@ public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.OPENAPI_CHANNEL_IDX_ENTITY_TYPE_CODE, Indexes.OPENAPI_CHANNEL_IDX_PROTOCOL, Indexes.OPENAPI_CHANNEL_IDX_SUPPLIER, Indexes.OPENAPI_CHANNEL_PRIMARY, Indexes.OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_NAME);
+        return Arrays.<Index>asList(Indexes.OPENAPI_CHANNEL_IDX_ENTITY_TYPE_CODE, Indexes.OPENAPI_CHANNEL_IDX_PROTOCOL, Indexes.OPENAPI_CHANNEL_IDX_SUPPLIER, Indexes.OPENAPI_CHANNEL_PRIMARY, Indexes.OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE);
     }
 
     /**
@@ -217,7 +217,7 @@ public class OpenapiChannel extends TableImpl<OpenapiChannelRecord> {
      */
     @Override
     public List<UniqueKey<OpenapiChannelRecord>> getKeys() {
-        return Arrays.<UniqueKey<OpenapiChannelRecord>>asList(Keys.KEY_OPENAPI_CHANNEL_PRIMARY, Keys.KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_NAME);
+        return Arrays.<UniqueKey<OpenapiChannelRecord>>asList(Keys.KEY_OPENAPI_CHANNEL_PRIMARY, Keys.KEY_OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE);
     }
 
     /**

@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * openapi模型
+ * openapi通道
  */
 @Generated(
     value = {
@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelRecord> implements Operator, Record18<Long, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, Timestamp, Timestamp> {
 
-    private static final long serialVersionUID = 363560822;
+    private static final long serialVersionUID = -1095448225;
 
     /**
      * Setter for <code>openapi_channel.id</code>. 主键ID
@@ -76,16 +76,16 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
     }
 
     /**
-     * Setter for <code>openapi_channel.channel_name</code>. 渠道名称
+     * Setter for <code>openapi_channel.channel_code</code>. 渠道编码
      */
-    public void setChannelName(String value) {
+    public void setChannelCode(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>openapi_channel.channel_name</code>. 渠道名称
+     * Getter for <code>openapi_channel.channel_code</code>. 渠道编码
      */
-    public String getChannelName() {
+    public String getChannelCode() {
         return (String) get(3);
     }
 
@@ -346,7 +346,7 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
      */
     @Override
     public Field<String> field4() {
-        return OpenapiChannel.OPENAPI_CHANNEL.CHANNEL_NAME;
+        return OpenapiChannel.OPENAPI_CHANNEL.CHANNEL_CODE;
     }
 
     /**
@@ -490,7 +490,7 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
      */
     @Override
     public String component4() {
-        return getChannelName();
+        return getChannelCode();
     }
 
     /**
@@ -634,7 +634,7 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
      */
     @Override
     public String value4() {
-        return getChannelName();
+        return getChannelCode();
     }
 
     /**
@@ -781,7 +781,7 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
      */
     @Override
     public OpenapiChannelRecord value4(String value) {
-        setChannelName(value);
+        setChannelCode(value);
         return this;
     }
 
@@ -951,13 +951,13 @@ public class OpenapiChannelRecord extends UpdatableRecordImpl<OpenapiChannelReco
     /**
      * Create a detached, initialised OpenapiChannelRecord
      */
-    public OpenapiChannelRecord(Long id, String entityType, String entityCode, String channelName, String status, String dataDestination, String priority, String protocol, String supplier, String url, String channelInfo, String priceInfo, Long cuid, String cuName, Long muid, String muName, Timestamp ctime, Timestamp mtime) {
+    public OpenapiChannelRecord(Long id, String entityType, String entityCode, String channelCode, String status, String dataDestination, String priority, String protocol, String supplier, String url, String channelInfo, String priceInfo, Long cuid, String cuName, Long muid, String muName, Timestamp ctime, Timestamp mtime) {
         super(OpenapiChannel.OPENAPI_CHANNEL);
 
         set(0, id);
         set(1, entityType);
         set(2, entityCode);
-        set(3, channelName);
+        set(3, channelCode);
         set(4, status);
         set(5, dataDestination);
         set(6, priority);

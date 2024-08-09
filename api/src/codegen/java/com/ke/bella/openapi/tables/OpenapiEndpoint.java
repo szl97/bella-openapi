@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OpenapiEndpoint extends TableImpl<OpenapiEndpointRecord> {
 
-    private static final long serialVersionUID = -1768295618;
+    private static final long serialVersionUID = -928141421;
 
     /**
      * The reference instance of <code>openapi_endpoint</code>
@@ -65,7 +65,12 @@ public class OpenapiEndpoint extends TableImpl<OpenapiEndpointRecord> {
     /**
      * The column <code>openapi_endpoint.endpoint</code>. 请求path
      */
-    public final TableField<OpenapiEndpointRecord, String> ENDPOINT = createField("endpoint", org.jooq.impl.SQLDataType.VARCHAR(256).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "请求path");
+    public final TableField<OpenapiEndpointRecord, String> ENDPOINT = createField("endpoint", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "请求path");
+
+    /**
+     * The column <code>openapi_endpoint.endpoint_code</code>. 能力点编码
+     */
+    public final TableField<OpenapiEndpointRecord, String> ENDPOINT_CODE = createField("endpoint_code", org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false).defaultValue(org.jooq.impl.DSL.inline("", org.jooq.impl.SQLDataType.VARCHAR)), this, "能力点编码");
 
     /**
      * The column <code>openapi_endpoint.endpoint_name</code>. 能力点名称
@@ -163,7 +168,7 @@ public class OpenapiEndpoint extends TableImpl<OpenapiEndpointRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.OPENAPI_ENDPOINT_PRIMARY, Indexes.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT, Indexes.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME);
+        return Arrays.<Index>asList(Indexes.OPENAPI_ENDPOINT_PRIMARY, Indexes.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT, Indexes.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE, Indexes.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME);
     }
 
     /**
@@ -187,7 +192,7 @@ public class OpenapiEndpoint extends TableImpl<OpenapiEndpointRecord> {
      */
     @Override
     public List<UniqueKey<OpenapiEndpointRecord>> getKeys() {
-        return Arrays.<UniqueKey<OpenapiEndpointRecord>>asList(Keys.KEY_OPENAPI_ENDPOINT_PRIMARY, Keys.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT, Keys.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME);
+        return Arrays.<UniqueKey<OpenapiEndpointRecord>>asList(Keys.KEY_OPENAPI_ENDPOINT_PRIMARY, Keys.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT, Keys.KEY_OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE);
     }
 
     /**
