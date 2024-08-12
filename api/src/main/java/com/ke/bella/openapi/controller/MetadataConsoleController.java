@@ -1,120 +1,182 @@
 package com.ke.bella.openapi.controller;
 
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
+import com.ke.bella.openapi.service.CategoryService;
+import com.ke.bella.openapi.service.ChannelService;
+import com.ke.bella.openapi.service.EndpointService;
+import com.ke.bella.openapi.service.ModelService;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkCategoryCreateOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkCategoryStatus;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelCreateOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelStatusOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelUpdateOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointCategoryOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointStatusOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkModelNameOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkModelOp;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkReplaceEndpointCategoryOp;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 16:22 description:
  */
-@RestController("/console")
+@RestController
+@RequestMapping("/console")
 public class MetadataConsoleController {
+    @Autowired
+    private EndpointService endpointService;
+    @Autowired
+    private ModelService modelService;
+    @Autowired
+    private ChannelService channelService;
+    @Autowired
+    private CategoryService categoryService;
+
     @PostMapping("/endpoint")
-    public OpenapiEndpointDB createEndpoint(@RequestBody MetaDataOps.EndpointOp op) {
-        return null;
+    public EndpointDB createEndpoint(@RequestBody MetaDataOps.EndpointOp op) {
+        checkEndpointOp(op, true);
+        return endpointService.createEndpoint(op);
     }
 
     @PutMapping("/endpoint")
     public Boolean updateEndpoint(@RequestBody MetaDataOps.EndpointOp op) {
+        checkEndpointOp(op, false);
+        endpointService.updateEndpoint(op);
         return true;
     }
 
     @PostMapping("/endpoint/activate")
     public Boolean activateEndpoint(@RequestBody MetaDataOps.EndpointStatusOp op) {
+        checkEndpointStatusOp(op);
+        endpointService.changeStatus(op.getEndpoint(), true);
         return true;
     }
 
-    @PutMapping("/endpoint/inactivate")
+    @PostMapping("/endpoint/inactivate")
     public Boolean inactivateEndpoint(@RequestBody MetaDataOps.EndpointStatusOp op) {
+        checkEndpointStatusOp(op);
+        endpointService.changeStatus(op.getEndpoint(), false);
         return true;
     }
 
     @PostMapping("/model")
-    public OpenapiEndpointDB createModel(@RequestBody MetaDataOps.ModelOp op) {
-        return null;
+    public ModelDB createModel(@RequestBody MetaDataOps.ModelOp op) {
+        checkModelOp(op, true);
+        return modelService.createModel(op);
     }
 
     @PutMapping("/model")
     public Boolean updateModel(@RequestBody MetaDataOps.ModelOp op) {
+        checkModelOp(op, false);
+        modelService.updateModel(op);
         return true;
     }
 
     @PostMapping("/model/activate")
     public Boolean activateModel(@RequestBody MetaDataOps.ModelStatusOp op) {
+        checkModelNameOp(op);
+        modelService.changeStatus(op.getModelName(), true);
         return true;
     }
 
-    @PutMapping("/model/inactivate")
+    @PostMapping("/model/inactivate")
     public Boolean inactivateModel(@RequestBody MetaDataOps.ModelStatusOp op) {
+        checkModelNameOp(op);
+        modelService.changeStatus(op.getModelName(), false);
         return true;
     }
 
     @PostMapping("/model/publish")
     public Boolean publishModel(@RequestBody MetaDataOps.ModelVisibilityOp op) {
+        checkModelNameOp(op);
+        modelService.changeVisibility(op.getModelName(), true);
         return true;
     }
 
     @PutMapping("/model/publish/cancel")
     public Boolean cancelPublishModel(@RequestBody MetaDataOps.ModelVisibilityOp op) {
+        checkModelNameOp(op);
+        modelService.changeVisibility(op.getModelName(), false);
         return true;
     }
 
     @PostMapping("/channel")
-    public OpenapiEndpointDB createChannel(@RequestBody MetaDataOps.ChannelOp op) {
-        return null;
+    public ChannelDB createChannel(@RequestBody MetaDataOps.ChannelCreateOp op) {
+        checkChannelCreateOp(op);
+        return channelService.createChannel(op);
     }
 
     @PutMapping("/channel")
-    public Boolean updateChannel(@RequestBody MetaDataOps.ChannelOp op) {
+    public Boolean updateChannel(@RequestBody MetaDataOps.ChannelUpdateOp op) {
+        checkChannelUpdateOp(op);
+        channelService.updateChannel(op);
         return true;
     }
 
     @PostMapping("/channel/activate")
     public Boolean activateChannel(@RequestBody MetaDataOps.ChannelStatusOp op) {
+        checkChannelStatusOp(op);
+        categoryService.changeStatus(op.getChannelCode(), true);
         return true;
     }
 
-    @PutMapping("/channel/inactivate")
+    @PostMapping("/channel/inactivate")
     public Boolean inactivateChannel(@RequestBody MetaDataOps.ChannelStatusOp op) {
+        checkChannelStatusOp(op);
+        categoryService.changeStatus(op.getChannelCode(), false);
         return true;
     }
 
     @PostMapping("/category")
-    public OpenapiEndpointDB createCategory(@RequestBody MetaDataOps.CategoryOp op) {
-        return null;
-    }
-
-    @PutMapping("/category")
-    public Boolean updateCategory(@RequestBody MetaDataOps.CategoryOp op) {
-        return true;
+    public CategoryDB createCategory(@RequestBody MetaDataOps.CategoryCreateOp op) {
+        checkCategoryCreateOp(op);
+        return categoryService.createCategory(op);
     }
 
     @PostMapping("/category/activate")
     public Boolean activateCategory(@RequestBody MetaDataOps.CategoryStatusOp op) {
+        checkCategoryStatus(op);
+        categoryService.changeStatus(op.getCategoryCode(), true);
         return true;
     }
 
-    @PutMapping("/category/inactivate/")
+    @PostMapping("/category/inactivate/")
     public Boolean inactivateCategory(@RequestBody MetaDataOps.CategoryStatusOp op) {
+        checkCategoryStatus(op);
+        categoryService.changeStatus(op.getCategoryCode(), false);
         return true;
     }
 
     @PostMapping("/endpoint/category")
-    public OpenapiEndpointDB addCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointCategoryOp op) {
-        return null;
+    public Boolean addCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointCategoriesOp op) {
+        checkEndpointCategoryOp(op);
+        categoryService.addCategoriesWithEndpoint(op);
+        return true;
     }
 
     @DeleteMapping("/endpoint/category")
-    public Boolean removeCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointCategoryOp op) {
+    public Boolean removeCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointCategoriesOp op) {
+        checkEndpointCategoryOp(op);
+        categoryService.removeCategoriesWithEndpoint(op);
         return true;
     }
 
     @PostMapping("/endpoint/category/replace")
-    public Boolean replaceCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointUpdateCategoriesOp op) {
+    public Boolean replaceCategoryWithEndpoint(@RequestBody MetaDataOps.EndpointCategoriesOp op) {
+        checkReplaceEndpointCategoryOp(op);
+        categoryService.replaceCategoryWithEndpoint(op);
         return true;
     }
 }

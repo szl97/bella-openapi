@@ -4,12 +4,12 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.OpenapiCategory;
-import com.ke.bella.openapi.tables.OpenapiChannel;
-import com.ke.bella.openapi.tables.OpenapiEndpoint;
-import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
-import com.ke.bella.openapi.tables.OpenapiModel;
-import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
+import com.ke.bella.openapi.tables.Category;
+import com.ke.bella.openapi.tables.Channel;
+import com.ke.bella.openapi.tables.Endpoint;
+import com.ke.bella.openapi.tables.EndpointCategoryRel;
+import com.ke.bella.openapi.tables.Model;
+import com.ke.bella.openapi.tables.ModelEndpointRel;
 
 import javax.annotation.Generated;
 
@@ -35,53 +35,55 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
-    public static final Index OPENAPI_CATEGORY_IDX_PARENT_CODE = Indexes0.OPENAPI_CATEGORY_IDX_PARENT_CODE;
-    public static final Index OPENAPI_CATEGORY_PRIMARY = Indexes0.OPENAPI_CATEGORY_PRIMARY;
-    public static final Index OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME = Indexes0.OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME;
-    public static final Index OPENAPI_CHANNEL_IDX_ENTITY_TYPE_CODE = Indexes0.OPENAPI_CHANNEL_IDX_ENTITY_TYPE_CODE;
-    public static final Index OPENAPI_CHANNEL_IDX_PROTOCOL = Indexes0.OPENAPI_CHANNEL_IDX_PROTOCOL;
-    public static final Index OPENAPI_CHANNEL_IDX_SUPPLIER = Indexes0.OPENAPI_CHANNEL_IDX_SUPPLIER;
-    public static final Index OPENAPI_CHANNEL_PRIMARY = Indexes0.OPENAPI_CHANNEL_PRIMARY;
-    public static final Index OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Indexes0.OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE;
-    public static final Index OPENAPI_ENDPOINT_PRIMARY = Indexes0.OPENAPI_ENDPOINT_PRIMARY;
-    public static final Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = Indexes0.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT;
-    public static final Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = Indexes0.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE;
-    public static final Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = Indexes0.OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME;
-    public static final Index OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_CATEGORY_CODE = Indexes0.OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_CATEGORY_CODE;
-    public static final Index OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_SORT = Indexes0.OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_SORT;
-    public static final Index OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY = Indexes0.OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY;
-    public static final Index OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = Indexes0.OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE;
-    public static final Index OPENAPI_MODEL_PRIMARY = Indexes0.OPENAPI_MODEL_PRIMARY;
-    public static final Index OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME = Indexes0.OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME;
-    public static final Index OPENAPI_MODEL_ENDPOINT_RELATION_IDX_MODEL_NAME = Indexes0.OPENAPI_MODEL_ENDPOINT_RELATION_IDX_MODEL_NAME;
-    public static final Index OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY = Indexes0.OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY;
-    public static final Index OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL = Indexes0.OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL;
+    public static final Index CATEGORY_IDX_CATEGORY_NAME = Indexes0.CATEGORY_IDX_CATEGORY_NAME;
+    public static final Index CATEGORY_IDX_PARENT_CODE = Indexes0.CATEGORY_IDX_PARENT_CODE;
+    public static final Index CATEGORY_PRIMARY = Indexes0.CATEGORY_PRIMARY;
+    public static final Index CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Indexes0.CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE;
+    public static final Index CHANNEL_IDX_ENTITY_TYPE_CODE = Indexes0.CHANNEL_IDX_ENTITY_TYPE_CODE;
+    public static final Index CHANNEL_IDX_PROTOCOL = Indexes0.CHANNEL_IDX_PROTOCOL;
+    public static final Index CHANNEL_IDX_SUPPLIER = Indexes0.CHANNEL_IDX_SUPPLIER;
+    public static final Index CHANNEL_PRIMARY = Indexes0.CHANNEL_PRIMARY;
+    public static final Index CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Indexes0.CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE;
+    public static final Index ENDPOINT_PRIMARY = Indexes0.ENDPOINT_PRIMARY;
+    public static final Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = Indexes0.ENDPOINT_UNIQ_IDX_UNI_ENDPOINT;
+    public static final Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = Indexes0.ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE;
+    public static final Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = Indexes0.ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME;
+    public static final Index ENDPOINT_CATEGORY_REL_IDX_CATEGORY_CODE = Indexes0.ENDPOINT_CATEGORY_REL_IDX_CATEGORY_CODE;
+    public static final Index ENDPOINT_CATEGORY_REL_IDX_SORT = Indexes0.ENDPOINT_CATEGORY_REL_IDX_SORT;
+    public static final Index ENDPOINT_CATEGORY_REL_PRIMARY = Indexes0.ENDPOINT_CATEGORY_REL_PRIMARY;
+    public static final Index ENDPOINT_CATEGORY_REL_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = Indexes0.ENDPOINT_CATEGORY_REL_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE;
+    public static final Index MODEL_PRIMARY = Indexes0.MODEL_PRIMARY;
+    public static final Index MODEL_UNIQ_IDX_UNI_MODEL_NAME = Indexes0.MODEL_UNIQ_IDX_UNI_MODEL_NAME;
+    public static final Index MODEL_ENDPOINT_REL_IDX_MODEL_NAME = Indexes0.MODEL_ENDPOINT_REL_IDX_MODEL_NAME;
+    public static final Index MODEL_ENDPOINT_REL_PRIMARY = Indexes0.MODEL_ENDPOINT_REL_PRIMARY;
+    public static final Index MODEL_ENDPOINT_REL_UNIQ_IDX_UNI_ENDPOINT_MODEL = Indexes0.MODEL_ENDPOINT_REL_UNIQ_IDX_UNI_ENDPOINT_MODEL;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
     private static class Indexes0 {
-        public static Index OPENAPI_CATEGORY_IDX_PARENT_CODE = Internal.createIndex("idx_parent_code", OpenapiCategory.OPENAPI_CATEGORY, new OrderField[] { OpenapiCategory.OPENAPI_CATEGORY.PARENT_CODE }, false);
-        public static Index OPENAPI_CATEGORY_PRIMARY = Internal.createIndex("PRIMARY", OpenapiCategory.OPENAPI_CATEGORY, new OrderField[] { OpenapiCategory.OPENAPI_CATEGORY.ID }, true);
-        public static Index OPENAPI_CATEGORY_UNIQ_IDX_UNI_CATEGORY_NAME = Internal.createIndex("uniq_idx_uni_category_name", OpenapiCategory.OPENAPI_CATEGORY, new OrderField[] { OpenapiCategory.OPENAPI_CATEGORY.CATEGORY_NAME }, true);
-        public static Index OPENAPI_CHANNEL_IDX_ENTITY_TYPE_CODE = Internal.createIndex("idx_entity_type_code", OpenapiChannel.OPENAPI_CHANNEL, new OrderField[] { OpenapiChannel.OPENAPI_CHANNEL.ENTITY_TYPE, OpenapiChannel.OPENAPI_CHANNEL.ENTITY_CODE }, false);
-        public static Index OPENAPI_CHANNEL_IDX_PROTOCOL = Internal.createIndex("idx_protocol", OpenapiChannel.OPENAPI_CHANNEL, new OrderField[] { OpenapiChannel.OPENAPI_CHANNEL.PROTOCOL }, false);
-        public static Index OPENAPI_CHANNEL_IDX_SUPPLIER = Internal.createIndex("idx_supplier", OpenapiChannel.OPENAPI_CHANNEL, new OrderField[] { OpenapiChannel.OPENAPI_CHANNEL.SUPPLIER }, false);
-        public static Index OPENAPI_CHANNEL_PRIMARY = Internal.createIndex("PRIMARY", OpenapiChannel.OPENAPI_CHANNEL, new OrderField[] { OpenapiChannel.OPENAPI_CHANNEL.ID }, true);
-        public static Index OPENAPI_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Internal.createIndex("uniq_idx_uni_channel_code", OpenapiChannel.OPENAPI_CHANNEL, new OrderField[] { OpenapiChannel.OPENAPI_CHANNEL.CHANNEL_CODE }, true);
-        public static Index OPENAPI_ENDPOINT_PRIMARY = Internal.createIndex("PRIMARY", OpenapiEndpoint.OPENAPI_ENDPOINT, new OrderField[] { OpenapiEndpoint.OPENAPI_ENDPOINT.ID }, true);
-        public static Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = Internal.createIndex("uniq_idx_uni_endpoint", OpenapiEndpoint.OPENAPI_ENDPOINT, new OrderField[] { OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT }, true);
-        public static Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = Internal.createIndex("uniq_idx_uni_endpoint_code", OpenapiEndpoint.OPENAPI_ENDPOINT, new OrderField[] { OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT_CODE }, true);
-        public static Index OPENAPI_ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = Internal.createIndex("uniq_idx_uni_endpoint_name", OpenapiEndpoint.OPENAPI_ENDPOINT, new OrderField[] { OpenapiEndpoint.OPENAPI_ENDPOINT.ENDPOINT_NAME }, false);
-        public static Index OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_CATEGORY_CODE = Internal.createIndex("idx_category_code", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, new OrderField[] { OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE }, false);
-        public static Index OPENAPI_ENDPOINT_CATEGORY_RELATION_IDX_SORT = Internal.createIndex("idx_sort", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, new OrderField[] { OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.SORT }, false);
-        public static Index OPENAPI_ENDPOINT_CATEGORY_RELATION_PRIMARY = Internal.createIndex("PRIMARY", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, new OrderField[] { OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.ID }, true);
-        public static Index OPENAPI_ENDPOINT_CATEGORY_RELATION_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = Internal.createIndex("uniq_idx_uni_endpoint_category_code", OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION, new OrderField[] { OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.ENDPOINT, OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE }, true);
-        public static Index OPENAPI_MODEL_PRIMARY = Internal.createIndex("PRIMARY", OpenapiModel.OPENAPI_MODEL, new OrderField[] { OpenapiModel.OPENAPI_MODEL.ID }, true);
-        public static Index OPENAPI_MODEL_UNIQ_IDX_UNI_MODEL_NAME = Internal.createIndex("uniq_idx_uni_model_name", OpenapiModel.OPENAPI_MODEL, new OrderField[] { OpenapiModel.OPENAPI_MODEL.MODEL_NAME }, true);
-        public static Index OPENAPI_MODEL_ENDPOINT_RELATION_IDX_MODEL_NAME = Internal.createIndex("idx_model_name", OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, new OrderField[] { OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.MODEL_NAME }, false);
-        public static Index OPENAPI_MODEL_ENDPOINT_RELATION_PRIMARY = Internal.createIndex("PRIMARY", OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, new OrderField[] { OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.ID }, true);
-        public static Index OPENAPI_MODEL_ENDPOINT_RELATION_UNIQ_IDX_UNI_ENDPOINT_MODEL = Internal.createIndex("uniq_idx_uni_endpoint_model", OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION, new OrderField[] { OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.ENDPOINT, OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION.MODEL_NAME }, true);
+        public static Index CATEGORY_IDX_CATEGORY_NAME = Internal.createIndex("idx_category_name", Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_NAME }, false);
+        public static Index CATEGORY_IDX_PARENT_CODE = Internal.createIndex("idx_parent_code", Category.CATEGORY, new OrderField[] { Category.CATEGORY.PARENT_CODE }, false);
+        public static Index CATEGORY_PRIMARY = Internal.createIndex("PRIMARY", Category.CATEGORY, new OrderField[] { Category.CATEGORY.ID }, true);
+        public static Index CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Internal.createIndex("uniq_idx_uni_category_code", Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_CODE }, true);
+        public static Index CHANNEL_IDX_ENTITY_TYPE_CODE = Internal.createIndex("idx_entity_type_code", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.ENTITY_TYPE, Channel.CHANNEL.ENTITY_CODE }, false);
+        public static Index CHANNEL_IDX_PROTOCOL = Internal.createIndex("idx_protocol", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.PROTOCOL }, false);
+        public static Index CHANNEL_IDX_SUPPLIER = Internal.createIndex("idx_supplier", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.SUPPLIER }, false);
+        public static Index CHANNEL_PRIMARY = Internal.createIndex("PRIMARY", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.ID }, true);
+        public static Index CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Internal.createIndex("uniq_idx_uni_channel_code", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.CHANNEL_CODE }, true);
+        public static Index ENDPOINT_PRIMARY = Internal.createIndex("PRIMARY", Endpoint.ENDPOINT, new OrderField[] { Endpoint.ENDPOINT.ID }, true);
+        public static Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT = Internal.createIndex("uniq_idx_uni_endpoint", Endpoint.ENDPOINT, new OrderField[] { Endpoint.ENDPOINT.ENDPOINT_ }, true);
+        public static Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_CODE = Internal.createIndex("uniq_idx_uni_endpoint_code", Endpoint.ENDPOINT, new OrderField[] { Endpoint.ENDPOINT.ENDPOINT_CODE }, true);
+        public static Index ENDPOINT_UNIQ_IDX_UNI_ENDPOINT_NAME = Internal.createIndex("uniq_idx_uni_endpoint_name", Endpoint.ENDPOINT, new OrderField[] { Endpoint.ENDPOINT.ENDPOINT_NAME }, false);
+        public static Index ENDPOINT_CATEGORY_REL_IDX_CATEGORY_CODE = Internal.createIndex("idx_category_code", EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.CATEGORY_CODE }, false);
+        public static Index ENDPOINT_CATEGORY_REL_IDX_SORT = Internal.createIndex("idx_sort", EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.SORT }, false);
+        public static Index ENDPOINT_CATEGORY_REL_PRIMARY = Internal.createIndex("PRIMARY", EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.ID }, true);
+        public static Index ENDPOINT_CATEGORY_REL_UNIQ_IDX_UNI_ENDPOINT_CATEGORY_CODE = Internal.createIndex("uniq_idx_uni_endpoint_category_code", EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.ENDPOINT, EndpointCategoryRel.ENDPOINT_CATEGORY_REL.CATEGORY_CODE }, true);
+        public static Index MODEL_PRIMARY = Internal.createIndex("PRIMARY", Model.MODEL, new OrderField[] { Model.MODEL.ID }, true);
+        public static Index MODEL_UNIQ_IDX_UNI_MODEL_NAME = Internal.createIndex("uniq_idx_uni_model_name", Model.MODEL, new OrderField[] { Model.MODEL.MODEL_NAME }, true);
+        public static Index MODEL_ENDPOINT_REL_IDX_MODEL_NAME = Internal.createIndex("idx_model_name", ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, false);
+        public static Index MODEL_ENDPOINT_REL_PRIMARY = Internal.createIndex("PRIMARY", ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.ID }, true);
+        public static Index MODEL_ENDPOINT_REL_UNIQ_IDX_UNI_ENDPOINT_MODEL = Internal.createIndex("uniq_idx_uni_endpoint_model", ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.ENDPOINT, ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, true);
     }
 }

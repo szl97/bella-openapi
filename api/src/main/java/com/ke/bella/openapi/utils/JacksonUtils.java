@@ -117,6 +117,19 @@ public class JacksonUtils {
         return null;
     }
 
+    public static Map toMap(String jsonStr) {
+        if(jsonStr == null) {
+            return null;
+        }
+        Map map = new HashMap();
+        try {
+            map = MAPPER.readValue(jsonStr, Map.class);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return map;
+    }
+
     public static Map toMap(Object objEntity) {
         if(Objects.isNull(objEntity)) {
             return null;

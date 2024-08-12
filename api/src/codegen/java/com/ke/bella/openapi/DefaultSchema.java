@@ -4,12 +4,12 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.OpenapiCategory;
-import com.ke.bella.openapi.tables.OpenapiChannel;
-import com.ke.bella.openapi.tables.OpenapiEndpoint;
-import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
-import com.ke.bella.openapi.tables.OpenapiModel;
-import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
+import com.ke.bella.openapi.tables.Category;
+import com.ke.bella.openapi.tables.Channel;
+import com.ke.bella.openapi.tables.Endpoint;
+import com.ke.bella.openapi.tables.EndpointCategoryRel;
+import com.ke.bella.openapi.tables.Model;
+import com.ke.bella.openapi.tables.ModelEndpointRel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = -2011994975;
+    private static final long serialVersionUID = 1031647543;
 
     /**
      * The reference instance of <code></code>
@@ -45,32 +45,32 @@ public class DefaultSchema extends SchemaImpl {
     /**
      * openapi类目
      */
-    public final OpenapiCategory OPENAPI_CATEGORY = com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
+    public final Category CATEGORY = com.ke.bella.openapi.tables.Category.CATEGORY;
 
     /**
      * openapi通道
      */
-    public final OpenapiChannel OPENAPI_CHANNEL = com.ke.bella.openapi.tables.OpenapiChannel.OPENAPI_CHANNEL;
+    public final Channel CHANNEL = com.ke.bella.openapi.tables.Channel.CHANNEL;
 
     /**
      * openapi能力点
      */
-    public final OpenapiEndpoint OPENAPI_ENDPOINT = com.ke.bella.openapi.tables.OpenapiEndpoint.OPENAPI_ENDPOINT;
+    public final Endpoint ENDPOINT = com.ke.bella.openapi.tables.Endpoint.ENDPOINT;
 
     /**
      * openapi能力点类目
      */
-    public final OpenapiEndpointCategoryRelation OPENAPI_ENDPOINT_CATEGORY_RELATION = com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION;
+    public final EndpointCategoryRel ENDPOINT_CATEGORY_REL = com.ke.bella.openapi.tables.EndpointCategoryRel.ENDPOINT_CATEGORY_REL;
 
     /**
      * openapi模型
      */
-    public final OpenapiModel OPENAPI_MODEL = com.ke.bella.openapi.tables.OpenapiModel.OPENAPI_MODEL;
+    public final Model MODEL = com.ke.bella.openapi.tables.Model.MODEL;
 
     /**
      * openapi模型能力点
      */
-    public final OpenapiModelEndpointRelation OPENAPI_MODEL_ENDPOINT_RELATION = com.ke.bella.openapi.tables.OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION;
+    public final ModelEndpointRel MODEL_ENDPOINT_REL = com.ke.bella.openapi.tables.ModelEndpointRel.MODEL_ENDPOINT_REL;
 
     /**
      * No further instances allowed
@@ -97,11 +97,11 @@ public class DefaultSchema extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            OpenapiCategory.OPENAPI_CATEGORY,
-            OpenapiChannel.OPENAPI_CHANNEL,
-            OpenapiEndpoint.OPENAPI_ENDPOINT,
-            OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION,
-            OpenapiModel.OPENAPI_MODEL,
-            OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION);
+            Category.CATEGORY,
+            Channel.CHANNEL,
+            Endpoint.ENDPOINT,
+            EndpointCategoryRel.ENDPOINT_CATEGORY_REL,
+            Model.MODEL,
+            ModelEndpointRel.MODEL_ENDPOINT_REL);
     }
 }

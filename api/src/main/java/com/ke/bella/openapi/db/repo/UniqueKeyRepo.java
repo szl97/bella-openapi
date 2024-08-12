@@ -4,13 +4,12 @@ import org.jooq.DSLContext;
 import org.jooq.TableField;
 import org.jooq.impl.TableImpl;
 import org.jooq.impl.UpdatableRecordImpl;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import static com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
 
 public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecordImpl<R>, K> implements BaseRepo {
     @Resource
@@ -20,6 +19,7 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
 
     protected abstract TableField<R, K> uniqueKey();
 
+    @Transactional
     public T insert(Object op) {
         R rec = getRecForInsert(op);
         db.insertInto(table())
@@ -28,6 +28,7 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
         return rec.into(entityClass());
     }
 
+    @Transactional
     public T insertIgnoreDuplicateKey(Object op) {
         R rec = getRecForInsert(op);
         int num = db.insertInto(table())
@@ -37,21 +38,21 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
         return num == 1 ? rec.into(entityClass()) : null;
     }
 
-    private R getRecForInsert(Object op) {
+    protected R getRecForInsert(Object op) {
         R rec = table().newRecord();
         rec.from(op);
         if(AutogenCodeRepo.class.isAssignableFrom(getClass())) {
-            ((AutogenCodeRepo)this).autogen(rec);
+            ((AutogenCodeRepo) this).autogen(rec);
         }
-        fillUpdatorInfo(rec);
+        fillCreatorInfo(rec);
         return rec;
     }
 
+    @Transactional
     public void update(Object op, K uniqueKey) {
         R rec = table().newRecord();
         rec.from(op);
         fillUpdatorInfo(rec);
-        rec.set(uniqueKey(), null);
         int num = db.update(table())
                 .set(rec)
                 .where(uniqueKey().eq(uniqueKey))

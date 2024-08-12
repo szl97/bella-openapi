@@ -70,6 +70,7 @@ public class MetaDataOps {
 
     @Data
     public static class ChannelUpdateOp {
+        private String priority;
         private String channelCode;
         private String channelInfo;
         private String priceInfo;
@@ -81,19 +82,10 @@ public class MetaDataOps {
     }
 
     @NoArgsConstructor
-    @EqualsAndHashCode(callSuper = true)
     @Data
     @SuperBuilder
-    public static class CategoryCreateOp extends CategoryOp {
+    public static class CategoryCreateOp {
         private String parentCode;
-    }
-
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @SuperBuilder
-    @Data
-    public static class CategoryOp {
-        private String categoryCode;
         private String categoryName;
     }
 
@@ -102,17 +94,12 @@ public class MetaDataOps {
         private String categoryCode;
     }
 
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class EndpointCategoryOp {
-        private String endpoint;
-        private String categoryCode;
-    }
-
-    @Data
-    public static class EndpointUpdateCategoriesOp {
+    public static class EndpointCategoriesOp {
         private String endpoint;
         private Set<String> categoryCodes;
     }

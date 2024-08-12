@@ -4,12 +4,12 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.OpenapiCategory;
-import com.ke.bella.openapi.tables.OpenapiChannel;
-import com.ke.bella.openapi.tables.OpenapiEndpoint;
-import com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation;
-import com.ke.bella.openapi.tables.OpenapiModel;
-import com.ke.bella.openapi.tables.OpenapiModelEndpointRelation;
+import com.ke.bella.openapi.tables.Category;
+import com.ke.bella.openapi.tables.Channel;
+import com.ke.bella.openapi.tables.Endpoint;
+import com.ke.bella.openapi.tables.EndpointCategoryRel;
+import com.ke.bella.openapi.tables.Model;
+import com.ke.bella.openapi.tables.ModelEndpointRel;
 
 import javax.annotation.Generated;
 
@@ -30,30 +30,30 @@ public class Tables {
     /**
      * openapi类目
      */
-    public static final OpenapiCategory OPENAPI_CATEGORY = com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
+    public static final Category CATEGORY = com.ke.bella.openapi.tables.Category.CATEGORY;
 
     /**
      * openapi通道
      */
-    public static final OpenapiChannel OPENAPI_CHANNEL = com.ke.bella.openapi.tables.OpenapiChannel.OPENAPI_CHANNEL;
+    public static final Channel CHANNEL = com.ke.bella.openapi.tables.Channel.CHANNEL;
 
     /**
      * openapi能力点
      */
-    public static final OpenapiEndpoint OPENAPI_ENDPOINT = com.ke.bella.openapi.tables.OpenapiEndpoint.OPENAPI_ENDPOINT;
+    public static final Endpoint ENDPOINT = com.ke.bella.openapi.tables.Endpoint.ENDPOINT;
 
     /**
      * openapi能力点类目
      */
-    public static final OpenapiEndpointCategoryRelation OPENAPI_ENDPOINT_CATEGORY_RELATION = com.ke.bella.openapi.tables.OpenapiEndpointCategoryRelation.OPENAPI_ENDPOINT_CATEGORY_RELATION;
+    public static final EndpointCategoryRel ENDPOINT_CATEGORY_REL = com.ke.bella.openapi.tables.EndpointCategoryRel.ENDPOINT_CATEGORY_REL;
 
     /**
      * openapi模型
      */
-    public static final OpenapiModel OPENAPI_MODEL = com.ke.bella.openapi.tables.OpenapiModel.OPENAPI_MODEL;
+    public static final Model MODEL = com.ke.bella.openapi.tables.Model.MODEL;
 
     /**
      * openapi模型能力点
      */
-    public static final OpenapiModelEndpointRelation OPENAPI_MODEL_ENDPOINT_RELATION = com.ke.bella.openapi.tables.OpenapiModelEndpointRelation.OPENAPI_MODEL_ENDPOINT_RELATION;
+    public static final ModelEndpointRel MODEL_ENDPOINT_REL = com.ke.bella.openapi.tables.ModelEndpointRel.MODEL_ENDPOINT_REL;
 }

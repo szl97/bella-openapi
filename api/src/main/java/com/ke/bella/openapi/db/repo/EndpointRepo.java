@@ -1,72 +1,78 @@
 package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
-import com.ke.bella.openapi.tables.records.OpenapiEndpointRecord;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.records.EndpointRecord;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-import static com.ke.bella.openapi.Tables.OPENAPI_ENDPOINT;
+import static com.ke.bella.openapi.Tables.ENDPOINT;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 19:55 description:
  */
 @Component
-public class EndpointRepo extends StatusRepo<OpenapiEndpointDB, OpenapiEndpointRecord, String> implements AutogenCodeRepo<OpenapiEndpointRecord> {
+public class EndpointRepo extends StatusRepo<EndpointDB, EndpointRecord, String> implements AutogenCodeRepo<EndpointRecord> {
 
-    public OpenapiEndpointDB queryByEndpointCode(String endpointCode) {
-        return db.selectFrom(OPENAPI_ENDPOINT)
-                .where(OPENAPI_ENDPOINT.ENDPOINT_CODE.eq(endpointCode))
-                .fetchOneInto(OpenapiEndpointDB.class);
+    public EndpointDB queryByEndpointCode(String endpointCode) {
+        return db.selectFrom(ENDPOINT)
+                .where(ENDPOINT.ENDPOINT_CODE.eq(endpointCode))
+                .fetchOneInto(EndpointDB.class);
     }
 
-    public List<OpenapiEndpointDB> list(Condition.EndpointCondition op) {
-        return constructSql(op).fetchInto(OpenapiEndpointDB.class);
+    public List<EndpointDB> list(Condition.EndpointCondition op) {
+        return constructSql(op).fetchInto(EndpointDB.class);
     }
 
-    public Page<OpenapiEndpointDB> page(Condition.EndpointCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), OpenapiEndpointDB.class);
+    public Page<EndpointDB> page(Condition.EndpointCondition op) {
+        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), EndpointDB.class);
     }
 
-    private SelectSeekStep1<OpenapiEndpointRecord, Long> constructSql(Condition.EndpointCondition op) {
-        return db.selectFrom(OPENAPI_ENDPOINT)
-                .where(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : OPENAPI_ENDPOINT.ENDPOINT.eq(op.getEndpoint()))
-                .and(StringUtils.isEmpty(op.getEndpointCode()) ? DSL.noCondition() : OPENAPI_ENDPOINT.ENDPOINT_CODE.eq(op.getEndpointCode()))
+    private SelectSeekStep1<EndpointRecord, Long> constructSql(Condition.EndpointCondition op) {
+        return db.selectFrom(ENDPOINT)
+                .where(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : ENDPOINT.ENDPOINT_.eq(op.getEndpoint()))
+                .and(StringUtils.isEmpty(op.getEndpointCode()) ? DSL.noCondition() : ENDPOINT.ENDPOINT_CODE.eq(op.getEndpointCode()))
                 .and(StringUtils.isEmpty(op.getEndpointName())
                         ? DSL.noCondition()
-                        : OPENAPI_ENDPOINT.ENDPOINT_NAME.like("%" + op.getEndpointName() + "%"))
-                .and(StringUtils.isEmpty(op.getEndpoints()) ? DSL.noCondition() : OPENAPI_ENDPOINT.ENDPOINT.in(op.getEndpoints()))
-                .and(StringUtils.isEmpty(op.getMaintainerCode()) ? DSL.noCondition() : OPENAPI_ENDPOINT.MAINTAINER_CODE.eq(op.getMaintainerCode()))
+                        : ENDPOINT.ENDPOINT_NAME.like("%" + op.getEndpointName() + "%"))
+                .and(CollectionUtils.isEmpty(op.getEndpoints()) ? DSL.noCondition() : ENDPOINT.ENDPOINT_.in(op.getEndpoints()))
+                .and(StringUtils.isEmpty(op.getMaintainerCode()) ? DSL.noCondition() : ENDPOINT.MAINTAINER_CODE.eq(op.getMaintainerCode()))
                 .and(StringUtils.isEmpty(op.getMaintainerName())
                         ? DSL.noCondition()
-                        : OPENAPI_ENDPOINT.MAINTAINER_NAME.like("%" + op.getMaintainerCode() + "%"))
-                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : OPENAPI_ENDPOINT.STATUS.eq(op.getStatus()))
-                .orderBy(OPENAPI_ENDPOINT.ID.desc());
+                        : ENDPOINT.MAINTAINER_NAME.like("%" + op.getMaintainerCode() + "%"))
+                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : ENDPOINT.STATUS.eq(op.getStatus()))
+                .orderBy(ENDPOINT.ID.desc());
     }
 
     @Override
-    public TableImpl<OpenapiEndpointRecord> table() {
-        return OPENAPI_ENDPOINT;
+    public TableImpl<EndpointRecord> table() {
+        return ENDPOINT;
     }
 
     @Override
-    protected TableField<OpenapiEndpointRecord, String> uniqueKey() {
-        return OPENAPI_ENDPOINT.ENDPOINT;
+    protected TableField<EndpointRecord, String> uniqueKey() {
+        return ENDPOINT.ENDPOINT_;
     }
 
     @Override
-    protected TableField<OpenapiEndpointRecord, String> statusFiled() {
-        return OPENAPI_ENDPOINT.STATUS;
+    protected TableField<EndpointRecord, String> statusFiled() {
+        return ENDPOINT.STATUS;
     }
 
     @Override
-    public TableField<OpenapiEndpointRecord, String> autoCode() {
-        return OPENAPI_ENDPOINT.ENDPOINT_CODE;
+    public TableField<EndpointRecord, String> autoCode() {
+        return ENDPOINT.ENDPOINT_CODE;
+    }
+
+    @Override
+    public String prefix() {
+        return "en_";
     }
 }

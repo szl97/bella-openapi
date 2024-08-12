@@ -2,27 +2,33 @@ package com.ke.bella.openapi.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiChannelDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelEndpointRelationDB;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
+import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.generateInvalidModelJsonKeyMessage;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.json2Map;
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.matchPath;
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.MODEL;
@@ -42,10 +48,11 @@ public class ModelService {
     private ChannelService channelService;
 
     @Transactional
-    public OpenapiModelDB createModel(MetaDataOps.ModelOp op) {
+    public ModelDB createModel(MetaDataOps.ModelOp op) {
         modelRepo.checkExist(op.getModelName(), false);
         checkEndpoint(op.getEndpoints());
-        OpenapiModelDB db = modelRepo.insert(op);
+        checkPropertyAndFeatures(op.getProperties(), op.getFeatures(), op.getEndpoints(), op.getModelName());
+        ModelDB db = modelRepo.insert(op);
         modelRepo.batchInsertModelEndpoints(op.getModelName(), op.getEndpoints());
         return db;
     }
@@ -53,9 +60,9 @@ public class ModelService {
     @Transactional
     public void updateModel(MetaDataOps.ModelOp op) {
         modelRepo.checkExist(op.getModelName(), true);
-        if(!CollectionUtils.isEmpty(op.getEndpoints())) {
+        if(CollectionUtils.isNotEmpty(op.getEndpoints())) {
             checkEndpoint(op.getEndpoints());
-            List<OpenapiModelEndpointRelationDB> originEndpoints = modelRepo.listEndpointsByModelName(op.getModelName());
+            List<ModelEndpointRelDB> originEndpoints = modelRepo.listEndpointsByModelName(op.getModelName());
             Set<String> inserts = Sets.newHashSet(op.getEndpoints());
             List<Long> deletes = new ArrayList<>();
             originEndpoints.forEach(origin -> {
@@ -66,27 +73,62 @@ public class ModelService {
                         }
                     }
             );
-            if(!CollectionUtils.isEmpty(deletes)) {
+            if(CollectionUtils.isNotEmpty(deletes)) {
                 modelRepo.batchDeleteModelEndpoints(deletes);
             }
-            if(!CollectionUtils.isEmpty(inserts)) {
+            if(CollectionUtils.isNotEmpty(inserts)) {
                 modelRepo.batchInsertModelEndpoints(op.getModelName(), inserts);
             }
         }
-        if(!StringUtils.isEmpty(op.getDocumentUrl()) || !StringUtils.isEmpty(op.getProperties())
-                || !StringUtils.isEmpty(op.getFeatures())) {
+        checkPropertyAndFeatures(op.getProperties(), op.getFeatures(), op.getEndpoints(), op.getModelName());
+        if(StringUtils.isNotEmpty(op.getDocumentUrl()) || StringUtils.isNotEmpty(op.getProperties())
+                || StringUtils.isNotEmpty(op.getFeatures())) {
             modelRepo.update(op, op.getModelName());
         }
+    }
+
+    private void checkPropertyAndFeatures(String properties, String features, Set<String> endpoints, String model) {
+        if(StringUtils.isEmpty(properties) && StringUtils.isEmpty(features)) {
+            return;
+        }
+        List<String> basisEndpoints = getAllBasicEndpoints(endpoints, model);
+        if(StringUtils.isNotEmpty(properties)) {
+            checkJson(properties, "properties", basisEndpoints);
+        }
+        if(StringUtils.isNotEmpty(features)) {
+            checkJson(features, "features", basisEndpoints);
+        }
+    }
+
+    private void checkJson(String obj, String field, List<String> basisEndpoints) {
+        Map<String, Object> map = json2Map(obj);
+        Assert.isTrue(map != null && !map.isEmpty(), field + "非json格式");
+        for (String endpoint : basisEndpoints) {
+            String invalidMessage = generateInvalidModelJsonKeyMessage(map, endpoint, field);
+            Assert.isNull(invalidMessage, invalidMessage);
+        }
+    }
+
+    private List<String> getAllBasicEndpoints(Set<String> endpoints, String model) {
+        List<ModelEndpointRelDB> dbs = modelRepo.listEndpointsByModelName(model);
+        Set<String> set = dbs.stream().map(ModelEndpointRelDB::getEndpoint).collect(Collectors.toSet());
+        if(CollectionUtils.isNotEmpty(endpoints)) {
+            set.addAll(endpoints);
+        }
+        return set.stream().filter(path ->
+                Arrays.stream(TableConstants.SystemBasicEndpoint.values())
+                        .map(TableConstants.SystemBasicEndpoint::getEndpoint)
+                        .anyMatch(match -> matchPath(match, path))).collect(Collectors.toList());
     }
 
     private void checkEndpoint(Set<String> endpoints) {
         Condition.EndpointCondition condition = Condition.EndpointCondition.builder()
                 .endpoints(endpoints)
                 .build();
-        List<OpenapiEndpointDB> dbs = endpointService.listByCondition(condition);
+        List<EndpointDB> dbs = endpointService.listByCondition(condition);
         Assert.isTrue(dbs.size() == endpoints.size(), () -> {
             Set<String> temp = Sets.newHashSet(endpoints);
-            dbs.stream().map(OpenapiEndpointDB::getEndpoint).collect(Collectors.toList()).forEach(temp::remove);
+            dbs.stream().map(EndpointDB::getEndpoint).collect(Collectors.toList()).forEach(temp::remove);
             return "能力点不存在：\r\n" + String.join(",", temp);
         });
     }
@@ -103,29 +145,29 @@ public class ModelService {
         modelRepo.checkExist(modelName, true);
         String visibility = publish ? PUBLIC : PRIVATE;
         if(publish) {
-            List<OpenapiChannelDB> actives = channelService.listActives(MODEL, modelName);
+            List<ChannelDB> actives = channelService.listActives(MODEL, modelName);
             Assert.notEmpty(actives, "模型至少有一个可用渠道才可以发布");
         }
         modelRepo.updateVisibility(modelName, visibility);
     }
 
-    public OpenapiModelDB getActiveByModelName(String modelName) {
-        OpenapiModelDB db = getOne(modelName);
+    public ModelDB getActiveByModelName(String modelName) {
+        ModelDB db = getOne(modelName);
         return db == null || db.getStatus().equals(INACTIVE) ? null : db;
     }
 
-    public OpenapiModelDB getOne(String modelName) {
+    public ModelDB getOne(String modelName) {
         return modelRepo.queryByUniqueKey(modelName);
     }
 
-    public List<OpenapiModelDB> listByCondition(Condition.ModelCondition condition) {
+    public List<ModelDB> listByCondition(Condition.ModelCondition condition) {
         if(!fillModelNames(condition)) {
             return Lists.newArrayList();
         }
         return modelRepo.list(condition);
     }
 
-    public Page<OpenapiModelDB> pageByCondition(Condition.ModelCondition condition) {
+    public Page<ModelDB> pageByCondition(Condition.ModelCondition condition) {
         if(!fillModelNames(condition)) {
             return Page.from(condition.getPageNum(), condition.getPageSize());
         }
@@ -133,7 +175,7 @@ public class ModelService {
     }
 
     private boolean fillModelNames(Condition.ModelCondition condition) {
-        if(!StringUtils.isEmpty(condition.getEndpoint())) {
+        if(StringUtils.isNotEmpty(condition.getEndpoint())) {
             List<String> modelNames = modelRepo.listModelNamesByEndpoint(condition.getEndpoint());
             if(CollectionUtils.isEmpty(modelNames)) {
                 return false;

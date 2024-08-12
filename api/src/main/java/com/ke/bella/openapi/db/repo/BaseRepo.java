@@ -1,12 +1,12 @@
 package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.db.AuthorizationContext;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.SelectLimitStep;
 import org.jooq.UpdatableRecord;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +24,7 @@ public interface BaseRepo {
                 op.setCuid(oper.getUserId());
             }
 
-            if(!StringUtils.isEmpty(oper.getUserName())) {
+            if(StringUtils.isNotEmpty(oper.getUserName())) {
                 op.setCuName(oper.getUserName());
             }
         }

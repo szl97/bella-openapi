@@ -2,99 +2,139 @@ package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiCategoryDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointCategoryRelationDB;
-import com.ke.bella.openapi.tables.records.OpenapiCategoryRecord;
-import com.ke.bella.openapi.tables.records.OpenapiEndpointCategoryRelationRecord;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
+import com.ke.bella.openapi.tables.records.CategoryRecord;
+import com.ke.bella.openapi.tables.records.EndpointCategoryRelRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.Tables.OPENAPI_ENDPOINT_CATEGORY_RELATION;
-import static com.ke.bella.openapi.tables.OpenapiCategory.OPENAPI_CATEGORY;
+import static com.ke.bella.openapi.Tables.ENDPOINT_CATEGORY_REL;
+import static com.ke.bella.openapi.tables.Category.CATEGORY;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 21:13 description:
  */
 @Component
-public class CategoryRepo extends StatusRepo<OpenapiCategoryDB, OpenapiCategoryRecord, String> {
+public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String> {
 
-    public int addRelations(List<MetaDataOps.EndpointCategoryOp> ops) {
-        List<OpenapiEndpointCategoryRelationRecord> records = ops.stream().map(op -> constructRecord(op)).collect(Collectors.toList());
+    @Override
+    protected CategoryRecord getRecForInsert(Object op) {
+        CategoryRecord rec = super.getRecForInsert(op);
+        try {
+            Field parentFiled = op.getClass().getDeclaredField("parentCode");
+            parentFiled.setAccessible(true);
+            Object prentCode = ReflectionUtils.getField(parentFiled, op);
+            String code = generateCategoryCode(prentCode == null ? "" : prentCode.toString());
+            code = prentCode == null ? code : prentCode + "-" + code;
+            rec.setCategoryCode(code);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException("参数错误，缺少parentCode");
+        }
+        return rec;
+    }
+
+    private String generateCategoryCode(String parentCode) {
+        String code = db.selectFrom(CATEGORY)
+                .where(CATEGORY.PARENT_CODE.eq(parentCode))
+                .orderBy(CATEGORY.ID.desc())
+                .limit(1)
+                .forUpdate()
+                .fetchOne(CATEGORY.CATEGORY_CODE);
+        if(code == null) {
+            return "0001";
+        }
+        String[] codes = code.split("-");
+        String maxCode = codes[codes.length - 1];
+        Assert.isTrue(!maxCode.equals("9999"), "类目超过最大数量");
+        return String.format("%04d", Integer.parseInt(maxCode) + 1);
+    }
+
+    @Transactional
+    public int batchInsertRelations(String endpoint, Collection<String> categoryCodes) {
+        List<EndpointCategoryRelRecord> records = categoryCodes.stream()
+                .map(code -> constructRecord(endpoint, code)).collect(Collectors.toList());
         return batchInsert(db, records);
     }
 
-    public OpenapiEndpointCategoryRelationRecord constructRecord(MetaDataOps.EndpointCategoryOp op) {
-        OpenapiEndpointCategoryRelationRecord rec = OPENAPI_ENDPOINT_CATEGORY_RELATION.newRecord();
-        rec.setEndpoint(op.getEndpoint());
-        rec.setCategoryCode(op.getCategoryCode());
+    public EndpointCategoryRelRecord constructRecord(String endpoint, String categoryCode) {
+        EndpointCategoryRelRecord rec = ENDPOINT_CATEGORY_REL.newRecord();
+        rec.setEndpoint(endpoint);
+        rec.setCategoryCode(categoryCode);
         fillCreatorInfo(rec);
         return rec;
     }
 
+    @Transactional
     public int deleteRelation(Long id) {
-        return db.deleteFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.ID.eq(id))
+        return db.deleteFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.ID.eq(id))
                 .execute();
     }
 
+    @Transactional
     public int deleteRelations(List<Long> ids) {
-        return db.deleteFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.ID.in(ids))
+        return db.deleteFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.ID.in(ids))
                 .execute();
     }
 
-    public List<OpenapiCategoryDB> queryAllChildrenIncludeSelfByCategoryCode(String categoryCode, String status) {
-        return db.selectFrom(OPENAPI_CATEGORY)
-                .where(OPENAPI_CATEGORY.CATEGORY_CODE.like(categoryCode + "%"))
-                .and(StringUtils.isEmpty(status) ? DSL.noCondition() : OPENAPI_CATEGORY.STATUS.eq(status))
-                .fetchInto(OpenapiCategoryDB.class);
+    public CategoryDB queryByParentCodeAndName(String parentCode, String name) {
+        return db.selectFrom(CATEGORY)
+                .where(CATEGORY.PARENT_CODE.eq(parentCode))
+                .and(CATEGORY.CATEGORY_NAME.eq(name))
+                .fetchOneInto(CategoryDB.class);
+    }
+
+    public List<CategoryDB> queryAllChildrenIncludeSelfByCategoryCode(String categoryCode, String status) {
+        return db.selectFrom(CATEGORY)
+                .where(CATEGORY.CATEGORY_CODE.like(categoryCode + "%"))
+                .and(StringUtils.isEmpty(status) ? DSL.noCondition() : CATEGORY.STATUS.eq(status))
+                .fetchInto(CategoryDB.class);
     }
 
     public long countChildrenByCategoryCode(String categoryCode, String status) {
-        return db.selectFrom(OPENAPI_CATEGORY)
-                .where(OPENAPI_CATEGORY.CATEGORY_CODE.like(categoryCode + "%"))
-                .and(OPENAPI_CATEGORY.CATEGORY_CODE.ne(categoryCode))
-                .and(StringUtils.isEmpty(status) ? DSL.noCondition() : OPENAPI_CATEGORY.STATUS.eq(status))
+        return db.selectFrom(CATEGORY)
+                .where(CATEGORY.CATEGORY_CODE.like(categoryCode + "%"))
+                .and(CATEGORY.CATEGORY_CODE.ne(categoryCode))
+                .and(StringUtils.isEmpty(status) ? DSL.noCondition() : CATEGORY.STATUS.eq(status))
                 .stream().count();
     }
 
-    public long countParentByCategoryCode(String categoryCode, String status) {
-        return db.selectFrom(OPENAPI_CATEGORY)
-                .where(OPENAPI_CATEGORY.CATEGORY_CODE.like("%" + categoryCode))
-                .and(OPENAPI_CATEGORY.CATEGORY_CODE.ne(categoryCode))
-                .and(StringUtils.isEmpty(status) ? DSL.noCondition() : OPENAPI_CATEGORY.STATUS.eq(status))
-                .stream().count();
+    public EndpointCategoryRelDB queryByEndpointAndCategoryCode(String endpoint, String categoryCode) {
+        return db.selectFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.ENDPOINT.eq(endpoint))
+                .and(ENDPOINT_CATEGORY_REL.CATEGORY_CODE.eq(categoryCode))
+                .fetchOneInto(EndpointCategoryRelDB.class);
     }
 
-    public OpenapiEndpointCategoryRelationDB queryByEndpointAndCategoryCode(String endpoint, String categoryCode) {
-        return db.selectFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.ENDPOINT.eq(endpoint))
-                .and(OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE.eq(categoryCode))
-                .fetchOneInto(OpenapiEndpointCategoryRelationDB.class);
+    public List<EndpointCategoryRelDB> listEndpointCategoriesByCategoryCodes(List<String> categoryCodes) {
+        return db.selectFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.CATEGORY_CODE.in(categoryCodes))
+                .fetchInto(EndpointCategoryRelDB.class);
     }
 
-    public List<OpenapiEndpointCategoryRelationDB> listEndpointCategoriesByCategoryCodes(List<String> categoryCodes) {
-        return db.selectFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE.in(categoryCodes))
-                .fetchInto(OpenapiEndpointCategoryRelationDB.class);
-    }
-
-    public List<OpenapiEndpointCategoryRelationDB> listEndpointCategoriesByEndpoint(String endpoint) {
-        return db.selectFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.ENDPOINT.eq(endpoint))
-                .fetchInto(OpenapiEndpointCategoryRelationDB.class);
+    public List<EndpointCategoryRelDB> listEndpointCategoriesByEndpoint(String endpoint) {
+        return db.selectFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.ENDPOINT.eq(endpoint))
+                .fetchInto(EndpointCategoryRelDB.class);
     }
 
     public long countEndpointCategoriesByCategoryCode(String categoryCode) {
-        return db.selectFrom(OPENAPI_ENDPOINT_CATEGORY_RELATION)
-                .where(OPENAPI_ENDPOINT_CATEGORY_RELATION.CATEGORY_CODE.eq(categoryCode))
+        return db.selectFrom(ENDPOINT_CATEGORY_REL)
+                .where(ENDPOINT_CATEGORY_REL.CATEGORY_CODE.eq(categoryCode))
                 .stream().count();
     }
 
@@ -102,38 +142,38 @@ public class CategoryRepo extends StatusRepo<OpenapiCategoryDB, OpenapiCategoryR
         return constructSql(op).stream().count();
     }
 
-    public List<OpenapiCategoryDB> list(Condition.CategoryCondition op) {
-        return constructSql(op).fetchInto(OpenapiCategoryDB.class);
+    public List<CategoryDB> list(Condition.CategoryCondition op) {
+        return constructSql(op).fetchInto(CategoryDB.class);
     }
 
-    public Page<OpenapiCategoryDB> page(Condition.CategoryCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), OpenapiCategoryDB.class);
+    public Page<CategoryDB> page(Condition.CategoryCondition op) {
+        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), CategoryDB.class);
     }
 
-    private SelectSeekStep1<OpenapiCategoryRecord, Long> constructSql(Condition.CategoryCondition op) {
-        return db.selectFrom(OPENAPI_CATEGORY)
-                .where(StringUtils.isEmpty(op.getCategoryCode()) ? DSL.noCondition() : OPENAPI_CATEGORY.CATEGORY_CODE.eq(op.getCategoryCode()))
+    private SelectSeekStep1<CategoryRecord, Long> constructSql(Condition.CategoryCondition op) {
+        return db.selectFrom(CATEGORY)
+                .where(StringUtils.isEmpty(op.getCategoryCode()) ? DSL.noCondition() : CATEGORY.CATEGORY_CODE.eq(op.getCategoryCode()))
                 .and(StringUtils.isEmpty(op.getCategoryName())
                         ? DSL.noCondition()
-                        : OPENAPI_CATEGORY.CATEGORY_NAME.like("%" + op.getCategoryName() + "%"))
-                .and(StringUtils.isEmpty(op.getParentCode()) ? DSL.noCondition() : OPENAPI_CATEGORY.PARENT_CODE.eq(op.getParentCode()))
-                .and(Boolean.TRUE.equals(op.getTopCategory()) ? OPENAPI_CATEGORY.PARENT_CODE.eq("") : DSL.noCondition())
-                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : OPENAPI_CATEGORY.STATUS.eq(op.getStatus()))
-                .orderBy(OPENAPI_CATEGORY.ID.desc());
+                        : CATEGORY.CATEGORY_NAME.like("%" + op.getCategoryName() + "%"))
+                .and(StringUtils.isEmpty(op.getParentCode()) ? DSL.noCondition() : CATEGORY.PARENT_CODE.eq(op.getParentCode()))
+                .and(Boolean.TRUE.equals(op.getTopCategory()) ? CATEGORY.PARENT_CODE.eq("") : DSL.noCondition())
+                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : CATEGORY.STATUS.eq(op.getStatus()))
+                .orderBy(CATEGORY.ID.desc());
     }
 
     @Override
-    public TableImpl<OpenapiCategoryRecord> table() {
-        return OPENAPI_CATEGORY;
+    public TableImpl<CategoryRecord> table() {
+        return CATEGORY;
     }
 
     @Override
-    protected TableField<OpenapiCategoryRecord, String> uniqueKey() {
-        return OPENAPI_CATEGORY.CATEGORY_CODE;
+    protected TableField<CategoryRecord, String> uniqueKey() {
+        return CATEGORY.CATEGORY_CODE;
     }
 
     @Override
-    protected TableField<OpenapiCategoryRecord, String> statusFiled() {
-        return OPENAPI_CATEGORY.STATUS;
+    protected TableField<CategoryRecord, String> statusFiled() {
+        return CATEGORY.STATUS;
     }
 }

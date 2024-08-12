@@ -7,6 +7,10 @@ import lombok.Getter;
 import java.util.List;
 
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.CHAT;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.TEXT2SPEECH;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.AUDIO2TEXT;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.IMAGES;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 20:46 description:
@@ -31,30 +35,30 @@ public class TableConstants {
     @AllArgsConstructor
     @Getter
     public enum SystemBasicEndpoint {
-        COMPLETION_ENDPOINT("/v*/chat/completions", "智能问答", "chat"),
-        EMBEDDING_ENDPOINT("/v*/embeddings", "向量化", "chat"),
-        SPEECH_ENDPOINT("/v*/audio/speech", "语音合成", "audio_text2Speech"),
-        ASR_ENDPOINT("/api/v*/asr/starttask", "语音识别", "audio_audio2Text"),
-        TEXT2IMAGE_ENDPOINT("/v*/images/generations", "文生图", "images"),
-        IMAGE2IMAGE_ENDPOINT("/v*/images/edits", "图生图", "images"),
+        COMPLETION_ENDPOINT("/v*/chat/completions", "智能问答", CHAT),
+        EMBEDDING_ENDPOINT("/v*/embeddings", "向量化", CHAT),
+        SPEECH_ENDPOINT("/v*/audio/speech", "语音合成", TEXT2SPEECH),
+        ASR_ENDPOINT("/api/v*/asr/starttask", "语音识别", AUDIO2TEXT),
+        TEXT2IMAGE_ENDPOINT("/v*/images/generations", "文生图", IMAGES),
+        IMAGE2IMAGE_ENDPOINT("/v*/images/edits", "图生图", IMAGES),
         ;
         private final String endpoint;
         private final String name;
-        private final String category;
+        private final SystemBasicCategory category;
     }
 
     @AllArgsConstructor
     @Getter
     public enum SystemBasicCategory {
-        CHAT("chat", "语言类", null),
-        AUDIO("audio", "语音类", null),
-        IMAGES("images", "图像类", null),
-        TEXT2SPEECH("audio_text2Speech", "语音合成", "audio"),
-        AUDIO2TEXT("audio_audio2Text", "语音识别", "audio"),
+        CHAT("0001", "语言类", null),
+        AUDIO("0002", "语音类", null),
+        IMAGES("0003", "图像类", null),
+        TEXT2SPEECH("0002-0001", "语音合成", AUDIO),
+        AUDIO2TEXT("0002-0002", "语音识别", AUDIO),
         ;
         private final String code;
         private final String name;
-        private final String parent;
+        private final SystemBasicCategory parent;
     }
 
     @AllArgsConstructor
@@ -67,6 +71,7 @@ public class TableConstants {
         STREAM_FUNCTION_CALL(COMPLETION_ENDPOINT.endpoint, "features", "stream_function_call", Boolean.class, "是否支持流式工具调用"),
         PARALLEL_TOOL_CALLS(COMPLETION_ENDPOINT.endpoint, "features", "parallel_tool_calls", Boolean.class, "是否支持并行工具调用"),
         VISION(COMPLETION_ENDPOINT.endpoint, "features", "vision", Boolean.class, "是否支持图片输入"),
+        JSON_FORMAT(COMPLETION_ENDPOINT.endpoint, "features", "json_format", Boolean.class, "是否支持json模式"),
         ;
         private final String endpoint;
         private final String fied;

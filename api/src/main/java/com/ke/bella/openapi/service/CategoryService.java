@@ -2,27 +2,29 @@ package com.ke.bella.openapi.service;
 
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.db.repo.CategoryRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.EndpointCategoryTree;
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiCategoryDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointCategoryRelationDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ke.bella.openapi.controller.validator.MetadataValidator.matchPath;
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
 
@@ -37,24 +39,24 @@ public class CategoryService {
     private EndpointService endpointService;
 
     @Transactional
-    public OpenapiCategoryDB createCategory(MetaDataOps.CategoryCreateOp op) {
-        categoryRepo.checkExist(op.getCategoryCode(), false);
+    public CategoryDB createCategory(MetaDataOps.CategoryCreateOp op) {
+        checkCategoryName(op.getParentCode(), op.getCategoryName());
         checkParentCode(op.getParentCode());
+        checkCategoryName(op.getParentCode() == null ? "" : op.getParentCode(), op.getCategoryName());
         return categoryRepo.insert(op);
     }
 
-    @Transactional
-    public void updateCategory(MetaDataOps.CategoryOp op) {
-        categoryRepo.checkExist(op.getCategoryCode(), true);
-        categoryRepo.update(op, op.getCategoryCode());
+    private void checkCategoryName(String parentCode, String name) {
+        CategoryDB db = categoryRepo.queryByParentCodeAndName(parentCode, name);
+        Assert.isNull(db, "父类目下已存在相同类目");
     }
 
     private void checkParentCode(String parentCode) {
-        if(StringUtils.isEmpty(parentCode)) {
+        if(parentCode == null) {
             return;
         }
         //加锁，防止执行过程中，变成叶子节点
-        OpenapiCategoryDB existed = categoryRepo.queryByUniqueKeyForUpdate(parentCode);
+        CategoryDB existed = categoryRepo.queryByUniqueKeyForUpdate(parentCode);
         Assert.notNull(existed, "父类目编码不存在");
         long endpointNum = categoryRepo.countEndpointCategoriesByCategoryCode(parentCode);
         Assert.isTrue(endpointNum == 0, "关联能力点的类目不可作为父类目");
@@ -67,60 +69,75 @@ public class CategoryService {
         categoryRepo.updateStatus(categoryCode, status);
     }
 
-    public List<OpenapiCategoryDB> listByCondition(Condition.CategoryCondition condition) {
+    public List<CategoryDB> listByCondition(Condition.CategoryCondition condition) {
         return categoryRepo.list(condition);
     }
 
-    public Page<OpenapiCategoryDB> pageByCondition(Condition.CategoryCondition condition) {
+    public Page<CategoryDB> pageByCondition(Condition.CategoryCondition condition) {
         return categoryRepo.page(condition);
     }
 
     @Transactional
-    public Boolean addCategoryWithEndpoint(MetaDataOps.EndpointCategoryOp op) {
-        OpenapiEndpointCategoryRelationDB existed = categoryRepo.queryByEndpointAndCategoryCode(op.getEndpoint(), op.getEndpoint());
-        Assert.isNull(existed, "能力点已存在于该类目下");
-        checkLeafCategory(op.getCategoryCode(), false);
-        categoryRepo.addRelations(Lists.newArrayList(op));
-        return true;
+    public void addCategoriesWithEndpoint(MetaDataOps.EndpointCategoriesOp op) {
+        Set<String> categories = op.getCategoryCodes();
+        categoryRepo.listEndpointCategoriesByEndpoint(op.getEndpoint())
+                .stream()
+                .map(EndpointCategoryRelDB::getCategoryCode)
+                .forEach(categories::remove);
+        if(categories.isEmpty()) {
+            return;
+        }
+        checkLeafCategories(categories);
+        categoryRepo.batchInsertRelations(op.getEndpoint(), op.getCategoryCodes());
     }
 
     @Transactional
-    public Boolean removeCategoryWithEndpoint(MetaDataOps.EndpointCategoryOp op) {
-        OpenapiEndpointCategoryRelationDB existed = categoryRepo.queryByEndpointAndCategoryCode(op.getEndpoint(), op.getEndpoint());
-        Assert.notNull(existed, "能力点已不存在于该类目下，无法删除");
-        return categoryRepo.deleteRelation(existed.getId()) == 1;
+    public void removeCategoriesWithEndpoint(MetaDataOps.EndpointCategoriesOp op) {
+        List<Long> ids = categoryRepo.listEndpointCategoriesByEndpoint(op.getEndpoint())
+                .stream()
+                .filter(x -> op.getCategoryCodes().contains(x.getCategoryCode()))
+                .map(EndpointCategoryRelDB::getId)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isNotEmpty(ids)) {
+        categoryRepo.deleteRelations(ids);
+        }
     }
 
     @Transactional
-    public Boolean replaceCategoryWithEndpoint(String endpoint, Set<String> categoryCodes) {
-        //当一次性要关联多个节点时，获取其中一个锁失败时不等待，直接抛异常，防止死锁发生
-        boolean nowait = categoryCodes.size() > 1;
-        categoryCodes.forEach(code -> checkLeafCategory(code, nowait));
-        List<OpenapiEndpointCategoryRelationDB> orgin = categoryRepo.listEndpointCategoriesByEndpoint(endpoint);
+    public void replaceCategoryWithEndpoint(MetaDataOps.EndpointCategoriesOp op) {
+        Set<String> systemCategory = Arrays.stream(TableConstants.SystemBasicEndpoint.values())
+                .filter(x -> matchPath(x.getEndpoint(), op.getEndpoint()))
+                .map(TableConstants.SystemBasicEndpoint::getCategory)
+                .map(TableConstants.SystemBasicCategory::getCode)
+                .collect(Collectors.toSet());
+        checkLeafCategories(op.getCategoryCodes());
+        List<EndpointCategoryRelDB> orgin = categoryRepo.listEndpointCategoriesByEndpoint(op.getEndpoint());
         List<Long> deletes = new ArrayList<>();
-        Set<String> insertCodes = Sets.newHashSet(categoryCodes);
+        Set<String> insertCodes = Sets.newHashSet(op.getCategoryCodes());
         orgin.forEach(db -> {
-            if(categoryCodes.contains(db.getCategoryCode())) {
+            if(op.getCategoryCodes().contains(db.getCategoryCode())) {
                 insertCodes.remove(db.getCategoryCode());
-            } else {
+            } else if(!systemCategory.contains(db.getCategoryCode())){
                 deletes.add(db.getId());
             }
         });
-        List<MetaDataOps.EndpointCategoryOp> inserts = insertCodes.stream()
-                .map(code -> MetaDataOps.EndpointCategoryOp.builder().endpoint(endpoint).categoryCode(code).build())
-                .collect(Collectors.toList());
-        if(!CollectionUtils.isEmpty(deletes)) {
+        if(CollectionUtils.isNotEmpty(deletes)) {
             categoryRepo.deleteRelations(deletes);
         }
-        if(!CollectionUtils.isEmpty(inserts)) {
-            categoryRepo.addRelations(inserts);
+        if(CollectionUtils.isNotEmpty(insertCodes)) {
+            categoryRepo.batchInsertRelations(op.getEndpoint(), insertCodes);
         }
-        return true;
+    }
+
+    private void checkLeafCategories(Set<String> categoryCodes) {
+        //当一次性要关联多个节点时，获取其中一个锁失败时不等待，直接抛异常，防止死锁发生
+        boolean nowait = categoryCodes.size() > 1;
+        categoryCodes.forEach(code -> checkLeafCategory(code, nowait));
     }
 
     private void checkLeafCategory(String categoryCode, boolean nowait) {
         //加锁，防止执行过程中变成了父节点
-        OpenapiCategoryDB existed = nowait ? categoryRepo.queryByUniqueKeyForUpdateNoWait(categoryCode)
+        CategoryDB existed = nowait ? categoryRepo.queryByUniqueKeyForUpdateNoWait(categoryCode)
                 : categoryRepo.queryByUniqueKeyForUpdate(categoryCode);
         Assert.notNull(existed, "类目编码不存在: " + categoryCode);
         long childs = categoryRepo.count(Condition.CategoryCondition.builder().parentCode(categoryCode).build());
@@ -128,38 +145,38 @@ public class CategoryService {
     }
 
     public EndpointCategoryTree listTree(Condition.CategoryTreeCondition condition) {
-        List<OpenapiCategoryDB> categories = categoryRepo.queryAllChildrenIncludeSelfByCategoryCode(condition.getCategoryCode(),
+        List<CategoryDB> categories = categoryRepo.queryAllChildrenIncludeSelfByCategoryCode(condition.getCategoryCode(),
                 condition.getStatus());
-        OpenapiCategoryDB category = categories.stream().filter(db -> db.getCategoryCode().equals(condition.getCategoryCode())).findAny()
+        CategoryDB category = categories.stream().filter(db -> db.getCategoryCode().equals(condition.getCategoryCode())).findAny()
                 .orElse(null);
         if(category == null) {
             return null;
         }
         return getTreeByCategoryCode(category,
-                categories.stream().collect(Collectors.groupingBy(OpenapiCategoryDB::getParentCode)),
+                categories.stream().collect(Collectors.groupingBy(CategoryDB::getParentCode)),
                 condition.isIncludeEndpoint());
     }
 
-    private EndpointCategoryTree getTreeByCategoryCode(OpenapiCategoryDB root, Map<String, List<OpenapiCategoryDB>> categories, boolean includeEndpoint) {
+    private EndpointCategoryTree getTreeByCategoryCode(CategoryDB root, Map<String, List<CategoryDB>> categories, boolean includeEndpoint) {
         EndpointCategoryTree tree = new EndpointCategoryTree();
         tree.setCategoryCode(root.getCategoryCode());
         tree.setCategoryName(root.getCategoryName());
-        List<OpenapiCategoryDB> children = categories.get(root.getCategoryCode());
+        List<CategoryDB> children = categories.get(root.getCategoryCode());
         if(CollectionUtils.isEmpty(children)) {
             if(includeEndpoint) {
                 tree.setEndpoints(listEndpointByCategoryCode(root.getCategoryCode()));
             }
             return tree;
         }
-        for (OpenapiCategoryDB child : children) {
+        for (CategoryDB child : children) {
             tree.addChild(getTreeByCategoryCode(child, categories, includeEndpoint));
         }
         return tree;
     }
 
-    private List<OpenapiEndpointDB> listEndpointByCategoryCode(String categoryCode) {
-        List<OpenapiEndpointCategoryRelationDB> relations = categoryRepo.listEndpointCategoriesByCategoryCodes(Lists.newArrayList(categoryCode));
-        Set<String> endpoints = relations.stream().map(OpenapiEndpointCategoryRelationDB::getEndpoint).collect(Collectors.toSet());
+    private List<EndpointDB> listEndpointByCategoryCode(String categoryCode) {
+        List<EndpointCategoryRelDB> relations = categoryRepo.listEndpointCategoriesByCategoryCodes(Lists.newArrayList(categoryCode));
+        Set<String> endpoints = relations.stream().map(EndpointCategoryRelDB::getEndpoint).collect(Collectors.toSet());
         return endpointService.listByCondition(Condition.EndpointCondition.builder()
                 .endpoints(endpoints)
                 .build());

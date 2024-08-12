@@ -4,16 +4,15 @@ import com.ke.bella.openapi.db.repo.EndpointRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class EndpointService {
     private EndpointRepo endpointRepo;
 
     @Transactional
-    public OpenapiEndpointDB createEndpoint(MetaDataOps.EndpointOp op) {
+    public EndpointDB createEndpoint(MetaDataOps.EndpointOp op) {
         endpointRepo.checkExist(op.getEndpoint(), false);
         return endpointRepo.insert(op);
     }
@@ -47,32 +46,32 @@ public class EndpointService {
         endpointRepo.updateStatus(endpoint, status);
     }
 
-    public OpenapiEndpointDB getActiveByEndpoint(String endpoint) {
+    public EndpointDB getActiveByEndpoint(String endpoint) {
         return getActive(UniqueKeyQuery.builder()
                 .endpoint(endpoint)
                 .build());
     }
 
-    public OpenapiEndpointDB getOne(UniqueKeyQuery query) {
-        if(!StringUtils.isEmpty(query.getEndpoint())) {
+    public EndpointDB getOne(UniqueKeyQuery query) {
+        if(StringUtils.isNotEmpty(query.getEndpoint())) {
             return endpointRepo.queryByUniqueKey(query.getEndpoint());
         }
-        if(!StringUtils.isEmpty(query.getEndpointCode())) {
+        if(StringUtils.isNotEmpty(query.getEndpointCode())) {
             return endpointRepo.queryByEndpointCode(query.getEndpointCode());
         }
         return null;
     }
 
-    public OpenapiEndpointDB getActive(UniqueKeyQuery query) {
-        OpenapiEndpointDB db = getOne(query);
+    public EndpointDB getActive(UniqueKeyQuery query) {
+        EndpointDB db = getOne(query);
         return db == null || db.getStatus().equals(INACTIVE) ? null : db;
     }
 
-    public List<OpenapiEndpointDB> listByCondition(Condition.EndpointCondition condition) {
+    public List<EndpointDB> listByCondition(Condition.EndpointCondition condition) {
         return endpointRepo.list(condition);
     }
 
-    public Page<OpenapiEndpointDB> pageByCondition(Condition.EndpointCondition condition) {
+    public Page<EndpointDB> pageByCondition(Condition.EndpointCondition condition) {
         return endpointRepo.page(condition);
     }
 

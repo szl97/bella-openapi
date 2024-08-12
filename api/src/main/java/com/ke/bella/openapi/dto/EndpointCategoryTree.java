@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.dto;
 
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +19,7 @@ import java.util.List;
 public class EndpointCategoryTree {
     private String categoryCode;
     private String categoryName;
-    private List<OpenapiEndpointDB> endpoints;
+    private List<EndpointDB> endpoints;
     private List<EndpointCategoryTree> children;
 
     public void addChild(EndpointCategoryTree tree) {

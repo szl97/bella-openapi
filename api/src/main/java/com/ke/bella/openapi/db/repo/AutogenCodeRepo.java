@@ -11,7 +11,11 @@ import java.util.UUID;
 public interface AutogenCodeRepo<R extends UpdatableRecordImpl<R>> {
     TableField<R, String> autoCode();
 
+    default String prefix() {
+        return "";
+    }
+
     default void autogen(R rec) {
-        rec.set(autoCode(), UUID.randomUUID().toString());
+        rec.set(autoCode(), prefix() + UUID.randomUUID());
     }
 }

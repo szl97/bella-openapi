@@ -1,65 +1,67 @@
 package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelEndpointRelationDB;
-import com.ke.bella.openapi.tables.records.OpenapiModelEndpointRelationRecord;
-import com.ke.bella.openapi.tables.records.OpenapiModelRecord;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
+import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
+import com.ke.bella.openapi.tables.records.ModelEndpointRelRecord;
+import com.ke.bella.openapi.tables.records.ModelRecord;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.ke.bella.openapi.Tables.OPENAPI_MODEL;
-import static com.ke.bella.openapi.Tables.OPENAPI_MODEL_ENDPOINT_RELATION;
-import static com.ke.bella.openapi.tables.OpenapiChannel.OPENAPI_CHANNEL;
+import static com.ke.bella.openapi.Tables.MODEL;
+import static com.ke.bella.openapi.Tables.MODEL_ENDPOINT_REL;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 20:34 description:
  */
 @Component
-public class ModelRepo extends StatusRepo<OpenapiModelDB, OpenapiModelRecord, String> {
+public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
 
+    @Transactional
     public void updateVisibility(String modelName, String visibility) {
-        OpenapiModelRecord rec = OPENAPI_MODEL.newRecord();
+        ModelRecord rec = MODEL.newRecord();
         rec.setVisibility(visibility);
         fillUpdatorInfo(rec);
-        int num = db.update(OPENAPI_MODEL)
+        int num = db.update(MODEL)
                 .set(rec)
-                .where(OPENAPI_MODEL.MODEL_NAME.eq(modelName))
+                .where(MODEL.MODEL_NAME.eq(modelName))
                 .execute();
         Assert.isTrue(num == 1, "模型实体更新失败，请检查模型实体是否存在");
     }
 
-    public List<OpenapiModelDB> list(Condition.ModelCondition op) {
-        return constructSql(op).fetchInto(OpenapiModelDB.class);
+    public List<ModelDB> list(Condition.ModelCondition op) {
+        return constructSql(op).fetchInto(ModelDB.class);
     }
 
-    public Page<OpenapiModelDB> page(Condition.ModelCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), OpenapiModelDB.class);
+    public Page<ModelDB> page(Condition.ModelCondition op) {
+        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), ModelDB.class);
     }
 
-    private SelectSeekStep1<OpenapiModelRecord, Long> constructSql(Condition.ModelCondition op) {
-        return db.selectFrom(OPENAPI_MODEL)
-                .where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : OPENAPI_MODEL.MODEL_NAME.like("%" + op.getModelName() + "%"))
-                .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : OPENAPI_MODEL.MODEL_NAME.in(op.getModelNames()))
-                .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : OPENAPI_MODEL.VISIBILITY.eq(op.getVisibility()))
-                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : OPENAPI_CHANNEL.STATUS.eq(op.getStatus()))
-                .orderBy(OPENAPI_MODEL.ID.desc());
+    private SelectSeekStep1<ModelRecord, Long> constructSql(Condition.ModelCondition op) {
+        return db.selectFrom(MODEL)
+                .where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like("%" + op.getModelName() + "%"))
+                .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
+                .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : MODEL.VISIBILITY.eq(op.getVisibility()))
+                .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : MODEL.STATUS.eq(op.getStatus()))
+                .orderBy(MODEL.ID.desc());
     }
 
+    @Transactional
     public int batchInsertModelEndpoints(String modelName, Collection<String> endpoints) {
-        List<OpenapiModelEndpointRelationRecord> records = new ArrayList<>();
+        List<ModelEndpointRelRecord> records = new ArrayList<>();
         for (String endpoint : endpoints) {
-            OpenapiModelEndpointRelationRecord rec = OPENAPI_MODEL_ENDPOINT_RELATION.newRecord();
+            ModelEndpointRelRecord rec = MODEL_ENDPOINT_REL.newRecord();
             rec.setModelName(modelName);
             rec.setEndpoint(endpoint);
             fillCreatorInfo(rec);
@@ -68,36 +70,37 @@ public class ModelRepo extends StatusRepo<OpenapiModelDB, OpenapiModelRecord, St
         return batchInsert(db, records);
     }
 
+    @Transactional
     public int batchDeleteModelEndpoints(List<Long> ids) {
-        return db.deleteFrom(OPENAPI_MODEL_ENDPOINT_RELATION)
-                .where(OPENAPI_MODEL_ENDPOINT_RELATION.ID.in(ids))
+        return db.deleteFrom(MODEL_ENDPOINT_REL)
+                .where(MODEL_ENDPOINT_REL.ID.in(ids))
                 .execute();
     }
 
-    public List<OpenapiModelEndpointRelationDB> listEndpointsByModelName(String modelName) {
-        return db.selectFrom(OPENAPI_MODEL_ENDPOINT_RELATION)
-                .where(OPENAPI_MODEL_ENDPOINT_RELATION.MODEL_NAME.eq(modelName))
-                .fetchInto(OpenapiModelEndpointRelationDB.class);
+    public List<ModelEndpointRelDB> listEndpointsByModelName(String modelName) {
+        return db.selectFrom(MODEL_ENDPOINT_REL)
+                .where(MODEL_ENDPOINT_REL.MODEL_NAME.eq(modelName))
+                .fetchInto(ModelEndpointRelDB.class);
     }
 
     public List<String> listModelNamesByEndpoint(String endpoint) {
-        return db.selectFrom(OPENAPI_MODEL_ENDPOINT_RELATION)
-                .where(OPENAPI_MODEL_ENDPOINT_RELATION.ENDPOINT.eq(endpoint))
-                .fetch(OPENAPI_MODEL_ENDPOINT_RELATION.MODEL_NAME);
+        return db.selectFrom(MODEL_ENDPOINT_REL)
+                .where(MODEL_ENDPOINT_REL.ENDPOINT.eq(endpoint))
+                .fetch(MODEL_ENDPOINT_REL.MODEL_NAME);
     }
 
     @Override
-    public TableImpl<OpenapiModelRecord> table() {
-        return OPENAPI_MODEL;
+    public TableImpl<ModelRecord> table() {
+        return MODEL;
     }
 
     @Override
-    protected TableField<OpenapiModelRecord, String> uniqueKey() {
-        return OPENAPI_MODEL.MODEL_NAME;
+    protected TableField<ModelRecord, String> uniqueKey() {
+        return MODEL.MODEL_NAME;
     }
 
     @Override
-    protected TableField<OpenapiModelRecord, String> statusFiled() {
-        return OPENAPI_MODEL.STATUS;
+    protected TableField<ModelRecord, String> statusFiled() {
+        return MODEL.STATUS;
     }
 }

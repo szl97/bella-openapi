@@ -2,6 +2,7 @@ package com.ke.bella.openapi.db.repo;
 
 import org.jooq.TableField;
 import org.jooq.impl.UpdatableRecordImpl;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.util.Assert;
 public abstract class StatusRepo<T extends Operator, R extends UpdatableRecordImpl<R>, K> extends UniqueKeyRepo<T, R, K> {
     protected abstract TableField<R, String> statusFiled();
 
+    @Transactional
     public void updateStatus(K categoryCode, String status) {
         R rec = table().newRecord();
         rec.set(statusFiled(), status);

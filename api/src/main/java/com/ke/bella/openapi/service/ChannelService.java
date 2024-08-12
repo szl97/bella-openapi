@@ -4,18 +4,18 @@ import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.OpenapiChannelDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiEndpointDB;
-import com.ke.bella.openapi.tables.pojos.OpenapiModelDB;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -38,13 +38,13 @@ public class ChannelService {
     private ModelService modelService;
 
     @Transactional
-    public OpenapiChannelDB createChannel(MetaDataOps.ChannelCreateOp op) {
+    public ChannelDB createChannel(MetaDataOps.ChannelCreateOp op) {
         if(op.getEntityType().equals(ENDPOINT)) {
-            OpenapiEndpointDB endpoint = endpointService.getOne(EndpointService.UniqueKeyQuery.builder()
+            EndpointDB endpoint = endpointService.getOne(EndpointService.UniqueKeyQuery.builder()
                     .endpoint(op.getEntityCode()).build());
             Assert.notNull(endpoint, "能力点实体不存在");
         } else {
-            OpenapiModelDB model = modelService.getOne(op.getEntityCode());
+            ModelDB model = modelService.getOne(op.getEntityCode());
             Assert.notNull(model, "模型实体不存在");
             //todo: 根据模型类型和协议检查channelInfo和priceInfo
         }
@@ -54,7 +54,7 @@ public class ChannelService {
     @Transactional
     public void updateChannel(MetaDataOps.ChannelUpdateOp op) {
         channelRepo.checkExist(op.getChannelCode(), true);
-        if(!StringUtils.isEmpty(op.getPriceInfo()) || !StringUtils.isEmpty(op.getChannelInfo())) {
+        if(StringUtils.isNotEmpty(op.getPriceInfo()) || StringUtils.isNotEmpty(op.getChannelInfo())) {
             Entity entity = getEntityInfoByCode(op.getChannelCode());
             if(entity.getEntityCode().equals(MODEL)) {
                 //todo: 修改根据模型类型和协议检查channelInfo,priceInfo
@@ -69,9 +69,9 @@ public class ChannelService {
         if(!active) {
             Entity entity = getEntityInfoByCode(channelCode);
             if(entity.getEntityCode().equals(MODEL)) {
-                OpenapiModelDB model = modelService.getActiveByModelName(entity.getEntityCode());
+                ModelDB model = modelService.getActiveByModelName(entity.getEntityCode());
                 if(model != null && model.getVisibility().equals(PUBLIC)) {
-                    List<OpenapiChannelDB> actives = listActives(MODEL, entity.getEntityCode());
+                    List<ChannelDB> actives = listActives(MODEL, entity.getEntityCode());
                     boolean moreThanOneActive = actives.stream()
                             .anyMatch(channel -> !channel.getChannelCode().equals(channelCode));
                     Assert.isTrue(moreThanOneActive, "已发布模型至少要有一个可用渠道");
@@ -90,16 +90,16 @@ public class ChannelService {
                 .build();
     }
 
-    public OpenapiChannelDB getOne(String channelCode) {
+    public ChannelDB getOne(String channelCode) {
         return channelRepo.queryByUniqueKey(channelCode);
     }
 
-    public OpenapiChannelDB getActiveByChannelCode(String channelCode) {
-        OpenapiChannelDB db = getOne(channelCode);
+    public ChannelDB getActiveByChannelCode(String channelCode) {
+        ChannelDB db = getOne(channelCode);
         return db == null || db.getStatus().equals(INACTIVE) ? null : db;
     }
 
-    public List<OpenapiChannelDB> listActives(String entityType, String entityCode) {
+    public List<ChannelDB> listActives(String entityType, String entityCode) {
         return listByCondition(Condition.ChannelCondition.builder()
                 .status(ACTIVE)
                 .entityType(entityType)
@@ -107,11 +107,11 @@ public class ChannelService {
                 .build());
     }
 
-    public List<OpenapiChannelDB> listByCondition(Condition.ChannelCondition condition) {
+    public List<ChannelDB> listByCondition(Condition.ChannelCondition condition) {
         return channelRepo.list(condition);
     }
 
-    public Page<OpenapiChannelDB> pageByCondition(Condition.ChannelCondition condition) {
+    public Page<ChannelDB> pageByCondition(Condition.ChannelCondition condition) {
         return channelRepo.page(condition);
     }
 
