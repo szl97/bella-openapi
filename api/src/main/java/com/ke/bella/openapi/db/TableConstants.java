@@ -6,11 +6,11 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.CHAT;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.TEXT2SPEECH;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.AUDIO2TEXT;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.CHAT;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.IMAGES;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.TEXT2SPEECH;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 20:46 description:

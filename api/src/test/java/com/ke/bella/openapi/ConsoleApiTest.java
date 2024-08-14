@@ -1,7 +1,7 @@
 package com.ke.bella.openapi;
 
 import com.google.common.collect.ImmutableList;
-import com.ke.bella.openapi.controller.response.BellaResponse;
+import com.ke.bella.openapi.controller.intercept.BellaResponseAdvice;
 import com.ke.bella.openapi.db.AuthorizationContext;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -26,16 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Author: Stan Sai Date: 2024/8/8 17:56 description:
@@ -89,7 +85,7 @@ public class ConsoleApiTest {
         MvcResult mvcResult = mockMvc.perform(requestBuilder(def.method, def.url, def.request))
                 .andReturn();
         MockHttpServletResponse servletResponse = mvcResult.getResponse();
-        BellaResponse bellaResponse = JacksonUtils.deserialize(servletResponse.getContentAsString(), BellaResponse.class);
+        BellaResponseAdvice.BellaResponse bellaResponse = JacksonUtils.deserialize(servletResponse.getContentAsString(), BellaResponseAdvice.BellaResponse.class);
         if(bellaResponse == null) {
             throw new RuntimeException(currentFile + " 第"+ lines + "行执行结果不符合预期，不是BellaResponse:" + servletResponse.getContentAsString());
         }

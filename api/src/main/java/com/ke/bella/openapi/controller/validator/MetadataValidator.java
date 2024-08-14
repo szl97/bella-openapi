@@ -3,7 +3,6 @@ package com.ke.bella.openapi.controller.validator;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.dto.MetaDataOps;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,8 +22,8 @@ import static com.ke.bella.openapi.db.TableConstants.DATA_DESTINATIONS;
 import static com.ke.bella.openapi.db.TableConstants.ENDPOINT;
 import static com.ke.bella.openapi.db.TableConstants.MODEL;
 import static com.ke.bella.openapi.db.TableConstants.ModelJsonKey;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory;
+import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint;
 import static com.ke.bella.openapi.utils.MatchUtils.isAllText;
 import static com.ke.bella.openapi.utils.MatchUtils.isBracesWithSpaces;
 import static com.ke.bella.openapi.utils.MatchUtils.isTextStart;
@@ -183,8 +182,8 @@ public class MetadataValidator {
         Assert.hasText(op.getEndpoint(), "能力点path不可为空");
         Assert.notEmpty(op.getCategoryCodes(), "类目编码不可为空");
         Assert.isTrue(Arrays.stream(SystemBasicEndpoint.values())
-                .noneMatch(endpoint -> matchPath(endpoint.getEndpoint(), op.getEndpoint())
-                        && op.getCategoryCodes().contains(endpoint.getCategory().getCode())),
+                        .noneMatch(endpoint -> matchPath(endpoint.getEndpoint(), op.getEndpoint())
+                                && op.getCategoryCodes().contains(endpoint.getCategory().getCode())),
                 "不可修改系统默认的能力点类目");
     }
 

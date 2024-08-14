@@ -20,6 +20,14 @@ public class OpenapiResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object sensitives;
 
+    public static OpenapiError convertFromException(ChannelException channelException) {
+        if(channelException instanceof ChannelException.OpenAIException) {
+            return ((ChannelException.OpenAIException) channelException).getResponse();
+        } else {
+            return new OpenapiError(channelException.getType(), channelException.getMessage(), channelException.getType());
+        }
+    }
+
     public static OpenapiResponse errorResponse(OpenapiError error) {
         OpenapiResponse response = new OpenapiResponse();
         response.setError(error);

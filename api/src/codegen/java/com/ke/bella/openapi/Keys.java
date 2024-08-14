@@ -55,6 +55,7 @@ public class Keys {
 
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_PRIMARY = UniqueKeys0.KEY_CATEGORY_PRIMARY;
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = UniqueKeys0.KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE;
+    public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = UniqueKeys0.KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME;
     public static final UniqueKey<ChannelRecord> KEY_CHANNEL_PRIMARY = UniqueKeys0.KEY_CHANNEL_PRIMARY;
     public static final UniqueKey<ChannelRecord> KEY_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = UniqueKeys0.KEY_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE;
     public static final UniqueKey<EndpointRecord> KEY_ENDPOINT_PRIMARY = UniqueKeys0.KEY_ENDPOINT_PRIMARY;
@@ -88,6 +89,7 @@ public class Keys {
     private static class UniqueKeys0 {
         public static final UniqueKey<CategoryRecord> KEY_CATEGORY_PRIMARY = Internal.createUniqueKey(Category.CATEGORY, "KEY_category_PRIMARY", Category.CATEGORY.ID);
         public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Internal.createUniqueKey(Category.CATEGORY, "KEY_category_uniq_idx_uni_category_code", Category.CATEGORY.CATEGORY_CODE);
+        public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = Internal.createUniqueKey(Category.CATEGORY, "KEY_category_uniq_idx_parent_code_category_name", Category.CATEGORY.PARENT_CODE, Category.CATEGORY.CATEGORY_NAME);
         public static final UniqueKey<ChannelRecord> KEY_CHANNEL_PRIMARY = Internal.createUniqueKey(Channel.CHANNEL, "KEY_channel_PRIMARY", Channel.CHANNEL.ID);
         public static final UniqueKey<ChannelRecord> KEY_CHANNEL_UNIQ_IDX_UNI_CHANNEL_CODE = Internal.createUniqueKey(Channel.CHANNEL, "KEY_channel_uniq_idx_uni_channel_code", Channel.CHANNEL.CHANNEL_CODE);
         public static final UniqueKey<EndpointRecord> KEY_ENDPOINT_PRIMARY = Internal.createUniqueKey(Endpoint.ENDPOINT, "KEY_endpoint_PRIMARY", Endpoint.ENDPOINT.ID);

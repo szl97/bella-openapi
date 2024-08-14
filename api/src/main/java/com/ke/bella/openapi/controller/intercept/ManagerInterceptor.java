@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.controller.intercet;
+package com.ke.bella.openapi.controller.intercept;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;

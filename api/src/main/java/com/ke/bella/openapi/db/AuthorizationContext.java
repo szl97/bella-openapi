@@ -32,6 +32,10 @@ public class AuthorizationContext {
                 .build());
     }
 
+    public static void setSystemAk() {
+        apiKey.set("123456");
+    }
+
     public static void clearAll() {
         operatorLocal.remove();
         apiKey.remove();

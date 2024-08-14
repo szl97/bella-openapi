@@ -126,6 +126,16 @@ public class JacksonUtils {
         return null;
     }
 
+    public static Map toMap(byte[] bytes) {
+        Map map = new HashMap();
+        try {
+            map = MAPPER.readValue(bytes, Map.class);
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return map;
+    }
+
     public static Map toMap(String jsonStr) {
         if(jsonStr == null) {
             return null;

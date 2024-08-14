@@ -1,9 +1,13 @@
-package com.ke.bella.openapi.controller.intercet;
+package com.ke.bella.openapi.controller.intercept;
 
-import com.ke.bella.openapi.controller.response.BellaResponse;
+import com.ke.bella.openapi.controller.EndpointRequestController;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -23,6 +27,7 @@ import java.io.StringWriter;
  * Author: Stan Sai Date: 2024/7/31 20:06 description:
  */
 @RestControllerAdvice
+@Order(2)
 @Slf4j
 public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
     private static String stacktrace(Throwable e) {
@@ -34,7 +39,9 @@ public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         Class<?> clazz = returnType.getContainingClass();
-        return clazz.getName().startsWith("com.ke.bella.openapi.controller");
+        return clazz.getName().startsWith("com.ke.bella.openapi.controller")
+                && !clazz.isAssignableFrom(EndpointResponseAdvice.class)
+                && !clazz.isAssignableFrom(EndpointRequestController.class);
     }
 
     @SuppressWarnings("rawtypes")
@@ -84,5 +91,16 @@ public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
         }
 
         return er;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @ToString
+    public static class BellaResponse<T> {
+        private int code;
+        private String message;
+        private long timestamp;
+        private T data;
+        private String stacktrace;
     }
 }

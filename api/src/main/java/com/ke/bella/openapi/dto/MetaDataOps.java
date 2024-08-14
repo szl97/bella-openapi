@@ -94,7 +94,6 @@ public class MetaDataOps {
         private String categoryCode;
     }
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

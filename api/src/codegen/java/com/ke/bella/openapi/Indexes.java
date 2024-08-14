@@ -36,8 +36,8 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     public static final Index CATEGORY_IDX_CATEGORY_NAME = Indexes0.CATEGORY_IDX_CATEGORY_NAME;
-    public static final Index CATEGORY_IDX_PARENT_CODE = Indexes0.CATEGORY_IDX_PARENT_CODE;
     public static final Index CATEGORY_PRIMARY = Indexes0.CATEGORY_PRIMARY;
+    public static final Index CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = Indexes0.CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME;
     public static final Index CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Indexes0.CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE;
     public static final Index CHANNEL_IDX_ENTITY_TYPE_CODE = Indexes0.CHANNEL_IDX_ENTITY_TYPE_CODE;
     public static final Index CHANNEL_IDX_PROTOCOL = Indexes0.CHANNEL_IDX_PROTOCOL;
@@ -64,8 +64,8 @@ public class Indexes {
 
     private static class Indexes0 {
         public static Index CATEGORY_IDX_CATEGORY_NAME = Internal.createIndex("idx_category_name", Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_NAME }, false);
-        public static Index CATEGORY_IDX_PARENT_CODE = Internal.createIndex("idx_parent_code", Category.CATEGORY, new OrderField[] { Category.CATEGORY.PARENT_CODE }, false);
         public static Index CATEGORY_PRIMARY = Internal.createIndex("PRIMARY", Category.CATEGORY, new OrderField[] { Category.CATEGORY.ID }, true);
+        public static Index CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = Internal.createIndex("uniq_idx_parent_code_category_name", Category.CATEGORY, new OrderField[] { Category.CATEGORY.PARENT_CODE, Category.CATEGORY.CATEGORY_NAME }, true);
         public static Index CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Internal.createIndex("uniq_idx_uni_category_code", Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_CODE }, true);
         public static Index CHANNEL_IDX_ENTITY_TYPE_CODE = Internal.createIndex("idx_entity_type_code", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.ENTITY_TYPE, Channel.CHANNEL.ENTITY_CODE }, false);
         public static Index CHANNEL_IDX_PROTOCOL = Internal.createIndex("idx_protocol", Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.PROTOCOL }, false);

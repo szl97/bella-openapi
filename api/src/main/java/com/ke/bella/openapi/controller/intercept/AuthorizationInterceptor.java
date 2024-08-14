@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.controller.intercet;
+package com.ke.bella.openapi.controller.intercept;
 
 import com.ke.bella.openapi.db.AuthorizationContext;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +22,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         //todo: ak鉴权，信息加入AuthorizationContext
         if(profile.equals("dev")) {
             AuthorizationContext.setSystemUser();
+            AuthorizationContext.setSystemAk();
         }
         return true;
     }

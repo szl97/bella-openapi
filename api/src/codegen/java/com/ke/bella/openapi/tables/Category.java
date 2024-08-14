@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Category extends TableImpl<CategoryRecord> {
 
-    private static final long serialVersionUID = 1821907020;
+    private static final long serialVersionUID = 652881237;
 
     /**
      * The reference instance of <code>category</code>
@@ -158,7 +158,7 @@ public class Category extends TableImpl<CategoryRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.CATEGORY_IDX_CATEGORY_NAME, Indexes.CATEGORY_IDX_PARENT_CODE, Indexes.CATEGORY_PRIMARY, Indexes.CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE);
+        return Arrays.<Index>asList(Indexes.CATEGORY_IDX_CATEGORY_NAME, Indexes.CATEGORY_PRIMARY, Indexes.CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME, Indexes.CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE);
     }
 
     /**
@@ -182,7 +182,7 @@ public class Category extends TableImpl<CategoryRecord> {
      */
     @Override
     public List<UniqueKey<CategoryRecord>> getKeys() {
-        return Arrays.<UniqueKey<CategoryRecord>>asList(Keys.KEY_CATEGORY_PRIMARY, Keys.KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE);
+        return Arrays.<UniqueKey<CategoryRecord>>asList(Keys.KEY_CATEGORY_PRIMARY, Keys.KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE, Keys.KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME);
     }
 
     /**
