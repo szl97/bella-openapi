@@ -1,16 +1,18 @@
 package com.ke.bella.openapi;
 
-import com.google.common.collect.ImmutableList;
-import com.ke.bella.openapi.controller.intercept.BellaResponseAdvice;
-import com.ke.bella.openapi.db.AuthorizationContext;
-import com.ke.bella.openapi.utils.JacksonUtils;
-import lombok.Data;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,15 +25,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.google.common.collect.ImmutableList;
+import com.ke.bella.openapi.BellaContext.Operator;
+import com.ke.bella.openapi.api.BellaResponseAdvice;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import lombok.Data;
 
 /**
  * Author: Stan Sai Date: 2024/8/8 17:56 description:
@@ -52,15 +51,15 @@ public class ConsoleApiTest {
 
     @BeforeAll
     public static void beforeAll(){
-        AuthorizationContext.setSystemUser();
+        BellaContext.setOperator(Operator.SYS);
     }
     @AfterAll
     public static void afterAll(){
-        AuthorizationContext.clearAll();
+        BellaContext.clearAll();
     }
 
     @Test
-    public void testApi() throws Exception {
+    void testApi() throws Exception {
         RequestDef def = new RequestDef();
         for(String path : paths) {
             currentFile = path;

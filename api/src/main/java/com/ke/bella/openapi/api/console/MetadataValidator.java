@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.controller.validator;
+package com.ke.bella.openapi.api.console;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

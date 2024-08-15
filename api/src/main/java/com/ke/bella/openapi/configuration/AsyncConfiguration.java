@@ -20,6 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 public class AsyncConfiguration extends AsyncConfigurerSupport {
+    @SuppressWarnings("serial")
     @Override
     public Executor getAsyncExecutor() {
         val executor = new ThreadPoolTaskExecutor() {
@@ -60,6 +61,7 @@ public class AsyncConfiguration extends AsyncConfigurerSupport {
                 return RunnableWrapper.of(task);
             }
 
+            @SuppressWarnings("unchecked")
             public <T> Callable<T> getCallableWrapper(Callable<T> task) {
                 if(task instanceof CallableWrapper) {
                     return task;

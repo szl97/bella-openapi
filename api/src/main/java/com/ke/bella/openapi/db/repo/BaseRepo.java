@@ -1,6 +1,8 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.db.AuthorizationContext;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -8,8 +10,7 @@ import org.jooq.SelectLimitStep;
 import org.jooq.UpdatableRecord;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
-import java.util.Collection;
+import com.ke.bella.openapi.BellaContext;
 
 /**
  * Author: Stan Sai Date: 2024/8/8 00:55 description:
@@ -18,7 +19,7 @@ public interface BaseRepo {
     default void fillCreatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        AuthorizationContext.UserInfo oper = AuthorizationContext.getUserInfo();
+        BellaContext.Operator oper = BellaContext.getOperator();
         if(oper != null) {
             if(oper.getUserId() != null) {
                 op.setCuid(oper.getUserId());
@@ -34,7 +35,7 @@ public interface BaseRepo {
     default void fillUpdatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        AuthorizationContext.UserInfo oper = AuthorizationContext.getUserInfo();
+        BellaContext.Operator oper = BellaContext.getOperator();
         if(oper != null) {
             op.setMuid(oper.getUserId());
             op.setMuName(oper.getUserName());

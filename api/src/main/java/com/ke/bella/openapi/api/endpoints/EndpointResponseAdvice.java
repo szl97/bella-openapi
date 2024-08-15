@@ -1,13 +1,6 @@
-package com.ke.bella.openapi.controller.intercept;
+package com.ke.bella.openapi.api.endpoints;
 
-import com.ke.bella.openapi.controller.EndpointRequestController;
-import com.ke.bella.openapi.db.RequestInfoContext;
-import com.ke.bella.openapi.protocol.ChannelException;
-import com.ke.bella.openapi.protocol.OpenapiResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -17,23 +10,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-/**
- * Author: Stan Sai Date: 2024/8/13 14:45 description:
- */
-@RestControllerAdvice(assignableTypes = EndpointRequestController.class)
-@Order(1)
-@Slf4j
+import com.ke.bella.openapi.db.RequestInfoContext;
+import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
+
+@RestControllerAdvice
 public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return true;
+        Class<?> clazz = returnType.getContainingClass();
+        return clazz.getName().startsWith("com.ke.bella.openapi.api.endpoints.");
     }
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        response.setStatusCode(HttpStatus.OK);
-        response.getHeaders().add("requestId", RequestInfoContext.getRequestId());
+        response.getHeaders().add("X-BELLA-REQUEST-ID", RequestInfoContext.getRequestId());
         return body;
     }
 

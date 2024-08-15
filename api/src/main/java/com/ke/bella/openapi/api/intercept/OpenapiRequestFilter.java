@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.controller.intercept;
+package com.ke.bella.openapi.api.intercept;
 
 import com.ke.bella.openapi.db.RequestInfoContext;
 import org.apache.commons.lang3.StringUtils;

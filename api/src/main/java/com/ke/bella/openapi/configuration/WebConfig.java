@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.configuration;
 
-import com.ke.bella.openapi.controller.intercept.AuthorizationInterceptor;
-import com.ke.bella.openapi.controller.intercept.ManagerInterceptor;
+import com.ke.bella.openapi.api.intercept.AuthorizationInterceptor;
+import com.ke.bella.openapi.api.intercept.ManagerInterceptor;
 import com.ke.bella.openapi.db.TableConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

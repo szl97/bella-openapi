@@ -1,13 +1,9 @@
-package com.ke.bella.openapi.controller.intercept;
+package com.ke.bella.openapi.api;
 
-import com.ke.bella.openapi.controller.EndpointRequestController;
-import com.ke.bella.openapi.utils.JacksonUtils;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,14 +16,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
-/**
- * Author: Stan Sai Date: 2024/7/31 20:06 description:
- */
-@RestControllerAdvice
-@Order(2)
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
+@RestControllerAdvice(annotations = BellaAPI.class)
 @Slf4j
 public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
     private static String stacktrace(Throwable e) {
@@ -38,10 +34,7 @@ public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        Class<?> clazz = returnType.getContainingClass();
-        return clazz.getName().startsWith("com.ke.bella.openapi.controller")
-                && !clazz.isAssignableFrom(EndpointResponseAdvice.class)
-                && !clazz.isAssignableFrom(EndpointRequestController.class);
+        return true;
     }
 
     @SuppressWarnings("rawtypes")

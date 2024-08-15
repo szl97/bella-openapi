@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.matchPath;
+import static com.ke.bella.openapi.api.console.MetadataValidator.*;
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
 

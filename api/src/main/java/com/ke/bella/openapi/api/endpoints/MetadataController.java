@@ -1,5 +1,6 @@
-package com.ke.bella.openapi.controller;
+package com.ke.bella.openapi.api.endpoints;
 
+import com.ke.bella.openapi.api.BellaAPI;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.dto.Condition;
 import com.ke.bella.openapi.dto.EndpointCategoryTree;
@@ -14,14 +15,14 @@ import com.ke.bella.openapi.tables.pojos.ModelDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Author: Stan Sai Date: 2024/8/1 17:27 description:
- */
+@BellaAPI
 @RestController
+@RequestMapping("/v1/meta")
 public class MetadataController {
     @Autowired
     private EndpointService endpointService;
@@ -32,62 +33,62 @@ public class MetadataController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping("/v1/endpoint/list")
+    @GetMapping("/endpoint/list")
     public List<EndpointDB> listEndpoint(Condition.EndpointCondition condition) {
         return endpointService.listByCondition(condition);
     }
 
-    @GetMapping("/v1/endpoint/page")
+    @GetMapping("/endpoint/page")
     public Page<EndpointDB> pageEndpoint(Condition.EndpointCondition condition) {
         return endpointService.pageByCondition(condition);
     }
 
-    @GetMapping("/v1/endpoint/info/{code}")
+    @GetMapping("/endpoint/info/{code}")
     public EndpointDB getEndpoint(@PathVariable String code) {
         return endpointService.getOne(EndpointService.UniqueKeyQuery.builder().endpointCode(code).build());
     }
 
-    @GetMapping("/v1/model/list")
+    @GetMapping("/model/list")
     public List<ModelDB> listModel(Condition.ModelCondition condition) {
         return modelService.listByCondition(condition);
     }
 
-    @GetMapping("/v1/model/page")
+    @GetMapping("/model/page")
     public Page<ModelDB> pageModel(Condition.ModelCondition condition) {
         return modelService.pageByCondition(condition);
     }
 
-    @GetMapping("/v1/model/info/{name}")
+    @GetMapping("/model/info/{name}")
     public ModelDB getModel(@PathVariable String name) {
         return modelService.getOne(name);
     }
 
-    @GetMapping("/v1/channel/list")
+    @GetMapping("/channel/list")
     public List<ChannelDB> listChannel(Condition.ChannelCondition condition) {
         return channelService.listByCondition(condition);
     }
 
-    @GetMapping("/v1/channel/page")
+    @GetMapping("/channel/page")
     public Page<ChannelDB> pageChannel(Condition.ChannelCondition condition) {
         return channelService.pageByCondition(condition);
     }
 
-    @GetMapping("/v1/channel/info/{code}")
+    @GetMapping("/channel/info/{code}")
     public ChannelDB getChannel(@PathVariable String code) {
         return channelService.getOne(code);
     }
 
-    @GetMapping("/v1/category/list")
+    @GetMapping("/category/list")
     public List<CategoryDB> listCategory(Condition.CategoryCondition condition) {
         return categoryService.listByCondition(condition);
     }
 
-    @GetMapping("/v1/category/page")
+    @GetMapping("/category/page")
     public Page<CategoryDB> pageCategory(Condition.CategoryCondition condition) {
         return categoryService.pageByCondition(condition);
     }
 
-    @GetMapping("/v1/category/tree")
+    @GetMapping("/category/tree")
     public EndpointCategoryTree listTree(Condition.CategoryTreeCondition condition) {
         return categoryService.listTree(condition);
     }

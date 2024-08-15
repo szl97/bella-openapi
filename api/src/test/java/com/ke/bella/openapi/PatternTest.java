@@ -6,7 +6,7 @@ import com.google.common.cache.LoadingCache;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.apache.commons.lang3.StringUtils;;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;

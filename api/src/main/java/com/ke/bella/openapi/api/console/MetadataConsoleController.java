@@ -1,5 +1,6 @@
-package com.ke.bella.openapi.controller;
+package com.ke.bella.openapi.api.console;
 
+import com.ke.bella.openapi.api.BellaAPI;
 import com.ke.bella.openapi.dto.MetaDataOps;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
@@ -9,6 +10,9 @@ import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+
+import static com.ke.bella.openapi.api.console.MetadataValidator.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,21 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkCategoryCreateOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkCategoryStatus;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelCreateOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelStatusOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkChannelUpdateOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointCategoryOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkEndpointStatusOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkModelNameOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkModelOp;
-import static com.ke.bella.openapi.controller.validator.MetadataValidator.checkReplaceEndpointCategoryOp;
-
-/**
- * Author: Stan Sai Date: 2024/8/1 16:22 description:
- */
+@BellaAPI
 @RestController
 @RequestMapping("/console")
 public class MetadataConsoleController {
