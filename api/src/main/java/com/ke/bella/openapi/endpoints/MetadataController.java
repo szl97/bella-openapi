@@ -1,9 +1,17 @@
-package com.ke.bella.openapi.api.endpoints;
+package com.ke.bella.openapi.endpoints;
 
-import com.ke.bella.openapi.api.BellaAPI;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.dto.EndpointCategoryTree;
+import com.ke.bella.openapi.protocol.Condition;
+import com.ke.bella.openapi.protocol.EndpointCategoryTree;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.EndpointService;
@@ -12,13 +20,6 @@ import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @BellaAPI
 @RestController

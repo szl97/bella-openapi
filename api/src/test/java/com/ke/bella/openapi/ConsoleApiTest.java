@@ -26,8 +26,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.ImmutableList;
-import com.ke.bella.openapi.BellaContext.Operator;
-import com.ke.bella.openapi.api.BellaResponseAdvice;
+import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.console.ConsoleContext.Operator;
+import com.ke.bella.openapi.intercept.BellaApiResponseAdvice;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
 import lombok.Data;
@@ -51,11 +52,11 @@ public class ConsoleApiTest {
 
     @BeforeAll
     public static void beforeAll(){
-        BellaContext.setOperator(Operator.SYS);
+        ConsoleContext.setOperator(Operator.SYS);
     }
     @AfterAll
     public static void afterAll(){
-        BellaContext.clearAll();
+        ConsoleContext.clearAll();
     }
 
     @Test
@@ -84,7 +85,8 @@ public class ConsoleApiTest {
         MvcResult mvcResult = mockMvc.perform(requestBuilder(def.method, def.url, def.request))
                 .andReturn();
         MockHttpServletResponse servletResponse = mvcResult.getResponse();
-        BellaResponseAdvice.BellaResponse bellaResponse = JacksonUtils.deserialize(servletResponse.getContentAsString(), BellaResponseAdvice.BellaResponse.class);
+        BellaApiResponseAdvice.BellaResponse bellaResponse = JacksonUtils.deserialize(servletResponse.getContentAsString(),
+                BellaApiResponseAdvice.BellaResponse.class);
         if(bellaResponse == null) {
             throw new RuntimeException(currentFile + " 第"+ lines + "行执行结果不符合预期，不是BellaResponse:" + servletResponse.getContentAsString());
         }

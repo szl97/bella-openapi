@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.dto;
+package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;
@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Author: Stan Sai Date: 2024/8/2 15:45 description:
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

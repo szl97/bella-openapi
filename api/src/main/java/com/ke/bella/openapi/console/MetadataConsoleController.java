@@ -1,17 +1,6 @@
-package com.ke.bella.openapi.api.console;
+package com.ke.bella.openapi.console;
 
-import com.ke.bella.openapi.api.BellaAPI;
-import com.ke.bella.openapi.dto.MetaDataOps;
-import com.ke.bella.openapi.service.CategoryService;
-import com.ke.bella.openapi.service.ChannelService;
-import com.ke.bella.openapi.service.EndpointService;
-import com.ke.bella.openapi.service.ModelService;
-import com.ke.bella.openapi.tables.pojos.CategoryDB;
-import com.ke.bella.openapi.tables.pojos.ChannelDB;
-import com.ke.bella.openapi.tables.pojos.EndpointDB;
-import com.ke.bella.openapi.tables.pojos.ModelDB;
-
-import static com.ke.bella.openapi.api.console.MetadataValidator.*;
+import static com.ke.bella.openapi.console.MetadataValidator.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +9,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ke.bella.openapi.annotations.BellaAPI;
+import com.ke.bella.openapi.service.CategoryService;
+import com.ke.bella.openapi.service.ChannelService;
+import com.ke.bella.openapi.service.EndpointService;
+import com.ke.bella.openapi.service.ModelService;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
 
 @BellaAPI
 @RestController

@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.api.intercept;
+package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.db.RequestInfoContext;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +22,7 @@ public class OpenapiRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
-            String requestId = request.getHeader("requestId");
+            String requestId = request.getHeader("X-BELLA-REQUEST-ID");
             if(StringUtils.isBlank(requestId)) {
                 requestId = UUID.randomUUID().toString();
             }

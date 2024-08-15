@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.dto;
+package com.ke.bella.openapi.console;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
-/**
- * Author: Stan Sai Date: 2024/8/2 16:52 description:
- */
 public class MetaDataOps {
 
     @Data

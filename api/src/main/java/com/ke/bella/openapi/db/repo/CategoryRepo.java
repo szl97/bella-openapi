@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.dto.MetaDataOps;
+import com.ke.bella.openapi.console.MetaDataOps;
+import com.ke.bella.openapi.protocol.Condition;
 import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
 import com.ke.bella.openapi.tables.records.CategoryRecord;

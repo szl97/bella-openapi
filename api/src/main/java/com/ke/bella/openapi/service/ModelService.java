@@ -2,11 +2,11 @@ package com.ke.bella.openapi.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.dto.MetaDataOps;
+import com.ke.bella.openapi.protocol.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.api.console.MetadataValidator.*;
+import static com.ke.bella.openapi.console.MetadataValidator.*;
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.MODEL;

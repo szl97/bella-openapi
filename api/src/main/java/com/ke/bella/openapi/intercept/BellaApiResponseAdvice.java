@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.api;
+package com.ke.bella.openapi.intercept;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
 import lombok.Data;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice(annotations = BellaAPI.class)
 @Slf4j
-public class BellaResponseAdvice implements ResponseBodyAdvice<Object> {
+public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
     private static String stacktrace(Throwable e) {
         StringWriter writer = new StringWriter();
         e.printStackTrace(new PrintWriter(writer));

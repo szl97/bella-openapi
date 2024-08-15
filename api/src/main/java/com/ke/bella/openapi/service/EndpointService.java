@@ -1,9 +1,9 @@
 package com.ke.bella.openapi.service;
 
+import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.db.repo.EndpointRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.dto.Condition;
-import com.ke.bella.openapi.dto.MetaDataOps;
+import com.ke.bella.openapi.protocol.Condition;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

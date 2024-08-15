@@ -1,4 +1,4 @@
-package com.ke.bella.openapi;
+package com.ke.bella.openapi.console;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BellaContext {
+public class ConsoleContext {
     private static final ThreadLocal<Operator> operatorLocal = new ThreadLocal<>();
 
     public static Operator getOperator() {

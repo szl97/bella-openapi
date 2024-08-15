@@ -10,7 +10,7 @@ import org.jooq.SelectLimitStep;
 import org.jooq.UpdatableRecord;
 import org.springframework.util.Assert;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.console.ConsoleContext;
 
 /**
  * Author: Stan Sai Date: 2024/8/8 00:55 description:
@@ -19,7 +19,7 @@ public interface BaseRepo {
     default void fillCreatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        BellaContext.Operator oper = BellaContext.getOperator();
+        ConsoleContext.Operator oper = ConsoleContext.getOperator();
         if(oper != null) {
             if(oper.getUserId() != null) {
                 op.setCuid(oper.getUserId());
@@ -35,7 +35,7 @@ public interface BaseRepo {
     default void fillUpdatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        BellaContext.Operator oper = BellaContext.getOperator();
+        ConsoleContext.Operator oper = ConsoleContext.getOperator();
         if(oper != null) {
             op.setMuid(oper.getUserId());
             op.setMuName(oper.getUserName());

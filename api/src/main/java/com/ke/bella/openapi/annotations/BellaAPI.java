@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.api;
+package com.ke.bella.openapi.annotations;
 
 import static java.lang.annotation.RetentionPolicy.*;
 

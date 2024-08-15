@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.dto;
+package com.ke.bella.openapi.protocol;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
-/**
- * Author: Stan Sai Date: 2024/8/2 15:49 description:
- */
 public class Condition {
     @Data
     public static class PageCondition {

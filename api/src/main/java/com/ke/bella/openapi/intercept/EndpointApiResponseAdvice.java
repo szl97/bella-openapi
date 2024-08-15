@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.api.endpoints;
+package com.ke.bella.openapi.intercept;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 
-@RestControllerAdvice
-public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
+@RestControllerAdvice(annotations = EndpointAPI.class)
+public class EndpointApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         Class<?> clazz = returnType.getContainingClass();
