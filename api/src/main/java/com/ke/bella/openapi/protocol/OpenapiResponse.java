@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Author: Stan Sai Date: 2024/8/13 14:56 description:
- */
 @Data
 public class OpenapiResponse {
     /**

@@ -5,22 +5,20 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author zhangxiaojia002
- * @date 2023/6/21 10:09 上午
- **/
 @Data
 public class CompletionRequest {
-
     /**
      * ID of the model to use
      */
-    @NotNull
     private String model;
+
+    /**
+     * A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. Learn more.
+     */
+    private String user;
 
     /**
      * A list of messages comprising the conversation so far
@@ -119,11 +117,6 @@ public class CompletionRequest {
      */
     @Nullable
     private Map<String, Integer> logit_bias;
-
-    /**
-     * A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. Learn more.
-     */
-    private String user;
 
     /**
      * An object specifying the format that the model must output.<br/><br/> Setting to { "type": "json_object" } enables JSON mode,</br> which

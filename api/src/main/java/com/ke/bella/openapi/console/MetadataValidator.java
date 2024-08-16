@@ -28,9 +28,6 @@ import static com.ke.bella.openapi.utils.MatchUtils.isBracesWithSpaces;
 import static com.ke.bella.openapi.utils.MatchUtils.isTextStart;
 import static com.ke.bella.openapi.utils.MatchUtils.isValidURL;
 
-/**
- * Author: Stan Sai Date: 2024/8/5 10:12 description:
- */
 public class MetadataValidator {
     private static final LoadingCache<String, Pattern> baseEndpointPatternCache = CacheBuilder.newBuilder()
             .build(new CacheLoader<String, Pattern>() {
@@ -113,7 +110,7 @@ public class MetadataValidator {
         Assert.hasText(op.getEntityType(), "实体类型不可为空");
         Assert.hasText(op.getEntityCode(), "实体编码不可为空");
         if(op.getEntityType().equals(MODEL)) {
-            Assert.hasText(op.getChannelInfo(), "模型通道的通道信息中必须有模型版本号：version");
+            Assert.hasText(op.getChannelInfo(), "模型通道的通道信息不可为空");
             Assert.hasText(op.getPriceInfo(), "模型通道的单价信息不可为空");
         }
         Assert.isTrue(op.getEntityCode().equals(ENDPOINT) || op.getEntityType().equals(MODEL),

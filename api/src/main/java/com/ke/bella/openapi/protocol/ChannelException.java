@@ -2,10 +2,6 @@ package com.ke.bella.openapi.protocol;
 
 import lombok.Getter;
 
-/**
- * @author zhangxiaojia002
- * @date 2023/6/21 5:30 下午
- **/
 public abstract class ChannelException extends RuntimeException {
 
     protected ChannelException(String message) {

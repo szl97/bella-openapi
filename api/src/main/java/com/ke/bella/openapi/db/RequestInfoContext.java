@@ -7,9 +7,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Author: Stan Sai Date: 2024/8/13 10:37 description:
- */
 public class RequestInfoContext {
     private static final ThreadLocal<EndpointRequestInfo> endpointRequestInfo = new ThreadLocal<>();
 

@@ -12,9 +12,6 @@ import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.IMAGES;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.TEXT2SPEECH;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
 
-/**
- * Author: Stan Sai Date: 2024/8/1 20:46 description:
- */
 public class TableConstants {
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
@@ -38,7 +35,7 @@ public class TableConstants {
         COMPLETION_ENDPOINT("/v*/chat/completions", "智能问答", CHAT),
         EMBEDDING_ENDPOINT("/v*/embeddings", "向量化", CHAT),
         SPEECH_ENDPOINT("/v*/audio/speech", "语音合成", TEXT2SPEECH),
-        ASR_ENDPOINT("/api/v*/asr/starttask", "语音识别", AUDIO2TEXT),
+        ASR_ENDPOINT("/v*/audio/transcriptions", "语音识别", AUDIO2TEXT),
         TEXT2IMAGE_ENDPOINT("/v*/images/generations", "文生图", IMAGES),
         IMAGE2IMAGE_ENDPOINT("/v*/images/edits", "图生图", IMAGES),
         ;

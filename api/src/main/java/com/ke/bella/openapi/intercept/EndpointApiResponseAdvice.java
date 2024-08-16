@@ -16,11 +16,13 @@ import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 
 @RestControllerAdvice(annotations = EndpointAPI.class)
+@EndpointAPI
 public class EndpointApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         Class<?> clazz = returnType.getContainingClass();
-        return clazz.getName().startsWith("com.ke.bella.openapi.api.endpoints.");
+        return clazz.getName().startsWith("com.ke.bella.openapi.api.endpoints.")
+                || clazz.isAssignableFrom(EndpointApiResponseAdvice.class);
     }
 
     @Override

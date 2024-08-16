@@ -14,11 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-/**
- * @author zhangxiaojia002
- * @date 2023/6/27 6:57 下午
- **/
 @Data
 @JsonInclude(Include.NON_NULL)
 public class Message {
