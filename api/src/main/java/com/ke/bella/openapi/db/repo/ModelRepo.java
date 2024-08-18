@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.protocol.Condition;
+import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
 import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
 import com.ke.bella.openapi.tables.records.ModelEndpointRelRecord;

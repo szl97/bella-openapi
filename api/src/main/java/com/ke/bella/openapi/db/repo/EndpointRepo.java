@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.protocol.Condition;
+import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.records.EndpointRecord;
 import org.apache.commons.collections4.CollectionUtils;

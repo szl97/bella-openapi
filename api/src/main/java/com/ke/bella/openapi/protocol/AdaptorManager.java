@@ -9,9 +9,9 @@ import java.util.Set;
 
 @Component
 public class AdaptorManager {
-    private Map<String, Map<String, ProtocolAdaptor>> adaptors;
+    private Map<String, Map<String, IProtocolAdaptor>> adaptors;
 
-    public AdaptorManager(@Autowired Map<String, ProtocolAdaptor> adaptors) {
+    public AdaptorManager(@Autowired Map<String, IProtocolAdaptor> adaptors) {
         this.adaptors = new HashMap<>();
         adaptors.forEach((key, value) -> {
             String endpoint = value.endpoint();
@@ -25,7 +25,8 @@ public class AdaptorManager {
         return adaptors.get(endpoint).keySet();
     }
 
-    public <T extends ProtocolAdaptor> T getProtocolAdaptor(String endpoint, String protocol, Class<T> clazz) {
+    @SuppressWarnings("unchecked")
+    public <T extends IProtocolAdaptor> T getProtocolAdaptor(String endpoint, String protocol, Class<T> clazz) {
         return  (T) adaptors.get(endpoint).get(protocol);
     }
 }

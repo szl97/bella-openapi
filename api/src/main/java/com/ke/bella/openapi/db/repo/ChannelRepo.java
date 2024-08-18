@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.protocol.Condition;
+import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
 import org.apache.commons.lang3.StringUtils;

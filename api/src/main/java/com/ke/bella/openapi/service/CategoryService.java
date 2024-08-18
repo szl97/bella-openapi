@@ -1,21 +1,7 @@
 package com.ke.bella.openapi.service;
 
-import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.ke.bella.openapi.console.MetaDataOps;
-import com.ke.bella.openapi.db.TableConstants;
-import com.ke.bella.openapi.db.repo.CategoryRepo;
-import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.protocol.Condition;
-import com.ke.bella.openapi.protocol.EndpointCategoryTree;
-import com.ke.bella.openapi.tables.pojos.CategoryDB;
-import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
-import com.ke.bella.openapi.tables.pojos.EndpointDB;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
+import static com.ke.bella.openapi.console.MetadataValidator.*;
+import static com.ke.bella.openapi.db.TableConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,9 +10,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.console.MetadataValidator.*;
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.ke.bella.openapi.console.MetaDataOps;
+import com.ke.bella.openapi.db.TableConstants;
+import com.ke.bella.openapi.db.repo.CategoryRepo;
+import com.ke.bella.openapi.db.repo.Page;
+import com.ke.bella.openapi.protocol.metadata.Condition;
+import com.ke.bella.openapi.protocol.metadata.EndpointCategoryTree;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
+import com.ke.bella.openapi.tables.pojos.EndpointDB;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 12:00 description:

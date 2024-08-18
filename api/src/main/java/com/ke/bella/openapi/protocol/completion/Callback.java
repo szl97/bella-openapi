@@ -1,6 +1,5 @@
-package com.ke.bella.openapi.protocol;
+package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.protocol.completion.StreamCompletionResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

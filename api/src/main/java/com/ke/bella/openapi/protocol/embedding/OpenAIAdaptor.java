@@ -1,20 +1,28 @@
 package com.ke.bella.openapi.protocol.embedding;
 
-import com.ke.bella.openapi.protocol.ProtocolAdaptor;
+import com.ke.bella.openapi.protocol.AuthorizationProperty;
+import com.ke.bella.openapi.protocol.IProtocolAdaptor;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
 import org.springframework.stereotype.Component;
 
-/**
- * Author: Stan Sai Date: 2024/8/15 10:01 description:
- */
 @Component
-public class OpenAIAdaptor implements ProtocolAdaptor.EmbeddingAdaptor<OpenAIAdaptor.OpenAIProperty> {
+public class OpenAIAdaptor implements IProtocolAdaptor.EmbeddingAdaptor {
 
     @Override
-    public Class<OpenAIProperty> getPropertyClass() {
-        return null;
+    public Class<?> getPropertyClass() {
+        return OpenAIProperty.class;
     }
 
-    public static class OpenAIProperty extends ProtocolAdaptor.BaseProperty {
-
+    @Data
+    @SuperBuilder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class OpenAIProperty {
+        AuthorizationProperty auth;
     }
 }

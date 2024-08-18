@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.protocol;
+package com.ke.bella.openapi.protocol.metadata;
 
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;

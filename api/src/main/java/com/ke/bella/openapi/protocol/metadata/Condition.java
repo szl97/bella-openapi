@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.protocol;
+package com.ke.bella.openapi.protocol.metadata;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

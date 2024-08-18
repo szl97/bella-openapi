@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.protocol.Condition;
-import com.ke.bella.openapi.protocol.EndpointCategoryTree;
+import com.ke.bella.openapi.protocol.metadata.Condition;
+import com.ke.bella.openapi.protocol.metadata.EndpointCategoryTree;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.EndpointService;

@@ -1,11 +1,13 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.console.MetaDataOps;
-import com.ke.bella.openapi.protocol.Condition;
-import com.ke.bella.openapi.tables.pojos.CategoryDB;
-import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
-import com.ke.bella.openapi.tables.records.CategoryRecord;
-import com.ke.bella.openapi.tables.records.EndpointCategoryRelRecord;
+import static com.ke.bella.openapi.Tables.*;
+import static com.ke.bella.openapi.tables.Category.CATEGORY;
+
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
@@ -16,13 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.ke.bella.openapi.Tables.ENDPOINT_CATEGORY_REL;
-import static com.ke.bella.openapi.tables.Category.CATEGORY;
+import com.ke.bella.openapi.protocol.metadata.Condition;
+import com.ke.bella.openapi.tables.pojos.CategoryDB;
+import com.ke.bella.openapi.tables.pojos.EndpointCategoryRelDB;
+import com.ke.bella.openapi.tables.records.CategoryRecord;
+import com.ke.bella.openapi.tables.records.EndpointCategoryRelRecord;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 21:13 description:

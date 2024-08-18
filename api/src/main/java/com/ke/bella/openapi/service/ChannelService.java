@@ -3,7 +3,7 @@ package com.ke.bella.openapi.service;
 import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.protocol.Condition;
+import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
