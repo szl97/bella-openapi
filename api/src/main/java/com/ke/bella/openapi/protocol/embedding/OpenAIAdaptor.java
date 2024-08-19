@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol.embedding;
 
+import org.springframework.stereotype.Component;
+
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 
@@ -8,9 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import org.springframework.stereotype.Component;
-
-@Component
+@Component("OpenAIEmbedding")
 public class OpenAIAdaptor implements IProtocolAdaptor.EmbeddingAdaptor {
 
     @Override

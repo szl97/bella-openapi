@@ -18,6 +18,6 @@ public class AdaptorManager {
 
     public synchronized void register(String endpoint, IProtocolAdaptor adaptor) {
         Map<String, IProtocolAdaptor> map = adaptors.computeIfAbsent(endpoint, k -> new HashMap<>());
-        map.put(adaptor.getClass().getName(), adaptor);
+        map.put(adaptor.getClass().getSimpleName(), adaptor);
     }
 }

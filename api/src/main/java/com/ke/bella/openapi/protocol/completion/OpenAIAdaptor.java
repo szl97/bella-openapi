@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocalProperty;
@@ -14,9 +16,8 @@ import lombok.experimental.SuperBuilder;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import org.springframework.stereotype.Component;
 
-@Component
+@Component("OpenAICompletion")
 public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor {
 
     private CompletionSseListener.SseConverter sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
