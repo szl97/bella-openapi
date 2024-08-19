@@ -1,13 +1,13 @@
 package com.ke.bella.openapi.db.repo;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public interface Timed {
-    Timestamp getCtime();
+    LocalDateTime getCtime();
 
-    void setCtime(Timestamp ctime);
+    void setCtime(LocalDateTime ctime);
 
-    Timestamp getMtime();
+    LocalDateTime getMtime();
 
-    void setMtime(Timestamp mtime);
+    void setMtime(LocalDateTime mtime);
 }

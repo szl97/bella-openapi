@@ -38,6 +38,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/console/**")
                 .addPathPatterns(endpointPathPatterns)
+                .addPathPatterns("/v*/meta/auth/**")
                 .order(100);
         registry.addInterceptor(managerInterceptor)
                 .addPathPatterns("/console/**")

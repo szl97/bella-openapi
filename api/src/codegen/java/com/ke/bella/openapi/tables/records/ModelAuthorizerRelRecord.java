@@ -5,7 +5,7 @@ package com.ke.bella.openapi.tables.records;
 
 
 import com.ke.bella.openapi.db.repo.Operator;
-import com.ke.bella.openapi.tables.Category;
+import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 
 import java.time.LocalDateTime;
 
@@ -17,162 +17,162 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * openapi类目
+ * 模型授权信息
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implements Operator, Record11<Long, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
+public class ModelAuthorizerRelRecord extends UpdatableRecordImpl<ModelAuthorizerRelRecord> implements Operator, Record11<Long, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>category.id</code>. 主键ID
+     * Setter for <code>model_authorizer_rel.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>category.id</code>. 主键ID
+     * Getter for <code>model_authorizer_rel.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>category.category_code</code>. 类目编码
+     * Setter for <code>model_authorizer_rel.model_name</code>. 模型名称
      */
-    public void setCategoryCode(String value) {
+    public void setModelName(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>category.category_code</code>. 类目编码
+     * Getter for <code>model_authorizer_rel.model_name</code>. 模型名称
      */
-    public String getCategoryCode() {
+    public String getModelName() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>category.category_name</code>. 类目名
+     * Setter for <code>model_authorizer_rel.authorizer_type</code>. 所有者类型（组织/个人）
      */
-    public void setCategoryName(String value) {
+    public void setAuthorizerType(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>category.category_name</code>. 类目名
+     * Getter for <code>model_authorizer_rel.authorizer_type</code>. 所有者类型（组织/个人）
      */
-    public String getCategoryName() {
+    public String getAuthorizerType() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>category.parent_code</code>. 父类目编码
+     * Setter for <code>model_authorizer_rel.authorizer_code</code>. 所有者系统号
      */
-    public void setParentCode(String value) {
+    public void setAuthorizerCode(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>category.parent_code</code>. 父类目编码
+     * Getter for <code>model_authorizer_rel.authorizer_code</code>. 所有者系统号
      */
-    public String getParentCode() {
+    public String getAuthorizerCode() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>category.status</code>. 状态(active/inactive)
+     * Setter for <code>model_authorizer_rel.authorizer_name</code>. 所有者名称
      */
-    public void setStatus(String value) {
+    public void setAuthorizerName(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>category.status</code>. 状态(active/inactive)
+     * Getter for <code>model_authorizer_rel.authorizer_name</code>. 所有者名称
      */
-    public String getStatus() {
+    public String getAuthorizerName() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>category.cuid</code>. 创建人id
+     * Setter for <code>model_authorizer_rel.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>category.cuid</code>. 创建人id
+     * Getter for <code>model_authorizer_rel.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return (Long) get(5);
     }
 
     /**
-     * Setter for <code>category.cu_name</code>. 创建人姓名
+     * Setter for <code>model_authorizer_rel.cu_name</code>. 创建人姓名
      */
     public void setCuName(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>category.cu_name</code>. 创建人姓名
+     * Getter for <code>model_authorizer_rel.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>category.muid</code>. 编辑人id
+     * Setter for <code>model_authorizer_rel.muid</code>. 编辑人id
      */
     public void setMuid(Long value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>category.muid</code>. 编辑人id
+     * Getter for <code>model_authorizer_rel.muid</code>. 编辑人id
      */
     public Long getMuid() {
         return (Long) get(7);
     }
 
     /**
-     * Setter for <code>category.mu_name</code>. 编辑人姓名
+     * Setter for <code>model_authorizer_rel.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>category.mu_name</code>. 编辑人姓名
+     * Getter for <code>model_authorizer_rel.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
         return (String) get(8);
     }
 
     /**
-     * Setter for <code>category.ctime</code>.
+     * Setter for <code>model_authorizer_rel.ctime</code>.
      */
     public void setCtime(LocalDateTime value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>category.ctime</code>.
+     * Getter for <code>model_authorizer_rel.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return (LocalDateTime) get(9);
     }
 
     /**
-     * Setter for <code>category.mtime</code>.
+     * Setter for <code>model_authorizer_rel.mtime</code>.
      */
     public void setMtime(LocalDateTime value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>category.mtime</code>.
+     * Getter for <code>model_authorizer_rel.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return (LocalDateTime) get(10);
@@ -203,57 +203,57 @@ public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implemen
 
     @Override
     public Field<Long> field1() {
-        return Category.CATEGORY.ID;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.ID;
     }
 
     @Override
     public Field<String> field2() {
-        return Category.CATEGORY.CATEGORY_CODE;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.MODEL_NAME;
     }
 
     @Override
     public Field<String> field3() {
-        return Category.CATEGORY.CATEGORY_NAME;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.AUTHORIZER_TYPE;
     }
 
     @Override
     public Field<String> field4() {
-        return Category.CATEGORY.PARENT_CODE;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.AUTHORIZER_CODE;
     }
 
     @Override
     public Field<String> field5() {
-        return Category.CATEGORY.STATUS;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.AUTHORIZER_NAME;
     }
 
     @Override
     public Field<Long> field6() {
-        return Category.CATEGORY.CUID;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.CUID;
     }
 
     @Override
     public Field<String> field7() {
-        return Category.CATEGORY.CU_NAME;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.CU_NAME;
     }
 
     @Override
     public Field<Long> field8() {
-        return Category.CATEGORY.MUID;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.MUID;
     }
 
     @Override
     public Field<String> field9() {
-        return Category.CATEGORY.MU_NAME;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.MU_NAME;
     }
 
     @Override
     public Field<LocalDateTime> field10() {
-        return Category.CATEGORY.CTIME;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.CTIME;
     }
 
     @Override
     public Field<LocalDateTime> field11() {
-        return Category.CATEGORY.MTIME;
+        return ModelAuthorizerRel.MODEL_AUTHORIZER_REL.MTIME;
     }
 
     @Override
@@ -263,22 +263,22 @@ public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implemen
 
     @Override
     public String component2() {
-        return getCategoryCode();
+        return getModelName();
     }
 
     @Override
     public String component3() {
-        return getCategoryName();
+        return getAuthorizerType();
     }
 
     @Override
     public String component4() {
-        return getParentCode();
+        return getAuthorizerCode();
     }
 
     @Override
     public String component5() {
-        return getStatus();
+        return getAuthorizerName();
     }
 
     @Override
@@ -318,22 +318,22 @@ public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implemen
 
     @Override
     public String value2() {
-        return getCategoryCode();
+        return getModelName();
     }
 
     @Override
     public String value3() {
-        return getCategoryName();
+        return getAuthorizerType();
     }
 
     @Override
     public String value4() {
-        return getParentCode();
+        return getAuthorizerCode();
     }
 
     @Override
     public String value5() {
-        return getStatus();
+        return getAuthorizerName();
     }
 
     @Override
@@ -367,73 +367,73 @@ public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implemen
     }
 
     @Override
-    public CategoryRecord value1(Long value) {
+    public ModelAuthorizerRelRecord value1(Long value) {
         setId(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value2(String value) {
-        setCategoryCode(value);
+    public ModelAuthorizerRelRecord value2(String value) {
+        setModelName(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value3(String value) {
-        setCategoryName(value);
+    public ModelAuthorizerRelRecord value3(String value) {
+        setAuthorizerType(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value4(String value) {
-        setParentCode(value);
+    public ModelAuthorizerRelRecord value4(String value) {
+        setAuthorizerCode(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value5(String value) {
-        setStatus(value);
+    public ModelAuthorizerRelRecord value5(String value) {
+        setAuthorizerName(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value6(Long value) {
+    public ModelAuthorizerRelRecord value6(Long value) {
         setCuid(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value7(String value) {
+    public ModelAuthorizerRelRecord value7(String value) {
         setCuName(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value8(Long value) {
+    public ModelAuthorizerRelRecord value8(Long value) {
         setMuid(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value9(String value) {
+    public ModelAuthorizerRelRecord value9(String value) {
         setMuName(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value10(LocalDateTime value) {
+    public ModelAuthorizerRelRecord value10(LocalDateTime value) {
         setCtime(value);
         return this;
     }
 
     @Override
-    public CategoryRecord value11(LocalDateTime value) {
+    public ModelAuthorizerRelRecord value11(LocalDateTime value) {
         setMtime(value);
         return this;
     }
 
     @Override
-    public CategoryRecord values(Long value1, String value2, String value3, String value4, String value5, Long value6, String value7, Long value8, String value9, LocalDateTime value10, LocalDateTime value11) {
+    public ModelAuthorizerRelRecord values(Long value1, String value2, String value3, String value4, String value5, Long value6, String value7, Long value8, String value9, LocalDateTime value10, LocalDateTime value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -453,23 +453,23 @@ public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implemen
     // -------------------------------------------------------------------------
 
     /**
-     * Create a detached CategoryRecord
+     * Create a detached ModelAuthorizerRelRecord
      */
-    public CategoryRecord() {
-        super(Category.CATEGORY);
+    public ModelAuthorizerRelRecord() {
+        super(ModelAuthorizerRel.MODEL_AUTHORIZER_REL);
     }
 
     /**
-     * Create a detached, initialised CategoryRecord
+     * Create a detached, initialised ModelAuthorizerRelRecord
      */
-    public CategoryRecord(Long id, String categoryCode, String categoryName, String parentCode, String status, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
-        super(Category.CATEGORY);
+    public ModelAuthorizerRelRecord(Long id, String modelName, String authorizerType, String authorizerCode, String authorizerName, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
+        super(ModelAuthorizerRel.MODEL_AUTHORIZER_REL);
 
         setId(id);
-        setCategoryCode(categoryCode);
-        setCategoryName(categoryName);
-        setParentCode(parentCode);
-        setStatus(status);
+        setModelName(modelName);
+        setAuthorizerType(authorizerType);
+        setAuthorizerCode(authorizerCode);
+        setAuthorizerName(authorizerName);
         setCuid(cuid);
         setCuName(cuName);
         setMuid(muid);

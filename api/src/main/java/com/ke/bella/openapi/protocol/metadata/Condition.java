@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 public class Condition {
@@ -39,6 +40,8 @@ public class Condition {
         private Set<String> modelNames;
         private String visibility;
         private String status;
+        private String personalCode;
+        private Set<String> orgCodes;
     }
 
     @EqualsAndHashCode(callSuper = true)

@@ -94,10 +94,17 @@ public class MetadataConsoleController {
         return true;
     }
 
-    @PutMapping("/model/publish/cancel")
+    @PostMapping("/model/publish/cancel")
     public Boolean cancelPublishModel(@RequestBody MetaDataOps.ModelVisibilityOp op) {
         checkModelNameOp(op);
         modelService.changeVisibility(op.getModelName(), false);
+        return true;
+    }
+
+    @PostMapping("/model/authorize")
+    public Boolean authorizeModel(@RequestBody MetaDataOps.ModelAuthorizerOp op) {
+        checkModelAuthorizerOp(op);
+        modelService.modelAuthorize(op);
         return true;
     }
 

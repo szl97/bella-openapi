@@ -4,6 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,15 +95,32 @@ public class ConsoleApiTest {
         if(StringUtils.isNumeric(def.res)) {
             Assert.assertEquals(currentFile + " 第"+ lines + "行执行结果不符合预期, res code:" + bellaResponse.getCode(), Integer.valueOf(def.res).intValue(), bellaResponse.getCode());
         } else {
-            Map<String, Object> expected = JacksonUtils.toMap(def.res);
-            Map<String, Object> real = JacksonUtils.toMap(bellaResponse.getData());
-            for(Map.Entry<String, Object> entry : expected.entrySet()) {
-                if(!real.containsKey(entry.getKey())) {
-                    throw new RuntimeException(currentFile + " 第"+ lines + "行执行结果不符合预期, res:"+JacksonUtils.serialize(def.res));
+            if(bellaResponse.getData() instanceof Collection) {
+                Collection<LinkedHashMap<String, Object>> expected = JacksonUtils.deserialize(def.res, Collection.class);
+                Collection<LinkedHashMap<String, Object>> collection = (Collection) bellaResponse.getData();
+                for(LinkedHashMap<String, Object> o : expected) {
+                    boolean equal = collection.stream().anyMatch(x -> {
+                        if(x.keySet().containsAll(o.keySet())) {
+                            return x.entrySet().stream().allMatch(e->!o.containsKey(e.getKey()) || e.getValue().equals(o.get(e.getKey())));
+                        }
+                        return false;
+                    });
+                    if(!equal) {
+                        throw new RuntimeException(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(bellaResponse.getData()));
+                    }
                 }
-                Object obj = real.get(entry.getKey());
-                Assert.assertEquals(currentFile + " 第"+ lines + "行执行结果不符合预期, res:"+JacksonUtils.serialize(def.res), obj, entry.getValue());
+            } else {
+                Map<String, Object> expected = JacksonUtils.toMap(def.res);
+                Map<String, Object> real = JacksonUtils.toMap(bellaResponse.getData());
+                for (Map.Entry<String, Object> entry : expected.entrySet()) {
+                    if(!real.containsKey(entry.getKey())) {
+                        throw new RuntimeException(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res));
+                    }
+                    Object obj = real.get(entry.getKey());
+                    Assert.assertEquals(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res), obj,
+                            entry.getValue());
 
+                }
             }
         }
     }

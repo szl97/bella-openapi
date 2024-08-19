@@ -28,6 +28,11 @@ public class TableConstants {
     public static final String MODEL = "model";
     public static final String ENDPOINT = "endpoint";
     public static final List<String> ENTITY_TYPES = ImmutableList.of(MODEL, ENDPOINT);
+    public static final String SYSTEM = "system";
+    public static final String ORG = "org";
+    public static final String PERSON = "person";
+    public static final List<String> OWNER_TYPES = ImmutableList.of(SYSTEM, ORG, PERSON);
+    public static final List<String> AUTHORIZER_TYPES = ImmutableList.of(ORG, PERSON);
 
     @AllArgsConstructor
     @Getter

@@ -16,11 +16,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.ke.bella.openapi.db.TableConstants.AUTHORIZER_TYPES;
 import static com.ke.bella.openapi.db.TableConstants.CHANNEL_PRIORITY;
 import static com.ke.bella.openapi.db.TableConstants.DATA_DESTINATIONS;
 import static com.ke.bella.openapi.db.TableConstants.ENDPOINT;
 import static com.ke.bella.openapi.db.TableConstants.MODEL;
 import static com.ke.bella.openapi.db.TableConstants.ModelJsonKey;
+import static com.ke.bella.openapi.db.TableConstants.OWNER_TYPES;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory;
 import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint;
 import static com.ke.bella.openapi.utils.MatchUtils.isAllText;
@@ -85,6 +87,9 @@ public class MetadataValidator {
             Assert.isTrue(op.getModelName().length() <= 60, "模型名长度不能超过60");
             Assert.hasText(op.getProperties(), "模型属性不能为空");
             Assert.hasText(op.getFeatures(), "模型特性不能为空");
+            Assert.hasText(op.getOwnerType(), "模型所有者类型不能为空");
+            Assert.hasText(op.getOwnerCode(), "模型所有者code不能为空");
+            Assert.hasText(op.getOwnerName(), "模型所有者姓名不能为空");
         } else {
             Assert.isTrue(CollectionUtils.isNotEmpty(op.getEndpoints())
                     || StringUtils.isNotBlank(op.getDocumentUrl())
@@ -100,10 +105,25 @@ public class MetadataValidator {
                     String.join(",", Arrays.stream(SystemBasicEndpoint.values())
                             .map(SystemBasicEndpoint::getEndpoint).collect(Collectors.toList())));
         }
+        if(StringUtils.isNotEmpty(op.getOwnerType())) {
+            Assert.isTrue(OWNER_TYPES.contains(op.getOwnerType()), "错误的所有者类型");
+        }
     }
 
     public static void checkModelNameOp(MetaDataOps.ModelNameOp op) {
         Assert.hasText(op.getModelName(), "模型名不可为空");
+    }
+
+    public static void checkModelAuthorizerOp(MetaDataOps.ModelAuthorizerOp op) {
+        Assert.hasText(op.getModel(), "模型名称不可为空");
+        if(CollectionUtils.isNotEmpty(op.getAuthorizers())) {
+            Assert.isTrue(op.getAuthorizers().stream().allMatch(x -> AUTHORIZER_TYPES.contains(x.getAuthorizerType())),
+                    "错误的授权者类型");
+            Assert.isTrue(op.getAuthorizers().stream().map(MetaDataOps.ModelAuthorizer::getAuthorizerCode).noneMatch(String::isEmpty),
+                    "授权者code不能为空");
+            Assert.isTrue(op.getAuthorizers().stream().map(MetaDataOps.ModelAuthorizer::getAuthorizerName).noneMatch(String::isEmpty),
+                    "授权者名称不能为空");
+        }
     }
 
     public static void checkChannelCreateOp(MetaDataOps.ChannelCreateOp op) {

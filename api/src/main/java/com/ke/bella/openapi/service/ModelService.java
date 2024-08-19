@@ -2,6 +2,7 @@ package com.ke.bella.openapi.service;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.console.ConsoleContext;
 import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
@@ -9,6 +10,7 @@ import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelAuthorizerRelDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
 import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
 import org.apache.commons.collections4.CollectionUtils;
@@ -149,6 +151,40 @@ public class ModelService {
         modelRepo.updateVisibility(modelName, visibility);
     }
 
+    @Transactional
+    public void modelAuthorize(MetaDataOps.ModelAuthorizerOp op) {
+        modelRepo.checkExist(op.getModel(), true);
+        checkOwnerPermission(op.getModel());
+        List<ModelAuthorizerRelDB> origins = modelRepo.listAuthorizersByModelName(op.getModel());
+        Set<MetaDataOps.ModelAuthorizer> inserts = Sets.newHashSet(op.getAuthorizers());
+        List<Long> deletes = new ArrayList<>();
+        origins.forEach(origin -> {
+                    MetaDataOps.ModelAuthorizer authorizer = MetaDataOps.ModelAuthorizer
+                            .builder()
+                            .authorizerType(origin.getAuthorizerType())
+                            .authorizerCode(origin.getAuthorizerCode())
+                            .build();
+                    if(op.getAuthorizers().contains(authorizer)) {
+                        inserts.remove(authorizer);
+                    } else {
+                        deletes.add(origin.getId());
+                    }
+                }
+        );
+        if(CollectionUtils.isNotEmpty(deletes)) {
+            modelRepo.batchDeleteModelAuthorizers(deletes);
+        }
+        if(CollectionUtils.isNotEmpty(inserts)) {
+            modelRepo.batchInsertModelAuthorizers(op.getModel(), inserts);
+        }
+    }
+
+    private void checkOwnerPermission(String model) {
+        ModelDB db = modelRepo.queryByUniqueKey(model);
+        ConsoleContext.Operator operator = ConsoleContext.getOperator();
+        //todo: 检查 operator 是否是 Owner
+    }
+
     public ModelDB getActiveByModelName(String modelName) {
         ModelDB db = getOne(modelName);
         return db == null || db.getStatus().equals(INACTIVE) ? null : db;
@@ -159,31 +195,37 @@ public class ModelService {
     }
 
     public List<ModelDB> listByCondition(Condition.ModelCondition condition) {
-        if(!fillModelNames(condition)) {
-            return Lists.newArrayList();
-        }
         return modelRepo.list(condition);
     }
 
     public Page<ModelDB> pageByCondition(Condition.ModelCondition condition) {
-        if(!fillModelNames(condition)) {
-            return Page.from(condition.getPageNum(), condition.getPageSize());
-        }
         return modelRepo.page(condition);
     }
 
-    private boolean fillModelNames(Condition.ModelCondition condition) {
-        if(StringUtils.isNotEmpty(condition.getEndpoint())) {
-            List<String> modelNames = modelRepo.listModelNamesByEndpoint(condition.getEndpoint());
-            if(CollectionUtils.isEmpty(modelNames)) {
-                return false;
-            }
-            if(condition.getModelNames() == null) {
-                condition.setModelNames(new HashSet<>());
-            }
-            condition.getModelNames().addAll(modelNames);
-        }
-        return true;
+    public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition) {
+        fillPermissionCode(condition);
+        return listByCondition(condition);
     }
 
+    public Page<ModelDB> pageByConditionWithPermission(Condition.ModelCondition condition) {
+        fillPermissionCode(condition);
+        return pageByCondition(condition);
+    }
+
+    private void fillPermissionCode(Condition.ModelCondition condition) {
+        ConsoleContext.Operator operator = ConsoleContext.getOperator();
+        //todo: 获取所有 org
+        Set<String> orgCodes = Sets.newHashSet();
+        if(StringUtils.isEmpty(condition.getPersonalCode())) {
+            condition.setPersonalCode(operator.getUserId().toString());
+        } else {
+            Assert.isTrue(operator.getUserId().equals(0L) || condition.getPersonalCode().equals(operator.getUserId().toString()), "没有查询权限");
+        }
+        if(CollectionUtils.isEmpty(condition.getOrgCodes())) {
+            condition.setOrgCodes(orgCodes);
+        } else {
+            Assert.isTrue(operator.getUserId().equals(0L) || CollectionUtils.isEmpty(condition.getOrgCodes()) ||
+                    orgCodes.containsAll(condition.getOrgCodes()), "没有查询权限");
+        }
+    }
 }

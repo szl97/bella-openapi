@@ -1,12 +1,17 @@
 package com.ke.bella.openapi.db.repo;
 
+import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.protocol.metadata.Condition;
+import com.ke.bella.openapi.tables.pojos.ModelAuthorizerRelDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
 import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
+import com.ke.bella.openapi.tables.records.ModelAuthorizerRelRecord;
 import com.ke.bella.openapi.tables.records.ModelEndpointRelRecord;
 import com.ke.bella.openapi.tables.records.ModelRecord;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.Record;
+import org.jooq.SelectJoinStep;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
@@ -18,9 +23,14 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.ke.bella.openapi.Tables.MODEL;
+import static com.ke.bella.openapi.Tables.MODEL_AUTHORIZER_REL;
 import static com.ke.bella.openapi.Tables.MODEL_ENDPOINT_REL;
+import static com.ke.bella.openapi.db.TableConstants.ORG;
+import static com.ke.bella.openapi.db.TableConstants.PERSON;
+import static com.ke.bella.openapi.db.TableConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 20:34 description:
@@ -48,13 +58,41 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
         return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), ModelDB.class);
     }
 
-    private SelectSeekStep1<ModelRecord, Long> constructSql(Condition.ModelCondition op) {
-        return db.selectFrom(MODEL)
-                .where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like("%" + op.getModelName() + "%"))
+    private SelectSeekStep1<Record, Long> constructSql(Condition.ModelCondition op) {
+        SelectJoinStep step = db.select(MODEL.fields())
+                .from(MODEL);
+        if(StringUtils.isNotEmpty(op.getEndpoint())) {
+            step = step.leftJoin(MODEL_ENDPOINT_REL)
+                    .on(MODEL.MODEL_NAME.eq(MODEL_ENDPOINT_REL.MODEL_NAME));
+        }
+        if(StringUtils.isNotEmpty(op.getPersonalCode()) || CollectionUtils.isNotEmpty(op.getOrgCodes())) {
+            step = step.leftJoin(MODEL_AUTHORIZER_REL)
+                    .on(MODEL.MODEL_NAME.eq(MODEL_AUTHORIZER_REL.MODEL_NAME));
+        }
+        return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like("%" + op.getModelName() + "%"))
                 .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
                 .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : MODEL.VISIBILITY.eq(op.getVisibility()))
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : MODEL.STATUS.eq(op.getStatus()))
+                .and(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.eq(op.getEndpoint()))
+                .and(permissionCondition(op.getPersonalCode(), op.getOrgCodes()))
                 .orderBy(MODEL.ID.desc());
+    }
+
+    private org.jooq.Condition permissionCondition(String personalCode, Set<String> orgCodes) {
+        if(StringUtils.isEmpty(personalCode) && CollectionUtils.isEmpty(orgCodes)) {
+            return DSL.noCondition();
+        }
+        org.jooq.Condition condition = MODEL.VISIBILITY.eq(PUBLIC);
+        if(StringUtils.isNotEmpty(personalCode)) {
+            condition = condition.or(MODEL_AUTHORIZER_REL.AUTHORIZER_TYPE.eq(PERSON)
+                            .and(MODEL_AUTHORIZER_REL.AUTHORIZER_CODE.eq(personalCode)));
+        }
+        if(CollectionUtils.isNotEmpty(orgCodes)) {
+                condition = condition.or(MODEL_AUTHORIZER_REL.AUTHORIZER_TYPE.eq(ORG)
+                                .and(MODEL_AUTHORIZER_REL.AUTHORIZER_CODE.in(orgCodes)));
+
+        }
+        return condition;
     }
 
     @Transactional
@@ -87,6 +125,39 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
         return db.selectFrom(MODEL_ENDPOINT_REL)
                 .where(MODEL_ENDPOINT_REL.ENDPOINT.eq(endpoint))
                 .fetch(MODEL_ENDPOINT_REL.MODEL_NAME);
+    }
+
+    @Transactional
+    public int batchDeleteModelAuthorizers(List<Long> ids) {
+        return db.deleteFrom(MODEL_AUTHORIZER_REL)
+                .where(MODEL_AUTHORIZER_REL.ID.in(ids))
+                .execute();
+    }
+
+    @Transactional
+    public int batchInsertModelAuthorizers(String modelName, Collection<MetaDataOps.ModelAuthorizer> authorizers) {
+        List<ModelAuthorizerRelRecord> records = new ArrayList<>();
+        for (MetaDataOps.ModelAuthorizer authorizer : authorizers) {
+            ModelAuthorizerRelRecord rec = MODEL_AUTHORIZER_REL.newRecord();
+            rec.from(authorizer);
+            rec.setModelName(modelName);
+            fillCreatorInfo(rec);
+            records.add(rec);
+        }
+        return batchInsert(db, records);
+    }
+
+    public List<ModelAuthorizerRelDB> listAuthorizersByModelName(String modelName) {
+        return db.selectFrom(MODEL_AUTHORIZER_REL)
+                .where(MODEL_AUTHORIZER_REL.MODEL_NAME.eq(modelName))
+                .fetchInto(ModelAuthorizerRelDB.class);
+    }
+
+    public List<String> listModelNamesByAuthorizer(String authorizerType, String authorizerCode) {
+        return db.selectFrom(MODEL_AUTHORIZER_REL)
+                .where(MODEL_AUTHORIZER_REL.AUTHORIZER_TYPE.eq(authorizerType))
+                .and(MODEL_AUTHORIZER_REL.AUTHORIZER_CODE.eq(authorizerCode))
+                .fetch(MODEL_AUTHORIZER_REL.MODEL_NAME);
     }
 
     @Override

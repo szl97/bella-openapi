@@ -59,6 +59,16 @@ public class MetadataController {
         return modelService.pageByCondition(condition);
     }
 
+    @GetMapping("/auth/model/list")
+    public List<ModelDB> listAuthModel(Condition.ModelCondition condition) {
+        return modelService.listByConditionWithPermission(condition);
+    }
+
+    @GetMapping("/auth/model/page")
+    public List<ModelDB> pageAuthModel(Condition.ModelCondition condition) {
+        return modelService.listByConditionWithPermission(condition);
+    }
+
     @GetMapping("/model/info/{name}")
     public ModelDB getModel(@PathVariable String name) {
         return modelService.getOne(name);

@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class MetaDataOps {
@@ -31,9 +33,43 @@ public class MetaDataOps {
     public static class ModelOp {
         private String modelName;
         private Set<String> endpoints;
+        private String ownerType;
+        private String ownerCode;
+        private String ownerName;
         private String documentUrl;
         private String properties;
         private String features;
+    }
+
+    @Data
+    public static class ModelAuthorizerOp {
+        private String model;
+        private Set<ModelAuthorizer> authorizers;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModelAuthorizer {
+        private String  authorizerType;
+        private String  authorizerCode;
+        private String  authorizerName;
+
+        @Override
+        public boolean equals(Object object) {
+            if(this == object)
+                return true;
+            if(object == null || getClass() != object.getClass())
+                return false;
+            ModelAuthorizer that = (ModelAuthorizer) object;
+            return Objects.equals(authorizerType, that.authorizerType) && Objects.equals(authorizerCode, that.authorizerCode);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(authorizerType, authorizerCode);
+        }
     }
 
     @Data
