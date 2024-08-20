@@ -73,6 +73,6 @@ public class EndpointRepo extends StatusRepo<EndpointDB, EndpointRecord, String>
 
     @Override
     public String prefix() {
-        return "en_";
+        return "ep-";
     }
 }

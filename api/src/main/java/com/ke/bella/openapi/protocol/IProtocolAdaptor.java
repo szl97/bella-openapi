@@ -12,12 +12,12 @@ public interface IProtocolAdaptor {
 
     Class<?> getPropertyClass();
 
-    default Request.Builder authorizationRequestBuilder(AuthorizationProperty.AuthType type, AuthorizationProperty property) {
+    default Request.Builder authorizationRequestBuilder(AuthorizationProperty property) {
         Request.Builder builder = new Request.Builder();
-        if(type == null) {
+        if(property == null) {
             return builder;
         }
-        switch (type) {
+        switch (property.type) {
         case BASIC:
             return builder.header("Authorization", property.getApiKey());
         case CUSTOM:
@@ -30,9 +30,9 @@ public interface IProtocolAdaptor {
 
     interface CompletionAdaptor extends IProtocolAdaptor {
 
-        CompletionResponse httpRequest(CompletionRequest request, String url, IProtocalProperty property);
+        CompletionResponse httpRequest(CompletionRequest request, String url, IProtocolProperty property);
 
-        void streamRequest(CompletionRequest request, String url, IProtocalProperty property, Callback.CompletionSseCallback callback);
+        void streamRequest(CompletionRequest request, String url, IProtocolProperty property, Callback.CompletionSseCallback callback);
 
         @Override
         default String endpoint() {

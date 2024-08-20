@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
-import com.ke.bella.openapi.protocol.IProtocalProperty;
+import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
@@ -20,16 +20,16 @@ import okhttp3.RequestBody;
 @Component("OpenAICompletion")
 public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor {
 
-    private CompletionSseListener.SseConverter sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
+    private Callback.SseConvertCallback sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, IProtocalProperty property) {
+    public CompletionResponse httpRequest(CompletionRequest request, String url, IProtocolProperty property) {
         Request httpRequest = buildRequest(request, url, (OpenAIProperty) property);
         return HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, IProtocalProperty property, Callback.CompletionSseCallback callback) {
+    public void streamRequest(CompletionRequest request, String url, IProtocolProperty property, Callback.CompletionSseCallback callback) {
         Request httpRequest = buildRequest(request, url, (OpenAIProperty) property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
@@ -39,7 +39,7 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor {
             url += property.getApiVersion();
         }
         request.setModel(property.getDeployName());
-        Request.Builder builder = authorizationRequestBuilder(property.auth.getType(), property.getAuth())
+        Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
                 .post(RequestBody.create(MediaType.parse("application/json"),
                         JSON.toJSONString(request)));
@@ -55,7 +55,7 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor {
     @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OpenAIProperty implements IProtocalProperty {
+    public static class OpenAIProperty implements IProtocolProperty {
         AuthorizationProperty auth;
         String deployName;
         String apiVersion;

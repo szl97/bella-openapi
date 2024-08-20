@@ -3,12 +3,11 @@ package com.ke.bella.openapi;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +17,6 @@ import static com.ke.bella.openapi.utils.MatchUtils.isBracesWithSpaces;
 import static com.ke.bella.openapi.utils.MatchUtils.isTextStart;
 import static com.ke.bella.openapi.utils.MatchUtils.isValidURL;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 /**
  * Author: Stan Sai Date: 2024/8/5 12:44 description:

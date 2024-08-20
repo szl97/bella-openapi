@@ -3,7 +3,7 @@ package com.ke.bella.openapi.endpoints;
 import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
-import com.ke.bella.openapi.protocol.IProtocalProperty;
+import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.completion.Callback;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
@@ -31,7 +31,7 @@ public class ChatController {
         String endpoint = RequestInfoContext.getRequest().getRequestURI();
         ChannelDB channel = router.route(endpoint, request.getModel(), adaptorManager.getProtocols(endpoint));
         IProtocolAdaptor.CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, channel.getProtocol(), IProtocolAdaptor.CompletionAdaptor.class);
-        IProtocalProperty property = (IProtocalProperty) JacksonUtils.deserialize(channel.getChannelInfo(), adaptor.getPropertyClass());
+        IProtocolProperty property = (IProtocolProperty) JacksonUtils.deserialize(channel.getChannelInfo(), adaptor.getPropertyClass());
         if(request.isStream()) {
             SseEmitter sseEmitter = getSseEmitter();
             adaptor.streamRequest(request, channel.getUrl(), property, new Callback.CompletionSseCallback(sseEmitter));

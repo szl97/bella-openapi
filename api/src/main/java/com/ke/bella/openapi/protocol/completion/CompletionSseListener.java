@@ -14,11 +14,11 @@ public class CompletionSseListener extends EventSourceListener {
     @Setter
     private CompletableFuture<?> connectionInitFuture;
     private Callback.CompletionSseCallback callback;
-    private SseConverter sseConverter;
+    private Callback.SseConvertCallback sseConverter;
     private final Set<String> DONE_FLAGS = ImmutableSet.of("[DONE]");
 
     public CompletionSseListener(Callback.CompletionSseCallback sseCallback,
-                                SseConverter sseConverter) {
+                                Callback.SseConvertCallback sseConverter) {
         this.callback = sseCallback;
         this.sseConverter = sseConverter;
     }
@@ -34,7 +34,7 @@ public class CompletionSseListener extends EventSourceListener {
             if(DONE_FLAGS.contains(msg)) {
                 callback.done();
             } else {
-                StreamCompletionResponse response = sseConverter.convert(msg);
+                StreamCompletionResponse response = sseConverter.callback(msg);
                 if(response != null) {
                     callback.callback(response);
                 }
@@ -52,10 +52,5 @@ public class CompletionSseListener extends EventSourceListener {
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response) {
         callback.finishWithException(t);
-    }
-
-    @FunctionalInterface
-    interface SseConverter {
-        StreamCompletionResponse convert(String str);
     }
 }

@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.configuration;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,9 @@ import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 public class BellaAutoConf {
 
     @Bean
-    public AdaptorManager adaptorManager(@Autowired Map<String, IProtocolAdaptor> adaptors) {
+    public AdaptorManager adaptorManager(@Autowired List<IProtocolAdaptor> adaptors) {
         AdaptorManager manager = new AdaptorManager();
-        adaptors.forEach(manager::register);
+        adaptors.forEach(adaptor -> manager.register(adaptor.endpoint(), adaptor));
         return manager;
     }
 }

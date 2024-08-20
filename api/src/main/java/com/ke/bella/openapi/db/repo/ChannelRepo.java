@@ -62,6 +62,6 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
 
     @Override
     public String prefix() {
-        return "ch_";
+        return "ch-";
     }
 }

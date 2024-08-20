@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class AuthorizationProperty implements IProtocalProperty {
+public class AuthorizationProperty implements IProtocolProperty {
     @Getter
     @AllArgsConstructor
     public enum AuthType {
