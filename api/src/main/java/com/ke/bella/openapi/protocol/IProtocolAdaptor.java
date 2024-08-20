@@ -28,11 +28,11 @@ public interface IProtocolAdaptor {
     }
 
 
-    interface CompletionAdaptor extends IProtocolAdaptor {
+    interface CompletionAdaptor<T extends IProtocolProperty> extends IProtocolAdaptor {
 
-        CompletionResponse httpRequest(CompletionRequest request, String url, IProtocolProperty property);
+        CompletionResponse httpRequest(CompletionRequest request, String url, T property);
 
-        void streamRequest(CompletionRequest request, String url, IProtocolProperty property, Callback.CompletionSseCallback callback);
+        void streamRequest(CompletionRequest request, String url, T property, Callback.CompletionSseCallback callback);
 
         @Override
         default String endpoint() {

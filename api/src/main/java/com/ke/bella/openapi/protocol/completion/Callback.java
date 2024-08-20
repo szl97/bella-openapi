@@ -9,7 +9,7 @@ public interface Callback<T, R> {
      R callback(T msg);
 
      @FunctionalInterface
-     interface SseConvertCallback extends Callback<String, StreamCompletionResponse> {
+     interface SseConvertCallback<T> extends Callback<T, StreamCompletionResponse> {
      }
 
     @FunctionalInterface
@@ -33,8 +33,12 @@ public interface Callback<T, R> {
              }
          }
 
-         public void done() throws IOException {
-             sseEmitter.send("[DONE]");
+         public void done() {
+             try {
+                 sseEmitter.send("[DONE]");
+             } catch (IOException e) {
+                 throw new RuntimeException(e);
+             }
          }
 
          public void finish() {

@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.service;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.console.ConsoleContext;
 import com.ke.bella.openapi.console.MetaDataOps;
@@ -22,13 +21,14 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.console.MetadataValidator.*;
+import static com.ke.bella.openapi.console.MetadataValidator.generateInvalidModelJsonKeyMessage;
+import static com.ke.bella.openapi.console.MetadataValidator.json2Map;
+import static com.ke.bella.openapi.console.MetadataValidator.matchPath;
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.MODEL;

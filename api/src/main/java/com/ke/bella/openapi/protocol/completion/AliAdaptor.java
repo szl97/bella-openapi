@@ -20,24 +20,24 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component("AliCompletion")
-public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor {
+public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor.AliProperty> {
     @Override
     public Class<?> getPropertyClass() {
         return AliProperty.class;
     }
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, IProtocolProperty property) {
+    public CompletionResponse httpRequest(CompletionRequest request, String url, AliProperty property) {
         AliCompletionRequest aliRequest = requestConvert.callback(request);
-        Request httpRequest = buildRequest(aliRequest, url, (AliAdaptor.AliProperty) property);
+        Request httpRequest = buildRequest(aliRequest, url, property);
         AliCompletionResponse response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class);
         return responseConvert.callback(response);
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, IProtocolProperty property, Callback.CompletionSseCallback callback) {
+    public void streamRequest(CompletionRequest request, String url, AliProperty property, Callback.CompletionSseCallback callback) {
         AliCompletionRequest aliRequest = requestConvert.callback(request);
-        Request httpRequest = buildRequest(aliRequest, url, (AliAdaptor.AliProperty) property);
+        Request httpRequest = buildRequest(aliRequest, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
 
@@ -70,7 +70,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor {
         return usage;
     }
 
-    private Callback.SseConvertCallback sseConverter = str -> {
+    private final Callback.SseConvertCallback<String> sseConverter = str -> {
         AliCompletionResponse response = JacksonUtils.deserialize(str, AliCompletionResponse.class);
         OpenapiResponse.OpenapiError openAIError = null;
         List<StreamCompletionResponse.Choice> choices = null;
@@ -92,7 +92,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor {
                 .build();
     };
 
-    private Callback.ConvertCallback<AliCompletionResponse> responseConvert = response -> {
+    private final Callback.ConvertCallback<AliCompletionResponse> responseConvert = response -> {
         if(response == null) {
             return null;
         }
@@ -114,7 +114,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor {
                 .build();
     };
 
-    private Callback.RequestConvertCallback<AliCompletionRequest> requestConvert = request -> {
+    private final Callback.RequestConvertCallback<AliCompletionRequest> requestConvert = request -> {
         AliCompletionRequest.AliCompletionInput input = AliCompletionRequest.AliCompletionInput.builder()
                 .messages(request.getMessages())
                 .build();

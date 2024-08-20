@@ -144,7 +144,7 @@ public class MetadataValidator {
                 "通道的优先级只能是：" + String.join("或", CHANNEL_PRIORITY));
         Assert.hasText(op.getProtocol(), "请求协议不可为空字符串");
         Assert.hasText(op.getSupplier(), "供应商不可为空字符串");
-        Assert.isTrue(isValidURL(op.getUrl()), "url必须以http://或https://开头");
+        Assert.isTrue(StringUtils.isEmpty(op.getUrl()) || isValidURL(op.getUrl()), "url必须以http://或https://开头");
         checkJsonInfo(op.getChannelInfo());
         checkJsonInfo(op.getPriceInfo());
     }

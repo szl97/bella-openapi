@@ -18,19 +18,19 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 @Component("OpenAICompletion")
-public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor {
+public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIAdaptor.OpenAIProperty> {
 
-    private Callback.SseConvertCallback sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
+    private final Callback.SseConvertCallback<String> sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, IProtocolProperty property) {
-        Request httpRequest = buildRequest(request, url, (OpenAIProperty) property);
+    public CompletionResponse httpRequest(CompletionRequest request, String url, OpenAIProperty property) {
+        Request httpRequest = buildRequest(request, url, property);
         return HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, IProtocolProperty property, Callback.CompletionSseCallback callback) {
-        Request httpRequest = buildRequest(request, url, (OpenAIProperty) property);
+    public void streamRequest(CompletionRequest request, String url, OpenAIProperty property, Callback.CompletionSseCallback callback) {
+        Request httpRequest = buildRequest(request, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
 

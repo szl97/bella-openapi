@@ -14,7 +14,7 @@ public class CompletionSseListener extends EventSourceListener {
     @Setter
     private CompletableFuture<?> connectionInitFuture;
     private Callback.CompletionSseCallback callback;
-    private Callback.SseConvertCallback sseConverter;
+    private Callback.SseConvertCallback<String> sseConverter;
     private final Set<String> DONE_FLAGS = ImmutableSet.of("[DONE]");
 
     public CompletionSseListener(Callback.CompletionSseCallback sseCallback,
