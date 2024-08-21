@@ -17,7 +17,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * openapi能力点
+ * 能力点
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implements Operator, Record13<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
@@ -81,14 +81,14 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     /**
-     * Setter for <code>endpoint.maintainer_code</code>. 维护人系统号
+     * Setter for <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public void setMaintainerCode(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>endpoint.maintainer_code</code>. 维护人系统号
+     * Getter for <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public String getMaintainerCode() {
         return (String) get(4);

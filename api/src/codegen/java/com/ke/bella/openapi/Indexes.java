@@ -4,6 +4,7 @@
 package com.ke.bella.openapi;
 
 
+import com.ke.bella.openapi.tables.ApiKey;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -33,6 +34,8 @@ public class Indexes {
     public static final Index CATEGORY_IDX_CATEGORY_NAME = Internal.createIndex(DSL.name("idx_category_name"), Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_NAME }, false);
     public static final Index CHANNEL_IDX_ENTITY_TYPE_CODE = Internal.createIndex(DSL.name("idx_entity_type_code"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.ENTITY_TYPE, Channel.CHANNEL.ENTITY_CODE }, false);
     public static final Index MODEL_ENDPOINT_REL_IDX_MODEL_NAME = Internal.createIndex(DSL.name("idx_model_name"), ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, false);
+    public static final Index API_KEY_IDX_OWNER_TYPE_CODE = Internal.createIndex(DSL.name("idx_owner_type_code"), ApiKey.API_KEY, new OrderField[] { ApiKey.API_KEY.OWNER_TYPE, ApiKey.API_KEY.OWNER_CODE }, false);
+    public static final Index API_KEY_IDX_PARENT_CODE_USER_ID = Internal.createIndex(DSL.name("idx_parent_code_user_id"), ApiKey.API_KEY, new OrderField[] { ApiKey.API_KEY.PARENT_CODE, ApiKey.API_KEY.USER_ID }, false);
     public static final Index CHANNEL_IDX_PROTOCOL = Internal.createIndex(DSL.name("idx_protocol"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.PROTOCOL }, false);
     public static final Index ENDPOINT_CATEGORY_REL_IDX_SORT = Internal.createIndex(DSL.name("idx_sort"), EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.SORT }, false);
     public static final Index CHANNEL_IDX_SUPPLIER = Internal.createIndex(DSL.name("idx_supplier"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.SUPPLIER }, false);

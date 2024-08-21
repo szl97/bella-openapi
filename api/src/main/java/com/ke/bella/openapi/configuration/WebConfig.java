@@ -2,7 +2,6 @@ package com.ke.bella.openapi.configuration;
 
 import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
-import com.ke.bella.openapi.intercept.ManagerInterceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +19,6 @@ public class WebConfig implements WebMvcConfigurer {
             .map(TableConstants.SystemBasicEndpoint::getEndpoint).collect(Collectors.toList());
     @Autowired
     private AuthorizationInterceptor authorizationInterceptor;
-    @Autowired
-    private ManagerInterceptor managerInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -39,9 +36,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/console/**")
                 .addPathPatterns(endpointPathPatterns)
                 .addPathPatterns("/v*/meta/auth/**")
+                .addPathPatterns("/v*/apikey/**")
                 .order(100);
-        registry.addInterceptor(managerInterceptor)
-                .addPathPatterns("/console/**")
-                .order(200);
     }
 }

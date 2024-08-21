@@ -17,7 +17,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * openapi能力点类目
+ * 能力点类目
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EndpointCategoryRelRecord extends UpdatableRecordImpl<EndpointCategoryRelRecord> implements Operator, Record10<Long, String, String, Integer, Long, String, Long, String, LocalDateTime, LocalDateTime> {

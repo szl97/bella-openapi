@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol.metadata;
 
+import com.ke.bella.openapi.protocol.PageCondition;
+import com.ke.bella.openapi.protocol.PermissionCondition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,11 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 public class Condition {
-    @Data
-    public static class PageCondition {
-        private int pageNum;
-        private int pageSize;
-    }
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -34,14 +31,12 @@ public class Condition {
 
     @EqualsAndHashCode(callSuper = true)
     @Data
-    public static class ModelCondition extends PageCondition {
+    public static class ModelCondition extends PermissionCondition {
         private String modelName;
         private String endpoint;
         private Set<String> modelNames;
         private String visibility;
         private String status;
-        private String personalCode;
-        private Set<String> orgCodes;
     }
 
     @EqualsAndHashCode(callSuper = true)

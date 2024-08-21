@@ -4,10 +4,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +49,7 @@ import lombok.Data;
 @Transactional
 public class ConsoleApiTest {
 
-    private static final List<String> paths = ImmutableList.of("metadata.txt");
+    private static final List<String> paths = ImmutableList.of("metadata.txt", "apikey.txt");
 
     @Autowired
     private MockMvc mockMvc;
@@ -67,23 +71,64 @@ public class ConsoleApiTest {
         for(String path : paths) {
             currentFile = path;
             List<String> lines = readResourceLines(path);
+            Map<String, Object> answers = new HashMap<>();
             for(int i = 0; i < lines.size(); i++) {
                 if(i % 4 == 0) {
                     String[] strs = lines.get(i).split(" ");
                     def.setMethod(strs[0]);
                     def.setUrl(strs[1]);
                 } else if(i % 4 == 1) {
-                    def.setRequest(lines.get(i));
+                    def.setRequest(formatRequest(lines.get(i), answers));
                 } else if(i % 4 == 2) {
                     def.setRes(lines.get(i));
                 } else {
-                    requestAndCheck(def, i - 2);
+                    answers.put(String.valueOf(i-2), requestAndCheck(def, i - 2));
                 }
             }
         }
     }
 
-    private void requestAndCheck(RequestDef def, int lines) throws Exception {
+    private String formatRequest(String input, Map<String, Object> answers) {
+        String extract = extract(input);
+        if(extract == null) {
+            return input;
+        }
+        String replace = "%{"+extract+"}%";
+        String[] strs = extract.split("-");
+        Object answer = answers.get(strs[0]);
+        String text = getText(answer, strs, 1);
+        return input.replace(replace, text);
+    }
+
+    private String getText(Object answer, String[] strs, int index) {
+        if(answer instanceof String) {
+            return answer.toString();
+        } else if(index == strs.length) {
+            return JacksonUtils.serialize(answer);
+        } else if (answer instanceof List) {
+            List list = (List) answer;
+            answer = list.get(Integer.parseInt(strs[index]));
+            return getText(answer, strs, ++index);
+        } else {
+            Map<String, Object> map = (Map<String, Object>) answer;
+            answer = map.get(strs[index]);
+            return getText(answer, strs, ++index);
+        }
+    }
+
+    private String extract(String input) {
+        String regex = "%\\{([^}]*)}%";
+        Pattern pattern = Pattern.compile(regex);
+
+        Matcher matcher = pattern.matcher(input);
+        if(matcher.find()) {
+            // 提取并打印%{}之间的内容
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    private Object requestAndCheck(RequestDef def, int lines) throws Exception {
         MvcResult mvcResult = mockMvc.perform(requestBuilder(def.method, def.url, def.request))
                 .andReturn();
         MockHttpServletResponse servletResponse = mvcResult.getResponse();
@@ -110,19 +155,22 @@ public class ConsoleApiTest {
                     }
                 }
             } else {
-                Map<String, Object> expected = JacksonUtils.toMap(def.res);
-                Map<String, Object> real = JacksonUtils.toMap(bellaResponse.getData());
-                for (Map.Entry<String, Object> entry : expected.entrySet()) {
-                    if(!real.containsKey(entry.getKey())) {
-                        throw new RuntimeException(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res));
-                    }
-                    Object obj = real.get(entry.getKey());
-                    Assert.assertEquals(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res), obj,
-                            entry.getValue());
+                if(!def.res.equals("skip")) {
+                    Map<String, Object> expected = JacksonUtils.toMap(def.res);
+                    Map<String, Object> real = JacksonUtils.toMap(bellaResponse.getData());
+                    for (Map.Entry<String, Object> entry : expected.entrySet()) {
+                        if(!real.containsKey(entry.getKey())) {
+                            throw new RuntimeException(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res));
+                        }
+                        Object obj = real.get(entry.getKey());
+                        Assert.assertEquals(currentFile + " 第" + lines + "行执行结果不符合预期, res:" + JacksonUtils.serialize(def.res), obj,
+                                entry.getValue());
 
+                    }
                 }
             }
         }
+        return bellaResponse.getData();
     }
 
     private MockHttpServletRequestBuilder requestBuilder(String method, String url, String body) {
@@ -154,7 +202,7 @@ public class ConsoleApiTest {
             // 第4行 空格             空格        (n+1)%4 = 0
             File file = new File(Thread.currentThread()
                     .getContextClassLoader()
-                    .getResource("metadata.txt").getFile());
+                    .getResource(path).getFile());
             return FileUtils.readLines(file, "UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);

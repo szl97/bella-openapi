@@ -4,6 +4,8 @@
 package com.ke.bella.openapi;
 
 
+import com.ke.bella.openapi.tables.ApiKey;
+import com.ke.bella.openapi.tables.ApiKeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -34,7 +36,17 @@ public class DefaultSchema extends SchemaImpl {
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
 
     /**
-     * openapi类目
+     * ak
+     */
+    public final ApiKey API_KEY = ApiKey.API_KEY;
+
+    /**
+     * ak角色
+     */
+    public final ApiKeyRole API_KEY_ROLE = ApiKeyRole.API_KEY_ROLE;
+
+    /**
+     * 类目
      */
     public final Category CATEGORY = Category.CATEGORY;
 
@@ -44,12 +56,12 @@ public class DefaultSchema extends SchemaImpl {
     public final Channel CHANNEL = Channel.CHANNEL;
 
     /**
-     * openapi能力点
+     * 能力点
      */
     public final Endpoint ENDPOINT = Endpoint.ENDPOINT;
 
     /**
-     * openapi能力点类目
+     * 能力点类目
      */
     public final EndpointCategoryRel ENDPOINT_CATEGORY_REL = EndpointCategoryRel.ENDPOINT_CATEGORY_REL;
 
@@ -84,6 +96,8 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
+            ApiKey.API_KEY,
+            ApiKeyRole.API_KEY_ROLE,
             Category.CATEGORY,
             Channel.CHANNEL,
             Endpoint.ENDPOINT,

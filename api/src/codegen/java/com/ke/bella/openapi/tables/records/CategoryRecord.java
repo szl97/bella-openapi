@@ -17,7 +17,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * openapi类目
+ * 类目
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CategoryRecord extends UpdatableRecordImpl<CategoryRecord> implements Operator, Record11<Long, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {

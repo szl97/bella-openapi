@@ -4,6 +4,8 @@
 package com.ke.bella.openapi;
 
 
+import com.ke.bella.openapi.tables.ApiKey;
+import com.ke.bella.openapi.tables.ApiKeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -11,6 +13,8 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
+import com.ke.bella.openapi.tables.records.ApiKeyRecord;
+import com.ke.bella.openapi.tables.records.ApiKeyRoleRecord;
 import com.ke.bella.openapi.tables.records.CategoryRecord;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
 import com.ke.bella.openapi.tables.records.EndpointCategoryRelRecord;
@@ -36,6 +40,11 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_PRIMARY = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_PRIMARY"), new TableField[] { ApiKey.API_KEY.ID }, true);
+    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_UNIQ_IDX_AK_SHA = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_uniq_idx_ak_sha"), new TableField[] { ApiKey.API_KEY.AK_SHA }, true);
+    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_UNIQ_IDX_CODE = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_uniq_idx_code"), new TableField[] { ApiKey.API_KEY.CODE }, true);
+    public static final UniqueKey<ApiKeyRoleRecord> KEY_API_KEY_ROLE_PRIMARY = Internal.createUniqueKey(ApiKeyRole.API_KEY_ROLE, DSL.name("KEY_api_key_role_PRIMARY"), new TableField[] { ApiKeyRole.API_KEY_ROLE.ID }, true);
+    public static final UniqueKey<ApiKeyRoleRecord> KEY_API_KEY_ROLE_UNIQ_IDX_ROLE_CODE = Internal.createUniqueKey(ApiKeyRole.API_KEY_ROLE, DSL.name("KEY_api_key_role_uniq_idx_role_code"), new TableField[] { ApiKeyRole.API_KEY_ROLE.ROLE_CODE }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_PRIMARY = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_PRIMARY"), new TableField[] { Category.CATEGORY.ID }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_uniq_idx_parent_code_category_name"), new TableField[] { Category.CATEGORY.PARENT_CODE, Category.CATEGORY.CATEGORY_NAME }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_uniq_idx_uni_category_code"), new TableField[] { Category.CATEGORY.CATEGORY_CODE }, true);

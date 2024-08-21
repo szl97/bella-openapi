@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * openapi能力点
+ * 能力点
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Endpoint extends TableImpl<EndpointRecord> {
@@ -72,9 +72,9 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     public final TableField<EndpointRecord, String> ENDPOINT_NAME = createField(DSL.name("endpoint_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "能力点名称");
 
     /**
-     * The column <code>endpoint.maintainer_code</code>. 维护人系统号
+     * The column <code>endpoint.maintainer_code</code>. 维护人ucid
      */
-    public final TableField<EndpointRecord, String> MAINTAINER_CODE = createField(DSL.name("maintainer_code"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "维护人系统号");
+    public final TableField<EndpointRecord, String> MAINTAINER_CODE = createField(DSL.name("maintainer_code"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "维护人ucid");
 
     /**
      * The column <code>endpoint.maintainer_name</code>. 维护人姓名
@@ -121,7 +121,7 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     }
 
     private Endpoint(Name alias, Table<EndpointRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("openapi能力点"), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("能力点"), TableOptions.table());
     }
 
     /**

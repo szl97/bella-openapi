@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * openapi类目
+ * 类目
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Category extends TableImpl<CategoryRecord> {
@@ -111,7 +111,7 @@ public class Category extends TableImpl<CategoryRecord> {
     }
 
     private Category(Name alias, Table<CategoryRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("openapi类目"), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("类目"), TableOptions.table());
     }
 
     /**

@@ -46,6 +46,8 @@ public class ModelService {
     private EndpointService endpointService;
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    private ApikeyService apikeyService;
 
     @Transactional
     public ModelDB createModel(MetaDataOps.ModelOp op) {
@@ -203,29 +205,12 @@ public class ModelService {
     }
 
     public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition) {
-        fillPermissionCode(condition);
+        apikeyService.fillPermissionCode(condition);
         return listByCondition(condition);
     }
 
     public Page<ModelDB> pageByConditionWithPermission(Condition.ModelCondition condition) {
-        fillPermissionCode(condition);
+        apikeyService.fillPermissionCode(condition);
         return pageByCondition(condition);
-    }
-
-    private void fillPermissionCode(Condition.ModelCondition condition) {
-        ConsoleContext.Operator operator = ConsoleContext.getOperator();
-        //todo: 获取所有 org
-        Set<String> orgCodes = Sets.newHashSet();
-        if(StringUtils.isEmpty(condition.getPersonalCode())) {
-            condition.setPersonalCode(operator.getUserId().toString());
-        } else {
-            Assert.isTrue(operator.getUserId().equals(0L) || condition.getPersonalCode().equals(operator.getUserId().toString()), "没有查询权限");
-        }
-        if(CollectionUtils.isEmpty(condition.getOrgCodes())) {
-            condition.setOrgCodes(orgCodes);
-        } else {
-            Assert.isTrue(operator.getUserId().equals(0L) || CollectionUtils.isEmpty(condition.getOrgCodes()) ||
-                    orgCodes.containsAll(condition.getOrgCodes()), "没有查询权限");
-        }
     }
 }

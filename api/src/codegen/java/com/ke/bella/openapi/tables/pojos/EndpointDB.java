@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * openapi能力点
+ * 能力点
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EndpointDB implements Operator, Serializable {
@@ -137,14 +137,14 @@ public class EndpointDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>endpoint.maintainer_code</code>. 维护人系统号
+     * Getter for <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public String getMaintainerCode() {
         return this.maintainerCode;
     }
 
     /**
-     * Setter for <code>endpoint.maintainer_code</code>. 维护人系统号
+     * Setter for <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public void setMaintainerCode(String maintainerCode) {
         this.maintainerCode = maintainerCode;

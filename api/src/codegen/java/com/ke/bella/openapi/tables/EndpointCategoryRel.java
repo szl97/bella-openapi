@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * openapi能力点类目
+ * 能力点类目
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EndpointCategoryRel extends TableImpl<EndpointCategoryRelRecord> {
@@ -106,7 +106,7 @@ public class EndpointCategoryRel extends TableImpl<EndpointCategoryRelRecord> {
     }
 
     private EndpointCategoryRel(Name alias, Table<EndpointCategoryRelRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment("openapi能力点类目"), TableOptions.table());
+        super(alias, null, aliased, parameters, DSL.comment("能力点类目"), TableOptions.table());
     }
 
     /**

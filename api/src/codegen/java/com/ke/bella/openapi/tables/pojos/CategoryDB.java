@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * openapi类目
+ * 类目
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CategoryDB implements Operator, Serializable {

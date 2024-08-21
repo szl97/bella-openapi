@@ -11,17 +11,16 @@ import java.time.LocalDateTime;
 
 
 /**
- * 能力点类目
+ * ak角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EndpointCategoryRelDB implements Operator, Serializable {
+public class ApiKeyRoleDB implements Operator, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long          id;
-    private String        endpoint;
-    private String        categoryCode;
-    private Integer       sort;
+    private String        roleCode;
+    private String        path;
     private Long          cuid;
     private String        cuName;
     private Long          muid;
@@ -29,13 +28,12 @@ public class EndpointCategoryRelDB implements Operator, Serializable {
     private LocalDateTime ctime;
     private LocalDateTime mtime;
 
-    public EndpointCategoryRelDB() {}
+    public ApiKeyRoleDB() {}
 
-    public EndpointCategoryRelDB(EndpointCategoryRelDB value) {
+    public ApiKeyRoleDB(ApiKeyRoleDB value) {
         this.id = value.id;
-        this.endpoint = value.endpoint;
-        this.categoryCode = value.categoryCode;
-        this.sort = value.sort;
+        this.roleCode = value.roleCode;
+        this.path = value.path;
         this.cuid = value.cuid;
         this.cuName = value.cuName;
         this.muid = value.muid;
@@ -44,11 +42,10 @@ public class EndpointCategoryRelDB implements Operator, Serializable {
         this.mtime = value.mtime;
     }
 
-    public EndpointCategoryRelDB(
+    public ApiKeyRoleDB(
         Long          id,
-        String        endpoint,
-        String        categoryCode,
-        Integer       sort,
+        String        roleCode,
+        String        path,
         Long          cuid,
         String        cuName,
         Long          muid,
@@ -57,9 +54,8 @@ public class EndpointCategoryRelDB implements Operator, Serializable {
         LocalDateTime mtime
     ) {
         this.id = id;
-        this.endpoint = endpoint;
-        this.categoryCode = categoryCode;
-        this.sort = sort;
+        this.roleCode = roleCode;
+        this.path = path;
         this.cuid = cuid;
         this.cuName = cuName;
         this.muid = muid;
@@ -69,140 +65,126 @@ public class EndpointCategoryRelDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.id</code>. 主键ID
+     * Getter for <code>api_key_role.id</code>. 主键ID
      */
     public Long getId() {
         return this.id;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.id</code>. 主键ID
+     * Setter for <code>api_key_role.id</code>. 主键ID
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.endpoint</code>. 能力点
+     * Getter for <code>api_key_role.role_code</code>. ak编码
      */
-    public String getEndpoint() {
-        return this.endpoint;
+    public String getRoleCode() {
+        return this.roleCode;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.endpoint</code>. 能力点
+     * Setter for <code>api_key_role.role_code</code>. ak编码
      */
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.category_code</code>. 类目编码
+     * Getter for <code>api_key_role.path</code>. 授权的path
      */
-    public String getCategoryCode() {
-        return this.categoryCode;
+    public String getPath() {
+        return this.path;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.category_code</code>. 类目编码
+     * Setter for <code>api_key_role.path</code>. 授权的path
      */
-    public void setCategoryCode(String categoryCode) {
-        this.categoryCode = categoryCode;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.sort</code>. 排序
-     */
-    public Integer getSort() {
-        return this.sort;
-    }
-
-    /**
-     * Setter for <code>endpoint_category_rel.sort</code>. 排序
-     */
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    /**
-     * Getter for <code>endpoint_category_rel.cuid</code>. 创建人id
+     * Getter for <code>api_key_role.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.cuid</code>. 创建人id
+     * Setter for <code>api_key_role.cuid</code>. 创建人id
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.cu_name</code>. 创建人姓名
+     * Getter for <code>api_key_role.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
         return this.cuName;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.cu_name</code>. 创建人姓名
+     * Setter for <code>api_key_role.cu_name</code>. 创建人姓名
      */
     public void setCuName(String cuName) {
         this.cuName = cuName;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.muid</code>. 编辑人id
+     * Getter for <code>api_key_role.muid</code>. 编辑人id
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.muid</code>. 编辑人id
+     * Setter for <code>api_key_role.muid</code>. 编辑人id
      */
     public void setMuid(Long muid) {
         this.muid = muid;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.mu_name</code>. 编辑人姓名
+     * Getter for <code>api_key_role.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
         return this.muName;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.mu_name</code>. 编辑人姓名
+     * Setter for <code>api_key_role.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String muName) {
         this.muName = muName;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.ctime</code>.
+     * Getter for <code>api_key_role.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return this.ctime;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.ctime</code>.
+     * Setter for <code>api_key_role.ctime</code>.
      */
     public void setCtime(LocalDateTime ctime) {
         this.ctime = ctime;
     }
 
     /**
-     * Getter for <code>endpoint_category_rel.mtime</code>.
+     * Getter for <code>api_key_role.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return this.mtime;
     }
 
     /**
-     * Setter for <code>endpoint_category_rel.mtime</code>.
+     * Setter for <code>api_key_role.mtime</code>.
      */
     public void setMtime(LocalDateTime mtime) {
         this.mtime = mtime;
@@ -210,12 +192,11 @@ public class EndpointCategoryRelDB implements Operator, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("EndpointCategoryRelDB (");
+        StringBuilder sb = new StringBuilder("ApiKeyRoleDB (");
 
         sb.append(id);
-        sb.append(", ").append(endpoint);
-        sb.append(", ").append(categoryCode);
-        sb.append(", ").append(sort);
+        sb.append(", ").append(roleCode);
+        sb.append(", ").append(path);
         sb.append(", ").append(cuid);
         sb.append(", ").append(cuName);
         sb.append(", ").append(muid);

@@ -4,6 +4,8 @@
 package com.ke.bella.openapi;
 
 
+import com.ke.bella.openapi.tables.ApiKey;
+import com.ke.bella.openapi.tables.ApiKeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -20,7 +22,17 @@ import com.ke.bella.openapi.tables.ModelEndpointRel;
 public class Tables {
 
     /**
-     * openapi类目
+     * ak
+     */
+    public static final ApiKey API_KEY = ApiKey.API_KEY;
+
+    /**
+     * ak角色
+     */
+    public static final ApiKeyRole API_KEY_ROLE = ApiKeyRole.API_KEY_ROLE;
+
+    /**
+     * 类目
      */
     public static final Category CATEGORY = Category.CATEGORY;
 
@@ -30,12 +42,12 @@ public class Tables {
     public static final Channel CHANNEL = Channel.CHANNEL;
 
     /**
-     * openapi能力点
+     * 能力点
      */
     public static final Endpoint ENDPOINT = Endpoint.ENDPOINT;
 
     /**
-     * openapi能力点类目
+     * 能力点类目
      */
     public static final EndpointCategoryRel ENDPOINT_CATEGORY_REL = EndpointCategoryRel.ENDPOINT_CATEGORY_REL;
 
