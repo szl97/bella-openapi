@@ -1,9 +1,12 @@
 package com.ke.bella.openapi.utils;
 
+import org.springframework.util.AntPathMatcher;
+
 /**
  * Author: Stan Sai Date: 2024/8/5 16:05 description:
  */
 public class MatchUtils {
+    private static final AntPathMatcher matcher = new AntPathMatcher();
     /**
      * 判断字符串是否以文字开头
      *
@@ -69,5 +72,9 @@ public class MatchUtils {
 
         // 使用正则表达式匹配
         return input.matches("^(http://|https://).+");
+    }
+
+    public static boolean mathUrl(String pattern, String url) {
+        return matcher.match(pattern, url);
     }
 }

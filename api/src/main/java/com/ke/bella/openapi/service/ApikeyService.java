@@ -1,22 +1,31 @@
 package com.ke.bella.openapi.service;
 
+import com.google.common.collect.Sets;
 import com.ke.bella.openapi.console.ApikeyOps;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
+import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.PermissionCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
+import com.ke.bella.openapi.protocol.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.tables.pojos.ApiKeyDB;
 import com.ke.bella.openapi.tables.pojos.ApiKeyRoleDB;
 import com.ke.bella.openapi.utils.EncryptUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
+import com.ke.bella.openapi.utils.MatchUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,21 +41,68 @@ public class ApikeyService {
     private ApikeyRepo apikeyRepo;
     @Autowired
     private ApikeyRoleRepo apikeyRoleRepo;
+    @Value("${apikey.basic.monthQuota:200}")
+    private int basicMonthQuota;
+    @Value("${apikey.basic.roleCode:low}")
+    private String basicRoleCode;
+    @Value("#{'${apikey.basic.childRoleCodes:low,high}'.split (',')}")
+    private List<String> childRoleCodes;
 
+    @Transactional
     public String apply(ApikeyOps.ApplyOp op) {
         String ak = UUID.randomUUID().toString();
         String sha = EncryptUtils.sha256(ak);
         String display = EncryptUtils.desensitize(ak);
+        if(StringUtils.isNotEmpty(op.getRoleCode())) {
+            Assert.isTrue(childRoleCodes.contains(op.getRoleCode()), "role code不可使用");
+        }
         ApiKeyDB db = new ApiKeyDB();
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setOwnerType(op.getOwnerType());
         db.setOwnerCode(op.getOwnerCode());
         db.setOwnerName(op.getOwnerName());
+        db.setRoleCode(StringUtils.isEmpty(op.getRoleCode()) ? basicRoleCode : op.getRoleCode());
+        db.setMonthQuota(op.getMonthQuota() == null ? BigDecimal.valueOf(basicMonthQuota) : op.getMonthQuota());
         apikeyRepo.insert(db);
         return ak;
     }
 
+    @Transactional
+    public String createByParentCode(ApikeyCreateOp op) {
+        RequestInfoContext.ApikeyInfo apikey = RequestInfoContext.getApikey();
+        if(!apikey.getCode().equals(op.getParentCode())) {
+            throw new ChannelException.AuthorizationException("没有操作权限");
+        }
+        if(StringUtils.isNotEmpty(op.getRoleCode())) {
+            apikeyRoleRepo.checkExist(op.getRoleCode(), true);
+        }
+        Assert.isTrue(op.getMonthQuota() == null || op.getMonthQuota().doubleValue() <= apikey.getMonthQuota().doubleValue(), "配额超出ak的最大配额");
+        Assert.isTrue(op.getSafetyLevel() <= apikey.getSafetyLevel(), "安全等级超出ak的最高等级");
+        String ak = UUID.randomUUID().toString();
+        String sha = EncryptUtils.sha256(ak);
+        String display = EncryptUtils.desensitize(ak);
+        ApiKeyDB db = new ApiKeyDB();
+        db.setAkSha(sha);
+        db.setAkDisplay(display);
+        db.setParentCode(op.getParentCode());
+        db.setUserId(op.getUserId());
+        db.setOwnerType(apikey.getOwnerType());
+        db.setOwnerCode(apikey.getOwnerCode());
+        db.setOwnerName(apikey.getOwnerName());
+        db.setRoleCode(op.getRoleCode());
+        db.setMonthQuota(op.getMonthQuota());
+        db = apikeyRepo.insert(db);
+        if(CollectionUtils.isNotEmpty(op.getPaths())) {
+           boolean match = op.getPaths().stream().allMatch(url -> apikey.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.mathUrl(pattern, url))
+                    && apikey.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.mathUrl(pattern, url)));
+            Assert.isTrue(match, "超出ak的权限范围");
+            updateRole(ApikeyOps.RoleOp.builder().code(db.getCode()).paths(op.getPaths()).build());
+        }
+        return ak;
+    }
+
+    @Transactional
     public String reset(ApikeyOps.CodeOp op) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
@@ -60,6 +116,7 @@ public class ApikeyService {
         return ak;
     }
 
+    @Transactional
     public void updateRole(ApikeyOps.RoleOp op) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
@@ -67,13 +124,16 @@ public class ApikeyService {
             apikeyRoleRepo.checkExist(op.getRoleCode(), true);
         } else {
             ApiKeyRoleDB roleDB = new ApiKeyRoleDB();
-            roleDB.setPath(String.join(",", op.getPaths()));
+            ApikeyRoleRepo.RolePath rolePath = new ApikeyRoleRepo.RolePath();
+            rolePath.setIncluded(op.getPaths());
+            roleDB.setPath(JacksonUtils.serialize(rolePath));
             roleDB = apikeyRoleRepo.insert(roleDB);
             op.setRoleCode(roleDB.getRoleCode());
         }
         apikeyRepo.update(op, op.getCode());
     }
 
+    @Transactional
     public void certify(ApikeyOps.CertifyOp op) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
@@ -84,17 +144,19 @@ public class ApikeyService {
         apikeyRepo.update(db, op.getCode());
     }
 
-    private Byte fetchLevelByCertifyCode(String code) {
+    private Byte fetchLevelByCertifyCode(String certifyCode) {
         //todo: 根据验证码查询安全等级
         return 2;
     }
 
+    @Transactional
     public void updateQuota(ApikeyOps.QuotaOp op) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
         apikeyRepo.update(op, op.getCode());
     }
 
+    @Transactional
     public void changeStatus(ApikeyOps.CodeOp op, boolean active) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
@@ -102,18 +164,32 @@ public class ApikeyService {
         apikeyRepo.updateStatus(op.getCode(), status);
     }
 
+    public RequestInfoContext.ApikeyInfo verify(String ak) {
+        String sha = EncryptUtils.sha256(ak);
+        RequestInfoContext.ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
+        if(apikeyInfo == null) {
+            throw new ChannelException.AuthorizationException("api key不存在");
+        }
+        return apikeyInfo;
+    }
+
     private void checkPermission(String code) {
-        ConsoleContext.Operator operator = ConsoleContext.getOperator();
-        if(operator.getUserId().equals(0L)) {
+        RequestInfoContext.ApikeyInfo apikeyInfo = RequestInfoContext.getApikey();
+        if(apikeyInfo.getOwnerType().equals(SYSTEM)) {
             return;
         }
         ApiKeyDB db = apikeyRepo.queryByUniqueKey(code);
         //todo: 获取所有 org
         Set<String> orgCodes = new HashSet<>();
-        boolean isNotSystem = !db.getOwnerType().equals(SYSTEM);
-        boolean isPersonOwner = db.getOwnerType().equals(PERSON) && db.getOwnerCode().equals(operator.getUserId().toString());
-        boolean isOrgOwner = db.getOwnerType().equals(ORG) && orgCodes.contains(db.getOwnerCode());
-        Assert.isTrue(isNotSystem && (isPersonOwner || isOrgOwner), "没有操作权限");
+        if(db.getOwnerType().equals(SYSTEM)) {
+            throw new ChannelException.AuthorizationException("没有操作权限");
+        }
+        if(db.getOwnerType().equals(PERSON)) {
+            validateUserPermission(apikeyInfo, db.getOwnerCode());
+        }
+        if(db.getOwnerType().equals(ORG)) {
+            validateOrgPermission(apikeyInfo, Sets.newHashSet(db.getOwnerCode()), orgCodes);
+        }
     }
 
     public Page<ApiKeyDB> pageApikey(ApikeyCondition condition) {
@@ -122,28 +198,36 @@ public class ApikeyService {
     }
 
     public void fillPermissionCode(PermissionCondition condition) {
-        ConsoleContext.Operator operator = ConsoleContext.getOperator();
+        RequestInfoContext.ApikeyInfo apikeyInfo = RequestInfoContext.getApikey();
         // TODO: 获取所有组织代码并填充到 orgCodes
         Set<String> orgCodes = new HashSet<>();
 
         if (StringUtils.isEmpty(condition.getPersonalCode())) {
-            condition.setPersonalCode(operator.getUserId().toString());
+            if(apikeyInfo.getOwnerType().equals(PERSON)) {
+                condition.setPersonalCode(apikeyInfo.getOwnerCode());
+            }
         } else {
-            validateUserPermission(operator, condition.getPersonalCode());
+            validateUserPermission(apikeyInfo, condition.getPersonalCode());
         }
 
         if (CollectionUtils.isEmpty(condition.getOrgCodes())) {
             condition.setOrgCodes(orgCodes);
         } else {
-            validateOrgPermission(operator, condition.getOrgCodes(), orgCodes);
+            validateOrgPermission(apikeyInfo, condition.getOrgCodes(), orgCodes);
         }
     }
 
-    private void validateUserPermission(ConsoleContext.Operator operator, String personalCode) {
-        Assert.isTrue(operator.getUserId().equals(0L) || personalCode.equals(operator.getUserId().toString()), "没有查询权限");
+    private void validateUserPermission(RequestInfoContext.ApikeyInfo apikeyInfo, String personalCode) {
+        if(apikeyInfo.getOwnerType().equals(SYSTEM) || (apikeyInfo.getOwnerType().equals(PERSON) && personalCode.equals(apikeyInfo.getOwnerCode()))) {
+            return;
+        }
+        throw new ChannelException.AuthorizationException("没有操作权限");
     }
 
-    private void validateOrgPermission(ConsoleContext.Operator operator, Set<String> conditionOrgCodes, Set<String> orgCodes) {
-        Assert.isTrue(operator.getUserId().equals(0L) || CollectionUtils.isEmpty(conditionOrgCodes) || orgCodes.containsAll(conditionOrgCodes), "没有查询权限");
+    private void validateOrgPermission(RequestInfoContext.ApikeyInfo apikeyInfo, Set<String> conditionOrgCodes, Set<String> orgCodes) {
+        if(apikeyInfo.getOwnerType().equals(SYSTEM) || CollectionUtils.isEmpty(conditionOrgCodes) || orgCodes.containsAll(conditionOrgCodes)) {
+            return;
+        }
+        throw new ChannelException.AuthorizationException("没有操作权限");
     }
 }

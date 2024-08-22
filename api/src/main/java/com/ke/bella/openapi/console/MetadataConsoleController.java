@@ -1,15 +1,5 @@
 package com.ke.bella.openapi.console;
 
-import static com.ke.bella.openapi.console.MetadataValidator.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
@@ -19,6 +9,26 @@ import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import static com.ke.bella.openapi.console.MetadataValidator.checkCategoryCreateOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkCategoryStatus;
+import static com.ke.bella.openapi.console.MetadataValidator.checkChannelCreateOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkChannelStatusOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkChannelUpdateOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointCategoryOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointStatusOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkModelAuthorizerOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkModelNameOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkModelOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkReplaceEndpointCategoryOp;
 
 @BellaAPI
 @RestController

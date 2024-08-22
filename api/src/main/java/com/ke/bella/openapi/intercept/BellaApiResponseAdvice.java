@@ -3,6 +3,7 @@ package com.ke.bella.openapi.intercept;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.ke.bella.openapi.protocol.ChannelException;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +44,7 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         response.getHeaders().add("Cache-Control", "no-cache");
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
         if(body instanceof BellaResponse) {
             response.setStatusCode(HttpStatus.valueOf(((BellaResponse) body).getCode()));
             return body;
@@ -68,6 +70,9 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
                 || e instanceof UnsatisfiedServletRequestParameterException
                 || e instanceof MethodArgumentNotValidException) {
             code = 400;
+        }
+        if(e instanceof ChannelException.AuthorizationException) {
+            code = 401;
         }
 
         if(code == 500) {

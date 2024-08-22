@@ -73,16 +73,18 @@ public class ConsoleApiTest {
             List<String> lines = readResourceLines(path);
             Map<String, Object> answers = new HashMap<>();
             for(int i = 0; i < lines.size(); i++) {
-                if(i % 4 == 0) {
+                if(i % 5 == 0) {
                     String[] strs = lines.get(i).split(" ");
                     def.setMethod(strs[0]);
                     def.setUrl(strs[1]);
-                } else if(i % 4 == 1) {
+                } else if (i % 5 == 1) {
+                    def.setHeaders(JacksonUtils.toMap(formatRequest(lines.get(i), answers)));
+                } else if(i % 5 == 2) {
                     def.setRequest(formatRequest(lines.get(i), answers));
-                } else if(i % 4 == 2) {
+                } else if(i % 5 == 3) {
                     def.setRes(lines.get(i));
                 } else {
-                    answers.put(String.valueOf(i-2), requestAndCheck(def, i - 2));
+                    answers.put(String.valueOf(i-3), requestAndCheck(def, i - 3));
                 }
             }
         }
@@ -129,7 +131,7 @@ public class ConsoleApiTest {
     }
 
     private Object requestAndCheck(RequestDef def, int lines) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(requestBuilder(def.method, def.url, def.request))
+        MvcResult mvcResult = mockMvc.perform(requestBuilder(def.method, def.url, def.request, def.headers))
                 .andReturn();
         MockHttpServletResponse servletResponse = mvcResult.getResponse();
         BellaApiResponseAdvice.BellaResponse bellaResponse = JacksonUtils.deserialize(servletResponse.getContentAsString(),
@@ -173,33 +175,39 @@ public class ConsoleApiTest {
         return bellaResponse.getData();
     }
 
-    private MockHttpServletRequestBuilder requestBuilder(String method, String url, String body) {
+    private MockHttpServletRequestBuilder requestBuilder(String method, String url, String body, Map<String, Object> headers) {
+        MockHttpServletRequestBuilder builder;
         if(method.equals("GET")) {
-            return get(url);
+            builder = get(url);
         } else if(method.equals("POST")) {
-            return post(url).contentType(MediaType.APPLICATION_JSON).content(body);
+            builder = post(url).contentType(MediaType.APPLICATION_JSON).content(body);
         } else if(method.equals("PUT")) {
-            return put(url).contentType(MediaType.APPLICATION_JSON).content(body);
+            builder = put(url).contentType(MediaType.APPLICATION_JSON).content(body);
         } else if(method.equals("DELETE")) {
-            return delete(url);
+            builder = delete(url);
+        } else {
+            throw new RuntimeException(currentFile + ": unsupported http method");
         }
-        throw new RuntimeException(currentFile + ": unsupported http method");
+        headers.forEach(builder::header);
+        return builder;
     }
 
     @Data
      static class RequestDef {
          String method;
          String url;
+         Map<String, Object> headers;
          String request;
          String res;
     }
 
     private List<String> readResourceLines(String path) {
         try {
-            // 第1行 POST/PUT url    GET url    (n+1)%4 = 1
-            // 第2行 request         {}         (n+1)%4 = 2
-            // 第3行 res code        res        (n+1)%4 = 3
-            // 第4行 空格             空格        (n+1)%4 = 0
+            // 第1行 POST/PUT url    GET url    (n+1)%5 = 1
+            // 第2行 header          {}         (n+1)%5 = 2
+            // 第2行 request         {}         (n+1)%5 = 3
+            // 第3行 res code        res        (n+1)%5 = 4
+            // 第4行 空格             空格        (n+1)%5 = 0
             File file = new File(Thread.currentThread()
                     .getContextClassLoader()
                     .getResource(path).getFile());

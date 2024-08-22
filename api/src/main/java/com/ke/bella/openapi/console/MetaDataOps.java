@@ -17,7 +17,7 @@ public class MetaDataOps {
     @AllArgsConstructor
     @NoArgsConstructor
     @SuperBuilder
-    public static class EndpointOp {
+    public static class EndpointOp extends ConsoleContext.Operator {
         private String endpoint;
         private String endpointName;
         private String maintainerCode;
@@ -25,12 +25,16 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class EndpointStatusOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EndpointStatusOp extends ConsoleContext.Operator {
         private String endpoint;
     }
 
     @Data
-    public static class ModelOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModelOp extends ConsoleContext.Operator {
         private String modelName;
         private Set<String> endpoints;
         private String ownerType;
@@ -42,16 +46,18 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class ModelAuthorizerOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModelAuthorizerOp extends ConsoleContext.Operator {
         private String model;
         private Set<ModelAuthorizer> authorizers;
     }
 
     @Data
-    @Builder
+    @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ModelAuthorizer {
+    public static class ModelAuthorizer extends ConsoleContext.Operator {
         private String  authorizerType;
         private String  authorizerCode;
         private String  authorizerName;
@@ -73,23 +79,29 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class ModelNameOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModelNameOp extends ConsoleContext.Operator {
         private String modelName;
     }
 
     @EqualsAndHashCode(callSuper = true)
     @Data
+    @NoArgsConstructor
     public static class ModelStatusOp extends ModelNameOp {
 
     }
 
     @EqualsAndHashCode(callSuper = true)
     @Data
+    @NoArgsConstructor
     public static class ModelVisibilityOp extends ModelNameOp {
     }
 
     @Data
-    public static class ChannelCreateOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChannelCreateOp extends ConsoleContext.Operator {
         private String entityType;
         private String entityCode;
         private String dataDestination;
@@ -102,7 +114,9 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class ChannelUpdateOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ChannelUpdateOp extends ConsoleContext.Operator {
         private String priority;
         private String channelCode;
         private String channelInfo;
@@ -110,28 +124,31 @@ public class MetaDataOps {
     }
 
     @Data
-    public static class ChannelStatusOp {
+    public static class ChannelStatusOp extends ConsoleContext.Operator {
         private String channelCode;
     }
 
     @NoArgsConstructor
     @Data
     @SuperBuilder
-    public static class CategoryCreateOp {
+    @AllArgsConstructor
+    public static class CategoryCreateOp extends ConsoleContext.Operator {
         private String parentCode;
         private String categoryName;
     }
 
     @Data
-    public static class CategoryStatusOp {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryStatusOp extends ConsoleContext.Operator {
         private String categoryCode;
     }
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @Builder
-    public static class EndpointCategoriesOp {
+    @SuperBuilder
+    public static class EndpointCategoriesOp extends ConsoleContext.Operator {
         private String endpoint;
         private Set<String> categoryCodes;
     }

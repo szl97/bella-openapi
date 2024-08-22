@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
+import com.ke.bella.openapi.console.ConsoleContext;
 import com.ke.bella.openapi.db.RequestInfoContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,7 @@ public class OpenapiRequestFilter extends OncePerRequestFilter {
             RequestInfoContext.setRequest(wrappedRequest);
             chain.doFilter(wrappedRequest, response);
         } finally {
+            ConsoleContext.clearAll();
             RequestInfoContext.clearAll();
         }
     }

@@ -3,10 +3,16 @@ package com.ke.bella.openapi.endpoints;
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
+import com.ke.bella.openapi.protocol.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.tables.pojos.ApiKeyDB;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,5 +25,16 @@ public class ApikeyController {
     @GetMapping("/page")
     public Page<ApiKeyDB> pageApikey(ApikeyCondition condition) {
        return apikeyService.pageApikey(condition);
+    }
+
+    @PostMapping("/create")
+    public String createApikey(@RequestBody ApikeyCreateOp op) {
+        Assert.hasText(op.getParentCode(), "父ak不可为空");
+        Assert.notNull(op.getUserId(), "userId不可为空");
+        Assert.isTrue(op.getMonthQuota() == null || op.getMonthQuota().doubleValue() > 0, "配额应大于0");
+        Assert.notNull(op.getSafetyLevel(), "安全等级不可为空");
+        Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode())
+                        || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
+        return apikeyService.createByParentCode(op);
     }
 }

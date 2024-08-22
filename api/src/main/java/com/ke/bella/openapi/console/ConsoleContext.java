@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class ConsoleContext {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    @Builder
+    @SuperBuilder
     public static class Operator {
         Long userId;
         String userName;

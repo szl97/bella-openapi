@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 public abstract class ChannelException extends RuntimeException {
 
@@ -45,6 +46,21 @@ public abstract class ChannelException extends RuntimeException {
      * @return
      */
     public abstract String getType();
+    public static class AuthorizationException extends ChannelException {
+        public AuthorizationException(String message) {
+            super(message);
+        }
+
+        @Override
+        public Integer getHttpCode() {
+            return HttpStatus.UNAUTHORIZED.value();
+        }
+
+        @Override
+        public String getType() {
+            return HttpStatus.UNAUTHORIZED.getReasonPhrase();
+        }
+    }
 
     @Getter
     public static class SafetyCheckException extends ChannelException {
