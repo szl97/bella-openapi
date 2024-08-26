@@ -10,6 +10,7 @@ import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
+import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
@@ -29,7 +30,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor
     }
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, AliProperty property) {
+    public CompletionResponse completion(CompletionRequest request, String url, AliProperty property) {
         AliCompletionRequest aliRequest = requestConvert(request);
         Request httpRequest = buildRequest(aliRequest, url, property);
         AliCompletionResponse response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class);
@@ -37,7 +38,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, AliProperty property, Callbacks.StreamCompletionCallback callback) {
+    public void streamCompletion(CompletionRequest request, String url, AliProperty property, StreamCompletionCallback callback) {
         AliCompletionRequest aliRequest = requestConvert(request);
         Request httpRequest = buildRequest(aliRequest, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));

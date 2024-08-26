@@ -219,6 +219,7 @@ public class AwsCompletionConverter {
         return SystemContentBlock.builder().text(openAiMsg.getContent().toString()).build();
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static List<ContentBlock> convert2AwsContent(com.ke.bella.openapi.protocol.completion.Message message) {
         List<ContentBlock> contentBlocks = new ArrayList<>();
         if(message.getRole().equals("tool")) {
@@ -256,6 +257,7 @@ public class AwsCompletionConverter {
         return ContentBlock.fromText(text);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static ContentBlock convert2ToolUseBlock(Map toolCall) {
         Map<String, Object> map = (Map<String, Object>) toolCall.get("function");
         return ContentBlock.fromToolUse(ToolUseBlock
@@ -293,6 +295,7 @@ public class AwsCompletionConverter {
                 .build();
     }
 
+    @SuppressWarnings({ "rawtypes" })
     private static software.amazon.awssdk.services.bedrockruntime.model.Tool convert2AwsTool(com.ke.bella.openapi.protocol.completion.Message.Tool tool) {
         Map schemaMap = JacksonUtils.toMap(tool.getFunction().getParameters());
         software.amazon.awssdk.services.bedrockruntime.model.ToolSpecification.Builder toolBuilder = software.amazon.awssdk.services.bedrockruntime.model.ToolSpecification
@@ -321,6 +324,7 @@ public class AwsCompletionConverter {
         return builder.build();
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static Document convertObjectToDocument(Object value) {
         if(value == null) {
             return Document.fromNull();

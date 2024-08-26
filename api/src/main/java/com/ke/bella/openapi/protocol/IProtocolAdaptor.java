@@ -30,9 +30,9 @@ public interface IProtocolAdaptor {
 
     interface CompletionAdaptor<T extends IProtocolProperty> extends IProtocolAdaptor {
 
-        CompletionResponse httpRequest(CompletionRequest request, String url, T property);
+        CompletionResponse completion(CompletionRequest request, String url, T property);
 
-        void streamRequest(CompletionRequest request, String url, T property, Callbacks.StreamCompletionCallback callback);
+        void streamCompletion(CompletionRequest request, String url, T property, Callbacks.StreamCompletionCallback callback);
 
         @Override
         default String endpoint() {

@@ -1,20 +1,18 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.console.ConsoleContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
 import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.auth.AuthenticationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {

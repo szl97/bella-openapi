@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
+import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
     }
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, AwsAdaptor.AwsProperty property) {
+    public CompletionResponse completion(CompletionRequest request, String url, AwsAdaptor.AwsProperty property) {
         request.setModel(property.deployName);
         ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request);
         BedrockRuntimeClient client = AwsClientManager.client(property.region, property.auth.getApiKey(), property.auth.getSecret());
@@ -40,16 +41,17 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, AwsAdaptor.AwsProperty property, Callbacks.StreamCompletionCallback callback) {
+    public void streamCompletion(CompletionRequest request, String url, AwsAdaptor.AwsProperty property,
+            StreamCompletionCallback callback) {
         request.setModel(property.deployName);
         ConverseStreamRequest awsRequest = AwsCompletionConverter.convert2AwsStreamRequest(request);
         BedrockRuntimeAsyncClient client = AwsClientManager.asyncClient(property.region, property.auth.getApiKey(), property.auth.getSecret());
         AwsSseCompletionCallBack awsCallBack = new AwsSseCompletionCallBack(callback);
         client.converseStream(awsRequest, ConverseStreamResponseHandler.builder()
-                        .subscriber(awsCallBack)
-                        .onError(awsCallBack)
-                        .onComplete(awsCallBack)
-                        .build());
+                .subscriber(awsCallBack)
+                .onError(awsCallBack)
+                .onComplete(awsCallBack)
+                .build());
     }
 
     @Data
@@ -62,10 +64,10 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
         String deployName;
     }
 
-
     @AllArgsConstructor
     static class AwsSseCompletionCallBack implements ConverseStreamResponseHandler.Visitor, Consumer<Throwable>, Runnable {
         private Callbacks.StreamCompletionCallback callback;
+
         @Override
         public void visitContentBlockStart(ContentBlockStartEvent event) {
             StreamCompletionResponse response = AwsCompletionConverter.convert2OpenAIStreamResponse(event.start(), event.contentBlockIndex());

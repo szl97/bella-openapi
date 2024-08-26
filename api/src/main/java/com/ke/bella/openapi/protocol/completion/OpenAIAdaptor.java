@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
+import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
@@ -24,13 +25,13 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIA
             StreamCompletionResponse.class);
 
     @Override
-    public CompletionResponse httpRequest(CompletionRequest request, String url, OpenAIProperty property) {
+    public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property) {
         Request httpRequest = buildRequest(request, url, property);
         return HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, OpenAIProperty property, Callbacks.StreamCompletionCallback callback) {
+    public void streamCompletion(CompletionRequest request, String url, OpenAIProperty property, StreamCompletionCallback callback) {
         Request httpRequest = buildRequest(request, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
