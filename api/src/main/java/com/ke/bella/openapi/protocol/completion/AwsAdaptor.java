@@ -1,13 +1,17 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.util.function.Consumer;
+
+import org.springframework.stereotype.Component;
+
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlockDeltaEvent;
@@ -17,8 +21,6 @@ import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamMetadataEvent;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamResponseHandler;
-
-import java.util.function.Consumer;
 
 @Component("AwsCompletion")
 public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor.AwsProperty> {
@@ -31,16 +33,16 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
     @Override
     public CompletionResponse httpRequest(CompletionRequest request, String url, AwsAdaptor.AwsProperty property) {
         request.setModel(property.deployName);
-        ConverseRequest awsRequest = requestConvert.callback(request);
+        ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request);
         BedrockRuntimeClient client = AwsClientManager.client(property.region, property.auth.getApiKey(), property.auth.getSecret());
         ConverseResponse response = client.converse(awsRequest);
-        return responseConvert.callback(response);
+        return AwsCompletionConverter.convert2OpenAIResponse(response);
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, AwsAdaptor.AwsProperty property, Callback.CompletionSseCallback callback) {
+    public void streamRequest(CompletionRequest request, String url, AwsAdaptor.AwsProperty property, Callbacks.StreamCompletionCallback callback) {
         request.setModel(property.deployName);
-        ConverseStreamRequest awsRequest = streamRequestConvert.callback(request);
+        ConverseStreamRequest awsRequest = AwsCompletionConverter.convert2AwsStreamRequest(request);
         BedrockRuntimeAsyncClient client = AwsClientManager.asyncClient(property.region, property.auth.getApiKey(), property.auth.getSecret());
         AwsSseCompletionCallBack awsCallBack = new AwsSseCompletionCallBack(callback);
         client.converseStream(awsRequest, ConverseStreamResponseHandler.builder()
@@ -60,15 +62,10 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
         String deployName;
     }
 
-    private final Callback.ConvertCallback<ConverseResponse> responseConvert = AwsCompletionConverter::convert2OpenAIResponse;
-
-    private final Callback.RequestConvertCallback<ConverseRequest> requestConvert = AwsCompletionConverter::convert2AwsRequest;
-
-    private final Callback.RequestConvertCallback<ConverseStreamRequest> streamRequestConvert = AwsCompletionConverter::convert2AwsStreamRequest;
 
     @AllArgsConstructor
     static class AwsSseCompletionCallBack implements ConverseStreamResponseHandler.Visitor, Consumer<Throwable>, Runnable {
-        private Callback.CompletionSseCallback callback;
+        private Callbacks.StreamCompletionCallback callback;
         @Override
         public void visitContentBlockStart(ContentBlockStartEvent event) {
             StreamCompletionResponse response = AwsCompletionConverter.convert2OpenAIStreamResponse(event.start(), event.contentBlockIndex());

@@ -1,5 +1,8 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Setter;
@@ -7,18 +10,15 @@ import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
 public class CompletionSseListener extends EventSourceListener {
     @Setter
     private CompletableFuture<?> connectionInitFuture;
-    private Callback.CompletionSseCallback callback;
-    private Callback.SseConvertCallback<String> sseConverter;
+    private Callbacks.StreamCompletionCallback callback;
+    private Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter;
     private final Set<String> DONE_FLAGS = ImmutableSet.of("[DONE]");
 
-    public CompletionSseListener(Callback.CompletionSseCallback sseCallback,
-                                Callback.SseConvertCallback sseConverter) {
+    public CompletionSseListener(Callbacks.StreamCompletionCallback sseCallback,
+            Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter) {
         this.callback = sseCallback;
         this.sseConverter = sseConverter;
     }
@@ -34,7 +34,7 @@ public class CompletionSseListener extends EventSourceListener {
             if(DONE_FLAGS.contains(msg)) {
                 callback.done();
             } else {
-                StreamCompletionResponse response = sseConverter.callback(msg);
+                StreamCompletionResponse response = sseConverter.convert(id, type, msg);
                 if(response != null) {
                     callback.callback(response);
                 }

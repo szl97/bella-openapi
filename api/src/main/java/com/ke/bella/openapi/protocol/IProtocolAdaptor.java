@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol;
 
-import com.ke.bella.openapi.protocol.completion.Callback;
+import com.ke.bella.openapi.protocol.completion.Callbacks;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 
@@ -32,7 +32,7 @@ public interface IProtocolAdaptor {
 
         CompletionResponse httpRequest(CompletionRequest request, String url, T property);
 
-        void streamRequest(CompletionRequest request, String url, T property, Callback.CompletionSseCallback callback);
+        void streamRequest(CompletionRequest request, String url, T property, Callbacks.StreamCompletionCallback callback);
 
         @Override
         default String endpoint() {

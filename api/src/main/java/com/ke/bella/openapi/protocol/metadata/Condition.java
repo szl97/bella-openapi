@@ -1,15 +1,15 @@
 package com.ke.bella.openapi.protocol.metadata;
 
+import java.util.Set;
+
 import com.ke.bella.openapi.protocol.PageCondition;
 import com.ke.bella.openapi.protocol.PermissionCondition;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Set;
 
 public class Condition {
 

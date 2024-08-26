@@ -1,19 +1,23 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
+
 @Data
 @JsonInclude(Include.NON_NULL)
 public class Message {

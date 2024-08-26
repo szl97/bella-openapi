@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
-import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
+import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
@@ -20,7 +20,8 @@ import okhttp3.RequestBody;
 @Component("OpenAICompletion")
 public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIAdaptor.OpenAIProperty> {
 
-    private final Callback.SseConvertCallback<String> sseConverter = str -> JacksonUtils.deserialize(str, StreamCompletionResponse.class);
+    private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> JacksonUtils.deserialize(str,
+            StreamCompletionResponse.class);
 
     @Override
     public CompletionResponse httpRequest(CompletionRequest request, String url, OpenAIProperty property) {
@@ -29,7 +30,7 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIA
     }
 
     @Override
-    public void streamRequest(CompletionRequest request, String url, OpenAIProperty property, Callback.CompletionSseCallback callback) {
+    public void streamRequest(CompletionRequest request, String url, OpenAIProperty property, Callbacks.StreamCompletionCallback callback) {
         Request httpRequest = buildRequest(request, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
@@ -41,8 +42,7 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIA
         request.setModel(property.getDeployName());
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(MediaType.parse("application/json"),
-                        JSON.toJSONString(request)));
+                .post(RequestBody.create(JSON.toJSONString(request), MediaType.parse("application/json")));
         return builder.build();
     }
 
