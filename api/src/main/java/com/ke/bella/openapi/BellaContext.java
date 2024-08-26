@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.db;
+package com.ke.bella.openapi;
 
 import com.google.common.collect.Maps;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestInfoContext {
+public class BellaContext {
     private static final ThreadLocal<EndpointRequestInfo> endpointRequestInfo = new ThreadLocal<>();
 
     private static final ThreadLocal<ContentCachingRequestWrapper> requestCache = new ThreadLocal<>();

@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.annotations.EndpointAPI;
-import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
@@ -31,13 +31,13 @@ public class ChatController {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping("/completions")
     public Object completion(@RequestBody CompletionRequest request) {
-        String endpoint = RequestInfoContext.getRequest().getRequestURI();
+        String endpoint = BellaContext.getRequest().getRequestURI();
         ChannelDB channel = router.route(endpoint, request.getModel(), adaptorManager.getProtocols(endpoint));
         IProtocolAdaptor.CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, channel.getProtocol(),
                 IProtocolAdaptor.CompletionAdaptor.class);
         IProtocolProperty property = (IProtocolProperty) JacksonUtils.deserialize(channel.getChannelInfo(), adaptor.getPropertyClass());
         if(request.isStream()) {
-            SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, RequestInfoContext.getRequestId());
+            SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, BellaContext.getRequestId());
             adaptor.streamCompletion(request, channel.getUrl(), property, new StreamCompletionCallback(sse));
             return sse;
         }

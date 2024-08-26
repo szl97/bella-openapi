@@ -1,8 +1,8 @@
 package com.ke.bella.openapi.service;
 
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.console.ApikeyOps;
-import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
@@ -70,7 +70,7 @@ public class ApikeyService {
 
     @Transactional
     public String createByParentCode(ApikeyCreateOp op) {
-        RequestInfoContext.ApikeyInfo apikey = RequestInfoContext.getApikey();
+        BellaContext.ApikeyInfo apikey = BellaContext.getApikey();
         if(!apikey.getCode().equals(op.getParentCode())) {
             throw new ChannelException.AuthorizationException("没有操作权限");
         }
@@ -164,9 +164,9 @@ public class ApikeyService {
         apikeyRepo.updateStatus(op.getCode(), status);
     }
 
-    public RequestInfoContext.ApikeyInfo verify(String ak) {
+    public BellaContext.ApikeyInfo verify(String ak) {
         String sha = EncryptUtils.sha256(ak);
-        RequestInfoContext.ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
+        BellaContext.ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
         if(apikeyInfo == null) {
             throw new ChannelException.AuthorizationException("api key不存在");
         }
@@ -174,7 +174,7 @@ public class ApikeyService {
     }
 
     private void checkPermission(String code) {
-        RequestInfoContext.ApikeyInfo apikeyInfo = RequestInfoContext.getApikey();
+        BellaContext.ApikeyInfo apikeyInfo = BellaContext.getApikey();
         if(apikeyInfo.getOwnerType().equals(SYSTEM)) {
             return;
         }
@@ -198,7 +198,7 @@ public class ApikeyService {
     }
 
     public void fillPermissionCode(PermissionCondition condition) {
-        RequestInfoContext.ApikeyInfo apikeyInfo = RequestInfoContext.getApikey();
+        BellaContext.ApikeyInfo apikeyInfo = BellaContext.getApikey();
         // TODO: 获取所有组织代码并填充到 orgCodes
         Set<String> orgCodes = new HashSet<>();
 
@@ -217,14 +217,14 @@ public class ApikeyService {
         }
     }
 
-    private void validateUserPermission(RequestInfoContext.ApikeyInfo apikeyInfo, String personalCode) {
+    private void validateUserPermission(BellaContext.ApikeyInfo apikeyInfo, String personalCode) {
         if(apikeyInfo.getOwnerType().equals(SYSTEM) || (apikeyInfo.getOwnerType().equals(PERSON) && personalCode.equals(apikeyInfo.getOwnerCode()))) {
             return;
         }
         throw new ChannelException.AuthorizationException("没有操作权限");
     }
 
-    private void validateOrgPermission(RequestInfoContext.ApikeyInfo apikeyInfo, Set<String> conditionOrgCodes, Set<String> orgCodes) {
+    private void validateOrgPermission(BellaContext.ApikeyInfo apikeyInfo, Set<String> conditionOrgCodes, Set<String> orgCodes) {
         if(apikeyInfo.getOwnerType().equals(SYSTEM) || CollectionUtils.isEmpty(conditionOrgCodes) || orgCodes.containsAll(conditionOrgCodes)) {
             return;
         }

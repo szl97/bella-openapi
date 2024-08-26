@@ -1,7 +1,8 @@
 package com.ke.bella.openapi.intercept;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.console.ConsoleContext;
-import com.ke.bella.openapi.db.RequestInfoContext;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -27,13 +28,13 @@ public class OpenapiRequestFilter extends OncePerRequestFilter {
             if(StringUtils.isBlank(requestId)) {
                 requestId = UUID.randomUUID().toString();
             }
-            RequestInfoContext.setRequestId(requestId);
+            BellaContext.setRequestId(requestId);
             ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
-            RequestInfoContext.setRequest(wrappedRequest);
+            BellaContext.setRequest(wrappedRequest);
             chain.doFilter(wrappedRequest, response);
         } finally {
             ConsoleContext.clearAll();
-            RequestInfoContext.clearAll();
+            BellaContext.clearAll();
         }
     }
 }

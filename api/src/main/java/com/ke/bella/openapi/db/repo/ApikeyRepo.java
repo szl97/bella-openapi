@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.db.RequestInfoContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
 import com.ke.bella.openapi.tables.pojos.ApiKeyDB;
 import com.ke.bella.openapi.tables.records.ApiKeyRecord;
@@ -21,12 +21,12 @@ import static com.ke.bella.openapi.db.TableConstants.PERSON;
 @Component
 public class ApikeyRepo extends StatusRepo<ApiKeyDB, ApiKeyRecord, String> implements AutogenCodeRepo<ApiKeyRecord> {
 
-    public RequestInfoContext.ApikeyInfo queryBySha(String sha) {
+    public BellaContext.ApikeyInfo queryBySha(String sha) {
         return db.select(API_KEY.fields())
                 .select(API_KEY_ROLE.PATH).from(API_KEY)
                 .leftJoin(API_KEY_ROLE).on(API_KEY.ROLE_CODE.eq(API_KEY_ROLE.ROLE_CODE))
                 .where(API_KEY.AK_SHA.eq(sha))
-                .fetchOneInto(RequestInfoContext.ApikeyInfo.class);
+                .fetchOneInto(BellaContext.ApikeyInfo.class);
     }
 
     public List<ApiKeyDB> listAccessKeys(ApikeyCondition op) {

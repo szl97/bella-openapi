@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.annotations.EndpointAPI;
-import com.ke.bella.openapi.db.RequestInfoContext;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 
@@ -28,7 +28,7 @@ public class EndpointApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        response.getHeaders().add("X-BELLA-REQUEST-ID", RequestInfoContext.getRequestId());
+        response.getHeaders().add("X-BELLA-REQUEST-ID", BellaContext.getRequestId());
         return body;
     }
 
