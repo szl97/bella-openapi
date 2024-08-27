@@ -4,9 +4,9 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.ApiKey;
-import com.ke.bella.openapi.tables.ApiKeyMonthCost;
-import com.ke.bella.openapi.tables.ApiKeyRole;
+import com.ke.bella.openapi.tables.Apikey;
+import com.ke.bella.openapi.tables.ApikeyMonthCost;
+import com.ke.bella.openapi.tables.ApikeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -14,9 +14,9 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
-import com.ke.bella.openapi.tables.records.ApiKeyMonthCostRecord;
-import com.ke.bella.openapi.tables.records.ApiKeyRecord;
-import com.ke.bella.openapi.tables.records.ApiKeyRoleRecord;
+import com.ke.bella.openapi.tables.records.ApikeyMonthCostRecord;
+import com.ke.bella.openapi.tables.records.ApikeyRecord;
+import com.ke.bella.openapi.tables.records.ApikeyRoleRecord;
 import com.ke.bella.openapi.tables.records.CategoryRecord;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
 import com.ke.bella.openapi.tables.records.EndpointCategoryRelRecord;
@@ -42,13 +42,13 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_PRIMARY = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_PRIMARY"), new TableField[] { ApiKey.API_KEY.ID }, true);
-    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_UNIQ_IDX_AK_SHA = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_uniq_idx_ak_sha"), new TableField[] { ApiKey.API_KEY.AK_SHA }, true);
-    public static final UniqueKey<ApiKeyRecord> KEY_API_KEY_UNIQ_IDX_CODE = Internal.createUniqueKey(ApiKey.API_KEY, DSL.name("KEY_api_key_uniq_idx_code"), new TableField[] { ApiKey.API_KEY.CODE }, true);
-    public static final UniqueKey<ApiKeyMonthCostRecord> KEY_API_KEY_MONTH_COST_PRIMARY = Internal.createUniqueKey(ApiKeyMonthCost.API_KEY_MONTH_COST, DSL.name("KEY_api_key_month_cost_PRIMARY"), new TableField[] { ApiKeyMonthCost.API_KEY_MONTH_COST.ID }, true);
-    public static final UniqueKey<ApiKeyMonthCostRecord> KEY_API_KEY_MONTH_COST_UNIQ_IDX_AK_CODE_MONTH = Internal.createUniqueKey(ApiKeyMonthCost.API_KEY_MONTH_COST, DSL.name("KEY_api_key_month_cost_uniq_idx_ak_code_month"), new TableField[] { ApiKeyMonthCost.API_KEY_MONTH_COST.AK_CODE, ApiKeyMonthCost.API_KEY_MONTH_COST.MONTH }, true);
-    public static final UniqueKey<ApiKeyRoleRecord> KEY_API_KEY_ROLE_PRIMARY = Internal.createUniqueKey(ApiKeyRole.API_KEY_ROLE, DSL.name("KEY_api_key_role_PRIMARY"), new TableField[] { ApiKeyRole.API_KEY_ROLE.ID }, true);
-    public static final UniqueKey<ApiKeyRoleRecord> KEY_API_KEY_ROLE_UNIQ_IDX_ROLE_CODE = Internal.createUniqueKey(ApiKeyRole.API_KEY_ROLE, DSL.name("KEY_api_key_role_uniq_idx_role_code"), new TableField[] { ApiKeyRole.API_KEY_ROLE.ROLE_CODE }, true);
+    public static final UniqueKey<ApikeyRecord> KEY_APIKEY_PRIMARY = Internal.createUniqueKey(Apikey.APIKEY, DSL.name("KEY_apikey_PRIMARY"), new TableField[] { Apikey.APIKEY.ID }, true);
+    public static final UniqueKey<ApikeyRecord> KEY_APIKEY_UNIQ_IDX_AK_SHA = Internal.createUniqueKey(Apikey.APIKEY, DSL.name("KEY_apikey_uniq_idx_ak_sha"), new TableField[] { Apikey.APIKEY.AK_SHA }, true);
+    public static final UniqueKey<ApikeyRecord> KEY_APIKEY_UNIQ_IDX_CODE = Internal.createUniqueKey(Apikey.APIKEY, DSL.name("KEY_apikey_uniq_idx_code"), new TableField[] { Apikey.APIKEY.CODE }, true);
+    public static final UniqueKey<ApikeyMonthCostRecord> KEY_APIKEY_MONTH_COST_PRIMARY = Internal.createUniqueKey(ApikeyMonthCost.APIKEY_MONTH_COST, DSL.name("KEY_apikey_month_cost_PRIMARY"), new TableField[] { ApikeyMonthCost.APIKEY_MONTH_COST.ID }, true);
+    public static final UniqueKey<ApikeyMonthCostRecord> KEY_APIKEY_MONTH_COST_UNIQ_IDX_AK_CODE_MONTH = Internal.createUniqueKey(ApikeyMonthCost.APIKEY_MONTH_COST, DSL.name("KEY_apikey_month_cost_uniq_idx_ak_code_month"), new TableField[] { ApikeyMonthCost.APIKEY_MONTH_COST.AK_CODE, ApikeyMonthCost.APIKEY_MONTH_COST.MONTH }, true);
+    public static final UniqueKey<ApikeyRoleRecord> KEY_APIKEY_ROLE_PRIMARY = Internal.createUniqueKey(ApikeyRole.APIKEY_ROLE, DSL.name("KEY_apikey_role_PRIMARY"), new TableField[] { ApikeyRole.APIKEY_ROLE.ID }, true);
+    public static final UniqueKey<ApikeyRoleRecord> KEY_APIKEY_ROLE_UNIQ_IDX_ROLE_CODE = Internal.createUniqueKey(ApikeyRole.APIKEY_ROLE, DSL.name("KEY_apikey_role_uniq_idx_role_code"), new TableField[] { ApikeyRole.APIKEY_ROLE.ROLE_CODE }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_PRIMARY = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_PRIMARY"), new TableField[] { Category.CATEGORY.ID }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_PARENT_CODE_CATEGORY_NAME = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_uniq_idx_parent_code_category_name"), new TableField[] { Category.CATEGORY.PARENT_CODE, Category.CATEGORY.CATEGORY_NAME }, true);
     public static final UniqueKey<CategoryRecord> KEY_CATEGORY_UNIQ_IDX_UNI_CATEGORY_CODE = Internal.createUniqueKey(Category.CATEGORY, DSL.name("KEY_category_uniq_idx_uni_category_code"), new TableField[] { Category.CATEGORY.CATEGORY_CODE }, true);

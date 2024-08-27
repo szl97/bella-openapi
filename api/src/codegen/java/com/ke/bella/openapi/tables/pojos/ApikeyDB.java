@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * ak
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ApiKeyDB implements Operator, Serializable {
+public class ApikeyDB implements Operator, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -40,9 +40,9 @@ public class ApiKeyDB implements Operator, Serializable {
     private LocalDateTime ctime;
     private LocalDateTime mtime;
 
-    public ApiKeyDB() {}
+    public ApikeyDB() {}
 
-    public ApiKeyDB(ApiKeyDB value) {
+    public ApikeyDB(ApikeyDB value) {
         this.id = value.id;
         this.code = value.code;
         this.akSha = value.akSha;
@@ -65,7 +65,7 @@ public class ApiKeyDB implements Operator, Serializable {
         this.mtime = value.mtime;
     }
 
-    public ApiKeyDB(
+    public ApikeyDB(
         Long          id,
         String        code,
         String        akSha,
@@ -110,280 +110,280 @@ public class ApiKeyDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>api_key.id</code>. 主键ID
+     * Getter for <code>apikey.id</code>. 主键ID
      */
     public Long getId() {
         return this.id;
     }
 
     /**
-     * Setter for <code>api_key.id</code>. 主键ID
+     * Setter for <code>apikey.id</code>. 主键ID
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Getter for <code>api_key.code</code>. ak编码
+     * Getter for <code>apikey.code</code>. ak编码
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * Setter for <code>api_key.code</code>. ak编码
+     * Setter for <code>apikey.code</code>. ak编码
      */
     public void setCode(String code) {
         this.code = code;
     }
 
     /**
-     * Getter for <code>api_key.ak_sha</code>. 加密ak
+     * Getter for <code>apikey.ak_sha</code>. 加密ak
      */
     public String getAkSha() {
         return this.akSha;
     }
 
     /**
-     * Setter for <code>api_key.ak_sha</code>. 加密ak
+     * Setter for <code>apikey.ak_sha</code>. 加密ak
      */
     public void setAkSha(String akSha) {
         this.akSha = akSha;
     }
 
     /**
-     * Getter for <code>api_key.ak_display</code>. 脱敏ak
+     * Getter for <code>apikey.ak_display</code>. 脱敏ak
      */
     public String getAkDisplay() {
         return this.akDisplay;
     }
 
     /**
-     * Setter for <code>api_key.ak_display</code>. 脱敏ak
+     * Setter for <code>apikey.ak_display</code>. 脱敏ak
      */
     public void setAkDisplay(String akDisplay) {
         this.akDisplay = akDisplay;
     }
 
     /**
-     * Getter for <code>api_key.parent_code</code>. 父ak
+     * Getter for <code>apikey.parent_code</code>. 父ak
      */
     public String getParentCode() {
         return this.parentCode;
     }
 
     /**
-     * Setter for <code>api_key.parent_code</code>. 父ak
+     * Setter for <code>apikey.parent_code</code>. 父ak
      */
     public void setParentCode(String parentCode) {
         this.parentCode = parentCode;
     }
 
     /**
-     * Getter for <code>api_key.user_id</code>. 授权人id
+     * Getter for <code>apikey.user_id</code>. 授权人id
      */
     public Long getUserId() {
         return this.userId;
     }
 
     /**
-     * Setter for <code>api_key.user_id</code>. 授权人id
+     * Setter for <code>apikey.user_id</code>. 授权人id
      */
     public void setUserId(Long userId) {
         this.userId = userId;
     }
 
     /**
-     * Getter for <code>api_key.owner_type</code>. 所有者类型（系统/组织/个人）
+     * Getter for <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
      */
     public String getOwnerType() {
         return this.ownerType;
     }
 
     /**
-     * Setter for <code>api_key.owner_type</code>. 所有者类型（系统/组织/个人）
+     * Setter for <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
      */
     public void setOwnerType(String ownerType) {
         this.ownerType = ownerType;
     }
 
     /**
-     * Getter for <code>api_key.owner_code</code>. 所有者系统号
+     * Getter for <code>apikey.owner_code</code>. 所有者系统号
      */
     public String getOwnerCode() {
         return this.ownerCode;
     }
 
     /**
-     * Setter for <code>api_key.owner_code</code>. 所有者系统号
+     * Setter for <code>apikey.owner_code</code>. 所有者系统号
      */
     public void setOwnerCode(String ownerCode) {
         this.ownerCode = ownerCode;
     }
 
     /**
-     * Getter for <code>api_key.owner_name</code>. 所有者名称
+     * Getter for <code>apikey.owner_name</code>. 所有者名称
      */
     public String getOwnerName() {
         return this.ownerName;
     }
 
     /**
-     * Setter for <code>api_key.owner_name</code>. 所有者名称
+     * Setter for <code>apikey.owner_name</code>. 所有者名称
      */
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }
 
     /**
-     * Getter for <code>api_key.role_code</code>. 角色编码
+     * Getter for <code>apikey.role_code</code>. 角色编码
      */
     public String getRoleCode() {
         return this.roleCode;
     }
 
     /**
-     * Setter for <code>api_key.role_code</code>. 角色编码
+     * Setter for <code>apikey.role_code</code>. 角色编码
      */
     public void setRoleCode(String roleCode) {
         this.roleCode = roleCode;
     }
 
     /**
-     * Getter for <code>api_key.certify_code</code>. 安全认证码
+     * Getter for <code>apikey.certify_code</code>. 安全认证码
      */
     public String getCertifyCode() {
         return this.certifyCode;
     }
 
     /**
-     * Setter for <code>api_key.certify_code</code>. 安全认证码
+     * Setter for <code>apikey.certify_code</code>. 安全认证码
      */
     public void setCertifyCode(String certifyCode) {
         this.certifyCode = certifyCode;
     }
 
     /**
-     * Getter for <code>api_key.safety_level</code>. 安全等级
+     * Getter for <code>apikey.safety_level</code>. 安全等级
      */
     public Byte getSafetyLevel() {
         return this.safetyLevel;
     }
 
     /**
-     * Setter for <code>api_key.safety_level</code>. 安全等级
+     * Setter for <code>apikey.safety_level</code>. 安全等级
      */
     public void setSafetyLevel(Byte safetyLevel) {
         this.safetyLevel = safetyLevel;
     }
 
     /**
-     * Getter for <code>api_key.month_quota</code>. 每月额度
+     * Getter for <code>apikey.month_quota</code>. 每月额度
      */
     public BigDecimal getMonthQuota() {
         return this.monthQuota;
     }
 
     /**
-     * Setter for <code>api_key.month_quota</code>. 每月额度
+     * Setter for <code>apikey.month_quota</code>. 每月额度
      */
     public void setMonthQuota(BigDecimal monthQuota) {
         this.monthQuota = monthQuota;
     }
 
     /**
-     * Getter for <code>api_key.status</code>. 状态(active/inactive)
+     * Getter for <code>apikey.status</code>. 状态(active/inactive)
      */
     public String getStatus() {
         return this.status;
     }
 
     /**
-     * Setter for <code>api_key.status</code>. 状态(active/inactive)
+     * Setter for <code>apikey.status</code>. 状态(active/inactive)
      */
     public void setStatus(String status) {
         this.status = status;
     }
 
     /**
-     * Getter for <code>api_key.cuid</code>. 创建人id
+     * Getter for <code>apikey.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>api_key.cuid</code>. 创建人id
+     * Setter for <code>apikey.cuid</code>. 创建人id
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>api_key.cu_name</code>. 创建人姓名
+     * Getter for <code>apikey.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
         return this.cuName;
     }
 
     /**
-     * Setter for <code>api_key.cu_name</code>. 创建人姓名
+     * Setter for <code>apikey.cu_name</code>. 创建人姓名
      */
     public void setCuName(String cuName) {
         this.cuName = cuName;
     }
 
     /**
-     * Getter for <code>api_key.muid</code>. 编辑人id
+     * Getter for <code>apikey.muid</code>. 编辑人id
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>api_key.muid</code>. 编辑人id
+     * Setter for <code>apikey.muid</code>. 编辑人id
      */
     public void setMuid(Long muid) {
         this.muid = muid;
     }
 
     /**
-     * Getter for <code>api_key.mu_name</code>. 编辑人姓名
+     * Getter for <code>apikey.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
         return this.muName;
     }
 
     /**
-     * Setter for <code>api_key.mu_name</code>. 编辑人姓名
+     * Setter for <code>apikey.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String muName) {
         this.muName = muName;
     }
 
     /**
-     * Getter for <code>api_key.ctime</code>.
+     * Getter for <code>apikey.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return this.ctime;
     }
 
     /**
-     * Setter for <code>api_key.ctime</code>.
+     * Setter for <code>apikey.ctime</code>.
      */
     public void setCtime(LocalDateTime ctime) {
         this.ctime = ctime;
     }
 
     /**
-     * Getter for <code>api_key.mtime</code>.
+     * Getter for <code>apikey.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return this.mtime;
     }
 
     /**
-     * Setter for <code>api_key.mtime</code>.
+     * Setter for <code>apikey.mtime</code>.
      */
     public void setMtime(LocalDateTime mtime) {
         this.mtime = mtime;
@@ -391,7 +391,7 @@ public class ApiKeyDB implements Operator, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ApiKeyDB (");
+        StringBuilder sb = new StringBuilder("ApikeyDB (");
 
         sb.append(id);
         sb.append(", ").append(code);

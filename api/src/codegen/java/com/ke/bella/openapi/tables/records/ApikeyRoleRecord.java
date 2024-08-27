@@ -5,7 +5,7 @@ package com.ke.bella.openapi.tables.records;
 
 
 import com.ke.bella.openapi.db.repo.Operator;
-import com.ke.bella.openapi.tables.ApiKeyRole;
+import com.ke.bella.openapi.tables.ApikeyRole;
 
 import java.time.LocalDateTime;
 
@@ -20,131 +20,131 @@ import org.jooq.impl.UpdatableRecordImpl;
  * ak角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ApiKeyRoleRecord extends UpdatableRecordImpl<ApiKeyRoleRecord> implements Operator, Record9<Long, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
+public class ApikeyRoleRecord extends UpdatableRecordImpl<ApikeyRoleRecord> implements Operator, Record9<Long, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>api_key_role.id</code>. 主键ID
+     * Setter for <code>apikey_role.id</code>. 主键ID
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>api_key_role.id</code>. 主键ID
+     * Getter for <code>apikey_role.id</code>. 主键ID
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>api_key_role.role_code</code>. ak编码
+     * Setter for <code>apikey_role.role_code</code>. ak编码
      */
     public void setRoleCode(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>api_key_role.role_code</code>. ak编码
+     * Getter for <code>apikey_role.role_code</code>. ak编码
      */
     public String getRoleCode() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>api_key_role.path</code>. 授权的path
+     * Setter for <code>apikey_role.path</code>. 授权的path
      */
     public void setPath(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>api_key_role.path</code>. 授权的path
+     * Getter for <code>apikey_role.path</code>. 授权的path
      */
     public String getPath() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>api_key_role.cuid</code>. 创建人id
+     * Setter for <code>apikey_role.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>api_key_role.cuid</code>. 创建人id
+     * Getter for <code>apikey_role.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return (Long) get(3);
     }
 
     /**
-     * Setter for <code>api_key_role.cu_name</code>. 创建人姓名
+     * Setter for <code>apikey_role.cu_name</code>. 创建人姓名
      */
     public void setCuName(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>api_key_role.cu_name</code>. 创建人姓名
+     * Getter for <code>apikey_role.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>api_key_role.muid</code>. 编辑人id
+     * Setter for <code>apikey_role.muid</code>. 编辑人id
      */
     public void setMuid(Long value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>api_key_role.muid</code>. 编辑人id
+     * Getter for <code>apikey_role.muid</code>. 编辑人id
      */
     public Long getMuid() {
         return (Long) get(5);
     }
 
     /**
-     * Setter for <code>api_key_role.mu_name</code>. 编辑人姓名
+     * Setter for <code>apikey_role.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>api_key_role.mu_name</code>. 编辑人姓名
+     * Getter for <code>apikey_role.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>api_key_role.ctime</code>.
+     * Setter for <code>apikey_role.ctime</code>.
      */
     public void setCtime(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>api_key_role.ctime</code>.
+     * Getter for <code>apikey_role.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>api_key_role.mtime</code>.
+     * Setter for <code>apikey_role.mtime</code>.
      */
     public void setMtime(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>api_key_role.mtime</code>.
+     * Getter for <code>apikey_role.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return (LocalDateTime) get(8);
@@ -175,47 +175,47 @@ public class ApiKeyRoleRecord extends UpdatableRecordImpl<ApiKeyRoleRecord> impl
 
     @Override
     public Field<Long> field1() {
-        return ApiKeyRole.API_KEY_ROLE.ID;
+        return ApikeyRole.APIKEY_ROLE.ID;
     }
 
     @Override
     public Field<String> field2() {
-        return ApiKeyRole.API_KEY_ROLE.ROLE_CODE;
+        return ApikeyRole.APIKEY_ROLE.ROLE_CODE;
     }
 
     @Override
     public Field<String> field3() {
-        return ApiKeyRole.API_KEY_ROLE.PATH;
+        return ApikeyRole.APIKEY_ROLE.PATH;
     }
 
     @Override
     public Field<Long> field4() {
-        return ApiKeyRole.API_KEY_ROLE.CUID;
+        return ApikeyRole.APIKEY_ROLE.CUID;
     }
 
     @Override
     public Field<String> field5() {
-        return ApiKeyRole.API_KEY_ROLE.CU_NAME;
+        return ApikeyRole.APIKEY_ROLE.CU_NAME;
     }
 
     @Override
     public Field<Long> field6() {
-        return ApiKeyRole.API_KEY_ROLE.MUID;
+        return ApikeyRole.APIKEY_ROLE.MUID;
     }
 
     @Override
     public Field<String> field7() {
-        return ApiKeyRole.API_KEY_ROLE.MU_NAME;
+        return ApikeyRole.APIKEY_ROLE.MU_NAME;
     }
 
     @Override
     public Field<LocalDateTime> field8() {
-        return ApiKeyRole.API_KEY_ROLE.CTIME;
+        return ApikeyRole.APIKEY_ROLE.CTIME;
     }
 
     @Override
     public Field<LocalDateTime> field9() {
-        return ApiKeyRole.API_KEY_ROLE.MTIME;
+        return ApikeyRole.APIKEY_ROLE.MTIME;
     }
 
     @Override
@@ -309,61 +309,61 @@ public class ApiKeyRoleRecord extends UpdatableRecordImpl<ApiKeyRoleRecord> impl
     }
 
     @Override
-    public ApiKeyRoleRecord value1(Long value) {
+    public ApikeyRoleRecord value1(Long value) {
         setId(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value2(String value) {
+    public ApikeyRoleRecord value2(String value) {
         setRoleCode(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value3(String value) {
+    public ApikeyRoleRecord value3(String value) {
         setPath(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value4(Long value) {
+    public ApikeyRoleRecord value4(Long value) {
         setCuid(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value5(String value) {
+    public ApikeyRoleRecord value5(String value) {
         setCuName(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value6(Long value) {
+    public ApikeyRoleRecord value6(Long value) {
         setMuid(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value7(String value) {
+    public ApikeyRoleRecord value7(String value) {
         setMuName(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value8(LocalDateTime value) {
+    public ApikeyRoleRecord value8(LocalDateTime value) {
         setCtime(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord value9(LocalDateTime value) {
+    public ApikeyRoleRecord value9(LocalDateTime value) {
         setMtime(value);
         return this;
     }
 
     @Override
-    public ApiKeyRoleRecord values(Long value1, String value2, String value3, Long value4, String value5, Long value6, String value7, LocalDateTime value8, LocalDateTime value9) {
+    public ApikeyRoleRecord values(Long value1, String value2, String value3, Long value4, String value5, Long value6, String value7, LocalDateTime value8, LocalDateTime value9) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -381,17 +381,17 @@ public class ApiKeyRoleRecord extends UpdatableRecordImpl<ApiKeyRoleRecord> impl
     // -------------------------------------------------------------------------
 
     /**
-     * Create a detached ApiKeyRoleRecord
+     * Create a detached ApikeyRoleRecord
      */
-    public ApiKeyRoleRecord() {
-        super(ApiKeyRole.API_KEY_ROLE);
+    public ApikeyRoleRecord() {
+        super(ApikeyRole.APIKEY_ROLE);
     }
 
     /**
-     * Create a detached, initialised ApiKeyRoleRecord
+     * Create a detached, initialised ApikeyRoleRecord
      */
-    public ApiKeyRoleRecord(Long id, String roleCode, String path, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
-        super(ApiKeyRole.API_KEY_ROLE);
+    public ApikeyRoleRecord(Long id, String roleCode, String path, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
+        super(ApikeyRole.APIKEY_ROLE);
 
         setId(id);
         setRoleCode(roleCode);

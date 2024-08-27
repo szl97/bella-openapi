@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +31,8 @@ import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.PermissionCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCreateOp;
-import com.ke.bella.openapi.tables.pojos.ApiKeyDB;
-import com.ke.bella.openapi.tables.pojos.ApiKeyMonthCostDB;
-import com.ke.bella.openapi.tables.pojos.ApiKeyRoleDB;
+import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
+import com.ke.bella.openapi.tables.pojos.ApikeyRoleDB;
 import com.ke.bella.openapi.utils.EncryptUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
@@ -65,7 +65,7 @@ public class ApikeyService {
         if(StringUtils.isNotEmpty(op.getRoleCode())) {
             Assert.isTrue(childRoleCodes.contains(op.getRoleCode()), "role code不可使用");
         }
-        ApiKeyDB db = new ApiKeyDB();
+        ApikeyDB db = new ApikeyDB();
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setOwnerType(op.getOwnerType());
@@ -75,6 +75,10 @@ public class ApikeyService {
         db.setMonthQuota(op.getMonthQuota() == null ? BigDecimal.valueOf(basicMonthQuota) : op.getMonthQuota());
         apikeyRepo.insert(db);
         return ak;
+    }
+
+    public void sync(ApikeyDB ApikeyDB) {
+        apikeyRepo.insert(ApikeyDB);
     }
 
     @Transactional
@@ -91,7 +95,7 @@ public class ApikeyService {
         String ak = UUID.randomUUID().toString();
         String sha = EncryptUtils.sha256(ak);
         String display = EncryptUtils.desensitize(ak);
-        ApiKeyDB db = new ApiKeyDB();
+        ApikeyDB db = new ApikeyDB();
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setParentCode(op.getParentCode());
@@ -118,7 +122,7 @@ public class ApikeyService {
         String ak = UUID.randomUUID().toString();
         String sha = EncryptUtils.sha256(ak);
         String display = EncryptUtils.desensitize(ak);
-        ApiKeyDB db = new ApiKeyDB();
+        ApikeyDB db = new ApikeyDB();
         db.setAkSha(sha);
         db.setAkDisplay(display);
         apikeyRepo.update(db, op.getCode());
@@ -132,7 +136,7 @@ public class ApikeyService {
         if(StringUtils.isNotEmpty(op.getRoleCode())) {
             apikeyRoleRepo.checkExist(op.getRoleCode(), true);
         } else {
-            ApiKeyRoleDB roleDB = new ApiKeyRoleDB();
+            ApikeyRoleDB roleDB = new ApikeyRoleDB();
             ApikeyRoleRepo.RolePath rolePath = new ApikeyRoleRepo.RolePath();
             rolePath.setIncluded(op.getPaths());
             roleDB.setPath(JacksonUtils.serialize(rolePath));
@@ -147,7 +151,7 @@ public class ApikeyService {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
         Byte level = fetchLevelByCertifyCode(op.getCertifyCode());
-        ApiKeyDB db = new ApiKeyDB();
+        ApikeyDB db = new ApikeyDB();
         db.setCertifyCode(op.getCertifyCode());
         db.setSafetyLevel(level);
         apikeyRepo.update(db, op.getCode());
@@ -186,7 +190,7 @@ public class ApikeyService {
     public BigDecimal recordCost(String akCode, String month, BigDecimal cost) {
         BigDecimal amount = apikeyCostRepo.queryCost(akCode, month);
         if(amount == null) {
-            apikeyCostRepo.insert(akCode, month, cost);
+            apikeyCostRepo.insert(akCode, month);
         }
         apikeyCostRepo.increment(akCode, month, cost);
         return apikeyCostRepo.queryCost(akCode, month);
@@ -199,7 +203,7 @@ public class ApikeyService {
         return apikeyCostRepo.queryCost(akCode, month);
     }
 
-    public List<ApiKeyMonthCostDB> queryBillingsByAkCode(String akCode) {
+    public List<ApikeyMonthCostDB> queryBillingsByAkCode(String akCode) {
         return apikeyCostRepo.queryByAkCode(akCode);
     }
 
@@ -208,7 +212,7 @@ public class ApikeyService {
         if(apikeyInfo.getOwnerType().equals(SYSTEM)) {
             return;
         }
-        ApiKeyDB db = apikeyRepo.queryByUniqueKey(code);
+        ApikeyDB db = apikeyRepo.queryByUniqueKey(code);
         //todo: 获取所有 org
         Set<String> orgCodes = new HashSet<>();
         if(db.getOwnerType().equals(SYSTEM)) {
@@ -222,7 +226,7 @@ public class ApikeyService {
         }
     }
 
-    public Page<ApiKeyDB> pageApikey(ApikeyCondition condition) {
+    public Page<ApikeyDB> pageApikey(ApikeyCondition condition) {
         fillPermissionCode(condition);
         return apikeyRepo.pageAccessKeys(condition);
     }

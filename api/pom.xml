@@ -326,7 +326,7 @@
                     </pojoClass>
                     <pojoImplements>com.ke.bella.openapi.db.repo.Timed</pojoImplements>
                     <recordImplements>com.ke.bella.openapi.db.repo.Timed</recordImplements>
-                    <expression>api_key_month_cost</expression>
+                    <expression>apikey_month_cost</expression>
                   </table>
                   <table>
                     <daoClass>

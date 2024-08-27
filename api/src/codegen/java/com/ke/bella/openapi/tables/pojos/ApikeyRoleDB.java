@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * ak角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ApiKeyRoleDB implements Operator, Serializable {
+public class ApikeyRoleDB implements Operator, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,9 @@ public class ApiKeyRoleDB implements Operator, Serializable {
     private LocalDateTime ctime;
     private LocalDateTime mtime;
 
-    public ApiKeyRoleDB() {}
+    public ApikeyRoleDB() {}
 
-    public ApiKeyRoleDB(ApiKeyRoleDB value) {
+    public ApikeyRoleDB(ApikeyRoleDB value) {
         this.id = value.id;
         this.roleCode = value.roleCode;
         this.path = value.path;
@@ -42,7 +42,7 @@ public class ApiKeyRoleDB implements Operator, Serializable {
         this.mtime = value.mtime;
     }
 
-    public ApiKeyRoleDB(
+    public ApikeyRoleDB(
         Long          id,
         String        roleCode,
         String        path,
@@ -65,126 +65,126 @@ public class ApiKeyRoleDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>api_key_role.id</code>. 主键ID
+     * Getter for <code>apikey_role.id</code>. 主键ID
      */
     public Long getId() {
         return this.id;
     }
 
     /**
-     * Setter for <code>api_key_role.id</code>. 主键ID
+     * Setter for <code>apikey_role.id</code>. 主键ID
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Getter for <code>api_key_role.role_code</code>. ak编码
+     * Getter for <code>apikey_role.role_code</code>. ak编码
      */
     public String getRoleCode() {
         return this.roleCode;
     }
 
     /**
-     * Setter for <code>api_key_role.role_code</code>. ak编码
+     * Setter for <code>apikey_role.role_code</code>. ak编码
      */
     public void setRoleCode(String roleCode) {
         this.roleCode = roleCode;
     }
 
     /**
-     * Getter for <code>api_key_role.path</code>. 授权的path
+     * Getter for <code>apikey_role.path</code>. 授权的path
      */
     public String getPath() {
         return this.path;
     }
 
     /**
-     * Setter for <code>api_key_role.path</code>. 授权的path
+     * Setter for <code>apikey_role.path</code>. 授权的path
      */
     public void setPath(String path) {
         this.path = path;
     }
 
     /**
-     * Getter for <code>api_key_role.cuid</code>. 创建人id
+     * Getter for <code>apikey_role.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>api_key_role.cuid</code>. 创建人id
+     * Setter for <code>apikey_role.cuid</code>. 创建人id
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>api_key_role.cu_name</code>. 创建人姓名
+     * Getter for <code>apikey_role.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
         return this.cuName;
     }
 
     /**
-     * Setter for <code>api_key_role.cu_name</code>. 创建人姓名
+     * Setter for <code>apikey_role.cu_name</code>. 创建人姓名
      */
     public void setCuName(String cuName) {
         this.cuName = cuName;
     }
 
     /**
-     * Getter for <code>api_key_role.muid</code>. 编辑人id
+     * Getter for <code>apikey_role.muid</code>. 编辑人id
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>api_key_role.muid</code>. 编辑人id
+     * Setter for <code>apikey_role.muid</code>. 编辑人id
      */
     public void setMuid(Long muid) {
         this.muid = muid;
     }
 
     /**
-     * Getter for <code>api_key_role.mu_name</code>. 编辑人姓名
+     * Getter for <code>apikey_role.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
         return this.muName;
     }
 
     /**
-     * Setter for <code>api_key_role.mu_name</code>. 编辑人姓名
+     * Setter for <code>apikey_role.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String muName) {
         this.muName = muName;
     }
 
     /**
-     * Getter for <code>api_key_role.ctime</code>.
+     * Getter for <code>apikey_role.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return this.ctime;
     }
 
     /**
-     * Setter for <code>api_key_role.ctime</code>.
+     * Setter for <code>apikey_role.ctime</code>.
      */
     public void setCtime(LocalDateTime ctime) {
         this.ctime = ctime;
     }
 
     /**
-     * Getter for <code>api_key_role.mtime</code>.
+     * Getter for <code>apikey_role.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return this.mtime;
     }
 
     /**
-     * Setter for <code>api_key_role.mtime</code>.
+     * Setter for <code>apikey_role.mtime</code>.
      */
     public void setMtime(LocalDateTime mtime) {
         this.mtime = mtime;
@@ -192,7 +192,7 @@ public class ApiKeyRoleDB implements Operator, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ApiKeyRoleDB (");
+        StringBuilder sb = new StringBuilder("ApikeyRoleDB (");
 
         sb.append(id);
         sb.append(", ").append(roleCode);

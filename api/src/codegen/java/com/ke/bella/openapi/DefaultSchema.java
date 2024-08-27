@@ -4,9 +4,9 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.ApiKey;
-import com.ke.bella.openapi.tables.ApiKeyMonthCost;
-import com.ke.bella.openapi.tables.ApiKeyRole;
+import com.ke.bella.openapi.tables.Apikey;
+import com.ke.bella.openapi.tables.ApikeyMonthCost;
+import com.ke.bella.openapi.tables.ApikeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -39,17 +39,17 @@ public class DefaultSchema extends SchemaImpl {
     /**
      * ak
      */
-    public final ApiKey API_KEY = ApiKey.API_KEY;
+    public final Apikey APIKEY = Apikey.APIKEY;
 
     /**
      * ak月花费
      */
-    public final ApiKeyMonthCost API_KEY_MONTH_COST = ApiKeyMonthCost.API_KEY_MONTH_COST;
+    public final ApikeyMonthCost APIKEY_MONTH_COST = ApikeyMonthCost.APIKEY_MONTH_COST;
 
     /**
      * ak角色
      */
-    public final ApiKeyRole API_KEY_ROLE = ApiKeyRole.API_KEY_ROLE;
+    public final ApikeyRole APIKEY_ROLE = ApikeyRole.APIKEY_ROLE;
 
     /**
      * 类目
@@ -102,9 +102,9 @@ public class DefaultSchema extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
-            ApiKey.API_KEY,
-            ApiKeyMonthCost.API_KEY_MONTH_COST,
-            ApiKeyRole.API_KEY_ROLE,
+            Apikey.APIKEY,
+            ApikeyMonthCost.APIKEY_MONTH_COST,
+            ApikeyRole.APIKEY_ROLE,
             Category.CATEGORY,
             Channel.CHANNEL,
             Endpoint.ENDPOINT,

@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 
-import static com.ke.bella.openapi.Tables.API_KEY_MONTH_COST;
+import static com.ke.bella.openapi.Tables.APIKEY_MONTH_COST;
 
 @Component
 public class CacheRepoTest {
@@ -49,9 +49,9 @@ public class CacheRepoTest {
     @Transactional
     @CacheInvalidate(name = "apikey:cost:month:", key = "#akCode + ':' + #month")
     public boolean deleteCost(String akCode, String month) {
-        return db.deleteFrom(API_KEY_MONTH_COST)
-                .where(API_KEY_MONTH_COST.AK_CODE.eq(akCode))
-                .and(API_KEY_MONTH_COST.MONTH.eq(month))
+        return db.deleteFrom(APIKEY_MONTH_COST)
+                .where(APIKEY_MONTH_COST.AK_CODE.eq(akCode))
+                .and(APIKEY_MONTH_COST.MONTH.eq(month))
                 .execute() > 0;
     }
 }

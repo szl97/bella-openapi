@@ -2,7 +2,7 @@ package com.ke.bella.openapi.console;
 
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.service.ApikeyService;
-import com.ke.bella.openapi.tables.pojos.ApiKeyMonthCostDB;
+import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ public class ApikeyConsoleController {
     }
 
     @GetMapping("/cost/{akCode}")
-    public List<ApiKeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
+    public List<ApikeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
         return apikeyService.queryBillingsByAkCode(akCode);
     }
 }

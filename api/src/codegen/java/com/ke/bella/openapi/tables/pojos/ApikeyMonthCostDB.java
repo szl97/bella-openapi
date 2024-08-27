@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  * ak月花费
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ApiKeyMonthCostDB implements Timed, Serializable {
+public class ApikeyMonthCostDB implements Timed, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,9 +26,9 @@ public class ApiKeyMonthCostDB implements Timed, Serializable {
     private LocalDateTime ctime;
     private LocalDateTime mtime;
 
-    public ApiKeyMonthCostDB() {}
+    public ApikeyMonthCostDB() {}
 
-    public ApiKeyMonthCostDB(ApiKeyMonthCostDB value) {
+    public ApikeyMonthCostDB(ApikeyMonthCostDB value) {
         this.id = value.id;
         this.akCode = value.akCode;
         this.month = value.month;
@@ -37,7 +37,7 @@ public class ApiKeyMonthCostDB implements Timed, Serializable {
         this.mtime = value.mtime;
     }
 
-    public ApiKeyMonthCostDB(
+    public ApikeyMonthCostDB(
         Long          id,
         String        akCode,
         String        month,
@@ -54,84 +54,84 @@ public class ApiKeyMonthCostDB implements Timed, Serializable {
     }
 
     /**
-     * Getter for <code>api_key_month_cost.id</code>. 主键ID
+     * Getter for <code>apikey_month_cost.id</code>. 主键ID
      */
     public Long getId() {
         return this.id;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.id</code>. 主键ID
+     * Setter for <code>apikey_month_cost.id</code>. 主键ID
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Getter for <code>api_key_month_cost.ak_code</code>. ak编码
+     * Getter for <code>apikey_month_cost.ak_code</code>. ak编码
      */
     public String getAkCode() {
         return this.akCode;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.ak_code</code>. ak编码
+     * Setter for <code>apikey_month_cost.ak_code</code>. ak编码
      */
     public void setAkCode(String akCode) {
         this.akCode = akCode;
     }
 
     /**
-     * Getter for <code>api_key_month_cost.month</code>. 月份
+     * Getter for <code>apikey_month_cost.month</code>. 月份
      */
     public String getMonth() {
         return this.month;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.month</code>. 月份
+     * Setter for <code>apikey_month_cost.month</code>. 月份
      */
     public void setMonth(String month) {
         this.month = month;
     }
 
     /**
-     * Getter for <code>api_key_month_cost.amount</code>. 开销（分）
+     * Getter for <code>apikey_month_cost.amount</code>. 开销（分）
      */
     public BigDecimal getAmount() {
         return this.amount;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.amount</code>. 开销（分）
+     * Setter for <code>apikey_month_cost.amount</code>. 开销（分）
      */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
     /**
-     * Getter for <code>api_key_month_cost.ctime</code>.
+     * Getter for <code>apikey_month_cost.ctime</code>.
      */
     public LocalDateTime getCtime() {
         return this.ctime;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.ctime</code>.
+     * Setter for <code>apikey_month_cost.ctime</code>.
      */
     public void setCtime(LocalDateTime ctime) {
         this.ctime = ctime;
     }
 
     /**
-     * Getter for <code>api_key_month_cost.mtime</code>.
+     * Getter for <code>apikey_month_cost.mtime</code>.
      */
     public LocalDateTime getMtime() {
         return this.mtime;
     }
 
     /**
-     * Setter for <code>api_key_month_cost.mtime</code>.
+     * Setter for <code>apikey_month_cost.mtime</code>.
      */
     public void setMtime(LocalDateTime mtime) {
         this.mtime = mtime;
@@ -139,7 +139,7 @@ public class ApiKeyMonthCostDB implements Timed, Serializable {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ApiKeyMonthCostDB (");
+        StringBuilder sb = new StringBuilder("ApikeyMonthCostDB (");
 
         sb.append(id);
         sb.append(", ").append(akCode);

@@ -11,8 +11,8 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ke.bella.openapi.tables.pojos.ApiKeyMonthCostDB;
-import com.ke.bella.openapi.tables.records.ApiKeyMonthCostRecord;
+import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
+import com.ke.bella.openapi.tables.records.ApikeyMonthCostRecord;
 
 @Component
 public class ApikeyCostRepo implements BaseRepo {
@@ -20,31 +20,31 @@ public class ApikeyCostRepo implements BaseRepo {
     private DSLContext db;
 
     @Transactional
-    public void insert(String akCode, String month, BigDecimal amount) {
-        ApiKeyMonthCostRecord rec = API_KEY_MONTH_COST.newRecord();
+    public void insert(String akCode, String month) {
+        ApikeyMonthCostRecord rec = APIKEY_MONTH_COST.newRecord();
         rec.setAkCode(akCode);
         rec.setMonth(month);
         rec.setAmount(BigDecimal.ZERO);
 
-        db.insertInto(API_KEY_MONTH_COST).set(rec)
+        db.insertInto(APIKEY_MONTH_COST).set(rec)
                 .onDuplicateKeyIgnore()
                 .execute();
     }
 
     @Transactional
     public void increment(String akCode, String month, BigDecimal cost) {
-        db.update(API_KEY_MONTH_COST)
-                .set(API_KEY_MONTH_COST.AMOUNT, API_KEY_MONTH_COST.AMOUNT.add(cost))
-                .where(API_KEY_MONTH_COST.AK_CODE.eq(akCode))
-                .and(API_KEY_MONTH_COST.MONTH.eq(month))
+        db.update(APIKEY_MONTH_COST)
+                .set(APIKEY_MONTH_COST.AMOUNT, APIKEY_MONTH_COST.AMOUNT.add(cost))
+                .where(APIKEY_MONTH_COST.AK_CODE.eq(akCode))
+                .and(APIKEY_MONTH_COST.MONTH.eq(month))
                 .execute();
     }
 
     public BigDecimal queryCost(String akCode, String month) {
-        return db.select(API_KEY_MONTH_COST.AMOUNT)
-                .from(API_KEY_MONTH_COST)
-                .where(API_KEY_MONTH_COST.AK_CODE.eq(akCode))
-                .and(API_KEY_MONTH_COST.MONTH.eq(month))
+        return db.select(APIKEY_MONTH_COST.AMOUNT)
+                .from(APIKEY_MONTH_COST)
+                .where(APIKEY_MONTH_COST.AK_CODE.eq(akCode))
+                .and(APIKEY_MONTH_COST.MONTH.eq(month))
                 .fetchOneInto(BigDecimal.class);
     }
 
@@ -52,9 +52,9 @@ public class ApikeyCostRepo implements BaseRepo {
         return queryCost(akCode, month);
     }
 
-    public List<ApiKeyMonthCostDB> queryByAkCode(String akCode) {
-        return db.selectFrom(API_KEY_MONTH_COST)
-                .where(API_KEY_MONTH_COST.AK_CODE.eq(akCode))
-                .fetchInto(ApiKeyMonthCostDB.class);
+    public List<ApikeyMonthCostDB> queryByAkCode(String akCode) {
+        return db.selectFrom(APIKEY_MONTH_COST)
+                .where(APIKEY_MONTH_COST.AK_CODE.eq(akCode))
+                .fetchInto(ApikeyMonthCostDB.class);
     }
 }

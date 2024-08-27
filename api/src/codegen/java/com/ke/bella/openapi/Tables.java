@@ -4,9 +4,9 @@
 package com.ke.bella.openapi;
 
 
-import com.ke.bella.openapi.tables.ApiKey;
-import com.ke.bella.openapi.tables.ApiKeyMonthCost;
-import com.ke.bella.openapi.tables.ApiKeyRole;
+import com.ke.bella.openapi.tables.Apikey;
+import com.ke.bella.openapi.tables.ApikeyMonthCost;
+import com.ke.bella.openapi.tables.ApikeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
 import com.ke.bella.openapi.tables.Endpoint;
@@ -25,17 +25,17 @@ public class Tables {
     /**
      * ak
      */
-    public static final ApiKey API_KEY = ApiKey.API_KEY;
+    public static final Apikey APIKEY = Apikey.APIKEY;
 
     /**
      * ak月花费
      */
-    public static final ApiKeyMonthCost API_KEY_MONTH_COST = ApiKeyMonthCost.API_KEY_MONTH_COST;
+    public static final ApikeyMonthCost APIKEY_MONTH_COST = ApikeyMonthCost.APIKEY_MONTH_COST;
 
     /**
      * ak角色
      */
-    public static final ApiKeyRole API_KEY_ROLE = ApiKeyRole.API_KEY_ROLE;
+    public static final ApikeyRole APIKEY_ROLE = ApikeyRole.APIKEY_ROLE;
 
     /**
      * 类目
