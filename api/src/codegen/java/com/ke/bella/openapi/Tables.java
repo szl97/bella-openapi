@@ -5,6 +5,7 @@ package com.ke.bella.openapi;
 
 
 import com.ke.bella.openapi.tables.ApiKey;
+import com.ke.bella.openapi.tables.ApiKeyMonthCost;
 import com.ke.bella.openapi.tables.ApiKeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
@@ -25,6 +26,11 @@ public class Tables {
      * ak
      */
     public static final ApiKey API_KEY = ApiKey.API_KEY;
+
+    /**
+     * ak月花费
+     */
+    public static final ApiKeyMonthCost API_KEY_MONTH_COST = ApiKeyMonthCost.API_KEY_MONTH_COST;
 
     /**
      * ak角色

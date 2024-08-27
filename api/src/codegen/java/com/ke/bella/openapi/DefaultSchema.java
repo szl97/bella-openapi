@@ -5,6 +5,7 @@ package com.ke.bella.openapi;
 
 
 import com.ke.bella.openapi.tables.ApiKey;
+import com.ke.bella.openapi.tables.ApiKeyMonthCost;
 import com.ke.bella.openapi.tables.ApiKeyRole;
 import com.ke.bella.openapi.tables.Category;
 import com.ke.bella.openapi.tables.Channel;
@@ -39,6 +40,11 @@ public class DefaultSchema extends SchemaImpl {
      * ak
      */
     public final ApiKey API_KEY = ApiKey.API_KEY;
+
+    /**
+     * ak月花费
+     */
+    public final ApiKeyMonthCost API_KEY_MONTH_COST = ApiKeyMonthCost.API_KEY_MONTH_COST;
 
     /**
      * ak角色
@@ -97,6 +103,7 @@ public class DefaultSchema extends SchemaImpl {
     public final List<Table<?>> getTables() {
         return Arrays.<Table<?>>asList(
             ApiKey.API_KEY,
+            ApiKeyMonthCost.API_KEY_MONTH_COST,
             ApiKeyRole.API_KEY_ROLE,
             Category.CATEGORY,
             Channel.CHANNEL,

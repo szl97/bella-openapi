@@ -40,14 +40,14 @@ public class ApiKeyRecord extends UpdatableRecordImpl<ApiKeyRecord> implements O
     }
 
     /**
-     * Setter for <code>api_key.code</code>. ak
+     * Setter for <code>api_key.code</code>. ak编码
      */
     public void setCode(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>api_key.code</code>. ak
+     * Getter for <code>api_key.code</code>. ak编码
      */
     public String getCode() {
         return (String) get(1);

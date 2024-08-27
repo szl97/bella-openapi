@@ -43,7 +43,7 @@ public class ChannelRouter {
      */
     private List<ChannelDB> availableFilter(List<ChannelDB> channels, Set<String> protocols) {
         //todo: 筛选已触发限流的渠道 筛选数据流向符合的
-//        Set<String> dataPermission = Arrays.stream(RequestInfoContext.get(RequestInfoContext.Attribute.DATA_PERMISSION)
+//        Set<String> dataPermission = Arrays.stream(BellaContext.get(RequestInfoContext.Attribute.DATA_PERMISSION)
 //                .split(",")).collect(Collectors.toSet());
         return channels.stream().filter(x -> protocols.contains(x.getProtocol())).collect(Collectors.toList());
     }

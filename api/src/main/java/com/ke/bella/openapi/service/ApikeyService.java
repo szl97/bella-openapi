@@ -3,6 +3,7 @@ package com.ke.bella.openapi.service;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.console.ApikeyOps;
+import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
@@ -11,6 +12,7 @@ import com.ke.bella.openapi.protocol.PermissionCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.tables.pojos.ApiKeyDB;
+import com.ke.bella.openapi.tables.pojos.ApiKeyMonthCostDB;
 import com.ke.bella.openapi.tables.pojos.ApiKeyRoleDB;
 import com.ke.bella.openapi.utils.EncryptUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
@@ -41,6 +43,8 @@ public class ApikeyService {
     private ApikeyRepo apikeyRepo;
     @Autowired
     private ApikeyRoleRepo apikeyRoleRepo;
+    @Autowired
+    private ApikeyCostRepo apikeyCostRepo;
     @Value("${apikey.basic.monthQuota:200}")
     private int basicMonthQuota;
     @Value("${apikey.basic.roleCode:low}")
@@ -171,6 +175,26 @@ public class ApikeyService {
             throw new ChannelException.AuthorizationException("api key不存在");
         }
         return apikeyInfo;
+    }
+
+    public void recordCost(String apiKeyCode, String month, BigDecimal cost) {
+        BigDecimal amount = loadCost(apiKeyCode, month);
+        boolean insert = false;
+        if(amount == null) {
+            insert = apikeyCostRepo.insert(apiKeyCode, month, cost);
+        }
+        if(!insert) {
+            apikeyCostRepo.increment(apiKeyCode, month, cost);
+        }
+        apikeyCostRepo.refreshCache(apiKeyCode, month);
+    }
+
+    public BigDecimal loadCost(String apiKeyCode, String month) {
+        return apikeyCostRepo.queryCost(apiKeyCode, month);
+    }
+
+    public List<ApiKeyMonthCostDB> queryBillingsByAkCode(String akCode) {
+        return apikeyCostRepo.queryByAkCode(akCode);
     }
 
     private void checkPermission(String code) {

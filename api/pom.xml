@@ -21,6 +21,7 @@
     <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
     <ke-infrastructure.version>2.1.28</ke-infrastructure.version>
     <jooq.version>3.14.15</jooq.version>
+    <redisson.version>3.9.1</redisson.version>
   </properties>
 
   <dependencies>
@@ -207,6 +208,22 @@
       <artifactId>bedrockruntime</artifactId>
       <version>2.25.67</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.ben-manes.caffeine</groupId>
+      <artifactId>caffeine</artifactId>
+      <version>3.1.8</version>
+    </dependency>
+    <dependency>
+      <groupId>com.alicp.jetcache</groupId>
+      <artifactId>jetcache-starter-redisson</artifactId>
+      <version>2.7.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -298,6 +315,19 @@
               <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
               <matchers>
                 <tables>
+                  <table>
+                    <daoClass>
+                      <transform>PASCAL</transform>
+                      <expression>$0_D_B_Dao</expression>
+                    </daoClass>
+                    <pojoClass>
+                      <transform>PASCAL</transform>
+                      <expression>$0_D_B</expression>
+                    </pojoClass>
+                    <pojoImplements>com.ke.bella.openapi.db.repo.Timed</pojoImplements>
+                    <recordImplements>com.ke.bella.openapi.db.repo.Timed</recordImplements>
+                    <expression>api_key_month_cost</expression>
+                  </table>
                   <table>
                     <daoClass>
                       <transform>PASCAL</transform>

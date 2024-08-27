@@ -2,14 +2,19 @@ package com.ke.bella.openapi.console;
 
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.service.ApikeyService;
+import com.ke.bella.openapi.tables.pojos.ApiKeyMonthCostDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @BellaAPI
 @RestController
@@ -67,5 +72,10 @@ public class ApikeyConsoleController {
         Assert.hasText(op.getCode(), "code不可为空");
         apikeyService.changeStatus(op, false);
         return true;
+    }
+
+    @GetMapping("/cost/{akCode}")
+    public List<ApiKeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
+        return apikeyService.queryBillingsByAkCode(akCode);
     }
 }

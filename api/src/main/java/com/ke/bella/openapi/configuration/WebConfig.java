@@ -3,6 +3,7 @@ package com.ke.bella.openapi.configuration;
 import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
 
+import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -19,6 +20,8 @@ public class WebConfig implements WebMvcConfigurer {
             .map(TableConstants.SystemBasicEndpoint::getEndpoint).collect(Collectors.toList());
     @Autowired
     private AuthorizationInterceptor authorizationInterceptor;
+    @Autowired
+    private MonthQuotaInterceptor monthQuotaInterceptor;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -38,5 +41,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/v*/meta/auth/**")
                 .addPathPatterns("/v*/apikey/**")
                 .order(100);
+        registry.addInterceptor(monthQuotaInterceptor)
+                .addPathPatterns(endpointPathPatterns)
+                .order(110);
     }
 }

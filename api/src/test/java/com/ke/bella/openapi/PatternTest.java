@@ -7,7 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
+import java.util.GregorianCalendar;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -82,5 +85,12 @@ public class PatternTest {
     public void test2() {
         System.out.println(String.format("%03d", Integer.parseInt("001") + 1));
         System.out.println(String.format("%03d", Integer.parseInt("999") + 1));
+    }
+
+    @Test
+    public void test3() {
+        ExpressionParser parser = new SpelExpressionParser();
+        String spel = "T(String).format('%s:%s', '2222', '333')";
+        System.out.println(parser.parseExpression(spel).getValue(String.class));
     }
 }

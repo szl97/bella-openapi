@@ -124,14 +124,14 @@ public class ApiKeyDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>api_key.code</code>. ak
+     * Getter for <code>api_key.code</code>. ak编码
      */
     public String getCode() {
         return this.code;
     }
 
     /**
-     * Setter for <code>api_key.code</code>. ak
+     * Setter for <code>api_key.code</code>. ak编码
      */
     public void setCode(String code) {
         this.code = code;

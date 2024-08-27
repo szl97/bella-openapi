@@ -58,9 +58,9 @@ public class ApiKey extends TableImpl<ApiKeyRecord> {
     public final TableField<ApiKeyRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
 
     /**
-     * The column <code>api_key.code</code>. ak
+     * The column <code>api_key.code</code>. ak编码
      */
-    public final TableField<ApiKeyRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "ak");
+    public final TableField<ApiKeyRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "ak编码");
 
     /**
      * The column <code>api_key.ak_sha</code>. 加密ak
