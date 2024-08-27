@@ -46,7 +46,7 @@ public class ApikeyRepo extends StatusRepo<ApikeyDB, ApikeyRecord, String> imple
                 .and(op.getUserId() == null ? DSL.noCondition() : APIKEY.USER_ID.eq(op.getUserId()))
                 .and(op.isIncludeChild() ? DSL.noCondition() : APIKEY.PARENT_CODE.eq(StringUtils.EMPTY))
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : APIKEY.STATUS.eq(op.getStatus()))
-                .and(op.getPersonalCode().equals("0") ? DSL.noCondition() : (APIKEY.OWNER_TYPE.eq(PERSON).and(APIKEY.OWNER_CODE.eq(op.getPersonalCode()))).or(
+                .and(StringUtils.isEmpty(op.getPersonalCode()) || op.getPersonalCode().equals("0") ? DSL.noCondition() : (APIKEY.OWNER_TYPE.eq(PERSON).and(APIKEY.OWNER_CODE.eq(op.getPersonalCode()))).or(
                         (APIKEY.OWNER_TYPE.eq(ORG).and(APIKEY.OWNER_CODE.in(op.getOrgCodes())))
                 ))
                 .orderBy(APIKEY.ID.desc());
