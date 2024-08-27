@@ -1,5 +1,24 @@
 package com.ke.bella.openapi.service;
 
+import static com.ke.bella.openapi.db.TableConstants.*;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
+import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheUpdate;
+import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.console.ApikeyOps;
@@ -17,38 +36,24 @@ import com.ke.bella.openapi.tables.pojos.ApiKeyRoleDB;
 import com.ke.bella.openapi.utils.EncryptUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
-
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.ORG;
-import static com.ke.bella.openapi.db.TableConstants.PERSON;
-import static com.ke.bella.openapi.db.TableConstants.SYSTEM;
 
 @Component
 public class ApikeyService {
     @Autowired
     private ApikeyRepo apikeyRepo;
+
     @Autowired
     private ApikeyRoleRepo apikeyRoleRepo;
+
     @Autowired
     private ApikeyCostRepo apikeyCostRepo;
+
     @Value("${apikey.basic.monthQuota:200}")
     private int basicMonthQuota;
+
     @Value("${apikey.basic.roleCode:low}")
     private String basicRoleCode;
+
     @Value("#{'${apikey.basic.childRoleCodes:low,high}'.split (',')}")
     private List<String> childRoleCodes;
 
@@ -177,20 +182,21 @@ public class ApikeyService {
         return apikeyInfo;
     }
 
-    public void recordCost(String apiKeyCode, String month, BigDecimal cost) {
-        BigDecimal amount = loadCost(apiKeyCode, month);
-        boolean insert = false;
+    @CacheUpdate(name = "apikey:cost:month:", key = "#akCode + ':' + #month", value = "#result")
+    public BigDecimal recordCost(String akCode, String month, BigDecimal cost) {
+        BigDecimal amount = apikeyCostRepo.queryCost(akCode, month);
         if(amount == null) {
-            insert = apikeyCostRepo.insert(apiKeyCode, month, cost);
+            apikeyCostRepo.insert(akCode, month, cost);
         }
-        if(!insert) {
-            apikeyCostRepo.increment(apiKeyCode, month, cost);
-        }
-        apikeyCostRepo.refreshCache(apiKeyCode, month);
+        apikeyCostRepo.increment(akCode, month, cost);
+        return apikeyCostRepo.queryCost(akCode, month);
     }
 
-    public BigDecimal loadCost(String apiKeyCode, String month) {
-        return apikeyCostRepo.queryCost(apiKeyCode, month);
+    @Cached(name = "apikey:cost:month:", key = "#akCode + ':' + #month", cacheNullValue = true, expire = 31 * 24
+            * 3600, condition = "T(com.ke.bella.openapi.utils.DateTimeUtils).isCurrentMonth(#month)")
+    @CachePenetrationProtect(timeout = 5)
+    public BigDecimal loadCost(String akCode, String month) {
+        return apikeyCostRepo.queryCost(akCode, month);
     }
 
     public List<ApiKeyMonthCostDB> queryBillingsByAkCode(String akCode) {
