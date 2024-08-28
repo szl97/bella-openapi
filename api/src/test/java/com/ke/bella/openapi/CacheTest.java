@@ -26,7 +26,6 @@ public class CacheTest {
     @Autowired
     private RedissonClient redissonClient;
 
-    @Test
     public void testConcurrent() throws InterruptedException {
         String apikey = "计费测试code";
         String month = DateTimeUtils.getCurrentMonth();

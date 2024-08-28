@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.console;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -77,5 +79,11 @@ public class ApikeyConsoleController {
     @GetMapping("/cost/{akCode}")
     public List<ApikeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
         return apikeyService.queryBillingsByAkCode(akCode);
+    }
+
+
+    @GetMapping("/fetchBySha")
+    public BellaContext.ApikeyInfo fetchActiveBySha(@RequestParam("sha") String sha, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
+        return apikeyService.queryBySha(sha, onlyActive);
     }
 }

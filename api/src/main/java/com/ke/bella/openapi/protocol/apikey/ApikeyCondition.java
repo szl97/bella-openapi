@@ -8,7 +8,6 @@ import java.util.Set;
 
 @Data
 public class ApikeyCondition extends PermissionCondition {
-    private String akSha;
     private String ownerType;
     private String ownerCode;
     private String parentCode;

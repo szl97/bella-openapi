@@ -1,9 +1,12 @@
 package com.ke.bella.openapi.intercept;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
+import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.utils.JacksonUtils;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,19 +14,14 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.ke.bella.openapi.annotations.BellaAPI;
-import com.ke.bella.openapi.utils.JacksonUtils;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.ServletException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @RestControllerAdvice(annotations = BellaAPI.class)
 @Slf4j
@@ -67,7 +65,7 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
         int code = 500;
         String msg = e.getLocalizedMessage();
         if(e instanceof IllegalArgumentException
-                || e instanceof UnsatisfiedServletRequestParameterException
+                || e instanceof ServletException
                 || e instanceof MethodArgumentNotValidException) {
             code = 400;
         }

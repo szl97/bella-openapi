@@ -39,8 +39,8 @@ public class ApikeyController {
         return apikeyService.createByParentCode(op);
     }
 
-    @GetMapping("/validate")
-    public BellaContext.ApikeyInfo validate() {
+    @GetMapping("/whoAmI")
+    public BellaContext.ApikeyInfo whoAmI() {
         return BellaContext.getApikey();
     }
 }

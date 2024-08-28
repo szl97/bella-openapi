@@ -179,13 +179,18 @@ public class ApikeyService {
 
     public BellaContext.ApikeyInfo verify(String ak) {
         String sha = EncryptUtils.sha256(ak);
+        return queryBySha(sha, true);
+    }
+
+    public BellaContext.ApikeyInfo queryBySha(String sha, boolean onlyActive) {
         BellaContext.ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
-        if(apikeyInfo == null) {
+        if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
             throw new ChannelException.AuthorizationException("api key不存在");
         }
         return apikeyInfo;
     }
 
+    @Transactional
     @CacheUpdate(name = "apikey:cost:month:", key = "#akCode + ':' + #month", value = "#result")
     public BigDecimal recordCost(String akCode, String month, BigDecimal cost) {
         BigDecimal amount = apikeyCostRepo.queryCost(akCode, month);
@@ -233,6 +238,10 @@ public class ApikeyService {
 
     public void fillPermissionCode(PermissionCondition condition) {
         BellaContext.ApikeyInfo apikeyInfo = BellaContext.getApikey();
+        if (apikeyInfo.getOwnerType().equals(SYSTEM)) {
+            condition.setPersonalCode("0");
+            return;
+        }
         // TODO: 获取所有组织代码并填充到 orgCodes
         Set<String> orgCodes = new HashSet<>();
 

@@ -1,5 +1,6 @@
 package com.ke.bella.openapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.utils.JacksonUtils;
@@ -103,10 +104,12 @@ public class BellaContext {
         private String ownerCode;
         private String ownerName;
         private String roleCode;
+        @JsonIgnore
         private String path;
         private Byte safetyLevel;
         private BigDecimal monthQuota;
-        public ApikeyRoleRepo.RolePath rolePath;
+        private ApikeyRoleRepo.RolePath rolePath;
+        private String status;
         public ApikeyRoleRepo.RolePath getRolePath() {
             if(path == null) {
                 return new ApikeyRoleRepo.RolePath();
