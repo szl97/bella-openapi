@@ -147,7 +147,7 @@ public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String>
     }
 
     public Page<CategoryDB> page(Condition.CategoryCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), CategoryDB.class);
+        return queryPage(db, constructSql(op), op.getPage(), op.getSize(), CategoryDB.class);
     }
 
     private SelectSeekStep1<CategoryRecord, Long> constructSql(Condition.CategoryCondition op) {

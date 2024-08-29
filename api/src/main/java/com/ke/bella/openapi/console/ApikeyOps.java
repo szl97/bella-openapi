@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.console;
 
+import com.ke.bella.openapi.protocol.PageCondition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,14 @@ public class ApikeyOps {
         private String ownerName;
         private String roleCode;
         private BigDecimal monthQuota;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NameOp extends ConsoleContext.Operator {
+        private String code;
+        private String name;
     }
 
     @Data
@@ -52,5 +61,16 @@ public class ApikeyOps {
     @AllArgsConstructor
     public static class CodeOp extends ConsoleContext.Operator {
         private String code;
+    }
+
+    @Data
+    public class ApikeyCondition extends PageCondition {
+        private String ownerType;
+        private String ownerCode;
+        private String parentCode;
+        private String name;
+        private String outEntityCode;
+        private boolean includeChild;
+        private String status;
     }
 }

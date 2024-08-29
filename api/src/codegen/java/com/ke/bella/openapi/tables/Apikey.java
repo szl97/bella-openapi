@@ -20,7 +20,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row20;
+import org.jooq.Row21;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -73,14 +73,19 @@ public class Apikey extends TableImpl<ApikeyRecord> {
     public final TableField<ApikeyRecord, String> AK_DISPLAY = createField(DSL.name("ak_display"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "脱敏ak");
 
     /**
+     * The column <code>apikey.name</code>. 名字
+     */
+    public final TableField<ApikeyRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "名字");
+
+    /**
      * The column <code>apikey.parent_code</code>. 父ak
      */
     public final TableField<ApikeyRecord, String> PARENT_CODE = createField(DSL.name("parent_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "父ak");
 
     /**
-     * The column <code>apikey.user_id</code>. 授权人id
+     * The column <code>apikey.out_entity_code</code>. 授权实体code
      */
-    public final TableField<ApikeyRecord, Long> USER_ID = createField(DSL.name("user_id"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "授权人id");
+    public final TableField<ApikeyRecord, String> OUT_ENTITY_CODE = createField(DSL.name("out_entity_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "授权实体code");
 
     /**
      * The column <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
@@ -237,11 +242,11 @@ public class Apikey extends TableImpl<ApikeyRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row20 type methods
+    // Row21 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row20<Long, String, String, String, String, Long, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row20) super.fieldsRow();
+    public Row21<Long, String, String, String, String, String, String, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row21) super.fieldsRow();
     }
 }

@@ -2,7 +2,9 @@ package com.ke.bella.openapi.console;
 
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.annotations.BellaAPI;
+import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.service.ApikeyService;
+import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +36,14 @@ public class ApikeyConsoleController {
     public String reset(@RequestBody ApikeyOps.CodeOp op) {
         Assert.hasText(op.getCode(), "code不可为空");
         return apikeyService.reset(op);
+    }
+
+    @PostMapping("/rename")
+    public Boolean rename(@RequestBody ApikeyOps.NameOp op) {
+        Assert.hasText(op.getCode(), "code不可为空");
+        Assert.notNull(op.getName(), "name不可为null");
+        apikeyService.rename(op);
+        return true;
     }
 
     @PostMapping("/role/update")
@@ -76,14 +86,24 @@ public class ApikeyConsoleController {
         return true;
     }
 
+
     @GetMapping("/cost/{akCode}")
     public List<ApikeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
         return apikeyService.queryBillingsByAkCode(akCode);
     }
 
+    @GetMapping("/fetchByCode")
+    public BellaContext.ApikeyInfo fetchByCode(@RequestParam("code") String code, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
+        return apikeyService.queryByCode(code, onlyActive);
+    }
 
     @GetMapping("/fetchBySha")
-    public BellaContext.ApikeyInfo fetchActiveBySha(@RequestParam("sha") String sha, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
+    public BellaContext.ApikeyInfo fetchBySha(@RequestParam("sha") String sha, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
         return apikeyService.queryBySha(sha, onlyActive);
+    }
+
+    @GetMapping("/page")
+    public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
+        return apikeyService.pageApikey(condition);
     }
 }

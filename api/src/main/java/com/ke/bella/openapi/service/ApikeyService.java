@@ -29,7 +29,6 @@ import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.PermissionCondition;
-import com.ke.bella.openapi.protocol.apikey.ApikeyCondition;
 import com.ke.bella.openapi.protocol.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyRoleDB;
@@ -99,7 +98,7 @@ public class ApikeyService {
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setParentCode(op.getParentCode());
-        db.setUserId(op.getUserId());
+        db.setOutEntityCode(op.getOutEntityCode());
         db.setOwnerType(apikey.getOwnerType());
         db.setOwnerCode(apikey.getOwnerCode());
         db.setOwnerName(apikey.getOwnerName());
@@ -127,6 +126,11 @@ public class ApikeyService {
         db.setAkDisplay(display);
         apikeyRepo.update(db, op.getCode());
         return ak;
+    }
+
+    @Transactional
+    public void rename(ApikeyOps.NameOp op) {
+        apikeyRepo.update(op, op.getCode());
     }
 
     @Transactional
@@ -190,6 +194,14 @@ public class ApikeyService {
         return apikeyInfo;
     }
 
+    public BellaContext.ApikeyInfo queryByCode(String code, boolean onlyActive) {
+        BellaContext.ApikeyInfo apikeyInfo = apikeyRepo.queryByCode(code);
+        if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
+            throw new ChannelException.AuthorizationException("api key不存在");
+        }
+        return apikeyInfo;
+    }
+
     @Transactional
     @CacheUpdate(name = "apikey:cost:month:", key = "#akCode + ':' + #month", value = "#result")
     public BigDecimal recordCost(String akCode, String month, BigDecimal cost) {
@@ -231,17 +243,12 @@ public class ApikeyService {
         }
     }
 
-    public Page<ApikeyDB> pageApikey(ApikeyCondition condition) {
-        fillPermissionCode(condition);
+    public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
         return apikeyRepo.pageAccessKeys(condition);
     }
 
     public void fillPermissionCode(PermissionCondition condition) {
         BellaContext.ApikeyInfo apikeyInfo = BellaContext.getApikey();
-        if (apikeyInfo.getOwnerType().equals(SYSTEM)) {
-            condition.setPersonalCode("0");
-            return;
-        }
         // TODO: 获取所有组织代码并填充到 orgCodes
         Set<String> orgCodes = new HashSet<>();
 

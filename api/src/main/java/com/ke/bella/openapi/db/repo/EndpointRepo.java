@@ -32,7 +32,7 @@ public class EndpointRepo extends StatusRepo<EndpointDB, EndpointRecord, String>
     }
 
     public Page<EndpointDB> page(Condition.EndpointCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), EndpointDB.class);
+        return queryPage(db, constructSql(op), op.getPage(), op.getSize(), EndpointDB.class);
     }
 
     private SelectSeekStep1<EndpointRecord, Long> constructSql(Condition.EndpointCondition op) {

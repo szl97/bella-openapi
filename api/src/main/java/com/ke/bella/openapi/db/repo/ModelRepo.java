@@ -55,7 +55,7 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
     }
 
     public Page<ModelDB> page(Condition.ModelCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), ModelDB.class);
+        return queryPage(db, constructSql(op), op.getPage(), op.getSize(), ModelDB.class);
     }
 
     private SelectSeekStep1<Record, Long> constructSql(Condition.ModelCondition op) {

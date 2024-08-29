@@ -10,6 +10,7 @@ import java.util.List;
 public class ApikeyCreateOp extends ConsoleContext.Operator {
     private String parentCode;
     private Byte safetyLevel;
+    private String outEntityCode;
     private BigDecimal monthQuota;
     private String roleCode;
     private List<String> paths;

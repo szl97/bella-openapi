@@ -25,7 +25,7 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
     }
 
     public Page<ChannelDB> page(Condition.ChannelCondition op) {
-        return queryPage(db, constructSql(op), op.getPageNum(), op.getPageSize(), ChannelDB.class);
+        return queryPage(db, constructSql(op), op.getPage(), op.getSize(), ChannelDB.class);
     }
 
     private SelectSeekStep1<ChannelRecord, Long> constructSql(Condition.ChannelCondition op) {

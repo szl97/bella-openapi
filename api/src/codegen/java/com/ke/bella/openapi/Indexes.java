@@ -37,7 +37,7 @@ public class Indexes {
     public static final Index MODEL_ENDPOINT_REL_IDX_MODEL_NAME = Internal.createIndex(DSL.name("idx_model_name"), ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, false);
     public static final Index APIKEY_MONTH_COST_IDX_MONTH = Internal.createIndex(DSL.name("idx_month"), ApikeyMonthCost.APIKEY_MONTH_COST, new OrderField[] { ApikeyMonthCost.APIKEY_MONTH_COST.MONTH }, false);
     public static final Index APIKEY_IDX_OWNER_TYPE_CODE = Internal.createIndex(DSL.name("idx_owner_type_code"), Apikey.APIKEY, new OrderField[] { Apikey.APIKEY.OWNER_TYPE, Apikey.APIKEY.OWNER_CODE }, false);
-    public static final Index APIKEY_IDX_PARENT_CODE_USER_ID = Internal.createIndex(DSL.name("idx_parent_code_user_id"), Apikey.APIKEY, new OrderField[] { Apikey.APIKEY.PARENT_CODE, Apikey.APIKEY.USER_ID }, false);
+    public static final Index APIKEY_IDX_PARENT_CODE_USER_ID = Internal.createIndex(DSL.name("idx_parent_code_user_id"), Apikey.APIKEY, new OrderField[] { Apikey.APIKEY.PARENT_CODE }, false);
     public static final Index CHANNEL_IDX_PROTOCOL = Internal.createIndex(DSL.name("idx_protocol"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.PROTOCOL }, false);
     public static final Index ENDPOINT_CATEGORY_REL_IDX_SORT = Internal.createIndex(DSL.name("idx_sort"), EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.SORT }, false);
     public static final Index CHANNEL_IDX_SUPPLIER = Internal.createIndex(DSL.name("idx_supplier"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.SUPPLIER }, false);

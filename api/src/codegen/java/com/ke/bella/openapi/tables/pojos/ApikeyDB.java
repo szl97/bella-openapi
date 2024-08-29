@@ -23,8 +23,9 @@ public class ApikeyDB implements Operator, Serializable {
     private String        code;
     private String        akSha;
     private String        akDisplay;
+    private String        name;
     private String        parentCode;
-    private Long          userId;
+    private String        outEntityCode;
     private String        ownerType;
     private String        ownerCode;
     private String        ownerName;
@@ -47,8 +48,9 @@ public class ApikeyDB implements Operator, Serializable {
         this.code = value.code;
         this.akSha = value.akSha;
         this.akDisplay = value.akDisplay;
+        this.name = value.name;
         this.parentCode = value.parentCode;
-        this.userId = value.userId;
+        this.outEntityCode = value.outEntityCode;
         this.ownerType = value.ownerType;
         this.ownerCode = value.ownerCode;
         this.ownerName = value.ownerName;
@@ -70,8 +72,9 @@ public class ApikeyDB implements Operator, Serializable {
         String        code,
         String        akSha,
         String        akDisplay,
+        String        name,
         String        parentCode,
-        Long          userId,
+        String        outEntityCode,
         String        ownerType,
         String        ownerCode,
         String        ownerName,
@@ -91,8 +94,9 @@ public class ApikeyDB implements Operator, Serializable {
         this.code = code;
         this.akSha = akSha;
         this.akDisplay = akDisplay;
+        this.name = name;
         this.parentCode = parentCode;
-        this.userId = userId;
+        this.outEntityCode = outEntityCode;
         this.ownerType = ownerType;
         this.ownerCode = ownerCode;
         this.ownerName = ownerName;
@@ -166,6 +170,20 @@ public class ApikeyDB implements Operator, Serializable {
     }
 
     /**
+     * Getter for <code>apikey.name</code>. 名字
+     */
+    public String getName() {
+        return this.name;
+    }
+
+    /**
+     * Setter for <code>apikey.name</code>. 名字
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * Getter for <code>apikey.parent_code</code>. 父ak
      */
     public String getParentCode() {
@@ -180,17 +198,17 @@ public class ApikeyDB implements Operator, Serializable {
     }
 
     /**
-     * Getter for <code>apikey.user_id</code>. 授权人id
+     * Getter for <code>apikey.out_entity_code</code>. 授权实体code
      */
-    public Long getUserId() {
-        return this.userId;
+    public String getOutEntityCode() {
+        return this.outEntityCode;
     }
 
     /**
-     * Setter for <code>apikey.user_id</code>. 授权人id
+     * Setter for <code>apikey.out_entity_code</code>. 授权实体code
      */
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setOutEntityCode(String outEntityCode) {
+        this.outEntityCode = outEntityCode;
     }
 
     /**
@@ -397,8 +415,9 @@ public class ApikeyDB implements Operator, Serializable {
         sb.append(", ").append(code);
         sb.append(", ").append(akSha);
         sb.append(", ").append(akDisplay);
+        sb.append(", ").append(name);
         sb.append(", ").append(parentCode);
-        sb.append(", ").append(userId);
+        sb.append(", ").append(outEntityCode);
         sb.append(", ").append(ownerType);
         sb.append(", ").append(ownerCode);
         sb.append(", ").append(ownerName);
