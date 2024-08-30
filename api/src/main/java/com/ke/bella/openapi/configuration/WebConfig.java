@@ -3,6 +3,7 @@ package com.ke.bella.openapi.configuration;
 import com.ke.bella.openapi.db.TableConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
 
+import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
 import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,8 @@ import java.util.stream.Collectors;
 public class WebConfig implements WebMvcConfigurer {
     public static final List<String> endpointPathPatterns = Arrays.stream(TableConstants.SystemBasicEndpoint.values())
             .map(TableConstants.SystemBasicEndpoint::getEndpoint).collect(Collectors.toList());
+    @Autowired
+    private ConcurrentStartInterceptor concurrentStartInterceptor;
     @Autowired
     private AuthorizationInterceptor authorizationInterceptor;
     @Autowired
@@ -44,5 +47,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(monthQuotaInterceptor)
                 .addPathPatterns(endpointPathPatterns)
                 .order(110);
+        registry.addInterceptor(concurrentStartInterceptor);
     }
 }

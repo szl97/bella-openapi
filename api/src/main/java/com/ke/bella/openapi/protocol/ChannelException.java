@@ -2,6 +2,9 @@ package com.ke.bella.openapi.protocol;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import javax.servlet.ServletException;
 
 public abstract class ChannelException extends RuntimeException {
 
@@ -14,10 +17,12 @@ public abstract class ChannelException extends RuntimeException {
     }
 
     public static ChannelException fromException(Exception e) {
-        return new ChannelException(e.getMessage()) {
+        return new ChannelException(e.getMessage(), e) {
             @Override
             public Integer getHttpCode() {
-                if(e instanceof IllegalArgumentException) {
+                if(e instanceof IllegalArgumentException
+                        || e instanceof ServletException
+                        || e instanceof MethodArgumentNotValidException) {
                     return 400;
                 }
                 return 500;

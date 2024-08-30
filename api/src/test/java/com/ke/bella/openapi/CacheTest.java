@@ -55,6 +55,13 @@ public class CacheTest {
         Assert.assertTrue("failed !!", 10 == cost.doubleValue());
     }
 
+    @Test
+    public void deleteCache() {
+        String apikey = "ak-0d0b8f35-4dcb-4019-8f05-a2a52f438cef";
+        String month = DateTimeUtils.getCurrentMonth();
+        cacheRepoTest.deleteCost(apikey, month);
+    }
+
     public void testJetCache() throws InterruptedException {
         String apikey = "计费测试code";
         String month = DateTimeUtils.getCurrentMonth();

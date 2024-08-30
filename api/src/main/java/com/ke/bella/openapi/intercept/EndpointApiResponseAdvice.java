@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -15,8 +16,12 @@ import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 @RestControllerAdvice(annotations = EndpointAPI.class)
 @EndpointAPI
+@Slf4j
 public class EndpointApiResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -39,6 +44,11 @@ public class EndpointApiResponseAdvice implements ResponseBodyAdvice<Object> {
         OpenapiResponse openapiResponse = OpenapiResponse.errorResponse(error);
         if(e instanceof ChannelException.SafetyCheckException) {
             openapiResponse.setSensitives(((ChannelException.SafetyCheckException) e).getSensitive());
+        }
+        if(e.getHttpCode() == 500) {
+            LOGGER.error(e.getMessage(), e);
+        } else {
+            LOGGER.info(e.getMessage(), e);
         }
         return openapiResponse;
     }

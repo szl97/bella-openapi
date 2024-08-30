@@ -1,18 +1,19 @@
 package com.ke.bella.openapi.intercept;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.service.ApikeyService;
+import com.ke.bella.openapi.utils.MatchUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.protocol.ChannelException;
-import com.ke.bella.openapi.service.ApikeyService;
-import com.ke.bella.openapi.utils.MatchUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_REQUEST_MARKER;
 
 @Component
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
@@ -21,6 +22,9 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
+            return true;
+        }
         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(StringUtils.isEmpty(auth) || !auth.startsWith("Bearer ")) {
             throw new ChannelException.AuthorizationException("Invalid Authorization");

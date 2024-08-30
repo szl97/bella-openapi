@@ -223,11 +223,12 @@ public class ApikeyService {
         return apikeyCostRepo.queryCost(akCode, month);
     }
 
-    @Cached(name = "apikey:cost:month:", key = "#akCode + ':' + #month", cacheNullValue = true, expire = 31 * 24
-            * 3600, condition = "T(com.ke.bella.openapi.utils.DateTimeUtils).isCurrentMonth(#month)")
+    @Cached(name = "apikey:cost:month:", key = "#akCode + ':' + #month", expire = 31 * 24 * 3600,
+            condition = "T(com.ke.bella.openapi.utils.DateTimeUtils).isCurrentMonth(#month)")
     @CachePenetrationProtect(timeout = 5)
     public BigDecimal loadCost(String akCode, String month) {
-        return apikeyCostRepo.queryCost(akCode, month);
+        BigDecimal amount = apikeyCostRepo.queryCost(akCode, month);
+        return amount == null ? BigDecimal.ZERO : null;
     }
 
     public List<ApikeyMonthCostDB> queryBillingsByAkCode(String akCode) {

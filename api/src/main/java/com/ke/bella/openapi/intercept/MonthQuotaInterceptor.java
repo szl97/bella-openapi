@@ -12,13 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 
+import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_REQUEST_MARKER;
+
 @Component
 public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private ApikeyService apikeyService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if (Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
+            return true;
+        }
         BellaContext.ApikeyInfo apikey = BellaContext.getApikey();
         BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
         return cost.doubleValue() < apikey.getMonthQuota().doubleValue();
