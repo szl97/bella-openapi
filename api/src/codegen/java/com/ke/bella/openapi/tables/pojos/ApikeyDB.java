@@ -26,6 +26,7 @@ public class ApikeyDB implements Operator, Serializable {
     private String        name;
     private String        parentCode;
     private String        outEntityCode;
+    private String        serviceId;
     private String        ownerType;
     private String        ownerCode;
     private String        ownerName;
@@ -34,6 +35,7 @@ public class ApikeyDB implements Operator, Serializable {
     private Byte          safetyLevel;
     private BigDecimal    monthQuota;
     private String        status;
+    private String        remark;
     private Long          cuid;
     private String        cuName;
     private Long          muid;
@@ -51,6 +53,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.name = value.name;
         this.parentCode = value.parentCode;
         this.outEntityCode = value.outEntityCode;
+        this.serviceId = value.serviceId;
         this.ownerType = value.ownerType;
         this.ownerCode = value.ownerCode;
         this.ownerName = value.ownerName;
@@ -59,6 +62,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.safetyLevel = value.safetyLevel;
         this.monthQuota = value.monthQuota;
         this.status = value.status;
+        this.remark = value.remark;
         this.cuid = value.cuid;
         this.cuName = value.cuName;
         this.muid = value.muid;
@@ -75,6 +79,7 @@ public class ApikeyDB implements Operator, Serializable {
         String        name,
         String        parentCode,
         String        outEntityCode,
+        String        serviceId,
         String        ownerType,
         String        ownerCode,
         String        ownerName,
@@ -83,6 +88,7 @@ public class ApikeyDB implements Operator, Serializable {
         Byte          safetyLevel,
         BigDecimal    monthQuota,
         String        status,
+        String        remark,
         Long          cuid,
         String        cuName,
         Long          muid,
@@ -97,6 +103,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.name = name;
         this.parentCode = parentCode;
         this.outEntityCode = outEntityCode;
+        this.serviceId = serviceId;
         this.ownerType = ownerType;
         this.ownerCode = ownerCode;
         this.ownerName = ownerName;
@@ -105,6 +112,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.safetyLevel = safetyLevel;
         this.monthQuota = monthQuota;
         this.status = status;
+        this.remark = remark;
         this.cuid = cuid;
         this.cuName = cuName;
         this.muid = muid;
@@ -209,6 +217,20 @@ public class ApikeyDB implements Operator, Serializable {
      */
     public void setOutEntityCode(String outEntityCode) {
         this.outEntityCode = outEntityCode;
+    }
+
+    /**
+     * Getter for <code>apikey.service_id</code>. 服务id
+     */
+    public String getServiceId() {
+        return this.serviceId;
+    }
+
+    /**
+     * Setter for <code>apikey.service_id</code>. 服务id
+     */
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
     }
 
     /**
@@ -324,6 +346,20 @@ public class ApikeyDB implements Operator, Serializable {
     }
 
     /**
+     * Getter for <code>apikey.remark</code>. 备注
+     */
+    public String getRemark() {
+        return this.remark;
+    }
+
+    /**
+     * Setter for <code>apikey.remark</code>. 备注
+     */
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    /**
      * Getter for <code>apikey.cuid</code>. 创建人id
      */
     public Long getCuid() {
@@ -418,6 +454,7 @@ public class ApikeyDB implements Operator, Serializable {
         sb.append(", ").append(name);
         sb.append(", ").append(parentCode);
         sb.append(", ").append(outEntityCode);
+        sb.append(", ").append(serviceId);
         sb.append(", ").append(ownerType);
         sb.append(", ").append(ownerCode);
         sb.append(", ").append(ownerName);
@@ -426,6 +463,7 @@ public class ApikeyDB implements Operator, Serializable {
         sb.append(", ").append(safetyLevel);
         sb.append(", ").append(monthQuota);
         sb.append(", ").append(status);
+        sb.append(", ").append(remark);
         sb.append(", ").append(cuid);
         sb.append(", ").append(cuName);
         sb.append(", ").append(muid);

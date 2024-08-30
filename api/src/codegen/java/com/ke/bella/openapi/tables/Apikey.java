@@ -20,7 +20,6 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row21;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -88,6 +87,11 @@ public class Apikey extends TableImpl<ApikeyRecord> {
     public final TableField<ApikeyRecord, String> OUT_ENTITY_CODE = createField(DSL.name("out_entity_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "授权实体code");
 
     /**
+     * The column <code>apikey.service_id</code>. 服务id
+     */
+    public final TableField<ApikeyRecord, String> SERVICE_ID = createField(DSL.name("service_id"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "服务id");
+
+    /**
      * The column <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
      */
     public final TableField<ApikeyRecord, String> OWNER_TYPE = createField(DSL.name("owner_type"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "所有者类型（系统/组织/个人）");
@@ -126,6 +130,11 @@ public class Apikey extends TableImpl<ApikeyRecord> {
      * The column <code>apikey.status</code>. 状态(active/inactive)
      */
     public final TableField<ApikeyRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("active", SQLDataType.VARCHAR)), this, "状态(active/inactive)");
+
+    /**
+     * The column <code>apikey.remark</code>. 备注
+     */
+    public final TableField<ApikeyRecord, String> REMARK = createField(DSL.name("remark"), SQLDataType.VARCHAR(1024).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "备注");
 
     /**
      * The column <code>apikey.cuid</code>. 创建人id
@@ -197,7 +206,7 @@ public class Apikey extends TableImpl<ApikeyRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.APIKEY_IDX_OWNER_TYPE_CODE, Indexes.APIKEY_IDX_PARENT_CODE_USER_ID);
+        return Arrays.<Index>asList(Indexes.APIKEY_IDX_OWNER_TYPE_CODE, Indexes.APIKEY_IDX_PARENT_OUT_ENTITY_CODE);
     }
 
     @Override
@@ -239,14 +248,5 @@ public class Apikey extends TableImpl<ApikeyRecord> {
     @Override
     public Apikey rename(Name name) {
         return new Apikey(name, null);
-    }
-
-    // -------------------------------------------------------------------------
-    // Row21 type methods
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row21<Long, String, String, String, String, String, String, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row21) super.fieldsRow();
     }
 }

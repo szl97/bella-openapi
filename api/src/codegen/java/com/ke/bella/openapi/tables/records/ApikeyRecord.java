@@ -10,10 +10,7 @@ import com.ke.bella.openapi.tables.Apikey;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record21;
-import org.jooq.Row21;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -21,7 +18,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * ak
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements Operator, Record21<Long, String, String, String, String, String, String, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
+public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements Operator {
 
     private static final long serialVersionUID = 1L;
 
@@ -124,199 +121,227 @@ public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements O
     }
 
     /**
+     * Setter for <code>apikey.service_id</code>. 服务id
+     */
+    public void setServiceId(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>apikey.service_id</code>. 服务id
+     */
+    public String getServiceId() {
+        return (String) get(7);
+    }
+
+    /**
      * Setter for <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
      */
     public void setOwnerType(String value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>apikey.owner_type</code>. 所有者类型（系统/组织/个人）
      */
     public String getOwnerType() {
-        return (String) get(7);
+        return (String) get(8);
     }
 
     /**
      * Setter for <code>apikey.owner_code</code>. 所有者系统号
      */
     public void setOwnerCode(String value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>apikey.owner_code</code>. 所有者系统号
      */
     public String getOwnerCode() {
-        return (String) get(8);
+        return (String) get(9);
     }
 
     /**
      * Setter for <code>apikey.owner_name</code>. 所有者名称
      */
     public void setOwnerName(String value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>apikey.owner_name</code>. 所有者名称
      */
     public String getOwnerName() {
-        return (String) get(9);
+        return (String) get(10);
     }
 
     /**
      * Setter for <code>apikey.role_code</code>. 角色编码
      */
     public void setRoleCode(String value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>apikey.role_code</code>. 角色编码
      */
     public String getRoleCode() {
-        return (String) get(10);
+        return (String) get(11);
     }
 
     /**
      * Setter for <code>apikey.certify_code</code>. 安全认证码
      */
     public void setCertifyCode(String value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>apikey.certify_code</code>. 安全认证码
      */
     public String getCertifyCode() {
-        return (String) get(11);
+        return (String) get(12);
     }
 
     /**
      * Setter for <code>apikey.safety_level</code>. 安全等级
      */
     public void setSafetyLevel(Byte value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>apikey.safety_level</code>. 安全等级
      */
     public Byte getSafetyLevel() {
-        return (Byte) get(12);
+        return (Byte) get(13);
     }
 
     /**
      * Setter for <code>apikey.month_quota</code>. 每月额度
      */
     public void setMonthQuota(BigDecimal value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>apikey.month_quota</code>. 每月额度
      */
     public BigDecimal getMonthQuota() {
-        return (BigDecimal) get(13);
+        return (BigDecimal) get(14);
     }
 
     /**
      * Setter for <code>apikey.status</code>. 状态(active/inactive)
      */
     public void setStatus(String value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>apikey.status</code>. 状态(active/inactive)
      */
     public String getStatus() {
-        return (String) get(14);
+        return (String) get(15);
+    }
+
+    /**
+     * Setter for <code>apikey.remark</code>. 备注
+     */
+    public void setRemark(String value) {
+        set(16, value);
+    }
+
+    /**
+     * Getter for <code>apikey.remark</code>. 备注
+     */
+    public String getRemark() {
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>apikey.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
-        set(15, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>apikey.cuid</code>. 创建人id
      */
     public Long getCuid() {
-        return (Long) get(15);
+        return (Long) get(17);
     }
 
     /**
      * Setter for <code>apikey.cu_name</code>. 创建人姓名
      */
     public void setCuName(String value) {
-        set(16, value);
+        set(18, value);
     }
 
     /**
      * Getter for <code>apikey.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
-        return (String) get(16);
+        return (String) get(18);
     }
 
     /**
      * Setter for <code>apikey.muid</code>. 编辑人id
      */
     public void setMuid(Long value) {
-        set(17, value);
+        set(19, value);
     }
 
     /**
      * Getter for <code>apikey.muid</code>. 编辑人id
      */
     public Long getMuid() {
-        return (Long) get(17);
+        return (Long) get(19);
     }
 
     /**
      * Setter for <code>apikey.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String value) {
-        set(18, value);
+        set(20, value);
     }
 
     /**
      * Getter for <code>apikey.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
-        return (String) get(18);
+        return (String) get(20);
     }
 
     /**
      * Setter for <code>apikey.ctime</code>.
      */
     public void setCtime(LocalDateTime value) {
-        set(19, value);
+        set(21, value);
     }
 
     /**
      * Getter for <code>apikey.ctime</code>.
      */
     public LocalDateTime getCtime() {
-        return (LocalDateTime) get(19);
+        return (LocalDateTime) get(21);
     }
 
     /**
      * Setter for <code>apikey.mtime</code>.
      */
     public void setMtime(LocalDateTime value) {
-        set(20, value);
+        set(22, value);
     }
 
     /**
      * Getter for <code>apikey.mtime</code>.
      */
     public LocalDateTime getMtime() {
-        return (LocalDateTime) get(20);
+        return (LocalDateTime) get(22);
     }
 
     // -------------------------------------------------------------------------
@@ -326,487 +351,6 @@ public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements O
     @Override
     public Record1<Long> key() {
         return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record21 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row21<Long, String, String, String, String, String, String, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row21) super.fieldsRow();
-    }
-
-    @Override
-    public Row21<Long, String, String, String, String, String, String, String, String, String, String, String, Byte, BigDecimal, String, Long, String, Long, String, LocalDateTime, LocalDateTime> valuesRow() {
-        return (Row21) super.valuesRow();
-    }
-
-    @Override
-    public Field<Long> field1() {
-        return Apikey.APIKEY.ID;
-    }
-
-    @Override
-    public Field<String> field2() {
-        return Apikey.APIKEY.CODE;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return Apikey.APIKEY.AK_SHA;
-    }
-
-    @Override
-    public Field<String> field4() {
-        return Apikey.APIKEY.AK_DISPLAY;
-    }
-
-    @Override
-    public Field<String> field5() {
-        return Apikey.APIKEY.NAME;
-    }
-
-    @Override
-    public Field<String> field6() {
-        return Apikey.APIKEY.PARENT_CODE;
-    }
-
-    @Override
-    public Field<String> field7() {
-        return Apikey.APIKEY.OUT_ENTITY_CODE;
-    }
-
-    @Override
-    public Field<String> field8() {
-        return Apikey.APIKEY.OWNER_TYPE;
-    }
-
-    @Override
-    public Field<String> field9() {
-        return Apikey.APIKEY.OWNER_CODE;
-    }
-
-    @Override
-    public Field<String> field10() {
-        return Apikey.APIKEY.OWNER_NAME;
-    }
-
-    @Override
-    public Field<String> field11() {
-        return Apikey.APIKEY.ROLE_CODE;
-    }
-
-    @Override
-    public Field<String> field12() {
-        return Apikey.APIKEY.CERTIFY_CODE;
-    }
-
-    @Override
-    public Field<Byte> field13() {
-        return Apikey.APIKEY.SAFETY_LEVEL;
-    }
-
-    @Override
-    public Field<BigDecimal> field14() {
-        return Apikey.APIKEY.MONTH_QUOTA;
-    }
-
-    @Override
-    public Field<String> field15() {
-        return Apikey.APIKEY.STATUS;
-    }
-
-    @Override
-    public Field<Long> field16() {
-        return Apikey.APIKEY.CUID;
-    }
-
-    @Override
-    public Field<String> field17() {
-        return Apikey.APIKEY.CU_NAME;
-    }
-
-    @Override
-    public Field<Long> field18() {
-        return Apikey.APIKEY.MUID;
-    }
-
-    @Override
-    public Field<String> field19() {
-        return Apikey.APIKEY.MU_NAME;
-    }
-
-    @Override
-    public Field<LocalDateTime> field20() {
-        return Apikey.APIKEY.CTIME;
-    }
-
-    @Override
-    public Field<LocalDateTime> field21() {
-        return Apikey.APIKEY.MTIME;
-    }
-
-    @Override
-    public Long component1() {
-        return getId();
-    }
-
-    @Override
-    public String component2() {
-        return getCode();
-    }
-
-    @Override
-    public String component3() {
-        return getAkSha();
-    }
-
-    @Override
-    public String component4() {
-        return getAkDisplay();
-    }
-
-    @Override
-    public String component5() {
-        return getName();
-    }
-
-    @Override
-    public String component6() {
-        return getParentCode();
-    }
-
-    @Override
-    public String component7() {
-        return getOutEntityCode();
-    }
-
-    @Override
-    public String component8() {
-        return getOwnerType();
-    }
-
-    @Override
-    public String component9() {
-        return getOwnerCode();
-    }
-
-    @Override
-    public String component10() {
-        return getOwnerName();
-    }
-
-    @Override
-    public String component11() {
-        return getRoleCode();
-    }
-
-    @Override
-    public String component12() {
-        return getCertifyCode();
-    }
-
-    @Override
-    public Byte component13() {
-        return getSafetyLevel();
-    }
-
-    @Override
-    public BigDecimal component14() {
-        return getMonthQuota();
-    }
-
-    @Override
-    public String component15() {
-        return getStatus();
-    }
-
-    @Override
-    public Long component16() {
-        return getCuid();
-    }
-
-    @Override
-    public String component17() {
-        return getCuName();
-    }
-
-    @Override
-    public Long component18() {
-        return getMuid();
-    }
-
-    @Override
-    public String component19() {
-        return getMuName();
-    }
-
-    @Override
-    public LocalDateTime component20() {
-        return getCtime();
-    }
-
-    @Override
-    public LocalDateTime component21() {
-        return getMtime();
-    }
-
-    @Override
-    public Long value1() {
-        return getId();
-    }
-
-    @Override
-    public String value2() {
-        return getCode();
-    }
-
-    @Override
-    public String value3() {
-        return getAkSha();
-    }
-
-    @Override
-    public String value4() {
-        return getAkDisplay();
-    }
-
-    @Override
-    public String value5() {
-        return getName();
-    }
-
-    @Override
-    public String value6() {
-        return getParentCode();
-    }
-
-    @Override
-    public String value7() {
-        return getOutEntityCode();
-    }
-
-    @Override
-    public String value8() {
-        return getOwnerType();
-    }
-
-    @Override
-    public String value9() {
-        return getOwnerCode();
-    }
-
-    @Override
-    public String value10() {
-        return getOwnerName();
-    }
-
-    @Override
-    public String value11() {
-        return getRoleCode();
-    }
-
-    @Override
-    public String value12() {
-        return getCertifyCode();
-    }
-
-    @Override
-    public Byte value13() {
-        return getSafetyLevel();
-    }
-
-    @Override
-    public BigDecimal value14() {
-        return getMonthQuota();
-    }
-
-    @Override
-    public String value15() {
-        return getStatus();
-    }
-
-    @Override
-    public Long value16() {
-        return getCuid();
-    }
-
-    @Override
-    public String value17() {
-        return getCuName();
-    }
-
-    @Override
-    public Long value18() {
-        return getMuid();
-    }
-
-    @Override
-    public String value19() {
-        return getMuName();
-    }
-
-    @Override
-    public LocalDateTime value20() {
-        return getCtime();
-    }
-
-    @Override
-    public LocalDateTime value21() {
-        return getMtime();
-    }
-
-    @Override
-    public ApikeyRecord value1(Long value) {
-        setId(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value2(String value) {
-        setCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value3(String value) {
-        setAkSha(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value4(String value) {
-        setAkDisplay(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value5(String value) {
-        setName(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value6(String value) {
-        setParentCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value7(String value) {
-        setOutEntityCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value8(String value) {
-        setOwnerType(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value9(String value) {
-        setOwnerCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value10(String value) {
-        setOwnerName(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value11(String value) {
-        setRoleCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value12(String value) {
-        setCertifyCode(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value13(Byte value) {
-        setSafetyLevel(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value14(BigDecimal value) {
-        setMonthQuota(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value15(String value) {
-        setStatus(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value16(Long value) {
-        setCuid(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value17(String value) {
-        setCuName(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value18(Long value) {
-        setMuid(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value19(String value) {
-        setMuName(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value20(LocalDateTime value) {
-        setCtime(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord value21(LocalDateTime value) {
-        setMtime(value);
-        return this;
-    }
-
-    @Override
-    public ApikeyRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, String value8, String value9, String value10, String value11, String value12, Byte value13, BigDecimal value14, String value15, Long value16, String value17, Long value18, String value19, LocalDateTime value20, LocalDateTime value21) {
-        value1(value1);
-        value2(value2);
-        value3(value3);
-        value4(value4);
-        value5(value5);
-        value6(value6);
-        value7(value7);
-        value8(value8);
-        value9(value9);
-        value10(value10);
-        value11(value11);
-        value12(value12);
-        value13(value13);
-        value14(value14);
-        value15(value15);
-        value16(value16);
-        value17(value17);
-        value18(value18);
-        value19(value19);
-        value20(value20);
-        value21(value21);
-        return this;
     }
 
     // -------------------------------------------------------------------------
@@ -823,7 +367,7 @@ public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements O
     /**
      * Create a detached, initialised ApikeyRecord
      */
-    public ApikeyRecord(Long id, String code, String akSha, String akDisplay, String name, String parentCode, String outEntityCode, String ownerType, String ownerCode, String ownerName, String roleCode, String certifyCode, Byte safetyLevel, BigDecimal monthQuota, String status, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
+    public ApikeyRecord(Long id, String code, String akSha, String akDisplay, String name, String parentCode, String outEntityCode, String serviceId, String ownerType, String ownerCode, String ownerName, String roleCode, String certifyCode, Byte safetyLevel, BigDecimal monthQuota, String status, String remark, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
         super(Apikey.APIKEY);
 
         setId(id);
@@ -833,6 +377,7 @@ public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements O
         setName(name);
         setParentCode(parentCode);
         setOutEntityCode(outEntityCode);
+        setServiceId(serviceId);
         setOwnerType(ownerType);
         setOwnerCode(ownerCode);
         setOwnerName(ownerName);
@@ -841,6 +386,7 @@ public class ApikeyRecord extends UpdatableRecordImpl<ApikeyRecord> implements O
         setSafetyLevel(safetyLevel);
         setMonthQuota(monthQuota);
         setStatus(status);
+        setRemark(remark);
         setCuid(cuid);
         setCuName(cuName);
         setMuid(muid);

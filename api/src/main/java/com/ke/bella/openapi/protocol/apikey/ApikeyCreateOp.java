@@ -8,10 +8,12 @@ import java.util.List;
 
 @Data
 public class ApikeyCreateOp extends ConsoleContext.Operator {
+    private String name;
     private String parentCode;
     private Byte safetyLevel;
     private String outEntityCode;
     private BigDecimal monthQuota;
     private String roleCode;
     private List<String> paths;
+    private String remark;
 }

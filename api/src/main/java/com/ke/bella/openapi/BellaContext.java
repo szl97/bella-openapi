@@ -98,7 +98,7 @@ public class BellaContext {
     @Data
     public static class ApikeyInfo {
         private String code;
-        private String name;
+        private String serviceId;
         private String akSha;
         private String parentCode;
         private String ownerType;

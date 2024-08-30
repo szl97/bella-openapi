@@ -46,6 +46,14 @@ public class ApikeyConsoleController {
         return true;
     }
 
+    @PostMapping("/bindService")
+    public Boolean bindService(@RequestBody ApikeyOps.ServiceOp op) {
+        Assert.hasText(op.getCode(), "code不可为空");
+        Assert.notNull(op.getServiceId(), "name不可为null");
+        apikeyService.bindService(op);
+        return true;
+    }
+
     @PostMapping("/role/update")
     public Boolean updateRole(@RequestBody ApikeyOps.RoleOp op) {
         Assert.hasText(op.getCode(), "code不可为空");

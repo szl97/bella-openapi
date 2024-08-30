@@ -15,11 +15,13 @@ public class ApikeyOps {
     @Data
     @SuperBuilder
     public static class ApplyOp extends ConsoleContext.Operator {
+        private String name;
         private String ownerType;
         private String ownerCode;
         private String ownerName;
         private String roleCode;
         private BigDecimal monthQuota;
+        private String remark;
     }
 
     @Data
@@ -28,6 +30,14 @@ public class ApikeyOps {
     public static class NameOp extends ConsoleContext.Operator {
         private String code;
         private String name;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ServiceOp extends ConsoleContext.Operator {
+        private String code;
+        private String serviceId;
     }
 
     @Data
@@ -69,6 +79,7 @@ public class ApikeyOps {
         private String ownerCode;
         private String parentCode;
         private String name;
+        private String serviceId;
         private String outEntityCode;
         private boolean includeChild;
         private String status;

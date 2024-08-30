@@ -65,6 +65,7 @@ public class ApikeyService {
             Assert.isTrue(childRoleCodes.contains(op.getRoleCode()), "role code不可使用");
         }
         ApikeyDB db = new ApikeyDB();
+
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setOwnerType(op.getOwnerType());
@@ -72,6 +73,8 @@ public class ApikeyService {
         db.setOwnerName(op.getOwnerName());
         db.setRoleCode(StringUtils.isEmpty(op.getRoleCode()) ? basicRoleCode : op.getRoleCode());
         db.setMonthQuota(op.getMonthQuota() == null ? BigDecimal.valueOf(basicMonthQuota) : op.getMonthQuota());
+        db.setName(op.getName());
+        db.setRemark(op.getRemark());
         apikeyRepo.insert(db);
         return ak;
     }
@@ -104,6 +107,8 @@ public class ApikeyService {
         db.setOwnerName(apikey.getOwnerName());
         db.setRoleCode(op.getRoleCode());
         db.setMonthQuota(op.getMonthQuota());
+        db.setName(op.getName());
+        db.setRemark(op.getRemark());
         db = apikeyRepo.insert(db);
         if(CollectionUtils.isNotEmpty(op.getPaths())) {
            boolean match = op.getPaths().stream().allMatch(url -> apikey.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.mathUrl(pattern, url))
@@ -130,6 +135,11 @@ public class ApikeyService {
 
     @Transactional
     public void rename(ApikeyOps.NameOp op) {
+        apikeyRepo.update(op, op.getCode());
+    }
+
+    @Transactional
+    public void bindService(ApikeyOps.ServiceOp op) {
         apikeyRepo.update(op, op.getCode());
     }
 
