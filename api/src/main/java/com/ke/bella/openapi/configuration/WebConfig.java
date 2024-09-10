@@ -40,9 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/console/**")
-                .addPathPatterns(endpointPathPatterns)
-                .addPathPatterns("/v*/meta/auth/**")
-                .addPathPatterns("/v*/apikey/**")
+                .addPathPatterns("/v*/**")
                 .order(100);
         registry.addInterceptor(monthQuotaInterceptor)
                 .addPathPatterns(endpointPathPatterns)

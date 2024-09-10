@@ -3,6 +3,7 @@ package com.ke.bella.openapi.db.repo;
 import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
@@ -31,7 +32,8 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
     private SelectSeekStep1<ChannelRecord, Long> constructSql(Condition.ChannelCondition op) {
         return db.selectFrom(CHANNEL)
                 .where(StringUtils.isEmpty(op.getEntityType()) ? DSL.noCondition() : CHANNEL.ENTITY_TYPE.eq(op.getEntityType()))
-                .and(StringUtils.isEmpty(op.getEntityType()) ? DSL.noCondition() : CHANNEL.ENTITY_CODE.eq(op.getEntityCode()))
+                .and(StringUtils.isEmpty(op.getEntityCode()) ? DSL.noCondition() : CHANNEL.ENTITY_CODE.eq(op.getEntityCode()))
+                .and(CollectionUtils.isEmpty(op.getEntityCodes()) ? DSL.noCondition() : CHANNEL.ENTITY_CODE.in(op.getEntityCodes()))
                 .and(StringUtils.isEmpty(op.getSupplier()) ? DSL.noCondition() : CHANNEL.SUPPLIER.eq(op.getSupplier()))
                 .and(StringUtils.isEmpty(op.getProtocol()) ? DSL.noCondition() : CHANNEL.PROTOCOL.eq(op.getProtocol()))
                 .and(StringUtils.isEmpty(op.getPriority()) ? DSL.noCondition() : CHANNEL.PRIORITY.eq(op.getPriority()))

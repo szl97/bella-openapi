@@ -33,7 +33,9 @@ public class Condition {
     @Data
     public static class ModelCondition extends PermissionCondition {
         private String modelName;
+        private String ownerName;
         private String endpoint;
+        private Set<String> endpoints;
         private Set<String> modelNames;
         private String visibility;
         private String status;
@@ -47,6 +49,7 @@ public class Condition {
     public static class ChannelCondition extends PageCondition {
         private String entityType;
         private String entityCode;
+        private Set<String> entityCodes;
         private String supplier;
         private String protocol;
         private String priority;

@@ -50,22 +50,12 @@ public class MetadataController {
 
     @GetMapping("/model/list")
     public List<ModelDB> listModel(Condition.ModelCondition condition) {
-        return modelService.listByCondition(condition);
+        return modelService.listByConditionWithPermission(condition);
     }
 
     @GetMapping("/model/page")
     public Page<ModelDB> pageModel(Condition.ModelCondition condition) {
-        return modelService.pageByCondition(condition);
-    }
-
-    @GetMapping("/auth/model/list")
-    public List<ModelDB> listAuthModel(Condition.ModelCondition condition) {
-        return modelService.listByConditionWithPermission(condition);
-    }
-
-    @GetMapping("/auth/model/page")
-    public List<ModelDB> pageAuthModel(Condition.ModelCondition condition) {
-        return modelService.listByConditionWithPermission(condition);
+        return modelService.pageByConditionWithPermission(condition);
     }
 
     @GetMapping("/model/info/{name}")

@@ -61,7 +61,7 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
     private SelectSeekStep1<Record, Long> constructSql(Condition.ModelCondition op) {
         SelectJoinStep step = db.select(MODEL.fields())
                 .from(MODEL);
-        if(StringUtils.isNotEmpty(op.getEndpoint())) {
+        if(StringUtils.isNotEmpty(op.getEndpoint()) || CollectionUtils.isNotEmpty(op.getEndpoints())) {
             step = step.leftJoin(MODEL_ENDPOINT_REL)
                     .on(MODEL.MODEL_NAME.eq(MODEL_ENDPOINT_REL.MODEL_NAME));
         }
@@ -69,11 +69,13 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
             step = step.leftJoin(MODEL_AUTHORIZER_REL)
                     .on(MODEL.MODEL_NAME.eq(MODEL_AUTHORIZER_REL.MODEL_NAME));
         }
-        return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like("%" + op.getModelName() + "%"))
+        return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like(op.getModelName() + "%"))
+                .and(StringUtils.isEmpty(op.getOwnerName()) ? DSL.noCondition() : MODEL.OWNER_NAME.eq(op.getOwnerName()))
                 .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
                 .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : MODEL.VISIBILITY.eq(op.getVisibility()))
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : MODEL.STATUS.eq(op.getStatus()))
                 .and(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.eq(op.getEndpoint()))
+                .and(CollectionUtils.isEmpty(op.getEndpoints()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.in(op.getEndpoints()))
                 .and(permissionCondition(op.getPersonalCode(), op.getOrgCodes()))
                 .orderBy(MODEL.ID.desc());
     }
@@ -125,6 +127,12 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
         return db.selectFrom(MODEL_ENDPOINT_REL)
                 .where(MODEL_ENDPOINT_REL.ENDPOINT.eq(endpoint))
                 .fetch(MODEL_ENDPOINT_REL.MODEL_NAME);
+    }
+
+    public List<ModelEndpointRelDB> listEndpointsByModelNames(Set<String> modelNames) {
+        return db.selectFrom(MODEL_ENDPOINT_REL)
+                .where(MODEL_ENDPOINT_REL.MODEL_NAME.in(modelNames))
+                .fetchInto(ModelEndpointRelDB.class);
     }
 
     @Transactional
