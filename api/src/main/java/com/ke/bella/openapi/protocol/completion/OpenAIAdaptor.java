@@ -1,28 +1,29 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
-import com.ke.bella.openapi.protocol.IProtocolAdaptor;
-import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.springframework.stereotype.Component;
 
 @Component("OpenAICompletion")
-public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIAdaptor.OpenAIProperty> {
+public class OpenAIAdaptor implements CompletionAdaptor<OpenAIAdaptor.OpenAIProperty> {
 
-    private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> JacksonUtils.deserialize(str,
-            StreamCompletionResponse.class);
+    private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> {
+        StreamCompletionResponse response = JacksonUtils.deserialize(str, StreamCompletionResponse.class);
+        if(response != null && response.getCreated() == 0) {
+            response.setCreated(DateTimeUtils.getCurrentMills());
+        }
+        return response;
+    };
 
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property) {
@@ -32,6 +33,9 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIA
 
     @Override
     public void streamCompletion(CompletionRequest request, String url, OpenAIProperty property, StreamCompletionCallback callback) {
+        if(property.supportStreamOptions) {
+            request.setStream_options(new CompletionRequest.StreamOptions());
+        }
         Request httpRequest = buildRequest(request, url, property);
         HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
     }
@@ -53,12 +57,12 @@ public class OpenAIAdaptor implements IProtocolAdaptor.CompletionAdaptor<OpenAIA
     }
 
     @Data
-    @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class OpenAIProperty implements IProtocolProperty {
+    public static class OpenAIProperty extends CompletionAdaptor.CompletionProperty {
         AuthorizationProperty auth;
         String deployName;
         String apiVersion;
+        boolean supportStreamOptions;
     }
 }

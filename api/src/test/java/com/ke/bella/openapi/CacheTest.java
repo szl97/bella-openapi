@@ -55,7 +55,6 @@ public class CacheTest {
         Assert.assertTrue("failed !!", 10 == cost.doubleValue());
     }
 
-    @Test
     public void deleteCache() {
         String apikey = "ak-0d0b8f35-4dcb-4019-8f05-a2a52f438cef";
         String month = DateTimeUtils.getCurrentMonth();

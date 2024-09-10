@@ -74,7 +74,7 @@ public class MatchUtils {
         return input.matches("^(http://|https://).+");
     }
 
-    public static boolean mathUrl(String pattern, String url) {
+    public static boolean matchUrl(String pattern, String url) {
         return matcher.match(pattern, url);
     }
 }

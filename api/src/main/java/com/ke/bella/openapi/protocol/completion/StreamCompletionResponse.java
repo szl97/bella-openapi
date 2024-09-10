@@ -1,15 +1,15 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @SuperBuilder
@@ -22,7 +22,7 @@ public class StreamCompletionResponse extends OpenapiResponse {
     /**
      * 时间戳
      */
-    private int created;
+    private long created;
     /**
      * 唯一id
      */
@@ -36,6 +36,18 @@ public class StreamCompletionResponse extends OpenapiResponse {
 
 
     private List<Choice> choices;
+
+    public CompletionResponse convert() {
+        CompletionResponse response = new CompletionResponse();
+        response.setError(getError());
+        response.setCreated(created);
+        response.setId(id);
+        response.setModel(model);
+        response.setUsage(usage);
+        response.setObject(CHAT_COMPLETION_CHUNK_OBJECT);
+        response.setChoices(this.choices.stream().map(Choice::convert).collect(Collectors.toList()));
+        return response;
+    }
 
     @Data
     @AllArgsConstructor
@@ -53,6 +65,14 @@ public class StreamCompletionResponse extends OpenapiResponse {
         private String finish_reason;
         private int index;
         private Message delta;
+
+        public CompletionResponse.Choice convert() {
+            CompletionResponse.Choice choice = new CompletionResponse.Choice();
+            choice.setIndex(index);
+            choice.setFinish_reason(finish_reason);
+            choice.setMessage(delta);
+            return choice;
+        }
     }
 
 }

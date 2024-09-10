@@ -16,7 +16,7 @@ public abstract class ChannelException extends RuntimeException {
         super(message, throwable);
     }
 
-    public static ChannelException fromException(Exception e) {
+    public static ChannelException fromException(Throwable e) {
         return new ChannelException(e.getMessage(), e) {
             @Override
             public Integer getHttpCode() {

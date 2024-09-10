@@ -1,14 +1,19 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.collect.ImmutableSet;
 
+import com.ke.bella.openapi.protocol.ChannelException;
 import lombok.Setter;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
+import org.springframework.http.HttpStatus;
 
 public class CompletionSseListener extends EventSourceListener {
     @Setter
@@ -51,6 +56,29 @@ public class CompletionSseListener extends EventSourceListener {
 
     @Override
     public void onFailure(EventSource eventSource, Throwable t, Response response) {
-        callback.finishWithException(t);
+        ChannelException exception = null;
+        try {
+            if(t == null) {
+                exception = convertToException(response);
+            } else {
+                exception = ChannelException.fromException(t);
+            }
+        } catch (Exception e) {
+            exception = ChannelException.fromException(e);
+        } finally {
+            if(connectionInitFuture.isDone()) {
+                callback.finish(exception);
+            } else {
+                connectionInitFuture.completeExceptionally(exception);
+            }
+        }
+    }
+
+
+    public ChannelException convertToException(Response response) throws IOException {
+        String msg;
+        msg = response.body().string();
+        return new ChannelException.OpenAIException(response.code(),
+                HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
     }
 }

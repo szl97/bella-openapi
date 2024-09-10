@@ -62,11 +62,14 @@ public class HttpUtils {
         listener.setConnectionInitFuture(future);
         factory.newEventSource(request, listener);
         try {
-            future.get();
+             future.get();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
             Thread.currentThread().interrupt();
-        } catch (ExecutionException e) {
+        }  catch (ExecutionException e) {
+            if(e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
             throw new RuntimeException(e);
         }
     }

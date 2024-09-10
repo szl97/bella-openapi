@@ -6,12 +6,11 @@ import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class ChannelRouter {
@@ -19,15 +18,15 @@ public class ChannelRouter {
     @Autowired
     private ChannelService channelService;
 
-    public ChannelDB route(String endpoint, String model, Set<String> protocols) {
+    public ChannelDB route(String endpoint, String model) {
         List<ChannelDB> channels = channelService.listActives(model == null ?  TableConstants.ENDPOINT : TableConstants.MODEL,
-                model == null ? endpoint : model);
-        return pick(channels, protocols);
+                StringUtils.isEmpty(model) ? endpoint : model);
+        return pick(channels);
     }
 
-    private ChannelDB pick(List<ChannelDB> channels, Set<String> protocols) {
+    private ChannelDB pick(List<ChannelDB> channels) {
         Assert.notNull(channels, "没有可用渠道");
-        List<ChannelDB> available = availableFilter(channels, protocols);
+        List<ChannelDB> available = availableFilter(channels);
         Assert.notNull(available, "没有可用渠道");
         List<ChannelDB> highest = pickMaxPriority(channels);
         return route(highest);
@@ -37,15 +36,14 @@ public class ChannelRouter {
      * 可用： 1、未限流 2、协议可用 3、账户支持的数据流向（风控）
      *
      * @param channels
-     * @param protocols
      *
      * @return
      */
-    private List<ChannelDB> availableFilter(List<ChannelDB> channels, Set<String> protocols) {
+    private List<ChannelDB> availableFilter(List<ChannelDB> channels) {
         //todo: 筛选已触发限流的渠道 筛选数据流向符合的
 //        Set<String> dataPermission = Arrays.stream(BellaContext.get(RequestInfoContext.Attribute.DATA_PERMISSION)
 //                .split(",")).collect(Collectors.toSet());
-        return channels.stream().filter(x -> protocols.contains(x.getProtocol())).collect(Collectors.toList());
+        return channels;
     }
 
     private List<ChannelDB> pickMaxPriority(List<ChannelDB> channels) {

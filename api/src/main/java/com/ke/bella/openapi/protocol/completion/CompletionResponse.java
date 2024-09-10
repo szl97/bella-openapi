@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.collections4.CollectionUtils;
 
 @Data
 @JsonInclude(Include.NON_NULL)
@@ -22,7 +23,7 @@ public class CompletionResponse extends OpenapiResponse {
     /**
      * 时间戳
      */
-    private Integer created;
+    private long created;
     /**
      * 唯一id
      */
@@ -73,6 +74,58 @@ public class CompletionResponse extends OpenapiResponse {
             this.total_tokens += u.total_tokens;
             return this;
         }
+    }
+
+    public static CompletionResponse aggregate(List<StreamCompletionResponse> list) {
+        CompletionResponse response = null;
+        for(StreamCompletionResponse streamResponse : list) {
+            if(CollectionUtils.isEmpty(streamResponse.getChoices())) {
+                continue;
+            }
+            if(response == null) {
+                response = streamResponse.convert();
+            } else {
+                int index = streamResponse.getChoices().get(0).getIndex();
+                String content = (String) streamResponse.getChoices().get(0).getDelta().getContent();
+                //拼接当前choice内容
+                //判断当前choice对应的index是否已存在
+                boolean newChoice = true;
+                for (CompletionResponse.Choice choice : response.getChoices()) {
+                    if(choice.getIndex() == index) {
+                        newChoice = false;
+                        if(content != null) {
+                            if(choice.getMessage().getContent() == null) {
+                                choice.getMessage().setContent(content);
+                            } else {
+                                choice.getMessage().setContent(choice.getMessage().getContent() + content);
+                            }
+                        } else if(CollectionUtils.isNotEmpty(streamResponse.getChoices().get(0).getDelta().getTool_calls())) {
+                            //拼接function的arguments
+                            //拼接对应index的function
+                            int toolIndex = streamResponse.getChoices().get(0).getDelta().getTool_calls().get(0).getIndex();
+                            String arguments = streamResponse.getChoices().get(0).getDelta().getTool_calls().get(0).getFunction().getArguments();
+                            if(arguments == null) {
+                                continue;
+                            }
+                            for (Message.ToolCall toolCall : choice.getMessage().getTool_calls()) {
+                                if(toolCall.getIndex() == toolIndex) {
+                                    if(toolCall.getFunction().getArguments() == null) {
+                                        toolCall.getFunction().setArguments(arguments);
+                                    } else {
+                                        toolCall.getFunction().setArguments(toolCall.getFunction().getArguments() + arguments);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if(newChoice) {
+                    response.getChoices().add(streamResponse.getChoices().get(0).convert());
+                }
+                response.setUsage(streamResponse.getUsage());
+            }
+        }
+        return response;
     }
 
 }

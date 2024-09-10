@@ -28,19 +28,6 @@ public interface IProtocolAdaptor {
     }
 
 
-    interface CompletionAdaptor<T extends IProtocolProperty> extends IProtocolAdaptor {
-
-        CompletionResponse completion(CompletionRequest request, String url, T property);
-
-        void streamCompletion(CompletionRequest request, String url, T property, Callbacks.StreamCompletionCallback callback);
-
-        @Override
-        default String endpoint() {
-            return "/v1/chat/completions";
-        }
-
-    }
-
     interface EmbeddingAdaptor extends IProtocolAdaptor {
         @Override
         default String endpoint() {

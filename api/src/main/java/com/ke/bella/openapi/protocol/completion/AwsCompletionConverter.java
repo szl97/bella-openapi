@@ -1,22 +1,11 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.collect.Lists;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.ImageUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
-
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.core.document.internal.MapDocument;
@@ -40,6 +29,16 @@ import software.amazon.awssdk.services.bedrockruntime.model.ToolResultContentBlo
 import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlockDelta;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolUseBlockStart;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AwsCompletionConverter {
     /**
@@ -101,7 +100,10 @@ public class AwsCompletionConverter {
         tokenUsage.setPrompt_tokens(response.usage().inputTokens());
         tokenUsage.setCompletion_tokens(response.usage().outputTokens());
         tokenUsage.setTotal_tokens(response.usage().totalTokens());
-        return CompletionResponse.builder().choices(Lists.newArrayList(choice)).usage(tokenUsage).build();
+        return CompletionResponse.builder()
+                .created(DateTimeUtils.getCurrentMills())
+                .choices(Lists.newArrayList(choice))
+                .usage(tokenUsage).build();
     }
 
     public static StreamCompletionResponse convert2OpenAIStreamResponse(ContentBlockStart response, int index) {
@@ -121,7 +123,10 @@ public class AwsCompletionConverter {
         StreamCompletionResponse.Choice choice = new StreamCompletionResponse.Choice();
         choice.setDelta(openAiMsg);
         choice.setIndex(index);
-        return StreamCompletionResponse.builder().choices(Lists.newArrayList(choice)).build();
+        return StreamCompletionResponse.builder()
+                .choices(Lists.newArrayList(choice))
+                .created(DateTimeUtils.getCurrentMills())
+                .build();
     }
 
     public static StreamCompletionResponse convert2OpenAIStreamResponse(ContentBlockDelta response, int index) {
@@ -141,7 +146,9 @@ public class AwsCompletionConverter {
         StreamCompletionResponse.Choice choice = new StreamCompletionResponse.Choice();
         choice.setDelta(openAiMsg);
         choice.setIndex(index);
-        return StreamCompletionResponse.builder().choices(Lists.newArrayList(choice)).build();
+        return StreamCompletionResponse.builder().choices(Lists.newArrayList(choice))
+                .created(DateTimeUtils.getCurrentMills())
+                .build();
     }
 
     public static StreamCompletionResponse convertTo2OpenAIStreamResponse(TokenUsage usage) {
@@ -149,7 +156,9 @@ public class AwsCompletionConverter {
         tokenUsage.setPrompt_tokens(usage.inputTokens());
         tokenUsage.setCompletion_tokens(usage.outputTokens());
         tokenUsage.setTotal_tokens(usage.totalTokens());
-        return StreamCompletionResponse.builder().usage(tokenUsage).build();
+        return StreamCompletionResponse.builder()
+                .created(DateTimeUtils.getCurrentMills())
+                .usage(tokenUsage).build();
     }
 
     private static Object convert2OpenAIContent(List<ContentBlock> contentBlocks) {

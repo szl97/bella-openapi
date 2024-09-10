@@ -6,11 +6,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableApolloConfig
 @ComponentScan(basePackages = { "com.ke.bella.openapi" })
 @SpringBootApplication
 @EnableMethodCache(basePackages = "com.ke.bella.openapi")
+@EnableScheduling
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

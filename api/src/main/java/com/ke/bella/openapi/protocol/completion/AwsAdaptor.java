@@ -1,18 +1,12 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.util.function.Consumer;
-
-import org.springframework.stereotype.Component;
-
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
-import com.ke.bella.openapi.protocol.IProtocolAdaptor;
-import com.ke.bella.openapi.protocol.IProtocolProperty;
+import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlockDeltaEvent;
@@ -23,8 +17,10 @@ import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamMetada
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamResponseHandler;
 
+import java.util.function.Consumer;
+
 @Component("AwsCompletion")
-public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor.AwsProperty> {
+public class AwsAdaptor implements CompletionAdaptor<AwsAdaptor.AwsProperty> {
 
     @Override
     public Class<?> getPropertyClass() {
@@ -55,10 +51,9 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
     }
 
     @Data
-    @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AwsProperty implements IProtocolProperty {
+    public static class AwsProperty extends CompletionAdaptor.CompletionProperty {
         AuthorizationProperty auth;
         String region;
         String deployName;
@@ -94,7 +89,7 @@ public class AwsAdaptor implements IProtocolAdaptor.CompletionAdaptor<AwsAdaptor
 
         @Override
         public void accept(Throwable throwable) {
-            callback.finishWithException(throwable);
+            callback.finish(ChannelException.fromException(throwable));
         }
     }
 }

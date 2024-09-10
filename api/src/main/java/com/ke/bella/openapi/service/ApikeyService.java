@@ -111,8 +111,8 @@ public class ApikeyService {
         db.setRemark(op.getRemark());
         db = apikeyRepo.insert(db);
         if(CollectionUtils.isNotEmpty(op.getPaths())) {
-           boolean match = op.getPaths().stream().allMatch(url -> apikey.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.mathUrl(pattern, url))
-                    && apikey.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.mathUrl(pattern, url)));
+           boolean match = op.getPaths().stream().allMatch(url -> apikey.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
+                    && apikey.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url)));
             Assert.isTrue(match, "超出ak的权限范围");
             updateRole(ApikeyOps.RoleOp.builder().code(db.getCode()).paths(op.getPaths()).build());
         }

@@ -3,10 +3,13 @@ package com.ke.bella.openapi.service;
 import com.ke.bella.openapi.console.MetaDataOps;
 import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
+import com.ke.bella.openapi.protocol.AdaptorManager;
+import com.ke.bella.openapi.protocol.cost.CostCalculator;
 import com.ke.bella.openapi.protocol.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +20,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
 import static com.ke.bella.openapi.db.TableConstants.ENDPOINT;
@@ -36,30 +41,44 @@ public class ChannelService {
     private EndpointService endpointService;
     @Autowired
     private ModelService modelService;
+    @Autowired
+    private AdaptorManager adaptorManager;
 
     @Transactional
     public ChannelDB createChannel(MetaDataOps.ChannelCreateOp op) {
+        List<String> endpoints = new ArrayList<>();
         if(op.getEntityType().equals(ENDPOINT)) {
             EndpointDB endpoint = endpointService.getOne(EndpointService.UniqueKeyQuery.builder()
                     .endpoint(op.getEntityCode()).build());
             Assert.notNull(endpoint, "能力点实体不存在");
+            endpoints.add(endpoint.getEndpoint());
         } else {
             ModelDB model = modelService.getOne(op.getEntityCode());
             Assert.notNull(model, "模型实体不存在");
-            //todo: 根据模型类型和协议检查channelInfo和priceInfo
+            endpoints = modelService.getAllEndpoints(model.getModelName());
+
         }
+        endpoints.forEach(endpoint -> Assert.isTrue(CostCalculator.validate(endpoint, op.getPriceInfo()), "priceInfo invalid"));
+        endpoints.forEach(endpoint -> Assert.isTrue(adaptorManager.support(endpoint, op.getProtocol()), "不支持的协议"));
+        //todo: 根据协议检查channelInfo
         return channelRepo.insert(op);
     }
 
     @Transactional
     public void updateChannel(MetaDataOps.ChannelUpdateOp op) {
         channelRepo.checkExist(op.getChannelCode(), true);
-        if(StringUtils.isNotEmpty(op.getPriceInfo()) || StringUtils.isNotEmpty(op.getChannelInfo())) {
+        if(StringUtils.isNotEmpty(op.getPriceInfo())) {
+            List<String> endpoints = new ArrayList<>();
             Entity entity = getEntityInfoByCode(op.getChannelCode());
             if(entity.getEntityCode().equals(MODEL)) {
-                //todo: 修改根据模型类型和协议检查channelInfo,priceInfo
+                ModelDB model = modelService.getOne(entity.getEntityCode());
+                endpoints = modelService.getAllEndpoints(model.getModelName());
+            } else {
+                endpoints.add(entity.getEntityCode());
             }
+            endpoints.forEach(endpoint -> Assert.isTrue(CostCalculator.validate(endpoint, op.getPriceInfo()), "priceInfo invalid"));
         }
+        //todo: 根据协议检查channelInfo
         channelRepo.update(op, op.getChannelCode());
     }
 

@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol.completion;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.ke.bella.openapi.protocol.UserRequest;
 import lombok.Data;
 
 import javax.annotation.Nullable;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class CompletionRequest {
+public class CompletionRequest implements UserRequest {
     /**
      * ID of the model to use
      */
@@ -82,6 +83,11 @@ public class CompletionRequest {
     private boolean stream = false;
 
     /**
+     * Options for streaming response. Only set this when you set stream: true.
+     */
+    private StreamOptions stream_options;
+
+    /**
      * String or array Up to 4 sequences where the API will stop generating further tokens.
      */
     @Nullable
@@ -137,6 +143,17 @@ public class CompletionRequest {
     private Integer seed;
 
     private Boolean parallel_tool_calls;
+
+    @Data
+    public static class StreamOptions {
+        /**
+         * If set, an additional chunk will be streamed before the data: [DONE] message.
+         * The usage field on this chunk shows the token usage statistics for the entire request,
+         * and the choices field will always be an empty array.
+         * All other chunks will also include a usage field, but with a null value.
+         */
+        private boolean include_usage = true;
+    }
 }
 
 

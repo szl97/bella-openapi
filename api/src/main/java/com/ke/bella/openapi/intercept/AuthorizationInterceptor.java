@@ -32,8 +32,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         String ak = auth.substring(7);
         BellaContext.ApikeyInfo apikeyInfo = apikeyService.verify(ak);
         String url = request.getRequestURI();
-        boolean match = apikeyInfo.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.mathUrl(pattern, url))
-                && apikeyInfo.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.mathUrl(pattern, url));
+        boolean match = apikeyInfo.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
+                && apikeyInfo.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
         if(!match) {
             throw new ChannelException.AuthorizationException("没有操作权限");
         }

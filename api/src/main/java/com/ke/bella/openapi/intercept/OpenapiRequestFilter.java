@@ -2,7 +2,7 @@ package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.console.ConsoleContext;
-import org.apache.commons.lang3.StringUtils;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -23,11 +23,9 @@ public class OpenapiRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         try {
-            String requestId = request.getHeader("X-BELLA-REQUEST-ID");
-            if(StringUtils.isBlank(requestId)) {
-                requestId = UUID.randomUUID().toString();
-            }
-            BellaContext.setRequestId(requestId);
+            String requestId = UUID.randomUUID().toString();
+            BellaContext.getProcessData().setRequestId(requestId);
+            BellaContext.getProcessData().setRequestTime(DateTimeUtils.getCurrentMills());
             ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
             BellaContext.setRequest(wrappedRequest);
             chain.doFilter(wrappedRequest, response);

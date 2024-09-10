@@ -1,29 +1,25 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.protocol.AuthorizationProperty;
-import com.ke.bella.openapi.protocol.IProtocolAdaptor;
-import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component("AliCompletion")
-public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor.AliProperty> {
+public class AliAdaptor implements CompletionAdaptor<AliAdaptor.AliProperty> {
     @Override
     public Class<?> getPropertyClass() {
         return AliProperty.class;
@@ -54,10 +50,9 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor
     }
 
     @Data
-    @SuperBuilder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AliProperty implements IProtocolProperty {
+    public static class AliProperty extends CompletionAdaptor.CompletionProperty {
         AuthorizationProperty auth;
         String deployName;
     }
@@ -89,6 +84,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor
                     .build());
         }
         return StreamCompletionResponse.builder()
+                .created(DateTimeUtils.getCurrentMills())
                 .choices(choices)
                 .usage(convertTokenUsage(response.getUsage()))
                 .error(openAIError)
@@ -112,6 +108,7 @@ public class AliAdaptor implements IProtocolAdaptor.CompletionAdaptor<AliAdaptor
         return CompletionResponse.builder()
                 .id(response.getRequestId())
                 .choices(choices)
+                .created(DateTimeUtils.getCurrentMills())
                 .usage(convertTokenUsage(response.getUsage()))
                 .error(openAIError)
                 .build();

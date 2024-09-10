@@ -123,6 +123,11 @@ public class ModelService {
                         .anyMatch(match -> matchPath(match, path))).collect(Collectors.toList());
     }
 
+    public List<String> getAllEndpoints(String model) {
+        List<ModelEndpointRelDB> dbs = modelRepo.listEndpointsByModelName(model);
+        return dbs.stream().map(ModelEndpointRelDB::getEndpoint).collect(Collectors.toList());
+    }
+
     private void checkEndpoint(Set<String> endpoints) {
         Condition.EndpointCondition condition = Condition.EndpointCondition.builder()
                 .endpoints(endpoints)

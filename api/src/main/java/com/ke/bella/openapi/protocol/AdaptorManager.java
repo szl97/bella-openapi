@@ -12,6 +12,10 @@ public class AdaptorManager {
         return adaptors.get(endpoint).keySet();
     }
 
+    public boolean support(String endpoint, String protocol) {
+       return getProtocols(endpoint).contains(protocol);
+    }
+
     public <T extends IProtocolAdaptor> T getProtocolAdaptor(String endpoint, String protocol, Class<T> clazz) {
         return clazz.cast(adaptors.get(endpoint).get(protocol));
     }
