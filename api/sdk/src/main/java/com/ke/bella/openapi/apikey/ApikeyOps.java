@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class ApikeyOps {
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Data
     @SuperBuilder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ApplyOp extends Operator {
         private String name;
         private String ownerType;
@@ -26,16 +26,18 @@ public class ApikeyOps {
     }
 
     @Data
-    @NoArgsConstructor
+    @SuperBuilder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class NameOp extends Operator {
         private String code;
         private String name;
     }
 
     @Data
-    @NoArgsConstructor
+    @SuperBuilder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ServiceOp extends Operator {
         private String code;
         private String serviceId;
@@ -52,24 +54,27 @@ public class ApikeyOps {
     }
 
     @Data
-    @NoArgsConstructor
+    @SuperBuilder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class CertifyOp extends Operator {
         private String code;
         private String certifyCode;
     }
 
     @Data
-    @NoArgsConstructor
+    @SuperBuilder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class QuotaOp extends Operator {
         private String code;
         private BigDecimal monthQuota;
     }
 
     @Data
-    @NoArgsConstructor
+    @SuperBuilder
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class CodeOp extends Operator {
         private String code;
     }

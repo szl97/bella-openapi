@@ -26,6 +26,7 @@ public class MetaDataOps {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @SuperBuilder
     public static class EndpointStatusOp extends Operator {
         private String endpoint;
     }
@@ -33,6 +34,7 @@ public class MetaDataOps {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @SuperBuilder
     public static class ModelOp extends Operator {
         private String modelName;
         private Set<String> endpoints;
@@ -47,6 +49,7 @@ public class MetaDataOps {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @SuperBuilder
     public static class ModelAuthorizerOp extends Operator {
         private String model;
         private Set<ModelAuthorizer> authorizers;
@@ -100,6 +103,7 @@ public class MetaDataOps {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @SuperBuilder
     public static class ChannelCreateOp extends Operator {
         private String entityType;
         private String entityCode;
@@ -115,6 +119,7 @@ public class MetaDataOps {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @SuperBuilder
     public static class ChannelUpdateOp extends Operator {
         private String priority;
         private String channelCode;
