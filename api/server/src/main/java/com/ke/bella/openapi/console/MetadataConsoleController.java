@@ -135,14 +135,14 @@ public class MetadataConsoleController {
     @PostMapping("/channel/activate")
     public Boolean activateChannel(@RequestBody MetaDataOps.ChannelStatusOp op) {
         checkChannelStatusOp(op);
-        categoryService.changeStatus(op.getChannelCode(), true);
+        channelService.changeStatus(op.getChannelCode(), true);
         return true;
     }
 
     @PostMapping("/channel/inactivate")
     public Boolean inactivateChannel(@RequestBody MetaDataOps.ChannelStatusOp op) {
         checkChannelStatusOp(op);
-        categoryService.changeStatus(op.getChannelCode(), false);
+        channelService.changeStatus(op.getChannelCode(), false);
         return true;
     }
 

@@ -100,10 +100,10 @@ public class ChannelService {
     }
 
     public Entity getEntityInfoByCode(String code) {
-        String[] splits = code.split("_");
+        ChannelDB channel = channelRepo.queryByUniqueKey(code);
         return Entity.builder()
-                .entityType(splits[0])
-                .entityCode(splits[1])
+                .entityType(channel.getEntityType())
+                .entityCode(channel.getEntityCode())
                 .build();
     }
 
