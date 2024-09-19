@@ -1,21 +1,16 @@
 package com.ke.bella.openapi.metadata;
 
+import com.ke.bella.openapi.BaseDto;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Endpoint {
+public class Endpoint extends BaseDto {
     private String endpoint;
     private String endpointCode;
     private String endpointName;
     private String maintainerCode;
     private String maintainerName;
     private String status;
-    private Long cuid;
-    private String cuName;
-    private Long muid;
-    private String muName;
-    private LocalDateTime ctime;
-    private LocalDateTime mtime;
 }

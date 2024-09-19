@@ -1,14 +1,15 @@
 package com.ke.bella.openapi.metadata;
 
+import com.ke.bella.openapi.BaseDto;
 import com.ke.bella.openapi.protocol.IModelFeatures;
 import com.ke.bella.openapi.protocol.IModelProperties;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Model {
+public class Model extends BaseDto {
     private String modelName;
     private String documentUrl;
     private String visibility;
@@ -18,12 +19,7 @@ public class Model {
     private String status;
     private String properties;
     private String features;
-    private Long cuid;
-    private String cuName;
-    private Long muid;
-    private String muName;
-    private LocalDateTime ctime;
-    private LocalDateTime mtime;
+
 
     public <T extends IModelProperties> T toProperties(Class<T> type) {
         return JacksonUtils.deserialize(properties, type);

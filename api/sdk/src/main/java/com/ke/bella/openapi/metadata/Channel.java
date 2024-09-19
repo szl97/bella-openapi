@@ -1,14 +1,15 @@
 package com.ke.bella.openapi.metadata;
 
+import com.ke.bella.openapi.BaseDto;
 import com.ke.bella.openapi.protocol.IPriceInfo;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Channel {
+public class Channel extends BaseDto {
     private String entityType;
     private String entityCode;
     private String channelCode;
@@ -20,12 +21,6 @@ public class Channel {
     private String url;
     private String channelInfo;
     private String priceInfo;
-    private Long cuid;
-    private String cuName;
-    private Long muid;
-    private String muName;
-    private LocalDateTime ctime;
-    private LocalDateTime mtime;
 
     public <T extends IProtocolProperty> T toChannelInfo(Class<T> type) {
         return JacksonUtils.deserialize(channelInfo, type);
