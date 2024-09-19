@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 10:41 description:

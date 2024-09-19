@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.db;
+package com.ke.bella.openapi;
 
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.AUDIO2TEXT;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.CHAT;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.IMAGES;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory.TEXT2SPEECH;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.AUDIO2TEXT;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.CHAT;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.IMAGES;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.TEXT2SPEECH;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
 
-public class TableConstants {
+public class EntityConstants {
     public static final String ACTIVE = "active";
     public static final String INACTIVE = "inactive";
     public static final String PUBLIC = "public";
@@ -80,6 +80,29 @@ public class TableConstants {
         private final String code;
         private final Class<?> type;
         private final String description;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum Protocol {
+        OPENAPI("OpenAIAdaptor"),
+        ALI("AliAdaptor"),
+        AWS("AwsAdaptor")
+        ;
+        private final String code;
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public enum Supplier {
+        Ke("ke", "贝壳"),
+        ALI("阿里百炼", "阿里百炼"),
+        HUO_SHAN("火山方舟", "火山方舟"),
+        AWS("Bedrock", "Bedrock"),
+        AZURE("Azure", "Azure")
+        ;
+        private final String code;
+        private final String name;
     }
 
 }

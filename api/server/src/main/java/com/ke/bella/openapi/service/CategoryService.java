@@ -2,7 +2,7 @@ package com.ke.bella.openapi.service;
 
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.ke.bella.openapi.db.TableConstants;
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.db.repo.CategoryRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -25,8 +25,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.ke.bella.openapi.console.MetadataValidator.matchPath;
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 12:00 description:
@@ -105,10 +105,10 @@ public class CategoryService {
 
     @Transactional
     public void replaceCategoryWithEndpoint(MetaDataOps.EndpointCategoriesOp op) {
-        Set<String> systemCategory = Arrays.stream(TableConstants.SystemBasicEndpoint.values())
+        Set<String> systemCategory = Arrays.stream(EntityConstants.SystemBasicEndpoint.values())
                 .filter(x -> matchPath(x.getEndpoint(), op.getEndpoint()))
-                .map(TableConstants.SystemBasicEndpoint::getCategory)
-                .map(TableConstants.SystemBasicCategory::getCode)
+                .map(EntityConstants.SystemBasicEndpoint::getCategory)
+                .map(EntityConstants.SystemBasicCategory::getCode)
                 .collect(Collectors.toSet());
         checkLeafCategories(op.getCategoryCodes());
         List<EndpointCategoryRelDB> orgin = categoryRepo.listEndpointCategoriesByEndpoint(op.getEndpoint());

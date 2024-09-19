@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.configuration;
 
-import com.ke.bella.openapi.db.TableConstants;
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
 
 import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    public static final List<String> endpointPathPatterns = Arrays.stream(TableConstants.SystemBasicEndpoint.values())
-            .map(TableConstants.SystemBasicEndpoint::getEndpoint).collect(Collectors.toList());
+    public static final List<String> endpointPathPatterns = Arrays.stream(EntityConstants.SystemBasicEndpoint.values())
+            .map(EntityConstants.SystemBasicEndpoint::getEndpoint).collect(Collectors.toList());
     @Autowired
     private ConcurrentStartInterceptor concurrentStartInterceptor;
     @Autowired

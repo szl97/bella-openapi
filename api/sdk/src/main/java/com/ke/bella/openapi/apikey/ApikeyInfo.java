@@ -28,6 +28,7 @@ public class ApikeyInfo {
     private RolePath rolePath;
     private String status;
     private String remark;
+    private Long userId;
 
     public RolePath getRolePath() {
         if(path == null) {

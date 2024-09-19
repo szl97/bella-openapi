@@ -17,15 +17,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.db.TableConstants.AUTHORIZER_TYPES;
-import static com.ke.bella.openapi.db.TableConstants.CHANNEL_PRIORITY;
-import static com.ke.bella.openapi.db.TableConstants.DATA_DESTINATIONS;
-import static com.ke.bella.openapi.db.TableConstants.ENDPOINT;
-import static com.ke.bella.openapi.db.TableConstants.MODEL;
-import static com.ke.bella.openapi.db.TableConstants.ModelJsonKey;
-import static com.ke.bella.openapi.db.TableConstants.OWNER_TYPES;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicCategory;
-import static com.ke.bella.openapi.db.TableConstants.SystemBasicEndpoint;
+import static com.ke.bella.openapi.EntityConstants.AUTHORIZER_TYPES;
+import static com.ke.bella.openapi.EntityConstants.CHANNEL_PRIORITY;
+import static com.ke.bella.openapi.EntityConstants.DATA_DESTINATIONS;
+import static com.ke.bella.openapi.EntityConstants.ENDPOINT;
+import static com.ke.bella.openapi.EntityConstants.MODEL;
+import static com.ke.bella.openapi.EntityConstants.ModelJsonKey;
+import static com.ke.bella.openapi.EntityConstants.OWNER_TYPES;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory;
+import static com.ke.bella.openapi.EntityConstants.SystemBasicEndpoint;
 import static com.ke.bella.openapi.utils.MatchUtils.isAllText;
 import static com.ke.bella.openapi.utils.MatchUtils.isBracesWithSpaces;
 import static com.ke.bella.openapi.utils.MatchUtils.isTextStart;
@@ -134,7 +134,7 @@ public class MetadataValidator {
             Assert.hasText(op.getChannelInfo(), "模型通道的通道信息不可为空");
             Assert.hasText(op.getPriceInfo(), "模型通道的单价信息不可为空");
         }
-        Assert.isTrue(op.getEntityCode().equals(ENDPOINT) || op.getEntityType().equals(MODEL),
+        Assert.isTrue(op.getEntityType().equals(ENDPOINT) || op.getEntityType().equals(MODEL),
                 "实体类型只能是endpoint或model");
         Assert.hasText(op.getProtocol(), "请求协议不可为空");
         Assert.hasText(op.getSupplier(), "供应商不可为空");

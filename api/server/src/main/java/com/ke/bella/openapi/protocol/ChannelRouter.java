@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol;
 
-import com.ke.bella.openapi.db.TableConstants;
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class ChannelRouter {
     private ChannelService channelService;
 
     public ChannelDB route(String endpoint, String model) {
-        List<ChannelDB> channels = channelService.listActives(model == null ?  TableConstants.ENDPOINT : TableConstants.MODEL,
+        List<ChannelDB> channels = channelService.listActives(model == null ?  EntityConstants.ENDPOINT : EntityConstants.MODEL,
                 StringUtils.isEmpty(model) ? endpoint : model);
         return pick(channels);
     }
@@ -48,7 +48,7 @@ public class ChannelRouter {
 
     private List<ChannelDB> pickMaxPriority(List<ChannelDB> channels) {
         List<ChannelDB> highest = new ArrayList<>();
-        String max = TableConstants.LOW;
+        String max = EntityConstants.LOW;
         for (ChannelDB channel : channels) {
             int compare = compare(channel.getPriority(), max);
             if(compare < 0) {
@@ -67,11 +67,11 @@ public class ChannelRouter {
         if(priority.equals(target)) {
             return 0;
         }
-        if(priority.equals(TableConstants.LOW)) {
+        if(priority.equals(EntityConstants.LOW)) {
             return -1;
         }
-        if(priority.equals(TableConstants.NORMAL)) {
-            if(target.equals(TableConstants.HIGH)) {
+        if(priority.equals(EntityConstants.NORMAL)) {
+            if(target.equals(EntityConstants.HIGH)) {
                 return -1;
             }
         }

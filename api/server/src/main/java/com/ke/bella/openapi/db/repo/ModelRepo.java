@@ -28,9 +28,9 @@ import java.util.Set;
 import static com.ke.bella.openapi.Tables.MODEL;
 import static com.ke.bella.openapi.Tables.MODEL_AUTHORIZER_REL;
 import static com.ke.bella.openapi.Tables.MODEL_ENDPOINT_REL;
-import static com.ke.bella.openapi.db.TableConstants.ORG;
-import static com.ke.bella.openapi.db.TableConstants.PERSON;
-import static com.ke.bella.openapi.db.TableConstants.PUBLIC;
+import static com.ke.bella.openapi.EntityConstants.ORG;
+import static com.ke.bella.openapi.EntityConstants.PERSON;
+import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/1 20:34 description:

@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.ORG;
-import static com.ke.bella.openapi.db.TableConstants.PERSON;
-import static com.ke.bella.openapi.db.TableConstants.SYSTEM;
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.ORG;
+import static com.ke.bella.openapi.EntityConstants.PERSON;
+import static com.ke.bella.openapi.EntityConstants.SYSTEM;
 
 @Component
 public class ApikeyService {
@@ -204,6 +204,9 @@ public class ApikeyService {
         ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
         if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
             throw new ChannelException.AuthorizationException("api key不存在");
+        }
+        if(apikeyInfo.getOwnerType().equals(PERSON)) {
+            apikeyInfo.setUserId(Long.parseLong(apikeyInfo.getOwnerCode()));
         }
         return apikeyInfo;
     }

@@ -3,7 +3,7 @@ package com.ke.bella.openapi.service;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.console.ConsoleContext;
-import com.ke.bella.openapi.db.TableConstants;
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -30,11 +30,11 @@ import java.util.stream.Collectors;
 import static com.ke.bella.openapi.console.MetadataValidator.generateInvalidModelJsonKeyMessage;
 import static com.ke.bella.openapi.console.MetadataValidator.json2Map;
 import static com.ke.bella.openapi.console.MetadataValidator.matchPath;
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.MODEL;
-import static com.ke.bella.openapi.db.TableConstants.PRIVATE;
-import static com.ke.bella.openapi.db.TableConstants.PUBLIC;
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.MODEL;
+import static com.ke.bella.openapi.EntityConstants.PRIVATE;
+import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:31 description:
@@ -119,8 +119,8 @@ public class ModelService {
             set.addAll(endpoints);
         }
         return set.stream().filter(path ->
-                Arrays.stream(TableConstants.SystemBasicEndpoint.values())
-                        .map(TableConstants.SystemBasicEndpoint::getEndpoint)
+                Arrays.stream(EntityConstants.SystemBasicEndpoint.values())
+                        .map(EntityConstants.SystemBasicEndpoint::getEndpoint)
                         .anyMatch(match -> matchPath(match, path))).collect(Collectors.toList());
     }
 

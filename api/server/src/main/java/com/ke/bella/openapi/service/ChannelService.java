@@ -22,11 +22,11 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ke.bella.openapi.db.TableConstants.ACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.ENDPOINT;
-import static com.ke.bella.openapi.db.TableConstants.INACTIVE;
-import static com.ke.bella.openapi.db.TableConstants.MODEL;
-import static com.ke.bella.openapi.db.TableConstants.PUBLIC;
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.ENDPOINT;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.MODEL;
+import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:35 description:
