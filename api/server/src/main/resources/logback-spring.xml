@@ -11,6 +11,7 @@
 
     <conversionRule conversionWord="jsonMsg" converterClass="com.ke.iprd.log.aop.JsonMessageConverter"/>
 
+    <logger name="ShardingSphere-SQL" level="OFF"/>
     <logger name="druid" level="DEBUG"/>
     <logger name="executableSql" level="DEBUG"/>
     <logger name="com.alibaba.druid.filter.stat" level="INFO"/>
