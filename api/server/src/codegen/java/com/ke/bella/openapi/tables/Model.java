@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row16;
+import org.jooq.Row17;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -100,6 +100,11 @@ public class Model extends TableImpl<ModelRecord> {
      * The column <code>model.features</code>. 特性
      */
     public final TableField<ModelRecord, String> FEATURES = createField(DSL.name("features"), SQLDataType.VARCHAR(1024).nullable(false).defaultValue(DSL.inline("{}", SQLDataType.VARCHAR)), this, "特性");
+
+    /**
+     * The column <code>model.linked_to</code>. 模型软链
+     */
+    public final TableField<ModelRecord, String> LINKED_TO = createField(DSL.name("linked_to"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "模型软链");
 
     /**
      * The column <code>model.cuid</code>. 创建人id
@@ -216,11 +221,11 @@ public class Model extends TableImpl<ModelRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row16 type methods
+    // Row17 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row16<Long, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row16) super.fieldsRow();
+    public Row17<Long, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row17) super.fieldsRow();
     }
 }

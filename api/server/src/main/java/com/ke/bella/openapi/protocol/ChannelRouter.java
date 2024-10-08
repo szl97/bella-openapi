@@ -2,7 +2,9 @@ package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.service.ChannelService;
+import com.ke.bella.openapi.service.ModelService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -17,17 +19,24 @@ public class ChannelRouter {
     private final Random random = new Random();
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    private ModelService modelService;
 
     public ChannelDB route(String endpoint, String model) {
-        List<ChannelDB> channels = channelService.listActives(model == null ?  EntityConstants.ENDPOINT : EntityConstants.MODEL,
-                StringUtils.isEmpty(model) ? endpoint : model);
+        List<ChannelDB> channels;
+        if(model != null) {
+            String terminal = modelService.fetchTerminalModelName(model);
+            channels = channelService.listActives(EntityConstants.MODEL, terminal);
+        } else {
+            channels = channelService.listActives(EntityConstants.MODEL,endpoint);
+        }
         return pick(channels);
     }
 
     private ChannelDB pick(List<ChannelDB> channels) {
-        Assert.notNull(channels, "没有可用渠道");
+        Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
         List<ChannelDB> available = availableFilter(channels);
-        Assert.notNull(available, "没有可用渠道");
+        Assert.isTrue(CollectionUtils.isNotEmpty(available), "没有可用渠道");
         List<ChannelDB> highest = pickMaxPriority(channels);
         return route(highest);
     }

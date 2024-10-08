@@ -1,8 +1,11 @@
 package com.ke.bella.openapi.service;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.PermissionCondition;
@@ -24,11 +27,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,6 +65,27 @@ public class ApikeyService {
 
     @Value("#{'${apikey.basic.childRoleCodes:low,high}'.split (',')}")
     private List<String> childRoleCodes;
+    @Value("${cache.use:true}")
+    private boolean useCache;
+    @Autowired
+    private CacheManager cacheManager;
+    @Autowired
+    private ApplicationContext applicationContext;
+    private static final String apikeyCacheKey = "apikey:sha:";
+
+    @PostConstruct
+    public void postConstruct() {
+        QuickConfig quickConfig = QuickConfig.newBuilder(apikeyCacheKey)
+                .cacheNullValue(true)
+                .cacheType(CacheType.LOCAL)
+                .expire(Duration.ofSeconds(30))
+                .localExpire(Duration.ofSeconds(30))
+                .localLimit(500)
+                .penetrationProtect(true)
+                .penetrationProtectTimeout(Duration.ofSeconds(10))
+                .build();
+        cacheManager.getOrCreateCache(quickConfig);
+    }
 
     @Transactional
     public String apply(ApikeyOps.ApplyOp op) {
@@ -69,7 +96,6 @@ public class ApikeyService {
             Assert.isTrue(childRoleCodes.contains(op.getRoleCode()), "role code不可使用");
         }
         ApikeyDB db = new ApikeyDB();
-
         db.setAkSha(sha);
         db.setAkDisplay(display);
         db.setOwnerType(op.getOwnerType());
@@ -81,10 +107,6 @@ public class ApikeyService {
         db.setRemark(op.getRemark());
         apikeyRepo.insert(db);
         return ak;
-    }
-
-    public void sync(ApikeyDB ApikeyDB) {
-        apikeyRepo.insert(ApikeyDB);
     }
 
     @Transactional
@@ -201,7 +223,12 @@ public class ApikeyService {
     }
 
     public ApikeyInfo queryBySha(String sha, boolean onlyActive) {
-        ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
+        ApikeyInfo apikeyInfo;
+        if(useCache && onlyActive) {
+            apikeyInfo = applicationContext.getBean(ApikeyService.class).queryWithCache(sha);
+        } else {
+            apikeyInfo = apikeyRepo.queryBySha(sha);
+        }
         if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
             throw new ChannelException.AuthorizationException("api key不存在");
         }
@@ -235,7 +262,7 @@ public class ApikeyService {
     @CachePenetrationProtect(timeout = 5)
     public BigDecimal loadCost(String akCode, String month) {
         BigDecimal amount = apikeyCostRepo.queryCost(akCode, month);
-        return amount == null ? BigDecimal.ZERO : null;
+        return amount == null ? BigDecimal.ZERO : amount;
     }
 
     public List<ApikeyMonthCostDB> queryBillingsByAkCode(String akCode) {
@@ -297,5 +324,14 @@ public class ApikeyService {
             return;
         }
         throw new ChannelException.AuthorizationException("没有操作权限");
+    }
+
+    @Cached(name = apikeyCacheKey, key = "#sha")
+    public ApikeyInfo queryWithCache(String sha) {
+        ApikeyInfo apikeyInfo = apikeyRepo.queryBySha(sha);
+        if(apikeyInfo == null || (apikeyInfo.getStatus().equals(INACTIVE))) {
+            return null;
+        }
+        return apikeyInfo;
     }
 }

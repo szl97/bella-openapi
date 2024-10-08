@@ -1,11 +1,10 @@
 package com.ke.bella.openapi;
 
 import com.alicp.jetcache.anno.config.EnableMethodCache;
+import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-
-import com.ctrip.framework.apollo.spring.annotation.EnableApolloConfig;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableApolloConfig

@@ -28,6 +28,7 @@ public class ModelDB implements Operator, Serializable {
     private String        status;
     private String        properties;
     private String        features;
+    private String        linkedTo;
     private Long          cuid;
     private String        cuName;
     private Long          muid;
@@ -48,6 +49,7 @@ public class ModelDB implements Operator, Serializable {
         this.status = value.status;
         this.properties = value.properties;
         this.features = value.features;
+        this.linkedTo = value.linkedTo;
         this.cuid = value.cuid;
         this.cuName = value.cuName;
         this.muid = value.muid;
@@ -67,6 +69,7 @@ public class ModelDB implements Operator, Serializable {
         String        status,
         String        properties,
         String        features,
+        String        linkedTo,
         Long          cuid,
         String        cuName,
         Long          muid,
@@ -84,6 +87,7 @@ public class ModelDB implements Operator, Serializable {
         this.status = status;
         this.properties = properties;
         this.features = features;
+        this.linkedTo = linkedTo;
         this.cuid = cuid;
         this.cuName = cuName;
         this.muid = muid;
@@ -233,6 +237,20 @@ public class ModelDB implements Operator, Serializable {
     }
 
     /**
+     * Getter for <code>model.linked_to</code>. 模型软链
+     */
+    public String getLinkedTo() {
+        return this.linkedTo;
+    }
+
+    /**
+     * Setter for <code>model.linked_to</code>. 模型软链
+     */
+    public void setLinkedTo(String linkedTo) {
+        this.linkedTo = linkedTo;
+    }
+
+    /**
      * Getter for <code>model.cuid</code>. 创建人id
      */
     public Long getCuid() {
@@ -330,6 +348,7 @@ public class ModelDB implements Operator, Serializable {
         sb.append(", ").append(status);
         sb.append(", ").append(properties);
         sb.append(", ").append(features);
+        sb.append(", ").append(linkedTo);
         sb.append(", ").append(cuid);
         sb.append(", ").append(cuName);
         sb.append(", ").append(muid);

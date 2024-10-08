@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringJUnitConfig(TestConfiguration.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = { "spring.profiles.active=dev"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = { "spring.profiles.active=ut"})
 @AutoConfigureMockMvc
 @Transactional
 public class ConsoleApiTest {

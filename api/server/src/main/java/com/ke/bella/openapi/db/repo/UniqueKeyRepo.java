@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.db.repo;
 
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.TableField;
 import org.jooq.impl.TableImpl;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -72,6 +73,7 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
                 .fetchOneInto(type);
     }
 
+    @Transactional
     public T queryByUniqueKeyForUpdate(K uniqueKey) {
         return db.selectFrom(table())
                 .where(uniqueKey().eq(uniqueKey))
@@ -79,6 +81,7 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
                 .fetchOneInto(entityClass());
     }
 
+    @Transactional
     public T queryByUniqueKeyForUpdateNoWait(K uniqueKey) {
         return db.selectFrom(table())
                 .where(uniqueKey().eq(uniqueKey))
@@ -87,6 +90,7 @@ public abstract class UniqueKeyRepo<T extends Operator, R extends UpdatableRecor
                 .fetchOneInto(entityClass());
     }
 
+    @Transactional
     public T queryByUniqueKeyForUpdateSkipLocked(K uniqueKey) {
         return db.selectFrom(table())
                 .where(uniqueKey().eq(uniqueKey))

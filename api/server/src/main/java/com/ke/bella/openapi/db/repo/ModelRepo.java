@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.ke.bella.openapi.Tables.MODEL;
@@ -48,6 +49,11 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
                 .where(MODEL.MODEL_NAME.eq(modelName))
                 .execute();
         Assert.isTrue(num == 1, "模型实体更新失败，请检查模型实体是否存在");
+    }
+
+    public List<ModelDB> listLinkedRelations() {
+        return db.select(MODEL.MODEL_NAME, MODEL.LINKED_TO).from(MODEL)
+                .fetchInto(ModelDB.class);
     }
 
     public List<ModelDB> list(Condition.ModelCondition op) {
@@ -133,6 +139,11 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
         return db.selectFrom(MODEL_ENDPOINT_REL)
                 .where(MODEL_ENDPOINT_REL.MODEL_NAME.in(modelNames))
                 .fetchInto(ModelEndpointRelDB.class);
+    }
+
+    public List<ModelDB> listAll() {
+        return db.selectFrom(MODEL)
+                .fetchInto(ModelDB.class);
     }
 
     @Transactional

@@ -115,6 +115,12 @@ public class MetadataValidator {
         Assert.hasText(op.getModelName(), "模型名不可为空");
     }
 
+    public static void checkModelLinkOp(MetaDataOps.ModelLinkOp op) {
+        Assert.hasText(op.getModelName(), "模型名不可为空");
+        Assert.notNull(op.getLinkedTo(), "模型软链不可为null");
+        Assert.isTrue(!op.getLinkedTo().equals(op.getModelName()), "循环软链");
+    }
+
     public static void checkModelAuthorizerOp(MetaDataOps.ModelAuthorizerOp op) {
         Assert.hasText(op.getModel(), "模型名称不可为空");
         if(CollectionUtils.isNotEmpty(op.getAuthorizers())) {

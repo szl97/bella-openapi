@@ -12,6 +12,7 @@ import java.util.Set;
 
 public class MetaDataOps {
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -23,6 +24,7 @@ public class MetaDataOps {
         private String maintainerName;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -31,6 +33,7 @@ public class MetaDataOps {
         private String endpoint;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -46,6 +49,7 @@ public class MetaDataOps {
         private String features;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -80,6 +84,16 @@ public class MetaDataOps {
         }
     }
 
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ModelLinkOp extends Operator {
+        private String modelName;
+        private String linkedTo;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -100,6 +114,7 @@ public class MetaDataOps {
     public static class ModelVisibilityOp extends ModelNameOp {
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -116,6 +131,7 @@ public class MetaDataOps {
         private String priceInfo;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -127,11 +143,13 @@ public class MetaDataOps {
         private String priceInfo;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     public static class ChannelStatusOp extends Operator {
         private String channelCode;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @NoArgsConstructor
     @Data
     @SuperBuilder
@@ -141,6 +159,7 @@ public class MetaDataOps {
         private String categoryName;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -148,6 +167,7 @@ public class MetaDataOps {
         private String categoryCode;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

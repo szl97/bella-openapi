@@ -1,5 +1,11 @@
 package com.ke.bella.openapi.service;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.template.QuickConfig;
 import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -19,6 +25,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +34,6 @@ import static com.ke.bella.openapi.EntityConstants.ACTIVE;
 import static com.ke.bella.openapi.EntityConstants.ENDPOINT;
 import static com.ke.bella.openapi.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.EntityConstants.MODEL;
-import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:35 description:
@@ -41,6 +48,21 @@ public class ChannelService {
     private ModelService modelService;
     @Autowired
     private AdaptorManager adaptorManager;
+    @Autowired
+    private CacheManager cacheManager;
+    private static final String channelCacheKey = "channels:active:";
+
+    @PostConstruct
+    public void postConstruct() {
+        QuickConfig quickConfig = QuickConfig.newBuilder(channelCacheKey)
+                .cacheNullValue(true)
+                .cacheType(CacheType.BOTH)
+                .syncLocal(true)
+                .penetrationProtect(true)
+                .penetrationProtectTimeout(Duration.ofSeconds(10))
+                .build();
+        cacheManager.getOrCreateCache(quickConfig);
+    }
 
     @Transactional
     public ChannelDB createChannel(MetaDataOps.ChannelCreateOp op) {
@@ -59,7 +81,9 @@ public class ChannelService {
         endpoints.forEach(endpoint -> Assert.isTrue(CostCalculator.validate(endpoint, op.getPriceInfo()), "priceInfo invalid"));
         endpoints.forEach(endpoint -> Assert.isTrue(adaptorManager.support(endpoint, op.getProtocol()), "不支持的协议"));
         //todo: 根据协议检查channelInfo
-        return channelRepo.insert(op);
+        ChannelDB channelDB = channelRepo.insert(op);
+        updateCache(channelDB.getEntityType(), channelDB.getEntityCode());
+        return channelDB;
     }
 
     @Transactional
@@ -78,25 +102,15 @@ public class ChannelService {
         }
         //todo: 根据协议检查channelInfo
         channelRepo.update(op, op.getChannelCode());
+        updateCache(op.getChannelCode());
     }
 
     @Transactional
     public void changeStatus(String channelCode, boolean active) {
         channelRepo.checkExist(channelCode, true);
-        if(!active) {
-            Entity entity = getEntityInfoByCode(channelCode);
-            if(entity.getEntityCode().equals(MODEL)) {
-                ModelDB model = modelService.getActiveByModelName(entity.getEntityCode());
-                if(model != null && model.getVisibility().equals(PUBLIC)) {
-                    List<ChannelDB> actives = listActives(MODEL, entity.getEntityCode());
-                    boolean moreThanOneActive = actives.stream()
-                            .anyMatch(channel -> !channel.getChannelCode().equals(channelCode));
-                    Assert.isTrue(moreThanOneActive, "已发布模型至少要有一个可用渠道");
-                }
-            }
-        }
         String status = active ? ACTIVE : INACTIVE;
         channelRepo.updateStatus(channelCode, status);
+        updateCache(channelCode);
     }
 
     public Entity getEntityInfoByCode(String code) {
@@ -116,12 +130,32 @@ public class ChannelService {
         return db == null || db.getStatus().equals(INACTIVE) ? null : db;
     }
 
-    public List<ChannelDB> listActives(String entityType, String entityCode) {
+    public List<ChannelDB> listActivesWithDb(String entityType, String entityCode) {
         return listByCondition(Condition.ChannelCondition.builder()
                 .status(ACTIVE)
                 .entityType(entityType)
                 .entityCode(entityCode)
                 .build());
+    }
+
+    @Cached(name = channelCacheKey, key = "#entityType + ':' + #entityCode")
+    public List<ChannelDB> listActives(String entityType, String entityCode) {
+        return listActivesWithDb(entityType, entityCode);
+    }
+
+    private void updateCache(String channelCode) {
+        ChannelDB db = channelRepo.queryByUniqueKey(channelCode);
+        updateCache(db.getEntityType(), db.getEntityCode());
+    }
+
+    private void updateCache(String entityType, String entityCode) {
+        List<ChannelDB> channels = listByCondition(Condition.ChannelCondition.builder()
+                .status(ACTIVE)
+                .entityType(entityType)
+                .entityCode(entityCode)
+                .build());
+        Cache<String, List<ChannelDB>> cache = cacheManager.getCache(channelCacheKey);
+        cache.put(entityType + ":" + entityCode, channels);
     }
 
     public List<ChannelDB> listByCondition(Condition.ChannelCondition condition) {

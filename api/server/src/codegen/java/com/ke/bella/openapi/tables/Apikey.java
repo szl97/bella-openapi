@@ -117,6 +117,11 @@ public class Apikey extends TableImpl<ApikeyRecord> {
     public final TableField<ApikeyRecord, String> CERTIFY_CODE = createField(DSL.name("certify_code"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "安全认证码");
 
     /**
+     * The column <code>apikey.safety_scene_code</code>. 安全认证场景code
+     */
+    public final TableField<ApikeyRecord, String> SAFETY_SCENE_CODE = createField(DSL.name("safety_scene_code"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "安全认证场景code");
+
+    /**
      * The column <code>apikey.safety_level</code>. 安全等级
      */
     public final TableField<ApikeyRecord, Byte> SAFETY_LEVEL = createField(DSL.name("safety_level"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "安全等级");

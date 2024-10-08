@@ -32,6 +32,7 @@ public class ApikeyDB implements Operator, Serializable {
     private String        ownerName;
     private String        roleCode;
     private String        certifyCode;
+    private String        safetySceneCode;
     private Byte          safetyLevel;
     private BigDecimal    monthQuota;
     private String        status;
@@ -59,6 +60,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.ownerName = value.ownerName;
         this.roleCode = value.roleCode;
         this.certifyCode = value.certifyCode;
+        this.safetySceneCode = value.safetySceneCode;
         this.safetyLevel = value.safetyLevel;
         this.monthQuota = value.monthQuota;
         this.status = value.status;
@@ -85,6 +87,7 @@ public class ApikeyDB implements Operator, Serializable {
         String        ownerName,
         String        roleCode,
         String        certifyCode,
+        String        safetySceneCode,
         Byte          safetyLevel,
         BigDecimal    monthQuota,
         String        status,
@@ -109,6 +112,7 @@ public class ApikeyDB implements Operator, Serializable {
         this.ownerName = ownerName;
         this.roleCode = roleCode;
         this.certifyCode = certifyCode;
+        this.safetySceneCode = safetySceneCode;
         this.safetyLevel = safetyLevel;
         this.monthQuota = monthQuota;
         this.status = status;
@@ -304,6 +308,20 @@ public class ApikeyDB implements Operator, Serializable {
     }
 
     /**
+     * Getter for <code>apikey.safety_scene_code</code>. 安全认证场景code
+     */
+    public String getSafetySceneCode() {
+        return this.safetySceneCode;
+    }
+
+    /**
+     * Setter for <code>apikey.safety_scene_code</code>. 安全认证场景code
+     */
+    public void setSafetySceneCode(String safetySceneCode) {
+        this.safetySceneCode = safetySceneCode;
+    }
+
+    /**
      * Getter for <code>apikey.safety_level</code>. 安全等级
      */
     public Byte getSafetyLevel() {
@@ -460,6 +478,7 @@ public class ApikeyDB implements Operator, Serializable {
         sb.append(", ").append(ownerName);
         sb.append(", ").append(roleCode);
         sb.append(", ").append(certifyCode);
+        sb.append(", ").append(safetySceneCode);
         sb.append(", ").append(safetyLevel);
         sb.append(", ").append(monthQuota);
         sb.append(", ").append(status);

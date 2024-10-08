@@ -1,14 +1,17 @@
 package com.ke.bella.openapi.service;
 
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.console.ConsoleContext;
-import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
-import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelAuthorizerRelDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
@@ -16,25 +19,30 @@ import com.ke.bella.openapi.tables.pojos.ModelEndpointRelDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.ke.bella.openapi.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.PRIVATE;
+import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 import static com.ke.bella.openapi.console.MetadataValidator.generateInvalidModelJsonKeyMessage;
 import static com.ke.bella.openapi.console.MetadataValidator.json2Map;
 import static com.ke.bella.openapi.console.MetadataValidator.matchPath;
-import static com.ke.bella.openapi.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.EntityConstants.INACTIVE;
-import static com.ke.bella.openapi.EntityConstants.MODEL;
-import static com.ke.bella.openapi.EntityConstants.PRIVATE;
-import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:31 description:
@@ -46,9 +54,38 @@ public class ModelService {
     @Autowired
     private EndpointService endpointService;
     @Autowired
-    private ChannelService channelService;
-    @Autowired
     private ApikeyService apikeyService;
+    @Autowired
+    private CacheManager cacheManager;
+    @Autowired
+    private ApplicationContext applicationContext;
+    private static final String modelTerminalCacheKey = "model:terminal:";
+    private static final String modelMapCacheKey = "model:map:";
+
+
+    @PostConstruct
+    public void postConstruct() {
+        QuickConfig modelTerminalConfig = QuickConfig.newBuilder(modelTerminalCacheKey)
+                .localLimit(500)
+                .cacheNullValue(true)
+                .cacheType(CacheType.BOTH)
+                .syncLocal(true)
+                .penetrationProtect(true)
+                .penetrationProtectTimeout(Duration.ofSeconds(10))
+                .build();
+        cacheManager.getOrCreateCache(modelTerminalConfig);
+        QuickConfig modelCacheConfig = QuickConfig.newBuilder(modelMapCacheKey)
+                .expire(Duration.of(0, ChronoUnit.MILLIS))
+                .localExpire(Duration.of(10, ChronoUnit.MINUTES))
+                .localLimit(1)
+                .cacheNullValue(true)
+                .cacheType(CacheType.BOTH)
+                .syncLocal(true)
+                .penetrationProtect(true)
+                .penetrationProtectTimeout(Duration.ofSeconds(10))
+                .build();
+        cacheManager.getOrCreateCache(modelCacheConfig);
+    }
 
     @Transactional
     public ModelDB createModel(MetaDataOps.ModelOp op) {
@@ -57,6 +94,7 @@ public class ModelService {
         checkPropertyAndFeatures(op.getProperties(), op.getFeatures(), op.getEndpoints(), op.getModelName());
         ModelDB db = modelRepo.insert(op);
         modelRepo.batchInsertModelEndpoints(op.getModelName(), op.getEndpoints());
+        updateModelCache(op.getModelName(), op.getModelName());
         return db;
     }
 
@@ -88,6 +126,7 @@ public class ModelService {
                 || StringUtils.isNotEmpty(op.getFeatures())) {
             modelRepo.update(op, op.getModelName());
         }
+        updateModelCache(op.getModelName(), null);
     }
 
     private void checkPropertyAndFeatures(String properties, String features, Set<String> endpoints, String model) {
@@ -146,17 +185,15 @@ public class ModelService {
         modelRepo.checkExist(modelName, true);
         String status = active ? ACTIVE : INACTIVE;
         modelRepo.updateStatus(modelName, status);
+        updateModelCache(modelName, null);
     }
 
     @Transactional
     public void changeVisibility(String modelName, boolean publish) {
         modelRepo.checkExist(modelName, true);
         String visibility = publish ? PUBLIC : PRIVATE;
-        if(publish) {
-            List<ChannelDB> actives = channelService.listActives(MODEL, modelName);
-            Assert.notEmpty(actives, "模型至少有一个可用渠道才可以发布");
-        }
         modelRepo.updateVisibility(modelName, visibility);
+        updateModelCache(modelName, null);
     }
 
     @Transactional
@@ -187,6 +224,63 @@ public class ModelService {
         }
     }
 
+    @Transactional
+    public void modelLink(MetaDataOps.ModelLinkOp op) {
+        cacheManager.getCache(modelMapCacheKey).tryLockAndRun("lock", 10, TimeUnit.SECONDS, ()-> {
+            doModelLink(op);
+        });
+    }
+
+    private void doModelLink(MetaDataOps.ModelLinkOp op) {
+        ModelDB db = modelRepo.queryByUniqueKeyForUpdateNoWait(op.getModelName());
+        Assert.isTrue(db != null, "实体不存在");
+        if(db.getLinkedTo().equals(op.getLinkedTo())) {
+            return;
+        }
+        List<String> path = getPath(op.getLinkedTo());
+        Assert.isTrue(CollectionUtils.isNotEmpty(path), "linedTo实体不存在");
+        Assert.isTrue(!path.contains(op.getModelName()), "出现循环");
+        String terminal = path.get(path.size() - 1);
+        modelRepo.update(op, op.getModelName());
+        updateModelCache(op.getModelName(), terminal);
+    }
+
+    @Cached(name = modelTerminalCacheKey, key = "#modelName")
+    public String fetchTerminalModelName(String modelName) {
+        List<String> path = getPath(modelName);
+        return CollectionUtils.isEmpty(path) ? modelName : path.get(path.size() - 1);
+    }
+
+
+    @Cached(name = modelMapCacheKey, key = "#key")
+    public Map<String, ModelDB> queryWithCache(String key) {
+        List<ModelDB> list = modelRepo.listAll();
+        return list.stream().collect(Collectors.toMap(ModelDB::getModelName, Function.identity()));
+    }
+
+    public List<String> getPath(String target) {
+        Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
+        List<String> path = new ArrayList<>();
+        String name = target;
+        while(StringUtils.isNotEmpty(name) && map.containsKey(name)) {
+            path.add( name);
+            name = map.get(name).getLinkedTo();
+        }
+        return path;
+    }
+
+    private void updateModelCache(String modelName, String terminal) {
+        cacheManager.getCache(modelMapCacheKey).tryLockAndRun("lock", 10, TimeUnit.SECONDS, ()-> {
+            ModelDB modelDB = modelRepo.queryByUniqueKey(modelName);
+            Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
+            map.put(modelName, modelDB);
+            cacheManager.getCache(modelMapCacheKey).put("all", map);
+            if(StringUtils.isNotEmpty(terminal)) {
+                cacheManager.getCache(modelTerminalCacheKey).put(modelDB, terminal);
+            }
+        });
+    }
+
     private void checkOwnerPermission(String model) {
         ModelDB db = modelRepo.queryByUniqueKey(model);
         Operator operator = ConsoleContext.getOperator();
@@ -200,6 +294,10 @@ public class ModelService {
 
     public ModelDB getOne(String modelName) {
         return modelRepo.queryByUniqueKey(modelName);
+    }
+
+    public ModelDB getOneForUpdate(String modelName) {
+        return modelRepo.queryByUniqueKeyForUpdate(modelName);
     }
 
     public List<ModelDB> listByCondition(Condition.ModelCondition condition) {

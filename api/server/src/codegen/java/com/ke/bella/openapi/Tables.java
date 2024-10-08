@@ -15,7 +15,6 @@ import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
 
-
 /**
  * Convenience access to all tables in the default schema.
  */

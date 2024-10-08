@@ -27,6 +27,7 @@ import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointCatego
 import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkEndpointStatusOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkModelAuthorizerOp;
+import static com.ke.bella.openapi.console.MetadataValidator.checkModelLinkOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkModelNameOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkModelOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkReplaceEndpointCategoryOp;
@@ -116,6 +117,13 @@ public class MetadataConsoleController {
     public Boolean authorizeModel(@RequestBody MetaDataOps.ModelAuthorizerOp op) {
         checkModelAuthorizerOp(op);
         modelService.modelAuthorize(op);
+        return true;
+    }
+
+    @PostMapping("/model/link")
+    public Boolean linkModel(@RequestBody MetaDataOps.ModelLinkOp op) {
+        checkModelLinkOp(op);
+        modelService.modelLink(op);
         return true;
     }
 

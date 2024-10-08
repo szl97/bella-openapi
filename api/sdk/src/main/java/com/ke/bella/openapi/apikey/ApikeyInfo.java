@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ApikeyInfo {
+public class ApikeyInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String code;
     private String serviceId;
     private String akSha;
@@ -41,7 +43,8 @@ public class ApikeyInfo {
     }
 
     @Data
-    public static class RolePath {
+    public static class RolePath implements Serializable {
+        private static final long serialVersionUID = 1L;
         private List<String> included = new ArrayList<>();
         private List<String> excluded = new ArrayList<>();
     }
