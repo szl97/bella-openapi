@@ -5,6 +5,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
-public class CompletionProtocolProperty implements IProtocolProperty {
+public class CompletionProperty implements IProtocolProperty {
     String encodingType = StringUtils.EMPTY;
 }

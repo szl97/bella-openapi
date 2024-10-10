@@ -2,6 +2,8 @@ package com.ke.bella.openapi.protocol.cost;
 
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
+import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
+import com.ke.bella.openapi.protocol.embedding.EmbeddingResponse;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.AllArgsConstructor;
@@ -37,7 +39,9 @@ public class CostCalculator  {
     @AllArgsConstructor
     @Getter
     enum CostCalculators {
-        COMPLETION("/v*/chat/completions", completion);
+        COMPLETION("/v*/chat/completions", completion),
+        EMBEDDING("/v*/embeddings", embedding),
+        ;
         final String endpoint;
         final EndpointCostCalculator calculator;
     }
@@ -55,6 +59,21 @@ public class CostCalculator  {
         public boolean checkPriceInfo(String priceInfo) {
             CompletionPriceInfo price = JacksonUtils.deserialize(priceInfo, CompletionPriceInfo.class);
             return price != null && price.getInput() != null && price.getOutput() != null;
+        }
+    };
+
+    static EndpointCostCalculator embedding = new EndpointCostCalculator() {
+        @Override
+        public BigDecimal calculate(String priceInfo, Object usage) {
+            EmbeddingPriceInfo price = JacksonUtils.deserialize(priceInfo, EmbeddingPriceInfo.class);
+            EmbeddingResponse.TokenUsage tokenUsage = (EmbeddingResponse.TokenUsage) usage;
+            return price.getInput().multiply(BigDecimal.valueOf(tokenUsage.getPrompt_tokens() / 1000.0));
+        }
+
+        @Override
+        public boolean checkPriceInfo(String priceInfo) {
+            EmbeddingPriceInfo price = JacksonUtils.deserialize(priceInfo, EmbeddingPriceInfo.class);
+            return price != null && price.getInput() != null;
         }
     };
 

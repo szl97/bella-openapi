@@ -6,11 +6,13 @@ import com.ke.bella.openapi.protocol.UserRequest;
 import lombok.Data;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 @Data
-public class CompletionRequest implements UserRequest {
+public class CompletionRequest implements UserRequest, Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * ID of the model to use
      */

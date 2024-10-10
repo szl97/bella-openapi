@@ -142,8 +142,11 @@ public class ModelService {
         }
     }
 
-    private void checkJson(String obj, String field, List<String> basisEndpoints) {
-        Map<String, Object> map = json2Map(obj);
+    private void checkJson(String jsonStr, String field, List<String> basisEndpoints) {
+        if(jsonStr.equals("{}")) {
+            return;
+        }
+        Map<String, Object> map = json2Map(jsonStr);
         Assert.isTrue(map != null && !map.isEmpty(), field + "非json格式");
         for (String endpoint : basisEndpoints) {
             String invalidMessage = generateInvalidModelJsonKeyMessage(map, endpoint, field);

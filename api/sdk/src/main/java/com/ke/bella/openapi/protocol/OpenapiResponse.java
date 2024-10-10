@@ -7,11 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class OpenapiResponse {
+public class OpenapiResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 错误
      */
@@ -51,11 +54,6 @@ public class OpenapiResponse {
          * 可能为空
          */
         private String code;
-
-        public OpenapiError(String type, String message) {
-            this.message = message;
-            this.type = type;
-        }
 
         public OpenapiError(String type, String message, String code) {
             this.message = message;

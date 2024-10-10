@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OpenAIProperty extends CompletionProtocolProperty {
+public class OpenAIProperty extends CompletionProperty {
     AuthorizationProperty auth;
     String deployName;
     String apiVersion;

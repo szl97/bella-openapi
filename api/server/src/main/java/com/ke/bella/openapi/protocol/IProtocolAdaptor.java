@@ -22,12 +22,4 @@ public interface IProtocolAdaptor {
             return builder.header("Authorization", "Bearer " + property.getApiKey());
         }
     }
-
-
-    interface EmbeddingAdaptor extends IProtocolAdaptor {
-        @Override
-        default String endpoint() {
-            return "/v1/embeddings";
-        }
-    }
 }

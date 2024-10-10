@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AwsProperty extends CompletionProtocolProperty {
+public class AwsProperty extends CompletionProperty {
     AuthorizationProperty auth;
     String region;
     String deployName;

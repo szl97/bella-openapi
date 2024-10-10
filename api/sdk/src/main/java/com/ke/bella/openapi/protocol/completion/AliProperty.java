@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AliProperty extends CompletionProtocolProperty {
+public class AliProperty extends CompletionProperty {
     AuthorizationProperty auth;
     String deployName;
 }

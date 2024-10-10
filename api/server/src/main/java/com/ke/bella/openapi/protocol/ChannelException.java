@@ -56,7 +56,7 @@ public abstract class ChannelException extends RuntimeException {
         if(this instanceof ChannelException.OpenAIException) {
             return ((ChannelException.OpenAIException) this).getResponse();
         } else {
-            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), this.getType());
+            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), String.valueOf(this.getHttpCode()));
         }
     }
 
@@ -115,7 +115,7 @@ public abstract class ChannelException extends RuntimeException {
         private final OpenapiResponse.OpenapiError response;
 
         public OpenAIException(Integer httpCode, String type, String message) {
-            this(httpCode, type, message, new OpenapiResponse.OpenapiError(type, message));
+            this(httpCode, type, message, new OpenapiResponse.OpenapiError(type, message, String.valueOf(httpCode)));
         }
 
         public OpenAIException(Integer httpCode, String type, String message, OpenapiResponse.OpenapiError error) {
@@ -123,7 +123,7 @@ public abstract class ChannelException extends RuntimeException {
             this.httpCode = httpCode;
             this.type = type;
             if(error == null) {
-                this.response = new OpenapiResponse.OpenapiError(type, message);
+                this.response = new OpenapiResponse.OpenapiError(type, message, String.valueOf(httpCode));
             } else {
                 this.response = error;
             }

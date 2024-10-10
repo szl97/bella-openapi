@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
+import com.google.common.collect.Sets;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +11,9 @@ public class AdaptorManager {
     private final Map<String, Map<String, IProtocolAdaptor>> adaptors = new ConcurrentHashMap<>();
 
     public Set<String> getProtocols(String endpoint) {
+        if(!adaptors.containsKey(endpoint)) {
+            return Sets.newHashSet();
+        }
         return adaptors.get(endpoint).keySet();
     }
 
