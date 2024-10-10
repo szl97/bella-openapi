@@ -3,7 +3,10 @@ package com.ke.bella.openapi.protocol.completion;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -16,6 +19,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @JsonInclude(Include.NON_NULL)
 public class Message {
 
@@ -47,36 +53,6 @@ public class Message {
      * Tool call that this message is responding to.
      */
     private String tool_call_id;
-
-    public Message() {
-
-    }
-
-    public Message(String role, Object content, String name) {
-        this.role = role;
-        this.content = content;
-        this.name = name;
-    }
-
-    public String toMessage() {
-        return role + ": " + content;
-    }
-
-    public List<String> extractTextContent() {
-        if(getContent() instanceof String) {
-            return Collections.singletonList((String) getContent());
-        } else if(getContent() instanceof List) {
-            List<String> textMessages = new LinkedList<>();
-            for (Map content : (List<Map>) getContent()) {
-                if(content.containsKey("text")) {
-                    textMessages.add((String) content.get("text"));
-                }
-            }
-            return textMessages;
-        } else {
-            return Collections.emptyList();
-        }
-    }
 
     @Data
     public static class ToolCall {

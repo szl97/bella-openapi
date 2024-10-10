@@ -13,6 +13,7 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
+import com.ke.bella.openapi.tables.TeamMember;
 
 import org.jooq.Index;
 import org.jooq.OrderField;
@@ -34,6 +35,7 @@ public class Indexes {
     public static final Index ENDPOINT_CATEGORY_REL_IDX_CATEGORY_CODE = Internal.createIndex(DSL.name("idx_category_code"), EndpointCategoryRel.ENDPOINT_CATEGORY_REL, new OrderField[] { EndpointCategoryRel.ENDPOINT_CATEGORY_REL.CATEGORY_CODE }, false);
     public static final Index CATEGORY_IDX_CATEGORY_NAME = Internal.createIndex(DSL.name("idx_category_name"), Category.CATEGORY, new OrderField[] { Category.CATEGORY.CATEGORY_NAME }, false);
     public static final Index CHANNEL_IDX_ENTITY_TYPE_CODE = Internal.createIndex(DSL.name("idx_entity_type_code"), Channel.CHANNEL, new OrderField[] { Channel.CHANNEL.ENTITY_TYPE, Channel.CHANNEL.ENTITY_CODE }, false);
+    public static final Index TEAM_MEMBER_IDX_MEMBER_UID = Internal.createIndex(DSL.name("idx_member_uid"), TeamMember.TEAM_MEMBER, new OrderField[] { TeamMember.TEAM_MEMBER.MEMBER_UID }, false);
     public static final Index MODEL_ENDPOINT_REL_IDX_MODEL_NAME = Internal.createIndex(DSL.name("idx_model_name"), ModelEndpointRel.MODEL_ENDPOINT_REL, new OrderField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, false);
     public static final Index APIKEY_MONTH_COST_IDX_MONTH = Internal.createIndex(DSL.name("idx_month"), ApikeyMonthCost.APIKEY_MONTH_COST, new OrderField[] { ApikeyMonthCost.APIKEY_MONTH_COST.MONTH }, false);
     public static final Index MODEL_IDX_OWNER_NAME = Internal.createIndex(DSL.name("idx_owner_name"), Model.MODEL, new OrderField[] { Model.MODEL.OWNER_NAME }, false);

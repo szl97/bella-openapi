@@ -25,6 +25,7 @@ public class ApikeyInfo implements Serializable {
     private String roleCode;
     @JsonIgnore
     private String path;
+    private String safetySceneCode;
     private Byte safetyLevel;
     private BigDecimal monthQuota;
     private RolePath rolePath;

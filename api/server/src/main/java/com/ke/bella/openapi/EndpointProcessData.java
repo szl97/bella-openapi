@@ -29,4 +29,6 @@ public class EndpointProcessData {
     private String protocol;
     private String priceInfo;
     private String channelInfo;
+    private String supplier;
+    private Object requestRiskData;
 }

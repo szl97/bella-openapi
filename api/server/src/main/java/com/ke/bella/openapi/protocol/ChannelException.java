@@ -17,6 +17,9 @@ public abstract class ChannelException extends RuntimeException {
     }
 
     public static ChannelException fromException(Throwable e) {
+        if(e instanceof ChannelException) {
+            return (ChannelException) e;
+        }
         return new ChannelException(e.getMessage(), e) {
             @Override
             public Integer getHttpCode() {
@@ -55,6 +58,8 @@ public abstract class ChannelException extends RuntimeException {
     public OpenapiResponse.OpenapiError convertToOpenapiError() {
         if(this instanceof ChannelException.OpenAIException) {
             return ((ChannelException.OpenAIException) this).getResponse();
+        } else if(this instanceof ChannelException.SafetyCheckException) {
+            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), this.getType(), ((SafetyCheckException) this).getSensitive());
         } else {
             return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), String.valueOf(this.getHttpCode()));
         }
@@ -94,15 +99,14 @@ public abstract class ChannelException extends RuntimeException {
 
     @Getter
     public static class SafetyCheckException extends ChannelException {
-
         protected final Integer httpCode;
         protected final String type;
         protected final Object sensitive;
 
-        public SafetyCheckException(Integer httpCode, String type, String message, Object sensitive) {
-            super(message);
-            this.httpCode = httpCode;
-            this.type = type;
+        public SafetyCheckException(Object sensitive) {
+            super("safety_check_no_pass");
+            this.httpCode = 400;
+            this.type = "safety_check";
             this.sensitive = sensitive;
         }
     }

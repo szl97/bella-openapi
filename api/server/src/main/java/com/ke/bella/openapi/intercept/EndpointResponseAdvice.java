@@ -39,9 +39,10 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
         return body;
     }
 
-    @ExceptionHandler(ChannelException.class)
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    public OpenapiResponse exceptionHandler(ChannelException e) {
+    public OpenapiResponse exceptionHandler(Exception exception) {
+        ChannelException e = ChannelException.fromException(exception);
         OpenapiResponse.OpenapiError error = e.convertToOpenapiError();
         OpenapiResponse openapiResponse = OpenapiResponse.errorResponse(error);
         if(e instanceof ChannelException.SafetyCheckException) {
@@ -53,11 +54,5 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
             LOGGER.info(e.getMessage(), e);
         }
         return openapiResponse;
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public OpenapiResponse exceptionHandler(Exception e) {
-        return exceptionHandler(ChannelException.fromException(e));
     }
 }

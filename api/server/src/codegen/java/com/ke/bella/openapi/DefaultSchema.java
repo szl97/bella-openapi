@@ -14,6 +14,9 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
+import com.ke.bella.openapi.tables.Team;
+import com.ke.bella.openapi.tables.TeamMember;
+import com.ke.bella.openapi.tables.TeamRole;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,6 +90,21 @@ public class DefaultSchema extends SchemaImpl {
     public final ModelEndpointRel MODEL_ENDPOINT_REL = ModelEndpointRel.MODEL_ENDPOINT_REL;
 
     /**
+     * 团队表
+     */
+    public final Team TEAM = Team.TEAM;
+
+    /**
+     * 团队成员信息表
+     */
+    public final TeamMember TEAM_MEMBER = TeamMember.TEAM_MEMBER;
+
+    /**
+     * 团队角色
+     */
+    public final TeamRole TEAM_ROLE = TeamRole.TEAM_ROLE;
+
+    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -111,6 +129,9 @@ public class DefaultSchema extends SchemaImpl {
             EndpointCategoryRel.ENDPOINT_CATEGORY_REL,
             Model.MODEL,
             ModelAuthorizerRel.MODEL_AUTHORIZER_REL,
-            ModelEndpointRel.MODEL_ENDPOINT_REL);
+            ModelEndpointRel.MODEL_ENDPOINT_REL,
+            Team.TEAM,
+            TeamMember.TEAM_MEMBER,
+            TeamRole.TEAM_ROLE);
     }
 }

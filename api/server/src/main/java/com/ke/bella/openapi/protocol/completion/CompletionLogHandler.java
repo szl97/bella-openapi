@@ -3,7 +3,9 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EndpointProcessData;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogHandler;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.TokenCounter;
 import com.knuddels.jtokkit.api.EncodingType;
@@ -23,10 +25,14 @@ public class CompletionLogHandler implements EndpointLogHandler {
     @Override
     public void process(EndpointProcessData processData) {
         long startTime = processData.getRequestTime();
-        CompletionResponse response = (CompletionResponse) processData.getResponse();
-        long firstPackageTime = processData.getFirstPackageTime() == 0L ? response.getCreated()
+        CompletionResponse response = null;
+        if(processData.getResponse() instanceof CompletionResponse) {
+            response = (CompletionResponse) processData.getResponse();
+        }
+        long created = response == null ? DateTimeUtils.getCurrentMills() : response.getCreated();
+        long firstPackageTime = processData.getFirstPackageTime() == 0L ? created
                 : processData.getFirstPackageTime();
-        processData.setMetrics(countMetrics(startTime, response.getCreated(), firstPackageTime));
+        processData.setMetrics(countMetrics(startTime, created, firstPackageTime));
         CompletionRequest request = (CompletionRequest) processData.getRequest();
         String encodingType = JacksonUtils.deserialize(processData.getChannelInfo(), CompletionProperty.class).getEncodingType();
         processData.setUsage(countTokenUsage(request, response, encodingType));
@@ -42,7 +48,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
     }
 
     private CompletionResponse.TokenUsage countTokenUsage(CompletionRequest request, CompletionResponse response, String encodingType) {
-        if(response.getUsage() != null) {
+        if(response != null && response.getUsage() != null) {
             return response.getUsage();
         }
         EncodingType encoding = EncodingType.fromName(encodingType).orElse(EncodingType.CL100K_BASE);
@@ -82,7 +88,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
         Optional<Integer> userImgMessageToken = imgMessage.stream().map(x-> TokenCounter.imageToken(x.getLeft(), x.getRight())).reduce(Integer::sum);
         requestToken += userTextMessageToken.orElse(0) + userImgMessageToken.orElse(0);
 
-        int responseToken = (response.getChoices() == null) ? 0 : response.getChoices().stream()
+        int responseToken = (response == null || response.getChoices() == null) ? 0 : response.getChoices().stream()
                 .map(x -> {
                     if(CollectionUtils.isNotEmpty(x.getMessage().getTool_calls())) {
                         return getToolCallStr(x.getMessage().getTool_calls());

@@ -32,17 +32,13 @@ public class CompletionSseListener extends EventSourceListener {
 
     @Override
     public void onEvent(EventSource eventSource, String id, String type, String msg) {
-        try {
-            if(DONE_FLAGS.contains(msg)) {
-                callback.done();
-            } else {
-                StreamCompletionResponse response = sseConverter.convert(id, type, msg);
-                if(response != null) {
-                    callback.callback(response);
-                }
+        if(DONE_FLAGS.contains(msg)) {
+            callback.done();
+        } else {
+            StreamCompletionResponse response = sseConverter.convert(id, type, msg);
+            if(response != null) {
+                callback.callback(response);
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

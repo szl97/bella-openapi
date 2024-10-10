@@ -14,6 +14,9 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
+import com.ke.bella.openapi.tables.Team;
+import com.ke.bella.openapi.tables.TeamMember;
+import com.ke.bella.openapi.tables.TeamRole;
 
 /**
  * Convenience access to all tables in the default schema.
@@ -70,4 +73,19 @@ public class Tables {
      * 模型能力点
      */
     public static final ModelEndpointRel MODEL_ENDPOINT_REL = ModelEndpointRel.MODEL_ENDPOINT_REL;
+
+    /**
+     * 团队表
+     */
+    public static final Team TEAM = Team.TEAM;
+
+    /**
+     * 团队成员信息表
+     */
+    public static final TeamMember TEAM_MEMBER = TeamMember.TEAM_MEMBER;
+
+    /**
+     * 团队角色
+     */
+    public static final TeamRole TEAM_ROLE = TeamRole.TEAM_ROLE;
 }

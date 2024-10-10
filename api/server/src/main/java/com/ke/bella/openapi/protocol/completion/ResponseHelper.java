@@ -1,23 +1,21 @@
 package com.ke.bella.openapi.protocol.completion;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.ke.bella.openapi.protocol.completion.StreamCompletionResponse.CHAT_COMPLETION_CHUNK_OBJECT;
 
 public class ResponseHelper {
 
-    public static CompletionResponse convert(StreamCompletionResponse streamCompletionResponse) {
-        CompletionResponse response = new CompletionResponse();
+    public static CompletionResponse overwrite(CompletionResponse response, StreamCompletionResponse streamCompletionResponse) {
         response.setError(streamCompletionResponse.getError());
         response.setCreated(streamCompletionResponse.getCreated());
         response.setId(streamCompletionResponse.getId());
         response.setModel(streamCompletionResponse.getModel());
         response.setUsage(streamCompletionResponse.getUsage());
         response.setObject(CHAT_COMPLETION_CHUNK_OBJECT);
-        response.setChoices(streamCompletionResponse.getChoices().stream().map(ResponseHelper::convert).collect(Collectors.toList()));
         return response;
     }
 
@@ -29,55 +27,51 @@ public class ResponseHelper {
         return choice;
     }
 
-    public static CompletionResponse aggregate(List<StreamCompletionResponse> list) {
-        CompletionResponse response = null;
-        for (StreamCompletionResponse streamResponse : list) {
-            if(CollectionUtils.isEmpty(streamResponse.getChoices())) {
-                continue;
-            }
-            if(response == null) {
-                response = ResponseHelper.convert(streamResponse);
+    public static Message combineMessage(Message target, Message message) {
+        if(target == null) {
+            return message;
+        }
+        Object contentObj = message.getContent();
+        List<Message.ToolCall> toolCallList = message.getTool_calls();
+        if(contentObj != null) {
+            String content = contentObj.toString();
+            if(target.getContent() == null) {
+                target.setContent(content);
             } else {
-                int index = streamResponse.getChoices().get(0).getIndex();
-                String content = (String) streamResponse.getChoices().get(0).getDelta().getContent();
-                //拼接当前choice内容
-                //判断当前choice对应的index是否已存在
-                boolean newChoice = true;
-                for (CompletionResponse.Choice choice : response.getChoices()) {
-                    if(choice.getIndex() == index) {
-                        newChoice = false;
-                        if(content != null) {
-                            if(choice.getMessage().getContent() == null) {
-                                choice.getMessage().setContent(content);
+                target.setContent(target.getContent() + content);
+            }
+        } else if(CollectionUtils.isNotEmpty(toolCallList)) {
+            if(target.getTool_calls() == null) {
+                target.setTool_calls(toolCallList);
+            } else {
+                for (Message.ToolCall streamToolCall : toolCallList) {
+                    //拼接对应index的function
+                    int toolIndex = streamToolCall.getIndex();
+                    String name = streamToolCall.getFunction().getName();
+                    String arguments = streamToolCall.getFunction().getArguments();
+                    if(StringUtils.isBlank(name) && StringUtils.isEmpty(arguments)) {
+                        return target;
+                    }
+                    boolean add = true;
+                    for (Message.ToolCall toolCall : target.getTool_calls()) {
+                        if(toolCall.getIndex() == toolIndex) {
+                            add = false;
+                            if(StringUtils.isNotBlank(name) && StringUtils.isBlank(toolCall.getFunction().getName())) {
+                                toolCall.getFunction().setName(name);
+                            }
+                            if(toolCall.getFunction().getArguments() == null) {
+                                toolCall.getFunction().setArguments(arguments);
                             } else {
-                                choice.getMessage().setContent(choice.getMessage().getContent() + content);
-                            }
-                        } else if(CollectionUtils.isNotEmpty(streamResponse.getChoices().get(0).getDelta().getTool_calls())) {
-                            //拼接function的arguments
-                            //拼接对应index的function
-                            int toolIndex = streamResponse.getChoices().get(0).getDelta().getTool_calls().get(0).getIndex();
-                            String arguments = streamResponse.getChoices().get(0).getDelta().getTool_calls().get(0).getFunction().getArguments();
-                            if(arguments == null) {
-                                continue;
-                            }
-                            for (Message.ToolCall toolCall : choice.getMessage().getTool_calls()) {
-                                if(toolCall.getIndex() == toolIndex) {
-                                    if(toolCall.getFunction().getArguments() == null) {
-                                        toolCall.getFunction().setArguments(arguments);
-                                    } else {
-                                        toolCall.getFunction().setArguments(toolCall.getFunction().getArguments() + arguments);
-                                    }
-                                }
+                                toolCall.getFunction().setArguments(toolCall.getFunction().getArguments() + arguments);
                             }
                         }
                     }
+                    if(add) {
+                        target.getTool_calls().add(streamToolCall);
+                    }
                 }
-                if(newChoice) {
-                    response.getChoices().add(ResponseHelper.convert(streamResponse.getChoices().get(0)));
-                }
-                response.setUsage(streamResponse.getUsage());
             }
         }
-        return response;
+        return target;
     }
 }

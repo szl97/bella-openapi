@@ -21,8 +21,17 @@ public class OpenapiResponse implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private OpenapiError error;
 
+    /**
+     * response中安全检查为warning的内容，适配原协议
+     */
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object sensitives;
+
+    /**
+     * request中安全检查为warning的内容，适配原协议
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Object requestRiskData;
 
     public static OpenapiResponse errorResponse(OpenapiError error) {
         OpenapiResponse response = new OpenapiResponse();
@@ -36,7 +45,9 @@ public class OpenapiResponse implements Serializable {
     @Builder
     public static class OpenapiError {
 
-        //请求命中敏感信息后，在该字段中返回敏感内容
+        /**
+         * 安全检查结果为failed，返回error中包含检查结果
+         */
         private Object sensitive;
         /**
          * message通常存在
@@ -59,6 +70,13 @@ public class OpenapiResponse implements Serializable {
             this.message = message;
             this.type = type;
             this.code = code;
+        }
+
+        public OpenapiError(String type, String message, String code, Object sensitive) {
+            this.message = message;
+            this.type = type;
+            this.code = code;
+            this.sensitive = sensitive;
         }
     }
 

@@ -234,6 +234,8 @@ public class ApikeyService {
         }
         if(apikeyInfo.getOwnerType().equals(PERSON)) {
             apikeyInfo.setUserId(Long.parseLong(apikeyInfo.getOwnerCode()));
+        } else {
+            apikeyInfo.setUserId(0L);
         }
         return apikeyInfo;
     }
