@@ -50,29 +50,29 @@ public class OpenapiResponse implements Serializable {
          */
         private Object sensitive;
         /**
+         * code通常存在
+         */
+        private Integer code;
+        /**
          * message通常存在
          */
         private String message;
         /**
-         * type通常存在
+         * type 可能为空
          */
         private String type;
         /**
          * 可能为空
          */
         private String param;
-        /**
-         * 可能为空
-         */
-        private String code;
 
-        public OpenapiError(String type, String message, String code) {
+        public OpenapiError(String type, String message, Integer code) {
             this.message = message;
             this.type = type;
             this.code = code;
         }
 
-        public OpenapiError(String type, String message, String code, Object sensitive) {
+        public OpenapiError(String type, String message, Integer code, Object sensitive) {
             this.message = message;
             this.type = type;
             this.code = code;

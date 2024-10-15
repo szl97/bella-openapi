@@ -8,6 +8,7 @@ import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -33,6 +34,13 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        OpenapiResponse openapiResponse = (OpenapiResponse) body;
+        if(openapiResponse.getError() == null) {
+            response.setStatusCode(HttpStatus.OK);
+        } else {
+            Integer httpCode = openapiResponse.getError().getCode();
+            response.setStatusCode(httpCode == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.valueOf(httpCode));
+        }
         BellaContext.getProcessData().setResponse(body);
         logger.log(BellaContext.getProcessData());
         response.getHeaders().add("X-BELLA-REQUEST-ID", BellaContext.getProcessData().getRequestId());

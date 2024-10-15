@@ -1,11 +1,14 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import com.alibaba.nacos.api.naming.pojo.healthcheck.impl.Http;
 import com.google.common.collect.Lists;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.ImageUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.http.HttpStatus;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.core.document.Document;
 import software.amazon.awssdk.core.document.internal.MapDocument;
@@ -87,6 +90,16 @@ public class AwsCompletionConverter {
     }
 
     public static CompletionResponse convert2OpenAIResponse(ConverseResponse response) {
+        if(!response.sdkHttpResponse().isSuccessful()) {
+            OpenapiResponse.OpenapiError error = OpenapiResponse.OpenapiError.builder()
+                    .message(response.sdkHttpResponse().statusText().orElse(""))
+                    .type(HttpStatus.valueOf(response.sdkHttpResponse().statusCode()).getReasonPhrase())
+                    .code(response.sdkHttpResponse().statusCode())
+                    .build();
+            CompletionResponse completionResponse = new CompletionResponse();
+            completionResponse.setError(error);
+            return completionResponse;
+        }
         software.amazon.awssdk.services.bedrockruntime.model.Message message = response.output().message();
         com.ke.bella.openapi.protocol.completion.Message openAiMsg = new com.ke.bella.openapi.protocol.completion.Message();
         openAiMsg.setRole("assistant");

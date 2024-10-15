@@ -49,7 +49,7 @@ public abstract class ChannelException extends RuntimeException {
     public abstract Integer getHttpCode();
 
     /**
-     * 异常code
+     * 异常 type
      *
      * @return
      */
@@ -59,9 +59,9 @@ public abstract class ChannelException extends RuntimeException {
         if(this instanceof ChannelException.OpenAIException) {
             return ((ChannelException.OpenAIException) this).getResponse();
         } else if(this instanceof ChannelException.SafetyCheckException) {
-            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), this.getType(), ((SafetyCheckException) this).getSensitive());
+            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), this.getHttpCode(), ((SafetyCheckException) this).getSensitive());
         } else {
-            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), String.valueOf(this.getHttpCode()));
+            return new OpenapiResponse.OpenapiError(this.getType(), this.getMessage(), this.getHttpCode());
         }
     }
 
@@ -119,7 +119,7 @@ public abstract class ChannelException extends RuntimeException {
         private final OpenapiResponse.OpenapiError response;
 
         public OpenAIException(Integer httpCode, String type, String message) {
-            this(httpCode, type, message, new OpenapiResponse.OpenapiError(type, message, String.valueOf(httpCode)));
+            this(httpCode, type, message, new OpenapiResponse.OpenapiError(type, message, httpCode));
         }
 
         public OpenAIException(Integer httpCode, String type, String message, OpenapiResponse.OpenapiError error) {
@@ -127,7 +127,7 @@ public abstract class ChannelException extends RuntimeException {
             this.httpCode = httpCode;
             this.type = type;
             if(error == null) {
-                this.response = new OpenapiResponse.OpenapiError(type, message, String.valueOf(httpCode));
+                this.response = new OpenapiResponse.OpenapiError(type, message, httpCode);
             } else {
                 this.response = error;
             }

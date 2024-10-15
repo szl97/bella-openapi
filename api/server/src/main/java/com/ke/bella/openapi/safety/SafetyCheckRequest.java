@@ -61,6 +61,9 @@ public class SafetyCheckRequest {
         }
 
         public static Chat convertFrom(CompletionResponse completionResponse, EndpointProcessData processData, ApikeyInfo apikeyInfo) {
+            if(CollectionUtils.isEmpty(completionResponse.getChoices())) {
+                return null;
+            }
             List<com.ke.bella.openapi.protocol.completion.Message> messages = completionResponse.getChoices().stream()
                     .map(CompletionResponse.Choice::getMessage)
                     .collect(Collectors.toList());
