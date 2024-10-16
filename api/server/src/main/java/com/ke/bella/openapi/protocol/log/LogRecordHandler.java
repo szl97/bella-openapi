@@ -18,7 +18,7 @@ public class LogRecordHandler implements EventHandler<LogEvent> {
     }
 
     @Override
-    public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {;
+    public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
         logRepos.forEach(logRepo -> logRepo.record(event.getData()));
     }
 

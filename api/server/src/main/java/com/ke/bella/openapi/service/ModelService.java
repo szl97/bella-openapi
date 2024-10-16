@@ -26,7 +26,6 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -75,8 +74,8 @@ public class ModelService {
                 .build();
         cacheManager.getOrCreateCache(modelTerminalConfig);
         QuickConfig modelCacheConfig = QuickConfig.newBuilder(modelMapCacheKey)
-                .expire(Duration.of(0, ChronoUnit.MILLIS))
-                .localExpire(Duration.of(10, ChronoUnit.MINUTES))
+                .expire(Duration.ofDays(3650))
+                .localExpire(Duration.ofMinutes(5))
                 .localLimit(1)
                 .cacheNullValue(true)
                 .cacheType(CacheType.BOTH)

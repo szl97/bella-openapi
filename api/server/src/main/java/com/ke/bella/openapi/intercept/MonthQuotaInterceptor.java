@@ -20,7 +20,6 @@ import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_RE
 public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private ApikeyService apikeyService;
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {

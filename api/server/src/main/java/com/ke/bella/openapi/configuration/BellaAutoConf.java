@@ -6,7 +6,10 @@ import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.cost.CostCounter;
 import com.ke.bella.openapi.protocol.log.CostLogHandler;
 import com.ke.bella.openapi.protocol.log.LogEvent;
+import com.ke.bella.openapi.protocol.log.LogExceptionHandler;
 import com.ke.bella.openapi.protocol.log.LogRecordHandler;
+import com.ke.bella.openapi.protocol.log.MetricsLogHandler;
+import com.ke.bella.openapi.protocol.metrics.MetricsManager;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -25,6 +28,8 @@ public class BellaAutoConf {
     private Disruptor<LogEvent> logDisruptor;
     @Autowired
     private CostCounter costCounter;
+    @Autowired
+    private MetricsManager metricsManager;
     @Bean
     public AdaptorManager adaptorManager(@Autowired List<IProtocolAdaptor> adaptors) {
         AdaptorManager manager = new AdaptorManager();
@@ -36,7 +41,8 @@ public class BellaAutoConf {
     public RingBuffer<LogEvent> logRingBuffer(List<LogRepo> logRepos) {
         Disruptor<LogEvent> disruptor = new Disruptor<>(LogEvent::new, 1024,
                 DaemonThreadFactory.INSTANCE, ProducerType.MULTI, sleepingWaitStrategy);
-        disruptor.handleEventsWith(new LogRecordHandler(logRepos), new CostLogHandler(costCounter));
+        disruptor.handleEventsWith(new LogRecordHandler(logRepos), new CostLogHandler(costCounter), new MetricsLogHandler(metricsManager));
+        disruptor.setDefaultExceptionHandler(new LogExceptionHandler());
         disruptor.start();
         logDisruptor = disruptor;
         return disruptor.getRingBuffer();

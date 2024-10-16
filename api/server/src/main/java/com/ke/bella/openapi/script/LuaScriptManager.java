@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.script;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
@@ -31,10 +32,10 @@ public class LuaScriptManager {
     @PostConstruct
     public void init() throws IOException {
         QuickConfig config = QuickConfig.newBuilder(luaScriptsKey)
+                .expire(Duration.ofDays(3650))
+                .localExpire(Duration.ofMinutes(5))
                 .cacheNullValue(true)
                 .cacheType(CacheType.BOTH)
-                .expire(Duration.of(0, ChronoUnit.MILLIS))
-                .localExpire(Duration.of(0, ChronoUnit.MILLIS))
                 .localLimit(100)
                 .penetrationProtect(false)
                 .build();

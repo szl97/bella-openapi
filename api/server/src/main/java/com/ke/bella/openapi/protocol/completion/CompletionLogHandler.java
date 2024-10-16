@@ -29,13 +29,13 @@ public class CompletionLogHandler implements EndpointLogHandler {
         if(processData.getResponse() instanceof CompletionResponse) {
             response = (CompletionResponse) processData.getResponse();
         }
-        long created = response == null ? DateTimeUtils.getCurrentMills() : response.getCreated();
-        long firstPackageTime = processData.getFirstPackageTime() == 0L ? created
-                : processData.getFirstPackageTime();
-        processData.setMetrics(countMetrics(startTime, created, firstPackageTime));
+        long created = response == null ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
+        long firstPackageTime = processData.getFirstPackageTime();
         CompletionRequest request = (CompletionRequest) processData.getRequest();
         String encodingType = JacksonUtils.deserialize(processData.getChannelInfo(), CompletionProperty.class).getEncodingType();
-        processData.setUsage(countTokenUsage(request, response, encodingType));
+        CompletionResponse.TokenUsage usage = countTokenUsage(request, processData.getResponse(), encodingType);
+        processData.setUsage(usage);
+        processData.setMetrics(countMetrics(startTime, created, firstPackageTime, usage));
     }
 
     @Override
@@ -43,11 +43,32 @@ public class CompletionLogHandler implements EndpointLogHandler {
         return "/v1/chat/completions";
     }
 
-    private Map<String, Object> countMetrics(long startTime, long endTime, long firstPackageTime) {
-        return ImmutableMap.of("ttft", firstPackageTime - startTime, "ttlt", endTime - startTime);
+    private Map<String, Object> countMetrics(long startTime, long endTime, long firstPackageTime, CompletionResponse.TokenUsage usage) {
+        int inputToken = usage.getPrompt_tokens();
+        int outputToken = usage.getCompletion_tokens();
+        int ttft = 0;
+        if(firstPackageTime != 0) {
+            ttft = (int) (firstPackageTime - startTime);
+        }
+        int ttlt = (int) (endTime - startTime);
+        return ImmutableMap.of("ttft", ttft, "ttlt", ttlt, "input_token", inputToken, "output_token", outputToken);
     }
 
-    private CompletionResponse.TokenUsage countTokenUsage(CompletionRequest request, CompletionResponse response, String encodingType) {
+    private CompletionResponse.TokenUsage countTokenUsage(CompletionRequest request, OpenapiResponse openapiResponse, String encodingType) {
+        if(openapiResponse.getError() != null) {
+            int httpCode = openapiResponse.getError().getCode();
+            if(httpCode > 399 && httpCode < 500 && httpCode != 408) {
+                CompletionResponse.TokenUsage tokenUsage = new CompletionResponse.TokenUsage();
+                tokenUsage.setPrompt_tokens(0);
+                tokenUsage.setCompletion_tokens(0);
+                tokenUsage.setTotal_tokens(0);
+                return tokenUsage;
+            }
+        }
+        CompletionResponse response = null;
+        if(openapiResponse instanceof CompletionResponse) {
+            response = (CompletionResponse) openapiResponse;
+        }
         if(response != null && response.getUsage() != null) {
             return response.getUsage();
         }

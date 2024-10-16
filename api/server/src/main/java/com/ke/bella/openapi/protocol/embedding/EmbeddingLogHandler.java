@@ -1,8 +1,10 @@
 package com.ke.bella.openapi.protocol.embedding;
 
 import com.ke.bella.openapi.EndpointProcessData;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.CompletionProperty;
 import com.ke.bella.openapi.protocol.log.EndpointLogHandler;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.TokenCounter;
 import com.knuddels.jtokkit.api.EncodingType;
@@ -16,21 +18,32 @@ import java.util.Map;
 public class EmbeddingLogHandler implements EndpointLogHandler {
     @Override
     public void process(EndpointProcessData processData) {
-        long startTime = processData.getRequestTime();
-        Map<String, Object> map = new HashMap<>();
-        map.put("ttlt", System.currentTimeMillis() - startTime);
-        processData.setMetrics(map);
         EmbeddingRequest request = (EmbeddingRequest) processData.getRequest();
         String encodingType = JacksonUtils.deserialize(processData.getChannelInfo(), CompletionProperty.class).getEncodingType();
-        EmbeddingResponse response = (EmbeddingResponse) processData.getResponse();
-        if(response.getUsage() != null) {
-            processData.setUsage(response.getUsage());
-        } else {
-            int inputToken = countTokenUsage(request, encodingType);
-            EmbeddingResponse.TokenUsage tokenUsage = new EmbeddingResponse.TokenUsage();
-            tokenUsage.setPrompt_tokens(inputToken);
-            tokenUsage.setTotal_tokens(inputToken);
+        EmbeddingResponse response = null;
+        if(processData.getResponse() instanceof EmbeddingResponse) {
+            response = (EmbeddingResponse) processData.getResponse();
         }
+        EmbeddingResponse.TokenUsage usage;
+        if(response != null && response.getUsage() != null) {
+            usage = response.getUsage();
+        } else {
+            int inputToken = 0;
+            OpenapiResponse.OpenapiError error = processData.getResponse().getError();
+            if(error == null || (error.getCode() > 399 && error.getCode() < 500 && error.getCode() != 408)) {
+                inputToken = countTokenUsage(request, encodingType);
+            }
+            usage = new EmbeddingResponse.TokenUsage();
+            usage.setPrompt_tokens(inputToken);
+            usage.setTotal_tokens(inputToken);
+        }
+        long startTime = processData.getRequestTime();
+        int ttlt = (int) (DateTimeUtils.getCurrentSeconds() - startTime);
+        Map<String, Object> map = new HashMap<>();
+        map.put("ttlt", ttlt);
+        map.put("token", usage.getTotal_tokens());
+        processData.setMetrics(map);
+        processData.setUsage(usage);
     }
 
     private Integer countTokenUsage(EmbeddingRequest request, String encodingType) {

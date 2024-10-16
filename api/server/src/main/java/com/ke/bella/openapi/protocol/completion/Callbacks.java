@@ -35,7 +35,7 @@ public interface Callbacks {
              this.safetyService = safetyService;
              this.safetyCheckIndex = 0;
              this.responseBuffer = new CompletionResponse();
-             responseBuffer.setCreated(DateTimeUtils.getCurrentMills());
+             responseBuffer.setCreated(DateTimeUtils.getCurrentSeconds());
              this.choiceBuffer = new HashMap<>();
              this.requestRiskData = processData.getRequestRiskData();
          }
@@ -75,7 +75,7 @@ public interface Callbacks {
          public void finish(ChannelException exception) {
              OpenapiResponse.OpenapiError openapiError = exception.convertToOpenapiError();
              StreamCompletionResponse response = StreamCompletionResponse.builder()
-                     .created(DateTimeUtils.getCurrentMills())
+                     .created(DateTimeUtils.getCurrentSeconds())
                      .error(openapiError)
                      .build();
              try {
@@ -117,7 +117,7 @@ public interface Callbacks {
          private void log() {
              CompletionResponse response = responseBuffer;
              processData.setDuration(response.getCreated() - processData.getRequestTime());
-             processData.setFirstPackageTime(firstPackageTime == null ? DateTimeUtils.getCurrentMills() : firstPackageTime);
+             processData.setFirstPackageTime(firstPackageTime == null ? DateTimeUtils.getCurrentSeconds() : firstPackageTime);
              response.setChoices(Lists.newArrayList(choiceBuffer.values()));
              processData.setResponse(response);
              logger.log(processData);
@@ -141,7 +141,7 @@ public interface Callbacks {
              if(result != null) {
                  StreamCompletionResponse response = new StreamCompletionResponse();
                  response.setSensitives(result);
-                 response.setCreated(DateTimeUtils.getCurrentMills());
+                 response.setCreated(DateTimeUtils.getCurrentSeconds());
                  SseHelper.sendEvent(sse, response);
              }
              dirtyChoice = false;

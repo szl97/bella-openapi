@@ -114,7 +114,7 @@ public class AwsCompletionConverter {
         tokenUsage.setCompletion_tokens(response.usage().outputTokens());
         tokenUsage.setTotal_tokens(response.usage().totalTokens());
         return CompletionResponse.builder()
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .choices(Lists.newArrayList(choice))
                 .usage(tokenUsage).build();
     }
@@ -138,7 +138,7 @@ public class AwsCompletionConverter {
         choice.setIndex(index);
         return StreamCompletionResponse.builder()
                 .choices(Lists.newArrayList(choice))
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .build();
     }
 
@@ -160,7 +160,7 @@ public class AwsCompletionConverter {
         choice.setDelta(openAiMsg);
         choice.setIndex(index);
         return StreamCompletionResponse.builder().choices(Lists.newArrayList(choice))
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .build();
     }
 
@@ -170,7 +170,7 @@ public class AwsCompletionConverter {
         tokenUsage.setCompletion_tokens(usage.outputTokens());
         tokenUsage.setTotal_tokens(usage.totalTokens());
         return StreamCompletionResponse.builder()
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .usage(tokenUsage).build();
     }
 

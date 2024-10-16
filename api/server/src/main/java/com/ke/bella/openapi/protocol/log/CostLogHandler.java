@@ -27,6 +27,8 @@ public class CostLogHandler implements EventHandler<LogEvent> {
             return;
         }
         BigDecimal cost = CostCalculator.calculate(log.getEndpoint(), log.getPriceInfo(), log.getUsage());
-        costCounter.delta(log.getAkCode(), cost);
+        if(cost != null && BigDecimal.ZERO.compareTo(cost) < 0) {
+            costCounter.delta(log.getAkCode(), cost);
+        }
     }
 }

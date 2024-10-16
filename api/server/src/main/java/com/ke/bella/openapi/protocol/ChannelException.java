@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import lombok.Getter;
+import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -14,6 +15,20 @@ public abstract class ChannelException extends RuntimeException {
 
     protected ChannelException(String message, Throwable throwable) {
         super(message, throwable);
+    }
+
+    public static ChannelException fromResponse(int httpCode, String message) {
+        return new ChannelException(message) {
+            @Override
+            public Integer getHttpCode() {
+                return httpCode;
+            }
+
+            @Override
+            public String getType() {
+                return "Internal Exception";
+            }
+        };
     }
 
     public static ChannelException fromException(Throwable e) {

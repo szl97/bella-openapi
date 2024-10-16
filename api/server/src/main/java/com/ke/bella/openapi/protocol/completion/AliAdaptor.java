@@ -72,7 +72,7 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
                     .build());
         }
         return StreamCompletionResponse.builder()
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .choices(choices)
                 .usage(convertTokenUsage(response.getUsage()))
                 .error(openAIError)
@@ -96,7 +96,7 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
         return CompletionResponse.builder()
                 .id(response.getRequestId())
                 .choices(choices)
-                .created(DateTimeUtils.getCurrentMills())
+                .created(DateTimeUtils.getCurrentSeconds())
                 .usage(convertTokenUsage(response.getUsage()))
                 .error(openAIError)
                 .build();

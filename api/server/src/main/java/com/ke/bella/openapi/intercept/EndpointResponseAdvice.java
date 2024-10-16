@@ -41,7 +41,7 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
             Integer httpCode = openapiResponse.getError().getCode();
             response.setStatusCode(httpCode == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.valueOf(httpCode));
         }
-        BellaContext.getProcessData().setResponse(body);
+        BellaContext.getProcessData().setResponse(openapiResponse);
         logger.log(BellaContext.getProcessData());
         response.getHeaders().add("X-BELLA-REQUEST-ID", BellaContext.getProcessData().getRequestId());
         return body;

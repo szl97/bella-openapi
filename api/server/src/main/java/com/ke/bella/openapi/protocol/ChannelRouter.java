@@ -1,6 +1,8 @@
 package com.ke.bella.openapi.protocol;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.protocol.metrics.MetricsManager;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.ModelService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
@@ -8,11 +10,12 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ChannelRouter {
@@ -21,6 +24,8 @@ public class ChannelRouter {
     private ChannelService channelService;
     @Autowired
     private ModelService modelService;
+    @Autowired
+    private MetricsManager metricsManager;
 
     public ChannelDB route(String endpoint, String model) {
         List<ChannelDB> channels;
@@ -28,46 +33,58 @@ public class ChannelRouter {
             String terminal = modelService.fetchTerminalModelName(model);
             channels = channelService.listActives(EntityConstants.MODEL, terminal);
         } else {
-            channels = channelService.listActives(EntityConstants.MODEL,endpoint);
+            channels = channelService.listActives(EntityConstants.MODEL, endpoint);
         }
-        return pick(channels);
-    }
-
-    private ChannelDB pick(List<ChannelDB> channels) {
         Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
-        List<ChannelDB> available = availableFilter(channels);
-        Assert.isTrue(CollectionUtils.isNotEmpty(available), "没有可用渠道");
-        List<ChannelDB> highest = pickMaxPriority(channels);
-        return route(highest);
+        channels = filter(channels);
+        Assert.notNull(channels, "没有可用渠道");
+        channels = pickMaxPriority(channels);
+        return random(channels);
     }
 
     /**
-     * 可用： 1、未限流 2、协议可用 3、账户支持的数据流向（风控）
+     * 1、筛选账户支持的数据流向（风控） 2、筛选可用的渠道
      *
      * @param channels
      *
      * @return
      */
-    private List<ChannelDB> availableFilter(List<ChannelDB> channels) {
-        //todo: 筛选已触发限流的渠道 筛选数据流向符合的
-//        Set<String> dataPermission = Arrays.stream(BellaContext.get(RequestInfoContext.Attribute.DATA_PERMISSION)
-//                .split(",")).collect(Collectors.toSet());
+    private List<ChannelDB> filter(List<ChannelDB> channels) {
+        Byte safetyLevel = BellaContext.getApikey().getSafetyLevel();
+        Set<String> unavailableSet = metricsManager.getAllUnavailableChannels(
+                channels.stream().map(ChannelDB::getChannelCode).collect(Collectors.toList()));
+        channels = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
+                .filter(channel -> !unavailableSet.contains(channel.getChannelCode()))
+                .collect(Collectors.toList());
         return channels;
+    }
+
+    private Byte getSafetyLevelLimit(String dataDestination) {
+        switch (dataDestination) {
+        case EntityConstants.INNER:
+            return 0;
+        case EntityConstants.MAINLAND:
+            return 1;
+        case EntityConstants.OVERSEAS:
+            return 2;
+        }
+        return 2;
     }
 
     private List<ChannelDB> pickMaxPriority(List<ChannelDB> channels) {
         List<ChannelDB> highest = new ArrayList<>();
         String max = EntityConstants.LOW;
         for (ChannelDB channel : channels) {
-            int compare = compare(channel.getPriority(), max);
+            String priority = channel.getPriority();
+            int compare = compare(priority, max);
             if(compare < 0) {
                 continue;
             }
             if(compare > 0) {
                 highest.clear();
-                max = channel.getPriority();
+                max = priority;
+                highest.add(channel);
             }
-            highest.add(channel);
         }
         return highest;
     }
@@ -87,17 +104,12 @@ public class ChannelRouter {
         return 1;
     }
 
-    private ChannelDB route(List<ChannelDB> channels) {
-        if(channels.size() == 1) {
-            return channels.get(0);
+    private ChannelDB random(List<ChannelDB> list) {
+        if(list.size() == 1) {
+            return list.get(0);
         }
-        List<ChannelDB> minUsages = pickMinUsageChannels(channels);
-        return minUsages.get(random.nextInt(minUsages.size()));
-    }
-
-    private List<ChannelDB> pickMinUsageChannels(List<ChannelDB> channels) {
-        //todo: 选择资源利用率最小的 (没有资源利用率记录的默认会被选中)
-        return channels;
+        int rand = random.nextInt(list.size());
+        return list.get(rand);
     }
 
 }

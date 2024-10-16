@@ -16,7 +16,7 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
     private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> {
         StreamCompletionResponse response = JacksonUtils.deserialize(str, StreamCompletionResponse.class);
         if(response != null && response.getCreated() == 0) {
-            response.setCreated(DateTimeUtils.getCurrentMills());
+            response.setCreated(DateTimeUtils.getCurrentSeconds());
         }
         return response;
     };

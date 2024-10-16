@@ -2,7 +2,6 @@ package com.ke.bella.openapi.utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class DateTimeUtils {
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
@@ -15,6 +14,10 @@ public class DateTimeUtils {
     }
 
     public static long getCurrentMills() {
-       return new Date().getTime();
+       return System.currentTimeMillis();
+    }
+
+    public static long getCurrentSeconds() {
+        return getCurrentMills() / 1000;
     }
 }
