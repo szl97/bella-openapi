@@ -48,7 +48,7 @@ public class MetricsManager {
         OpenapiResponse response = processData.getResponse();
         int minCompletedThreshold = 10;
         int errorRateThreshold = 30;//百分比
-        int httpCode = response.getError() == null ? 200 : response.getError().getCode();
+        int httpCode = response.getError() == null ? 200 : response.getError().getHttpCode();
         metrics.add(minCompletedThreshold);
         metrics.add(errorRateThreshold);
         metrics.add(httpCode);

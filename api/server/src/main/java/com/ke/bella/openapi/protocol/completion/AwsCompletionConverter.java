@@ -94,7 +94,7 @@ public class AwsCompletionConverter {
             OpenapiResponse.OpenapiError error = OpenapiResponse.OpenapiError.builder()
                     .message(response.sdkHttpResponse().statusText().orElse(""))
                     .type(HttpStatus.valueOf(response.sdkHttpResponse().statusCode()).getReasonPhrase())
-                    .code(response.sdkHttpResponse().statusCode())
+                    .httpCode(response.sdkHttpResponse().statusCode())
                     .build();
             CompletionResponse completionResponse = new CompletionResponse();
             completionResponse.setError(error);

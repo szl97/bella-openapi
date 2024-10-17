@@ -18,7 +18,7 @@ public class KeAdaptor extends OpenAIAdaptor {
         if(CollectionUtils.isEmpty(keResponse.getEmbed_res())) {
             int httpCode = keResponse.getCode() > 200 && keResponse.getCode() < 600 ? keResponse.getCode() : 500;
             response.setError(OpenapiResponse.OpenapiError.builder()
-                    .code(httpCode)
+                    .httpCode(httpCode)
                     .message(keResponse.getMsg())
                     .type(HttpStatus.valueOf(httpCode).getReasonPhrase())
                     .build());

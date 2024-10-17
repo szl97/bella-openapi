@@ -30,7 +30,7 @@ public class EmbeddingLogHandler implements EndpointLogHandler {
         } else {
             int inputToken = 0;
             OpenapiResponse.OpenapiError error = processData.getResponse().getError();
-            if(error == null || (error.getCode() > 399 && error.getCode() < 500 && error.getCode() != 408)) {
+            if(error == null || (error.getHttpCode() > 399 && error.getHttpCode() < 500 && error.getHttpCode() != 408)) {
                 inputToken = countTokenUsage(request, encodingType);
             }
             usage = new EmbeddingResponse.TokenUsage();

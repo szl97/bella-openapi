@@ -52,7 +52,11 @@ public class OpenapiResponse implements Serializable {
         /**
          * code通常存在
          */
-        private Integer code;
+        private String code;
+        /**
+         * code通常存在
+         */
+        private Integer httpCode = 400;
         /**
          * message通常存在
          */
@@ -66,17 +70,18 @@ public class OpenapiResponse implements Serializable {
          */
         private String param;
 
-        public OpenapiError(String type, String message, Integer code) {
+        public OpenapiError(String type, String message, Integer httpCode, Object sensitive) {
             this.message = message;
             this.type = type;
-            this.code = code;
+            this.code = httpCode.toString();
+            this.sensitive = sensitive;
         }
 
-        public OpenapiError(String type, String message, Integer code, Object sensitive) {
+        public OpenapiError(String type, String message, Integer httpCode) {
             this.message = message;
             this.type = type;
-            this.code = code;
-            this.sensitive = sensitive;
+            this.code = httpCode.toString();
+            this.httpCode = httpCode;
         }
     }
 

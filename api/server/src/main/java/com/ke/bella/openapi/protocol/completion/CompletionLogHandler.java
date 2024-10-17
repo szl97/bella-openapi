@@ -56,7 +56,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
 
     private CompletionResponse.TokenUsage countTokenUsage(CompletionRequest request, OpenapiResponse openapiResponse, String encodingType) {
         if(openapiResponse.getError() != null) {
-            int httpCode = openapiResponse.getError().getCode();
+            int httpCode = openapiResponse.getError().getHttpCode();
             if(httpCode > 399 && httpCode < 500 && httpCode != 408) {
                 CompletionResponse.TokenUsage tokenUsage = new CompletionResponse.TokenUsage();
                 tokenUsage.setPrompt_tokens(0);
