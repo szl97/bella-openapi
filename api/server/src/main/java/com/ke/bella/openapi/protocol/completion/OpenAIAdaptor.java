@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.alibaba.fastjson.JSON;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
@@ -43,7 +42,7 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
         request.setModel(property.getDeployName());
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JSON.toJSONString(request), MediaType.parse("application/json")));
+                .post(RequestBody.create(JacksonUtils.serialize(request), MediaType.parse("application/json")));
         return builder.build();
     }
 

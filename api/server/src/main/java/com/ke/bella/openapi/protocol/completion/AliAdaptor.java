@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
@@ -40,7 +39,7 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
         request.setModel(property.getDeployName());
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JSON.toJSONString(request),
+                .post(RequestBody.create(JacksonUtils.serialize(request),
                         MediaType.parse("application/json")));
         return builder.build();
     }

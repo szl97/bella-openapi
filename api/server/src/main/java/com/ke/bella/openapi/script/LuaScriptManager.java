@@ -1,11 +1,10 @@
 package com.ke.bella.openapi.script;
 
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -14,9 +13,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 @Component
 public class LuaScriptManager {
@@ -44,7 +43,8 @@ public class LuaScriptManager {
 
     private String doLoad(String fileName) throws IOException {
         Resource resource = resourceLoader.getResource(luaDir + fileName);
-        String scriptContent = FileUtils.readFileToString(resource.getFile(), StandardCharsets.UTF_8);
+        InputStream inputStream = resource.getInputStream();
+        String scriptContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         return redissonClient.getScript().scriptLoad(scriptContent);
     }
 
