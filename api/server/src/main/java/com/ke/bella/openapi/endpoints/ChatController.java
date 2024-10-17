@@ -17,6 +17,8 @@ import com.ke.bella.openapi.safety.SafetyCheckRequest;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.SseHelper;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +29,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @EndpointAPI
 @RestController
 @RequestMapping("/v1/chat")
+@Tag(name = "chat")
 public class ChatController {
     @Autowired
     private ChannelRouter router;
@@ -36,7 +39,6 @@ public class ChatController {
     private EndpointLogger logger;
     @Autowired
     private ISafetyCheckService<SafetyCheckRequest.Chat> safetyCheckService;
-
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping("/completions")
     public Object completion(@RequestBody CompletionRequest request) {

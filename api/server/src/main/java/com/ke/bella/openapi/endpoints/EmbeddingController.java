@@ -10,6 +10,8 @@ import com.ke.bella.openapi.protocol.embedding.EmbeddingProperty;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingRequest;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EndpointAPI
 @RestController
 @RequestMapping("/v1/embeddings")
+@Tag(name = "chat")
 public class EmbeddingController {
     @Autowired
     private ChannelRouter router;

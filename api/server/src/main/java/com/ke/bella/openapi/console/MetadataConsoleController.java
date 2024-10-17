@@ -10,6 +10,7 @@ import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,7 @@ import static com.ke.bella.openapi.console.MetadataValidator.checkReplaceEndpoin
 @BellaAPI
 @RestController
 @RequestMapping("/console")
+@Tag(name = "元数据管理")
 public class MetadataConsoleController {
     @Autowired
     private EndpointService endpointService;

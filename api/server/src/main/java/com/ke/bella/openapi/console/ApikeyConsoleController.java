@@ -7,6 +7,7 @@ import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
 @BellaAPI
 @RestController
 @RequestMapping("/console/apikey")
+@Tag(name = "API Key管理")
 public class ApikeyConsoleController {
     @Autowired
     private ApikeyService apikeyService;
