@@ -58,6 +58,6 @@ public class EmbeddingLogHandler implements EndpointLogHandler {
 
     @Override
     public String endpoint() {
-        return null;
+        return "/v1/embeddings";
     }
 }
