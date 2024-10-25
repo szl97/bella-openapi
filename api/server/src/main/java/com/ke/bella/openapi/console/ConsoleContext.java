@@ -15,6 +15,10 @@ public class ConsoleContext {
         return userInfo;
     }
 
+    public static Operator getOperatorIgnoreNull() {
+        return operatorLocal.get();
+    }
+
     public static void setOperator(Operator operator) {
         operatorLocal.set(operator);
     }

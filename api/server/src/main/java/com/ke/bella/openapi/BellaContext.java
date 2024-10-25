@@ -37,6 +37,10 @@ public class BellaContext {
         return akThreadLocal.get();
     }
 
+    public static ApikeyInfo getApikeyIgnoreNull() {
+        return akThreadLocal.get();
+    }
+
     public static void setApikey(ApikeyInfo ak) {
         akThreadLocal.set(ak);
         getProcessData().setAkCode(ak.getCode());

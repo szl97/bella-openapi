@@ -2,7 +2,6 @@ package com.ke.bella.openapi.configuration;
 
 import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
-
 import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
 import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;

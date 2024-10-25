@@ -26,13 +26,15 @@ public class BellaApiRequestAdvice extends RequestBodyAdviceAdapter {
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
-        if(body instanceof Operator) {
-            if(profile.equals("dev") || profile.equals("ut")) {
-                ConsoleContext.setOperator(ConsoleContext.SYS);
-                return body;
+        if(ConsoleContext.getOperatorIgnoreNull() == null) {
+            if(body instanceof Operator) {
+                if(profile.equals("dev") || profile.equals("ut")) {
+                    ConsoleContext.setOperator(ConsoleContext.SYS);
+                    return body;
+                }
+                Operator oper = (Operator) body;
+                ConsoleContext.setOperator(oper);
             }
-            Operator oper = (Operator) body;
-            ConsoleContext.setOperator(oper);
         }
         return body;
     }

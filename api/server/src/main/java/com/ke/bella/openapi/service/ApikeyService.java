@@ -8,10 +8,12 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.PermissionCondition;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.apikey.ApikeyOps;
+import com.ke.bella.openapi.console.ConsoleContext;
 import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
@@ -272,11 +274,17 @@ public class ApikeyService {
     }
 
     private void checkPermission(String code) {
-        ApikeyInfo apikeyInfo = BellaContext.getApikey();
+        ApikeyDB db = apikeyRepo.queryByUniqueKey(code);
+        ApikeyInfo apikeyInfo = BellaContext.getApikeyIgnoreNull();
+        if(apikeyInfo == null) {
+            Operator op = ConsoleContext.getOperator();
+            Assert.isTrue(db.getOwnerType().equals(PERSON) && db.getOwnerCode().equals(op.getUserId().toString()),
+                    "没有操作权限");
+            return;
+        }
         if(apikeyInfo.getOwnerType().equals(SYSTEM)) {
             return;
         }
-        ApikeyDB db = apikeyRepo.queryByUniqueKey(code);
         //todo: 获取所有 org
         Set<String> orgCodes = new HashSet<>();
         if(db.getOwnerType().equals(SYSTEM)) {
@@ -296,6 +304,18 @@ public class ApikeyService {
 
     public void fillPermissionCode(PermissionCondition condition) {
         ApikeyInfo apikeyInfo = BellaContext.getApikey();
+        if(apikeyInfo == null) {
+            Operator op = ConsoleContext.getOperator();
+            if (CollectionUtils.isNotEmpty(condition.getOrgCodes())) {
+                throw new ChannelException.AuthorizationException("没有操作权限");
+            }
+            if (StringUtils.isNotEmpty(condition.getPersonalCode())) {
+                Assert.isTrue(op.getUserId().toString().equals(condition.getPersonalCode()), "没有操作权限");
+            } else {
+                condition.setPersonalCode(op.getUserId().toString());
+            }
+            return;
+        }
         // TODO: 获取所有组织代码并填充到 orgCodes
         Set<String> orgCodes = new HashSet<>();
 

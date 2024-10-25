@@ -1,14 +1,11 @@
 package com.ke.bella.openapi;
 
 import com.google.common.collect.ImmutableList;
-import com.ke.bella.openapi.console.ConsoleContext;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,15 +50,6 @@ public class ConsoleApiTest {
     private MockMvc mockMvc;
 
     private String currentFile = null;
-
-    @BeforeAll
-    public static void beforeAll(){
-        ConsoleContext.setOperator(ConsoleContext.SYS);
-    }
-    @AfterAll
-    public static void afterAll(){
-        ConsoleContext.clearAll();
-    }
 
     @Test
     void testApi() throws Exception {
