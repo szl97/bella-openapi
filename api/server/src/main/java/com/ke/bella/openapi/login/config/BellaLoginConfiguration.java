@@ -6,6 +6,7 @@ import com.ke.bella.openapi.login.cas.BellaCasClient;
 import com.ke.bella.openapi.login.cas.BellaRedirectFilter;
 import com.ke.bella.openapi.login.cas.BellaValidatorFilter;
 import com.ke.bella.openapi.login.cas.CasProperties;
+import com.ke.bella.openapi.login.cors.CORSFilter;
 import com.ke.bella.openapi.login.session.SessionManager;
 import com.ke.bella.openapi.login.session.SessionProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,14 @@ public class BellaLoginConfiguration {
 
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
+
+    @Bean
+    public FilterRegistrationBean<CORSFilter> corsFilterFilter() {
+        FilterRegistrationBean<CORSFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new CORSFilter());
+        filterRegistrationBean.setOrder(CORSFilter.ORDER);
+        return filterRegistrationBean;
+    }
 
     private RedisTemplate<String, Operator> redisTemplate() {
         RedisTemplate<String, Operator> redisTemplate = new RedisTemplate<>();

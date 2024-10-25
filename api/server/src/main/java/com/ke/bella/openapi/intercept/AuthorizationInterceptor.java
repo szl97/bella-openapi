@@ -43,7 +43,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 BellaContext.setApikey(apikeyInfo);
                 roles.add("/console/**");
             }
-            if(roles != null && roles.stream().noneMatch(role -> MatchUtils.matchUrl(role, url))) {
+            if(roles != null && roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))) {
                 return true;
             }
         }

@@ -68,7 +68,7 @@ public class BellaAuthenticationFilter implements Filter {
             loginBuilder.append(encodedService);
             if(clientSupport) {
                 httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-                httpResponse.setHeader("Location", loginBuilder.toString());
+                httpResponse.setHeader("X-Redirect-Login", loginBuilder.toString());
             } else {
                 httpResponse.sendRedirect(loginBuilder.toString());
             }
