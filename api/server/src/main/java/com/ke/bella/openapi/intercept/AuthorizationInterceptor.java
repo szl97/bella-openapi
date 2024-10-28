@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
+import com.google.common.collect.Lists;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
@@ -36,14 +37,14 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         String url = request.getRequestURI();
         Operator op = ConsoleContext.getOperatorIgnoreNull();
         if(op != null) {
-            List<String> roles = properties.getLoginRoles();
+            List<String> roles = Lists.newArrayList(properties.getLoginRoles());
             if(properties.getManagers().containsKey(op.getUserId())) {
                 String akCode = properties.getManagers().get(op.getUserId());
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
                 BellaContext.setApikey(apikeyInfo);
                 roles.add("/console/**");
             }
-            if(roles != null && roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))) {
+            if(roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))) {
                 return true;
             }
         }
