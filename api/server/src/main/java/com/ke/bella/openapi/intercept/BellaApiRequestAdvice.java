@@ -2,7 +2,7 @@ package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.annotations.BellaAPI;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;

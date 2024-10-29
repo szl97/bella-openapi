@@ -5,7 +5,7 @@ import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;

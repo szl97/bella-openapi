@@ -6,6 +6,7 @@
   <modules>
     <module>server</module>
     <module>sdk</module>
+    <module>auth</module>
   </modules>
   <parent>
     <groupId>com.lianjia.infrastructure</groupId>

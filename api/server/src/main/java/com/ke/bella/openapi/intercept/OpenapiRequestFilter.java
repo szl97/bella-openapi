@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

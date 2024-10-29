@@ -1,11 +1,10 @@
 package com.ke.bella.openapi.login.cas;
 
 import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.login.session.SessionManager;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -49,7 +48,7 @@ public class BellaAuthenticationFilter implements Filter {
             sessionManager.destroySession(httpRequest);
             return;
         }
-        String auth = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        String auth = httpRequest.getHeader("Authorization");
         if(StringUtils.isNotBlank(auth)) {
             chain.doFilter(request, response);
             return;
@@ -67,7 +66,7 @@ public class BellaAuthenticationFilter implements Filter {
             String encodedService = URLEncoder.encode(serviceBuilder.toString(), StandardCharsets.UTF_8.toString());
             loginBuilder.append(encodedService);
             if(clientSupport) {
-                httpResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+                httpResponse.setStatus(401);
                 httpResponse.setHeader("X-Redirect-Login", loginBuilder.toString());
             } else {
                 httpResponse.sendRedirect(loginBuilder.toString());

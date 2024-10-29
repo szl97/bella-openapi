@@ -7,7 +7,7 @@ import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.console.ConsoleContext;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
