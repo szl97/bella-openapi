@@ -55,6 +55,7 @@ public class BellaCasClient {
                 casProperties.getLogoutUri(), sessionManager);
         filterRegistrationBean.setOrder(CAS_STEP_THREE);
         filterRegistrationBean.setFilter(filter);
+        filterRegistrationBean.setUrlPatterns(casProperties.getValidationUrlPatterns());
         return filterRegistrationBean;
     }
 }

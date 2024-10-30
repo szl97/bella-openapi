@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @BellaAPI
 @RestController
-@RequestMapping("/v1/userInfo")
+@RequestMapping("/console/userInfo")
 @Tag(name = "信息查询")
 public class UserInfoController {
     @GetMapping
