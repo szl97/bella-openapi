@@ -22,16 +22,18 @@ public class BellaAuthenticationFilter implements Filter {
     private final String clientHost;
     private final String serviceUri;
     private final boolean clientSupport;
+    private final String authorizationHeader;
     private final String clientIndex;
     private final String logoutUri;
     private final SessionManager sessionManager;
 
-    public BellaAuthenticationFilter(String loginUrl, String clientHost, String serviceUri, boolean clientSupport, String clientIndex,
-            String logoutUri, SessionManager sessionManager) {
+    public BellaAuthenticationFilter(String loginUrl, String clientHost, String serviceUri, boolean clientSupport,
+            String authorizationHeader, String clientIndex, String logoutUri, SessionManager sessionManager) {
         this.loginUrl = loginUrl;
         this.clientHost = clientHost;
         this.serviceUri = serviceUri;
         this.clientSupport = clientSupport;
+        this.authorizationHeader = authorizationHeader;
         this.clientIndex = clientIndex;
         this.logoutUri = logoutUri;
         this.sessionManager = sessionManager;
@@ -48,10 +50,12 @@ public class BellaAuthenticationFilter implements Filter {
             sessionManager.destroySession(httpRequest);
             return;
         }
-        String auth = httpRequest.getHeader("Authorization");
-        if(StringUtils.isNotBlank(auth)) {
-            chain.doFilter(request, response);
-            return;
+        if(StringUtils.isNotBlank(authorizationHeader)) {
+            String auth = httpRequest.getHeader(authorizationHeader);
+            if(StringUtils.isNotBlank(auth)) {
+                chain.doFilter(request, response);
+                return;
+            }
         }
         Operator operator = sessionManager.getSession(httpRequest);
         if(operator == null) {

@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.login.cas;
 
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,12 @@ public class CasProperties {
     private String serverUrlPrefix;
     private String serverLoginUrl;
     private String clientHost;
-    private String clientUri;
+    private String clientUri = "/console/cas";
     private String clientIndexUrl;
-    private String logoutUri;
-    private List<String> validationUrlPatterns;
+    private String logoutUri = "/console/logout";
+    private List<String> validationUrlPatterns = Lists.newArrayList("/console/*");
     private boolean clientSupport;
+    private String authorizationHeader;
     private String idAttribute = "ucid";
     private String nameAttribute = "displayName";
 }
