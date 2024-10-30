@@ -1,16 +1,16 @@
 package com.ke.bella.openapi.login.cas;
 
-import com.ke.bella.openapi.login.cors.CORSFilter;
 import com.ke.bella.openapi.login.session.SessionManager;
 import org.jasig.cas.client.configuration.ConfigurationKeys;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.core.Ordered;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class BellaCasClient {
     public static final String redirectParameter = "redirect";
-    private static final int CAS_STEP_ONE = CORSFilter.ORDER + 1;
+    private static final int CAS_STEP_ONE = Ordered.HIGHEST_PRECEDENCE + 51;
     private static final int CAS_STEP_TWO = CAS_STEP_ONE + 1;
     private static final int CAS_STEP_THREE = CAS_STEP_TWO + 1;
 
