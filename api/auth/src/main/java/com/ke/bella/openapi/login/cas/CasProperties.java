@@ -22,5 +22,7 @@ public class CasProperties {
     private String authorizationHeader;
     private String idAttribute = "ucid";
     private String nameAttribute = "displayName";
+    private String emailAttribute = "email";
+    private List<String> optionalAttributes = Lists.newArrayList();
 }
 
