@@ -37,9 +37,10 @@ public class EmbeddingController {
         EndpointProcessData processData = BellaContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
-        String channelInfo = processData.getChannelInfo();
+        String channelInfo = channel.getChannelInfo();
         EmbeddingAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, EmbeddingAdaptor.class);
         EmbeddingProperty property = (EmbeddingProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
+        BellaContext.setEncodingType(property.getEncodingType());
         return adaptor.embedding(request, url, property);
     }
 }

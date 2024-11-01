@@ -6,7 +6,6 @@ import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogHandler;
 import com.ke.bella.openapi.utils.DateTimeUtils;
-import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.TokenCounter;
 import com.knuddels.jtokkit.api.EncodingType;
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,7 +31,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
         long created = response == null ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
         long firstPackageTime = processData.getFirstPackageTime();
         CompletionRequest request = (CompletionRequest) processData.getRequest();
-        String encodingType = JacksonUtils.deserialize(processData.getChannelInfo(), CompletionProperty.class).getEncodingType();
+        String encodingType = processData.getEncodingType();
         CompletionResponse.TokenUsage usage = countTokenUsage(request, processData.getResponse(), encodingType);
         processData.setUsage(usage);
         processData.setMetrics(countMetrics(startTime, created, firstPackageTime, usage));

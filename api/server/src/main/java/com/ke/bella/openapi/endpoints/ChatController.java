@@ -52,9 +52,10 @@ public class ChatController {
         EndpointProcessData processData = BellaContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
-        String channelInfo = processData.getChannelInfo();
+        String channelInfo = channel.getChannelInfo();
         CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, CompletionAdaptor.class);
         CompletionProperty property = (CompletionProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
+        BellaContext.setEncodingType(property.getEncodingType());
         if(request.isStream()) {
             SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, BellaContext.getProcessData().getRequestId());
             adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, BellaContext.getApikey(), logger, safetyCheckService));

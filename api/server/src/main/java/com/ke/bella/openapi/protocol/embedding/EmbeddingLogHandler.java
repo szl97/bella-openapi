@@ -2,10 +2,8 @@ package com.ke.bella.openapi.protocol.embedding;
 
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
-import com.ke.bella.openapi.protocol.completion.CompletionProperty;
 import com.ke.bella.openapi.protocol.log.EndpointLogHandler;
 import com.ke.bella.openapi.utils.DateTimeUtils;
-import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.TokenCounter;
 import com.knuddels.jtokkit.api.EncodingType;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,7 @@ public class EmbeddingLogHandler implements EndpointLogHandler {
     @Override
     public void process(EndpointProcessData processData) {
         EmbeddingRequest request = (EmbeddingRequest) processData.getRequest();
-        String encodingType = JacksonUtils.deserialize(processData.getChannelInfo(), CompletionProperty.class).getEncodingType();
+        String encodingType = processData.getEncodingType();
         EmbeddingResponse response = null;
         if(processData.getResponse() instanceof EmbeddingResponse) {
             response = (EmbeddingResponse) processData.getResponse();

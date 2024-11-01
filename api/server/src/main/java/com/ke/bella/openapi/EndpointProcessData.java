@@ -32,7 +32,7 @@ public class EndpointProcessData {
     private String forwardUrl;
     private String protocol;
     private String priceInfo;
-    private String channelInfo;
+    private String encodingType;
     private String supplier;
     private Object requestRiskData;
 }

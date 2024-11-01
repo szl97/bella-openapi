@@ -49,11 +49,13 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             }
         }
         String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(StringUtils.isEmpty(auth) || !auth.startsWith("Bearer ")) {
+        if(StringUtils.isEmpty(auth)) {
             throw new ChannelException.AuthorizationException("Invalid Authorization");
         }
-        String ak = auth.substring(7);
-        ApikeyInfo apikeyInfo = apikeyService.verify(ak);
+        if(auth.startsWith("Bearer ")) {
+            auth = auth.substring(7);
+        }
+        ApikeyInfo apikeyInfo = apikeyService.verify(auth);
         boolean match = apikeyInfo.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
                 && apikeyInfo.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
         if(!match) {

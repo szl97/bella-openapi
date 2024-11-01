@@ -56,8 +56,11 @@ public class BellaContext {
         BellaContext.getProcessData().setForwardUrl(channel.getUrl());
         BellaContext.getProcessData().setProtocol(channel.getProtocol());
         BellaContext.getProcessData().setPriceInfo(channel.getPriceInfo());
-        BellaContext.getProcessData().setChannelInfo(channel.getChannelInfo());
         BellaContext.getProcessData().setSupplier(channel.getSupplier());
+    }
+
+    public static void setEncodingType(String encodingType) {
+        getProcessData().setEncodingType(encodingType);
     }
 
     public static void setEndpointData(String endpoint, ChannelDB channel, Object request) {
