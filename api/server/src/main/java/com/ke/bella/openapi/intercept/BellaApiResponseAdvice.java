@@ -2,6 +2,7 @@ package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaResponse;
 import com.ke.bella.openapi.annotations.BellaAPI;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +65,8 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
         String msg = e.getLocalizedMessage();
         if(e instanceof IllegalArgumentException
                 || e instanceof ServletException
-                || e instanceof MethodArgumentNotValidException) {
+                || e instanceof MethodArgumentNotValidException
+		        || e instanceof BizParamCheckException) {
             code = 400;
         }
         if(e instanceof ChannelException.AuthorizationException) {
@@ -80,7 +82,14 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
         BellaResponse<?> er = new BellaResponse<>();
         er.setCode(code);
         er.setTimestamp(System.currentTimeMillis());
-        er.setMessage(msg);
+
+		//一些特殊异常类型返回给调用方的错误信息提示需要按照指定的规则给值
+		if (e instanceof MethodArgumentNotValidException) {
+			er.setMessage(((MethodArgumentNotValidException) e).getBindingResult().getFieldError().getDefaultMessage());
+		}else {
+			er.setMessage(msg);
+		}
+
         if(code == 500) {
             er.setStacktrace(stacktrace(e));
         }

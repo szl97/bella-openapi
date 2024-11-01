@@ -14,9 +14,9 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
-import com.ke.bella.openapi.tables.Team;
-import com.ke.bella.openapi.tables.TeamMember;
-import com.ke.bella.openapi.tables.TeamRole;
+import com.ke.bella.openapi.tables.Space;
+import com.ke.bella.openapi.tables.SpaceMember;
+import com.ke.bella.openapi.tables.SpaceRole;
 import com.ke.bella.openapi.tables.records.ApikeyMonthCostRecord;
 import com.ke.bella.openapi.tables.records.ApikeyRecord;
 import com.ke.bella.openapi.tables.records.ApikeyRoleRecord;
@@ -27,9 +27,9 @@ import com.ke.bella.openapi.tables.records.EndpointRecord;
 import com.ke.bella.openapi.tables.records.ModelAuthorizerRelRecord;
 import com.ke.bella.openapi.tables.records.ModelEndpointRelRecord;
 import com.ke.bella.openapi.tables.records.ModelRecord;
-import com.ke.bella.openapi.tables.records.TeamMemberRecord;
-import com.ke.bella.openapi.tables.records.TeamRecord;
-import com.ke.bella.openapi.tables.records.TeamRoleRecord;
+import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
+import com.ke.bella.openapi.tables.records.SpaceRecord;
+import com.ke.bella.openapi.tables.records.SpaceRoleRecord;
 
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -38,7 +38,7 @@ import org.jooq.impl.Internal;
 
 
 /**
- * A class modelling foreign key relationships and constraints of tables in 
+ * A class modelling foreign key relationships and constraints of tables in
  * the default schema.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
@@ -71,10 +71,9 @@ public class Keys {
     public static final UniqueKey<ModelAuthorizerRelRecord> KEY_MODEL_AUTHORIZER_REL_UNIQ_IDX_UNI_MODEL_NAME_AUTHORIZER_CODE = Internal.createUniqueKey(ModelAuthorizerRel.MODEL_AUTHORIZER_REL, DSL.name("KEY_model_authorizer_rel_uniq_idx_uni_model_name_authorizer_code"), new TableField[] { ModelAuthorizerRel.MODEL_AUTHORIZER_REL.MODEL_NAME, ModelAuthorizerRel.MODEL_AUTHORIZER_REL.AUTHORIZER_CODE }, true);
     public static final UniqueKey<ModelEndpointRelRecord> KEY_MODEL_ENDPOINT_REL_PRIMARY = Internal.createUniqueKey(ModelEndpointRel.MODEL_ENDPOINT_REL, DSL.name("KEY_model_endpoint_rel_PRIMARY"), new TableField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.ID }, true);
     public static final UniqueKey<ModelEndpointRelRecord> KEY_MODEL_ENDPOINT_REL_UNIQ_IDX_UNI_ENDPOINT_MODEL = Internal.createUniqueKey(ModelEndpointRel.MODEL_ENDPOINT_REL, DSL.name("KEY_model_endpoint_rel_uniq_idx_uni_endpoint_model"), new TableField[] { ModelEndpointRel.MODEL_ENDPOINT_REL.ENDPOINT, ModelEndpointRel.MODEL_ENDPOINT_REL.MODEL_NAME }, true);
-    public static final UniqueKey<TeamRecord> KEY_TEAM_PRIMARY = Internal.createUniqueKey(Team.TEAM, DSL.name("KEY_team_PRIMARY"), new TableField[] { Team.TEAM.ID }, true);
-    public static final UniqueKey<TeamRecord> KEY_TEAM_UNIQ_IDX_TEAM_CODE = Internal.createUniqueKey(Team.TEAM, DSL.name("KEY_team_uniq_idx_team_code"), new TableField[] { Team.TEAM.TEAM_CODE }, true);
-    public static final UniqueKey<TeamMemberRecord> KEY_TEAM_MEMBER_PRIMARY = Internal.createUniqueKey(TeamMember.TEAM_MEMBER, DSL.name("KEY_team_member_PRIMARY"), new TableField[] { TeamMember.TEAM_MEMBER.ID }, true);
-    public static final UniqueKey<TeamMemberRecord> KEY_TEAM_MEMBER_UNIQ_IDX_TEAM_MEMBER_UID = Internal.createUniqueKey(TeamMember.TEAM_MEMBER, DSL.name("KEY_team_member_uniq_idx_team_member_uid"), new TableField[] { TeamMember.TEAM_MEMBER.TEAM_CODE, TeamMember.TEAM_MEMBER.MEMBER_UID }, true);
-    public static final UniqueKey<TeamRoleRecord> KEY_TEAM_ROLE_PRIMARY = Internal.createUniqueKey(TeamRole.TEAM_ROLE, DSL.name("KEY_team_role_PRIMARY"), new TableField[] { TeamRole.TEAM_ROLE.ID }, true);
-    public static final UniqueKey<TeamRoleRecord> KEY_TEAM_ROLE_UNIQ_IDX_TEAM_ROLE_CODE = Internal.createUniqueKey(TeamRole.TEAM_ROLE, DSL.name("KEY_team_role_uniq_idx_team_role_code"), new TableField[] { TeamRole.TEAM_ROLE.TEAM_CODE, TeamRole.TEAM_ROLE.ROLE_CODE }, true);
+    public static final UniqueKey<SpaceRecord> KEY_SPACE_PRIMARY = Internal.createUniqueKey(Space.SPACE, DSL.name("KEY_space_PRIMARY"), new TableField[] { Space.SPACE.ID }, true);
+    public static final UniqueKey<SpaceRecord> KEY_SPACE_UNIQ_IDX_SPACE_CODE = Internal.createUniqueKey(Space.SPACE, DSL.name("KEY_space_uniq_idx_space_code"), new TableField[] { Space.SPACE.SPACE_CODE }, true);
+    public static final UniqueKey<SpaceMemberRecord> KEY_SPACE_MEMBER_PRIMARY = Internal.createUniqueKey(SpaceMember.SPACE_MEMBER, DSL.name("KEY_space_member_PRIMARY"), new TableField[] { SpaceMember.SPACE_MEMBER.ID }, true);
+    public static final UniqueKey<SpaceRoleRecord> KEY_SPACE_ROLE_PRIMARY = Internal.createUniqueKey(SpaceRole.SPACE_ROLE, DSL.name("KEY_space_role_PRIMARY"), new TableField[] { SpaceRole.SPACE_ROLE.ID }, true);
+    public static final UniqueKey<SpaceRoleRecord> KEY_SPACE_ROLE_UNIQ_IDX_SPACE_ROLE_CODE = Internal.createUniqueKey(SpaceRole.SPACE_ROLE, DSL.name("KEY_space_role_uniq_idx_space_role_code"), new TableField[] { SpaceRole.SPACE_ROLE.SPACE_CODE, SpaceRole.SPACE_ROLE.ROLE_CODE }, true);
 }

@@ -14,9 +14,10 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
-import com.ke.bella.openapi.tables.Team;
-import com.ke.bella.openapi.tables.TeamMember;
-import com.ke.bella.openapi.tables.TeamRole;
+import com.ke.bella.openapi.tables.Space;
+import com.ke.bella.openapi.tables.SpaceMember;
+import com.ke.bella.openapi.tables.SpaceRole;
+
 
 /**
  * Convenience access to all tables in the default schema.
@@ -75,17 +76,17 @@ public class Tables {
     public static final ModelEndpointRel MODEL_ENDPOINT_REL = ModelEndpointRel.MODEL_ENDPOINT_REL;
 
     /**
-     * 团队表
+     * 空间表
      */
-    public static final Team TEAM = Team.TEAM;
+    public static final Space SPACE = Space.SPACE;
 
     /**
      * 团队成员信息表
      */
-    public static final TeamMember TEAM_MEMBER = TeamMember.TEAM_MEMBER;
+    public static final SpaceMember SPACE_MEMBER = SpaceMember.SPACE_MEMBER;
 
     /**
-     * 团队角色
+     * 空间角色
      */
-    public static final TeamRole TEAM_ROLE = TeamRole.TEAM_ROLE;
+    public static final SpaceRole SPACE_ROLE = SpaceRole.SPACE_ROLE;
 }

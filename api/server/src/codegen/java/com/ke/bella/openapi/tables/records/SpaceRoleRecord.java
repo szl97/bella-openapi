@@ -3,207 +3,178 @@
  */
 package com.ke.bella.openapi.tables.records;
 
-
-import com.ke.bella.openapi.db.repo.Operator;
-import com.ke.bella.openapi.tables.TeamRole;
+import com.ke.bella.openapi.db.repo.Timed;
+import com.ke.bella.openapi.tables.SpaceRole;
 
 import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record13;
-import org.jooq.Row13;
+import org.jooq.Record11;
+import org.jooq.Row11;
 import org.jooq.impl.UpdatableRecordImpl;
 
-
 /**
- * 团队角色
+ * 空间角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implements Operator, Record13<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, String, String> {
+public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord>
+        implements Timed, Record11<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long> {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * Setter for <code>team_role.id</code>. 主键
+     * Setter for <code>space_role.id</code>. 主键
      */
     public void setId(Long value) {
         set(0, value);
     }
 
     /**
-     * Getter for <code>team_role.id</code>. 主键
+     * Getter for <code>space_role.id</code>. 主键
      */
     public Long getId() {
         return (Long) get(0);
     }
 
     /**
-     * Setter for <code>team_role.team_code</code>. 团队编码
+     * Setter for <code>space_role.space_code</code>. 团队编码
      */
-    public void setTeamCode(String value) {
+    public void setSpaceCode(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>team_role.team_code</code>. 团队编码
+     * Getter for <code>space_role.space_code</code>. 团队编码
      */
-    public String getTeamCode() {
+    public String getSpaceCode() {
         return (String) get(1);
     }
 
     /**
-     * Setter for <code>team_role.role_code</code>. 角色编码
+     * Setter for <code>space_role.role_code</code>. 角色编码
      */
     public void setRoleCode(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>team_role.role_code</code>. 角色编码
+     * Getter for <code>space_role.role_code</code>. 角色编码
      */
     public String getRoleCode() {
         return (String) get(2);
     }
 
     /**
-     * Setter for <code>team_role.role_name</code>. 角色名称
+     * Setter for <code>space_role.role_name</code>. 角色名称
      */
     public void setRoleName(String value) {
         set(3, value);
     }
 
     /**
-     * Getter for <code>team_role.role_name</code>. 角色名称
+     * Getter for <code>space_role.role_name</code>. 角色名称
      */
     public String getRoleName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>team_role.role_desc</code>. 角色描述
+     * Setter for <code>space_role.role_desc</code>. 角色描述
      */
     public void setRoleDesc(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>team_role.role_desc</code>. 角色描述
+     * Getter for <code>space_role.role_desc</code>. 角色描述
      */
     public String getRoleDesc() {
         return (String) get(4);
     }
 
     /**
-     * Setter for <code>team_role.role_type</code>. 角色类型(1系统内置，2自定义)
+     * Setter for <code>space_role.role_type</code>. 角色类型(1系统内置，2自定义)
      */
     public void setRoleType(Byte value) {
         set(5, value);
     }
 
     /**
-     * Getter for <code>team_role.role_type</code>. 角色类型(1系统内置，2自定义)
+     * Getter for <code>space_role.role_type</code>. 角色类型(1系统内置，2自定义)
      */
     public Byte getRoleType() {
         return (Byte) get(5);
     }
 
     /**
-     * Setter for <code>team_role.status</code>. 删除状态(0未删除，-1已删除)
+     * Setter for <code>space_role.status</code>. 删除状态(0未删除，-1已删除)
      */
     public void setStatus(Byte value) {
         set(6, value);
     }
 
     /**
-     * Getter for <code>team_role.status</code>. 删除状态(0未删除，-1已删除)
+     * Getter for <code>space_role.status</code>. 删除状态(0未删除，-1已删除)
      */
     public Byte getStatus() {
         return (Byte) get(6);
     }
 
     /**
-     * Setter for <code>team_role.ctime</code>. 创建时间
+     * Setter for <code>space_role.ctime</code>. 创建时间
      */
     public void setCtime(LocalDateTime value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>team_role.ctime</code>. 创建时间
+     * Getter for <code>space_role.ctime</code>. 创建时间
      */
     public LocalDateTime getCtime() {
         return (LocalDateTime) get(7);
     }
 
     /**
-     * Setter for <code>team_role.mtime</code>. 最后一次更新时间
+     * Setter for <code>space_role.mtime</code>. 最后一次更新时间
      */
     public void setMtime(LocalDateTime value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>team_role.mtime</code>. 最后一次更新时间
+     * Getter for <code>space_role.mtime</code>. 最后一次更新时间
      */
     public LocalDateTime getMtime() {
         return (LocalDateTime) get(8);
     }
 
     /**
-     * Setter for <code>team_role.cuid</code>. 创建人系统号
+     * Setter for <code>space_role.cuid</code>. 创建人系统号
      */
     public void setCuid(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>team_role.cuid</code>. 创建人系统号
+     * Getter for <code>space_role.cuid</code>. 创建人系统号
      */
     public Long getCuid() {
         return (Long) get(9);
     }
 
     /**
-     * Setter for <code>team_role.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_role.muid</code>. 最后一次更新人系统号
      */
     public void setMuid(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>team_role.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_role.muid</code>. 最后一次更新人系统号
      */
     public Long getMuid() {
         return (Long) get(10);
-    }
-
-    /**
-     * Setter for <code>team_role.cu_name</code>. 团队创建人姓名
-     */
-    public void setCuName(String value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>team_role.cu_name</code>. 团队创建人姓名
-     */
-    public String getCuName() {
-        return (String) get(11);
-    }
-
-    /**
-     * Setter for <code>team_role.mu_name</code>. 团队最后一次更新人姓名
-     */
-    public void setMuName(String value) {
-        set(12, value);
-    }
-
-    /**
-     * Getter for <code>team_role.mu_name</code>. 团队最后一次更新人姓名
-     */
-    public String getMuName() {
-        return (String) get(12);
     }
 
     // -------------------------------------------------------------------------
@@ -216,82 +187,72 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
     }
 
     // -------------------------------------------------------------------------
-    // Record13 type implementation
+    // Record11 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, String, String> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row11<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long> fieldsRow() {
+        return (Row11) super.fieldsRow();
     }
 
     @Override
-    public Row13<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long, String, String> valuesRow() {
-        return (Row13) super.valuesRow();
+    public Row11<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long> valuesRow() {
+        return (Row11) super.valuesRow();
     }
 
     @Override
     public Field<Long> field1() {
-        return TeamRole.TEAM_ROLE.ID;
+        return SpaceRole.SPACE_ROLE.ID;
     }
 
     @Override
     public Field<String> field2() {
-        return TeamRole.TEAM_ROLE.TEAM_CODE;
+        return SpaceRole.SPACE_ROLE.SPACE_CODE;
     }
 
     @Override
     public Field<String> field3() {
-        return TeamRole.TEAM_ROLE.ROLE_CODE;
+        return SpaceRole.SPACE_ROLE.ROLE_CODE;
     }
 
     @Override
     public Field<String> field4() {
-        return TeamRole.TEAM_ROLE.ROLE_NAME;
+        return SpaceRole.SPACE_ROLE.ROLE_NAME;
     }
 
     @Override
     public Field<String> field5() {
-        return TeamRole.TEAM_ROLE.ROLE_DESC;
+        return SpaceRole.SPACE_ROLE.ROLE_DESC;
     }
 
     @Override
     public Field<Byte> field6() {
-        return TeamRole.TEAM_ROLE.ROLE_TYPE;
+        return SpaceRole.SPACE_ROLE.ROLE_TYPE;
     }
 
     @Override
     public Field<Byte> field7() {
-        return TeamRole.TEAM_ROLE.STATUS;
+        return SpaceRole.SPACE_ROLE.STATUS;
     }
 
     @Override
     public Field<LocalDateTime> field8() {
-        return TeamRole.TEAM_ROLE.CTIME;
+        return SpaceRole.SPACE_ROLE.CTIME;
     }
 
     @Override
     public Field<LocalDateTime> field9() {
-        return TeamRole.TEAM_ROLE.MTIME;
+        return SpaceRole.SPACE_ROLE.MTIME;
     }
 
     @Override
     public Field<Long> field10() {
-        return TeamRole.TEAM_ROLE.CUID;
+        return SpaceRole.SPACE_ROLE.CUID;
     }
 
     @Override
     public Field<Long> field11() {
-        return TeamRole.TEAM_ROLE.MUID;
-    }
-
-    @Override
-    public Field<String> field12() {
-        return TeamRole.TEAM_ROLE.CU_NAME;
-    }
-
-    @Override
-    public Field<String> field13() {
-        return TeamRole.TEAM_ROLE.MU_NAME;
+        return SpaceRole.SPACE_ROLE.MUID;
     }
 
     @Override
@@ -301,7 +262,7 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
 
     @Override
     public String component2() {
-        return getTeamCode();
+        return getSpaceCode();
     }
 
     @Override
@@ -350,23 +311,13 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
     }
 
     @Override
-    public String component12() {
-        return getCuName();
-    }
-
-    @Override
-    public String component13() {
-        return getMuName();
-    }
-
-    @Override
     public Long value1() {
         return getId();
     }
 
     @Override
     public String value2() {
-        return getTeamCode();
+        return getSpaceCode();
     }
 
     @Override
@@ -415,95 +366,74 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
     }
 
     @Override
-    public String value12() {
-        return getCuName();
-    }
-
-    @Override
-    public String value13() {
-        return getMuName();
-    }
-
-    @Override
-    public TeamRoleRecord value1(Long value) {
+    public SpaceRoleRecord value1(Long value) {
         setId(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value2(String value) {
-        setTeamCode(value);
+    public SpaceRoleRecord value2(String value) {
+        setSpaceCode(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value3(String value) {
+    public SpaceRoleRecord value3(String value) {
         setRoleCode(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value4(String value) {
+    public SpaceRoleRecord value4(String value) {
         setRoleName(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value5(String value) {
+    public SpaceRoleRecord value5(String value) {
         setRoleDesc(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value6(Byte value) {
+    public SpaceRoleRecord value6(Byte value) {
         setRoleType(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value7(Byte value) {
+    public SpaceRoleRecord value7(Byte value) {
         setStatus(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value8(LocalDateTime value) {
+    public SpaceRoleRecord value8(LocalDateTime value) {
         setCtime(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value9(LocalDateTime value) {
+    public SpaceRoleRecord value9(LocalDateTime value) {
         setMtime(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value10(Long value) {
+    public SpaceRoleRecord value10(Long value) {
         setCuid(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value11(Long value) {
+    public SpaceRoleRecord value11(Long value) {
         setMuid(value);
         return this;
     }
 
     @Override
-    public TeamRoleRecord value12(String value) {
-        setCuName(value);
-        return this;
-    }
-
-    @Override
-    public TeamRoleRecord value13(String value) {
-        setMuName(value);
-        return this;
-    }
-
-    @Override
-    public TeamRoleRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, Byte value7, LocalDateTime value8, LocalDateTime value9, Long value10, Long value11, String value12, String value13) {
+    public SpaceRoleRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, Byte value7,
+            LocalDateTime value8, LocalDateTime value9, Long value10, Long value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -515,8 +445,6 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
         value9(value9);
         value10(value10);
         value11(value11);
-        value12(value12);
-        value13(value13);
         return this;
     }
 
@@ -525,20 +453,21 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
     // -------------------------------------------------------------------------
 
     /**
-     * Create a detached TeamRoleRecord
+     * Create a detached SpaceRoleRecord
      */
-    public TeamRoleRecord() {
-        super(TeamRole.TEAM_ROLE);
+    public SpaceRoleRecord() {
+        super(SpaceRole.SPACE_ROLE);
     }
 
     /**
-     * Create a detached, initialised TeamRoleRecord
+     * Create a detached, initialised SpaceRoleRecord
      */
-    public TeamRoleRecord(Long id, String teamCode, String roleCode, String roleName, String roleDesc, Byte roleType, Byte status, LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid, String cuName, String muName) {
-        super(TeamRole.TEAM_ROLE);
+    public SpaceRoleRecord(Long id, String spaceCode, String roleCode, String roleName, String roleDesc, Byte roleType, Byte status,
+            LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid) {
+        super(SpaceRole.SPACE_ROLE);
 
         setId(id);
-        setTeamCode(teamCode);
+        setSpaceCode(spaceCode);
         setRoleCode(roleCode);
         setRoleName(roleName);
         setRoleDesc(roleDesc);
@@ -548,7 +477,5 @@ public class TeamRoleRecord extends UpdatableRecordImpl<TeamRoleRecord> implemen
         setMtime(mtime);
         setCuid(cuid);
         setMuid(muid);
-        setCuName(cuName);
-        setMuName(muName);
     }
 }

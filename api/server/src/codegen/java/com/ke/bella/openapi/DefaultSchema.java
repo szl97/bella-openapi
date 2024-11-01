@@ -14,9 +14,9 @@ import com.ke.bella.openapi.tables.EndpointCategoryRel;
 import com.ke.bella.openapi.tables.Model;
 import com.ke.bella.openapi.tables.ModelAuthorizerRel;
 import com.ke.bella.openapi.tables.ModelEndpointRel;
-import com.ke.bella.openapi.tables.Team;
-import com.ke.bella.openapi.tables.TeamMember;
-import com.ke.bella.openapi.tables.TeamRole;
+import com.ke.bella.openapi.tables.Space;
+import com.ke.bella.openapi.tables.SpaceMember;
+import com.ke.bella.openapi.tables.SpaceRole;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,19 +90,19 @@ public class DefaultSchema extends SchemaImpl {
     public final ModelEndpointRel MODEL_ENDPOINT_REL = ModelEndpointRel.MODEL_ENDPOINT_REL;
 
     /**
-     * 团队表
+     * 空间表
      */
-    public final Team TEAM = Team.TEAM;
+    public final Space SPACE = Space.SPACE;
 
     /**
      * 团队成员信息表
      */
-    public final TeamMember TEAM_MEMBER = TeamMember.TEAM_MEMBER;
+    public final SpaceMember SPACE_MEMBER = SpaceMember.SPACE_MEMBER;
 
     /**
-     * 团队角色
+     * 空间角色
      */
-    public final TeamRole TEAM_ROLE = TeamRole.TEAM_ROLE;
+    public final SpaceRole SPACE_ROLE = SpaceRole.SPACE_ROLE;
 
     /**
      * No further instances allowed
@@ -130,8 +130,8 @@ public class DefaultSchema extends SchemaImpl {
             Model.MODEL,
             ModelAuthorizerRel.MODEL_AUTHORIZER_REL,
             ModelEndpointRel.MODEL_ENDPOINT_REL,
-            Team.TEAM,
-            TeamMember.TEAM_MEMBER,
-            TeamRole.TEAM_ROLE);
+            Space.SPACE,
+            SpaceMember.SPACE_MEMBER,
+            SpaceRole.SPACE_ROLE);
     }
 }

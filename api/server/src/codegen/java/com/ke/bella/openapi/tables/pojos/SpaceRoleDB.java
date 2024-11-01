@@ -4,22 +4,22 @@
 package com.ke.bella.openapi.tables.pojos;
 
 
-import com.ke.bella.openapi.db.repo.Operator;
+import com.ke.bella.openapi.db.repo.Timed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 /**
- * 团队角色
+ * 空间角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class TeamRoleDB implements Operator, Serializable {
+public class SpaceRoleDB implements Timed, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Long          id;
-    private String        teamCode;
+    private String        spaceCode;
     private String        roleCode;
     private String        roleName;
     private String        roleDesc;
@@ -29,14 +29,12 @@ public class TeamRoleDB implements Operator, Serializable {
     private LocalDateTime mtime;
     private Long          cuid;
     private Long          muid;
-    private String        cuName;
-    private String        muName;
 
-    public TeamRoleDB() {}
+    public SpaceRoleDB() {}
 
-    public TeamRoleDB(TeamRoleDB value) {
+    public SpaceRoleDB(SpaceRoleDB value) {
         this.id = value.id;
-        this.teamCode = value.teamCode;
+        this.spaceCode = value.spaceCode;
         this.roleCode = value.roleCode;
         this.roleName = value.roleName;
         this.roleDesc = value.roleDesc;
@@ -46,13 +44,11 @@ public class TeamRoleDB implements Operator, Serializable {
         this.mtime = value.mtime;
         this.cuid = value.cuid;
         this.muid = value.muid;
-        this.cuName = value.cuName;
-        this.muName = value.muName;
     }
 
-    public TeamRoleDB(
+    public SpaceRoleDB(
         Long          id,
-        String        teamCode,
+        String        spaceCode,
         String        roleCode,
         String        roleName,
         String        roleDesc,
@@ -61,12 +57,10 @@ public class TeamRoleDB implements Operator, Serializable {
         LocalDateTime ctime,
         LocalDateTime mtime,
         Long          cuid,
-        Long          muid,
-        String        cuName,
-        String        muName
+        Long          muid
     ) {
         this.id = id;
-        this.teamCode = teamCode;
+        this.spaceCode = spaceCode;
         this.roleCode = roleCode;
         this.roleName = roleName;
         this.roleDesc = roleDesc;
@@ -76,198 +70,168 @@ public class TeamRoleDB implements Operator, Serializable {
         this.mtime = mtime;
         this.cuid = cuid;
         this.muid = muid;
-        this.cuName = cuName;
-        this.muName = muName;
     }
 
     /**
-     * Getter for <code>team_role.id</code>. 主键
+     * Getter for <code>space_role.id</code>. 主键
      */
     public Long getId() {
         return this.id;
     }
 
     /**
-     * Setter for <code>team_role.id</code>. 主键
+     * Setter for <code>space_role.id</code>. 主键
      */
     public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * Getter for <code>team_role.team_code</code>. 团队编码
+     * Getter for <code>space_role.space_code</code>. 团队编码
      */
-    public String getTeamCode() {
-        return this.teamCode;
+    public String getSpaceCode() {
+        return this.spaceCode;
     }
 
     /**
-     * Setter for <code>team_role.team_code</code>. 团队编码
+     * Setter for <code>space_role.space_code</code>. 团队编码
      */
-    public void setTeamCode(String teamCode) {
-        this.teamCode = teamCode;
+    public void setSpaceCode(String spaceCode) {
+        this.spaceCode = spaceCode;
     }
 
     /**
-     * Getter for <code>team_role.role_code</code>. 角色编码
+     * Getter for <code>space_role.role_code</code>. 角色编码
      */
     public String getRoleCode() {
         return this.roleCode;
     }
 
     /**
-     * Setter for <code>team_role.role_code</code>. 角色编码
+     * Setter for <code>space_role.role_code</code>. 角色编码
      */
     public void setRoleCode(String roleCode) {
         this.roleCode = roleCode;
     }
 
     /**
-     * Getter for <code>team_role.role_name</code>. 角色名称
+     * Getter for <code>space_role.role_name</code>. 角色名称
      */
     public String getRoleName() {
         return this.roleName;
     }
 
     /**
-     * Setter for <code>team_role.role_name</code>. 角色名称
+     * Setter for <code>space_role.role_name</code>. 角色名称
      */
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
 
     /**
-     * Getter for <code>team_role.role_desc</code>. 角色描述
+     * Getter for <code>space_role.role_desc</code>. 角色描述
      */
     public String getRoleDesc() {
         return this.roleDesc;
     }
 
     /**
-     * Setter for <code>team_role.role_desc</code>. 角色描述
+     * Setter for <code>space_role.role_desc</code>. 角色描述
      */
     public void setRoleDesc(String roleDesc) {
         this.roleDesc = roleDesc;
     }
 
     /**
-     * Getter for <code>team_role.role_type</code>. 角色类型(1系统内置，2自定义)
+     * Getter for <code>space_role.role_type</code>. 角色类型(1系统内置，2自定义)
      */
     public Byte getRoleType() {
         return this.roleType;
     }
 
     /**
-     * Setter for <code>team_role.role_type</code>. 角色类型(1系统内置，2自定义)
+     * Setter for <code>space_role.role_type</code>. 角色类型(1系统内置，2自定义)
      */
     public void setRoleType(Byte roleType) {
         this.roleType = roleType;
     }
 
     /**
-     * Getter for <code>team_role.status</code>. 删除状态(0未删除，-1已删除)
+     * Getter for <code>space_role.status</code>. 删除状态(0未删除，-1已删除)
      */
     public Byte getStatus() {
         return this.status;
     }
 
     /**
-     * Setter for <code>team_role.status</code>. 删除状态(0未删除，-1已删除)
+     * Setter for <code>space_role.status</code>. 删除状态(0未删除，-1已删除)
      */
     public void setStatus(Byte status) {
         this.status = status;
     }
 
     /**
-     * Getter for <code>team_role.ctime</code>. 创建时间
+     * Getter for <code>space_role.ctime</code>. 创建时间
      */
     public LocalDateTime getCtime() {
         return this.ctime;
     }
 
     /**
-     * Setter for <code>team_role.ctime</code>. 创建时间
+     * Setter for <code>space_role.ctime</code>. 创建时间
      */
     public void setCtime(LocalDateTime ctime) {
         this.ctime = ctime;
     }
 
     /**
-     * Getter for <code>team_role.mtime</code>. 最后一次更新时间
+     * Getter for <code>space_role.mtime</code>. 最后一次更新时间
      */
     public LocalDateTime getMtime() {
         return this.mtime;
     }
 
     /**
-     * Setter for <code>team_role.mtime</code>. 最后一次更新时间
+     * Setter for <code>space_role.mtime</code>. 最后一次更新时间
      */
     public void setMtime(LocalDateTime mtime) {
         this.mtime = mtime;
     }
 
     /**
-     * Getter for <code>team_role.cuid</code>. 创建人系统号
+     * Getter for <code>space_role.cuid</code>. 创建人系统号
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>team_role.cuid</code>. 创建人系统号
+     * Setter for <code>space_role.cuid</code>. 创建人系统号
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>team_role.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_role.muid</code>. 最后一次更新人系统号
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>team_role.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_role.muid</code>. 最后一次更新人系统号
      */
     public void setMuid(Long muid) {
         this.muid = muid;
     }
 
-    /**
-     * Getter for <code>team_role.cu_name</code>. 团队创建人姓名
-     */
-    public String getCuName() {
-        return this.cuName;
-    }
-
-    /**
-     * Setter for <code>team_role.cu_name</code>. 团队创建人姓名
-     */
-    public void setCuName(String cuName) {
-        this.cuName = cuName;
-    }
-
-    /**
-     * Getter for <code>team_role.mu_name</code>. 团队最后一次更新人姓名
-     */
-    public String getMuName() {
-        return this.muName;
-    }
-
-    /**
-     * Setter for <code>team_role.mu_name</code>. 团队最后一次更新人姓名
-     */
-    public void setMuName(String muName) {
-        this.muName = muName;
-    }
-
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("TeamRoleDB (");
+        StringBuilder sb = new StringBuilder("SpaceRoleDB (");
 
         sb.append(id);
-        sb.append(", ").append(teamCode);
+        sb.append(", ").append(spaceCode);
         sb.append(", ").append(roleCode);
         sb.append(", ").append(roleName);
         sb.append(", ").append(roleDesc);
@@ -277,8 +241,6 @@ public class TeamRoleDB implements Operator, Serializable {
         sb.append(", ").append(mtime);
         sb.append(", ").append(cuid);
         sb.append(", ").append(muid);
-        sb.append(", ").append(cuName);
-        sb.append(", ").append(muName);
 
         sb.append(")");
         return sb.toString();
