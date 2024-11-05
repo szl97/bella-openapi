@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -240,6 +241,23 @@ public class SpaceService {
                 .build();
     }
 
+    public List<Space> listSpace(List<String> spaceCodes) {
+
+        List<SpaceRecord> spaceRecords = spaceRepo.querySpaceBySpaceCodes(spaceCodes);
+
+        if(CollectionUtils.isEmpty(spaceRecords)) {
+            return Collections.emptyList();
+        }
+
+        return spaceRecords.stream()
+                .map(record -> Space.builder()
+                        .spaceName(record.getSpaceName())
+                        .spaceCode(record.getSpaceCode())
+                        .ownerUid(record.getOwnerUid())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     public List<RoleWithSpace> listRole(String memberUid) {
 
         List<SpaceMemberRecord> members = spaceRepo.listMemberByMemberUid(memberUid);
@@ -280,6 +298,14 @@ public class SpaceService {
     }
 
     public RoleWithSpace getMemberRole(String memberUid, String spaceCode) {
+
+        if(Objects.equals(memberUid, spaceCode)) {
+            return RoleWithSpace.builder()
+                    .roleCode(RoleCodeEnum.OWNER.getCode())
+                    .spaceCode(spaceCode)
+                    .spaceName("个人空间")
+                    .build();
+        }
 
         SpaceMemberRecord member = spaceRepo.queryMemberBySpaceCodeAndMemberUid(spaceCode, memberUid);
         if(member == null) {

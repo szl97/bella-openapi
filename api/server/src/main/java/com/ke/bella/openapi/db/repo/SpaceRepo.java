@@ -34,6 +34,13 @@ public class SpaceRepo implements BaseRepo {
                 .fetchOneInto(SpaceRecord.class);
     }
 
+    public List<SpaceRecord> querySpaceBySpaceCodes(List<String> spaceCodes) {
+        return db.selectFrom(Tables.SPACE)
+                .where(Tables.SPACE.SPACE_CODE.in(spaceCodes))
+                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+                .fetchInto(SpaceRecord.class);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void createSpace(SpaceRecord record) {
         if(StringUtils.isEmpty(record.getSpaceDescription())) {

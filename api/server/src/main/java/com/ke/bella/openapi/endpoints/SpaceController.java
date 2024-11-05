@@ -13,8 +13,6 @@ import com.ke.bella.openapi.space.CreateRoleOp;
 import com.ke.bella.openapi.space.CreateSpaceOp;
 import com.ke.bella.openapi.space.UpdateSpaceNameOp;
 import com.ke.bella.openapi.space.ChangeSpaceOwnerOp;
-import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
-import com.ke.bella.openapi.tables.records.SpaceRecord;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -54,6 +52,11 @@ public class SpaceController {
     @GetMapping("/get")
     public Space getSpace(@RequestParam String spaceCode) {
         return spaceService.querySpaceBySpaceCode(spaceCode);
+    }
+
+    @GetMapping("/list")
+    public List<Space> listSpace(@RequestParam List<String> spaceCodes) {
+        return spaceService.listSpace(spaceCodes);
     }
 
     @PostMapping("/owner/change")
