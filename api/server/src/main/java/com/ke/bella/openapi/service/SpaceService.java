@@ -260,9 +260,15 @@ public class SpaceService {
 
     public List<RoleWithSpace> listRole(String memberUid) {
 
+        List<RoleWithSpace> rolesAll = Lists.newArrayList();
+        rolesAll.add(RoleWithSpace.builder()
+                .roleCode(RoleCodeEnum.OWNER.getCode())
+                .spaceCode(memberUid)
+                .spaceName("个人空间").build());
+
         List<SpaceMemberRecord> members = spaceRepo.listMemberByMemberUid(memberUid);
         if(CollectionUtils.isEmpty(members)) {
-            return Lists.newArrayList();
+            return rolesAll;
         }
 
         // 收集唯一的空间编码
@@ -286,15 +292,10 @@ public class SpaceService {
                     return role;
                 })
                 .collect(Collectors.toList());
-
-        // 添加个人空间
-        roles = CollectionUtils.isEmpty(roles) ? Lists.newArrayList() : roles;
-        roles.add(RoleWithSpace.builder()
-                .roleCode(RoleCodeEnum.OWNER.getCode())
-                .spaceCode(memberUid)
-                .spaceName("个人空间").build());
-
-        return roles;
+        if(CollectionUtils.isNotEmpty(roles)) {
+            rolesAll.addAll(roles);
+        }
+        return rolesAll;
     }
 
     public RoleWithSpace getMemberRole(String memberUid, String spaceCode) {
