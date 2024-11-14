@@ -38,13 +38,16 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         Operator op = ConsoleContext.getOperatorIgnoreNull();
         if(op != null) {
             List<String> roles = Lists.newArrayList(properties.getLoginRoles());
+            List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
             if(properties.getManagers().containsKey(op.getUserId())) {
                 String akCode = properties.getManagers().get(op.getUserId());
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
                 BellaContext.setApikey(apikeyInfo);
                 roles.add("/console/**");
+                excludes.clear();
             }
-            if(roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))) {
+            if(roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
+            && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url))) {
                 return true;
             }
         }

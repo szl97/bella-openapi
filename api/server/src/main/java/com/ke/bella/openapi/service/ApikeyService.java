@@ -19,6 +19,7 @@ import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.safety.SafetyAuditService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyRoleDB;
@@ -73,6 +74,8 @@ public class ApikeyService {
     private CacheManager cacheManager;
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    private SafetyAuditService safetyAuditService;
     private static final String apikeyCacheKey = "apikey:sha:";
 
     @PostConstruct
@@ -192,16 +195,11 @@ public class ApikeyService {
     public void certify(ApikeyOps.CertifyOp op) {
         apikeyRepo.checkExist(op.getCode(), true);
         checkPermission(op.getCode());
-        Byte level = fetchLevelByCertifyCode(op.getCertifyCode());
+        Byte level = safetyAuditService.fetchLevelByCertifyCode(op.getCertifyCode());
         ApikeyDB db = new ApikeyDB();
         db.setCertifyCode(op.getCertifyCode());
         db.setSafetyLevel(level);
         apikeyRepo.update(db, op.getCode());
-    }
-
-    private Byte fetchLevelByCertifyCode(String certifyCode) {
-        //todo: 根据验证码查询安全等级
-        return 2;
     }
 
     @Transactional

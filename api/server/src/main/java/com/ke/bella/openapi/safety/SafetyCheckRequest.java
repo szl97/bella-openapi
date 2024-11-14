@@ -4,7 +4,6 @@ import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
-import com.ke.bella.openapi.protocol.completion.Message;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

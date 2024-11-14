@@ -69,8 +69,8 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
 		        || e instanceof BizParamCheckException) {
             code = 400;
         }
-        if(e instanceof ChannelException.AuthorizationException) {
-            code = 401;
+        if(e instanceof ChannelException) {
+            code = ((ChannelException)e).getHttpCode();
         }
 
         if(code == 500) {
