@@ -2,8 +2,6 @@ package com.ke.bella.openapi.utils;
 
 import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
-import io.netty.handler.timeout.ReadTimeoutException;
-import io.netty.handler.timeout.TimeoutException;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
@@ -13,14 +11,9 @@ import okhttp3.Response;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
-import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.springframework.http.HttpStatus;
 
-import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -61,17 +54,15 @@ public class HttpUtils {
         try {
             Response response = HttpUtils.httpRequest(request);
             T result = JacksonUtils.deserialize(response.body().bytes(), clazz);
-            if(result == null && response.code() != 200) {
+            if(result == null && response.code() > 299) {
+                if(response.code() > 499 && response.code() < 600) {
+                    throw ChannelException.fromResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), response.body().string());
+                }
                 throw ChannelException.fromResponse(response.code(), response.body().string());
             }
             return result;
-        }  catch (ConnectException e) {
-            throw ChannelException.fromResponse(HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase());
-        } catch (TimeoutException | SocketTimeoutException | SSLException e) {
-            throw ChannelException.fromResponse(HttpStatus.REQUEST_TIMEOUT.value(), HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw ChannelException.fromException(e);
         }
     }
 

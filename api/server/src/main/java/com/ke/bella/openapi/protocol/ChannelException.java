@@ -3,9 +3,13 @@ package com.ke.bella.openapi.protocol;
 import lombok.Getter;
 import okhttp3.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.servlet.ServletException;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketException;
 
 public abstract class ChannelException extends RuntimeException {
 
@@ -40,8 +44,12 @@ public abstract class ChannelException extends RuntimeException {
             public Integer getHttpCode() {
                 if(e instanceof IllegalArgumentException
                         || e instanceof ServletException
-                        || e instanceof MethodArgumentNotValidException) {
+                        || e instanceof MethodArgumentNotValidException
+                        || e instanceof HttpMessageConversionException) {
                     return 400;
+                }
+                if(e instanceof IOException) {
+                    return 502;
                 }
                 return 500;
             }

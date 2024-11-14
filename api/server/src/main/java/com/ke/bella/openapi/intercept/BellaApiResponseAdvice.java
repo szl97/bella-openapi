@@ -76,7 +76,7 @@ public class BellaApiResponseAdvice implements ResponseBodyAdvice<Object> {
         if(code == 500) {
             LOGGER.warn(e.getMessage(), e);
         } else {
-            LOGGER.info(e.getMessage());
+            LOGGER.info(e.getMessage(), e);
         }
 
         BellaResponse<?> er = new BellaResponse<>();

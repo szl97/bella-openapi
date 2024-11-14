@@ -35,32 +35,43 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         OpenapiResponse openapiResponse = (OpenapiResponse) body;
+        String requestId = BellaContext.getProcessData().getRequestId();
         if(openapiResponse.getError() == null) {
             response.setStatusCode(HttpStatus.OK);
         } else {
             Integer httpCode = openapiResponse.getError().getHttpCode();
-            response.setStatusCode(httpCode == null ? HttpStatus.INTERNAL_SERVER_ERROR : HttpStatus.valueOf(httpCode));
+            response.setStatusCode(httpCode == null ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.valueOf(httpCode));
+            logError(httpCode, requestId, openapiResponse.getError().getMessage(), null);
         }
         BellaContext.getProcessData().setResponse(openapiResponse);
         logger.log(BellaContext.getProcessData());
-        response.getHeaders().add("X-BELLA-REQUEST-ID", BellaContext.getProcessData().getRequestId());
+        response.getHeaders().add("X-BELLA-REQUEST-ID", requestId);
         return body;
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public OpenapiResponse exceptionHandler(Exception exception) {
+        String requestId = BellaContext.getProcessData().getRequestId();
         ChannelException e = ChannelException.fromException(exception);
+        logError(e.getHttpCode(), requestId, e.getMessage(), e);
         OpenapiResponse.OpenapiError error = e.convertToOpenapiError();
         OpenapiResponse openapiResponse = OpenapiResponse.errorResponse(error);
         if(e instanceof ChannelException.SafetyCheckException) {
             openapiResponse.setSensitives(((ChannelException.SafetyCheckException) e).getSensitive());
         }
-        if(e.getHttpCode() == 500) {
-            LOGGER.error(e.getMessage(), e);
-        } else {
-            LOGGER.info(e.getMessage(), e);
-        }
         return openapiResponse;
+    }
+
+    private void logError(Integer httpCode, String requestId, String msg, Throwable e) {
+        String str = "req_id :" + requestId + ",msg:" + msg;
+        //输出req_id方便根据req_id查询能力点日志
+        if(httpCode == 500) {
+            LOGGER.error(str, e);
+        } else if(httpCode == 400 || httpCode == 401){
+            LOGGER.info(str, e);
+        } else {
+            LOGGER.warn(str, e);
+        }
     }
 }
