@@ -156,38 +156,10 @@ function toast({ ...props }: Toast) {
     type: "ADD_TOAST",
     toast: {
       ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
-      },
-    },
-  })
-
-  return {
-    id: id,
-    dismiss,
-    update,
-  }
-}
-
-function defaultToast({ ...props }: Toast) {
-  const id = genId()
-
-  const update = (props: ToasterToast) =>
-      dispatch({
-        type: "UPDATE_TOAST",
-        toast: { ...props, id },
-      })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
       style: {
-        background: '#fff', // 设置白色背景
-        color: '#000', // 设置文本颜色
+        background: '#000', // 设置黑色背景
+        color: '#fff', // 设置白色文字
+        border: '1px solid #333', // 设置深色边框
       },
       id,
       open: true,
@@ -224,4 +196,4 @@ function useToast() {
   }
 }
 
-export { useToast, toast, defaultToast }
+export { useToast, toast }

@@ -1,0 +1,80 @@
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { Model } from "@/lib/types/openapi";
+import { Badge } from "@/components/ui/badge";
+
+interface ModelCardProps {
+    model: Model;
+}
+
+export function ModelCard({ model }: ModelCardProps) {
+    const properties = JSON.parse(model.properties) as Record<string, any>;
+    const features = JSON.parse(model.features) as Record<string, boolean>;
+
+    const renderProperty = (label: string, value: any) => {
+        if (value !== undefined && value !== null) {
+            return (
+                <div className="bg-gray-50 rounded-lg p-3">
+                    <span className="text-sm font-medium text-gray-500">{label}</span>
+                    <p className="text-lg font-semibold text-gray-800">{value}</p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    return (
+        <Card className="overflow-hidden bg-white shadow-lg hover:shadow-xl transition-shadow duration-300 border-none rounded-xl">
+            <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100 pb-8 relative">
+                <CardTitle className="flex items-center justify-between z-10 relative">
+                    <span className="text-lg font-bold text-gray-800">{model.modelName}</span>
+                    {model.documentUrl && (
+                        <Link
+                            href={model.documentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 hover:bg-white/50">
+                                <ExternalLink size={16} />
+                            </Button>
+                        </Link>
+                    )}
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="-mt-6 relative z-20">
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                    {renderProperty("最大输入长度", properties.max_input_context)}
+                    {renderProperty("最大输出长度", properties.max_output_context)}
+                </div>
+                {Object.values(features).some(v => v === true) && (
+                    <div className="mt-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">特性</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {Object.entries(features).map(([key, value]) => (
+                                value === true ? <Badge key={key} variant="secondary" className="bg-blue-50 text-blue-600 hover:bg-blue-100">{key}</Badge> : null
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {model.priceDetails && (
+                    <div className="mt-4">
+                        <h3 className="text-sm font-medium text-gray-600 mb-2">费用</h3>
+                        <div className="bg-gray-50 rounded-lg p-3">
+                            {Object.entries(model.priceDetails.displayPrice).map(([key, value]) => (
+                                <div key={key} className="flex justify-between items-center mb-1">
+                                    <span className="text-xs text-gray-600">{key}</span>
+                                    <span className="text-sm font-semibold text-gray-800">{value}</span>
+                                </div>
+                            ))}
+                            <div className="text-xs text-gray-500 mt-2 text-right">
+                                单位: {model.priceDetails.unit}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}

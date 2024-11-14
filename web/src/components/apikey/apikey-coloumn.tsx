@@ -1,81 +1,177 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { ApikeyInfo } from "@/types/openapi";
-import React from "react";
-import { certifyDialog, deleteDialog, quotaDialog, resetDialog } from "./apikey-dialog";
-import "@/app/globals.css"
+'use client'
+
+import React, {useRef, useEffect, useState, ReactNode} from "react"
+import {ColumnDef} from "@tanstack/react-table"
+import {ApikeyInfo} from "@/lib/types/openapi"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} from "./apikey-dialog"
+import {HoverContext} from "@/components/ui/data-table";
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {SquarePen} from 'lucide-react'
+
+interface EditableCellProps {
+    content: ReactNode;
+    dialogComponent: (isOpen: boolean, onClose: () => void) => React.ReactElement;
+    positionCalc: string;
+    rowId: string;
+}
+
+const EditableCell: React.FC<EditableCellProps> = ({ content, dialogComponent, positionCalc, rowId }) => {
+    const hoveredRowId = React.useContext(HoverContext);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const contentRef = useRef<HTMLSpanElement>(null);
+    const [iconPosition, setIconPosition] = useState(0);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            const contentWidth = contentRef.current.offsetWidth;
+            setIconPosition(contentWidth / 2 + 5);
+        }
+    }, [content]);
+
+    const showButton = hoveredRowId === rowId || isDialogOpen;
+
+    return (
+        <div className="relative flex justify-center items-center w-full">
+            <span ref={contentRef} className="font-medium">{content}</span>
+            {showButton && (
+                <div style={{ position: 'absolute', left: `calc(${positionCalc} + ${iconPosition}px)` }}>
+                    {dialogComponent(isDialogOpen, () => setIsDialogOpen(!isDialogOpen))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+
+const RemarkCell = ({ value }: { value: string }) => {
+    const remark = value || '/'
+    return (
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <div className="truncate max-w-xs cursor-help">{remark}</div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-64 break-words">
+                    <p>{remark}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+    )
+}
+
+const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => (
+    <div className="flex flex-wrap justify-end gap-2">
+        <DeleteDialog code={code} refresh={refresh}/>
+        <ResetDialog code={code} refresh={refresh}/>
+    </div>
+)
 
 export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
     {
         accessorKey: "akDisplay",
-        header: () => <div className="text-center w-1/8">ak</div>,
-        cell: ({ row }) => <div className="text-center w-1/8">{row.getValue("akDisplay")}</div>,
+        header: "AK",
+        cell: ({row}) =>
+            (<div className="font-mono text-sm">
+                {row.original.akDisplay}
+            </div>)
+        ,
     },
     {
         accessorKey: "name",
-        header: () => <div className="text-center w-1/8">名称</div>,
-        cell: ({ row }) => <div className="text-center w-1/8">{row.getValue("name")}</div>,
+        header: "名称",
+        cell: ({row}) => (
+            <EditableCell
+                content={row.original.name}
+                dialogComponent={(isOpen, onClose) => (
+                    <RenameDialog
+                        code={row.original.code}
+                        origin={row.original.name}
+                        refresh={refresh}
+                        isOpen={isOpen}
+                        onClose={onClose}
+                    />
+                )}
+                positionCalc="50%"
+                rowId={row.id}
+            />
+        ),
     },
     {
         accessorKey: "serviceId",
-        header: () => <div className="text-center w-1/8">服务名</div>,
-        cell: ({ row }) => <div className="text-center w-1/8">{row.getValue("serviceId")}</div>,
-    },
-    {
-        accessorKey: "roleCode",
-        header: () => <div className="text-center w-1/8">权限等级</div>,
-        cell: ({ row }) => <div className="text-center w-1/8">{row.getValue("roleCode")}</div>,
+        header:
+            "服务名",
+        cell:
+            ({row}) => <div>{row.getValue("serviceId")}</div>,
     },
     {
         accessorKey: "safetyLevel",
-        header: () => <div className="text-center w-1/8">安全级别</div>,
-        cell: ({ row }) => <div className="text-center w-1/8">{row.getValue("safetyLevel")}</div>,
+        header: "安全等级",
+        cell: ({row}) => {
+            const level = row.original.safetyLevel as number;
+            let color = "bg-green-100 text-green-800";
+            if (level == 1) {
+                color = "bg-yellow-100 text-yellow-800";
+            }
+            if (level == 0) {
+                color = "bg-red-100 text-red-800";
+            }
+
+            return (
+                <EditableCell
+                    content={<Badge className={`${color} capitalize`}>{level}</Badge>}
+                    dialogComponent={(isOpen, onClose) => (
+                        <CertifyDialog
+                            code={row.original.code}
+                            refresh={refresh}
+                            isOpen={isOpen}
+                            onClose={onClose}
+                        />
+                    )}
+                    positionCalc="60%"
+                    rowId={row.id}
+                />
+            );
+        },
     },
     {
         accessorKey: "monthQuota",
-        header: () => <div className="text-center w-1/8">每月额度</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("monthQuota"));
+        header: "每月额度",
+        cell: ({row}) => {
             const formatted = new Intl.NumberFormat("zh-CN", {
                 style: "currency",
                 currency: "CNY",
-            }).format(amount);
-            return <div className="text-center font-medium w-1/8">{formatted}</div>;
-        },
+            }).format(row.original.monthQuota);
+
+            return (
+                <EditableCell
+                    content={formatted}
+                    dialogComponent={(isOpen, onClose) => (
+                        <QuotaDialog
+                            code={row.original.code}
+                            origin={row.original.monthQuota}
+                            refresh={refresh}
+                            isOpen={isOpen}
+                            onClose={onClose}
+                        />
+                    )}
+                    positionCalc="50%"
+                    rowId={row.id}
+                />
+            );
+        }
     },
     {
         accessorKey: "remark",
-        header: () => <div className="text-center w-1/2">备注</div>,
-        cell: ({ row }) => {
-            const remark = row.original.remark || '/';
-            return (
-                <div className="relative group">
-                    <div className="truncate w-full">{remark}</div>
-                    <div className={`absolute hidden group-hover:block bg-gray-700 text-white text-xs rounded p-2 z-10 whitespace-normal break-words ${remark ? 'w-64' : 'w-32'}`}>
-                        {remark}
-                    </div>
-                </div>
-            );
-        },
+        header: "备注",
+        cell: ({row}) => <RemarkCell value={row.original.remark}/>,
     },
     {
         id: "actions",
-        header: () => <div className="text-center w-1/4">操作</div>,
-        cell: ({ row }) => {
-            const apikey = row.original;
-            return (
-                <div className="grid place-items-center w-1/4">
-                    <div className="flex space-x-3">
-                        <div className="flex flex-col space-y-1">
-                            {deleteDialog(apikey.code, refresh)}
-                            {resetDialog(apikey.code, refresh)}
-                        </div>
-                        <div className="flex flex-col space-y-1">
-                            {certifyDialog(apikey.code, "", refresh)}
-                            {quotaDialog(apikey.code, apikey.monthQuota, refresh)}
-                        </div>
-                    </div>
-                </div>
-            );
-        },
+        header: "",
+        cell: ({row}) => (
+            <ActionCell code={row.original.code} refresh={refresh}/>
+        ),
     },
-];
+]

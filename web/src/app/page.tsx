@@ -1,10 +1,5 @@
-import {auth} from "@/auth"
-import {ClientHeader} from "@/components/client-header";
+import MetaPage from "@/app/meta/page";
 
-export default async function Home() {
-  const session = await auth();
-  return (<div>
-    <ClientHeader/>
-    <pre>{JSON.stringify(session, null, 2)}</pre>
-  </div>)
+export default function Home() {
+  return <MetaPage/>
 }

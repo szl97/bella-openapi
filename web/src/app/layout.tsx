@@ -1,52 +1,44 @@
-import type {Metadata} from "next";
-import localFont from "next/font/local";
-import "./globals.css";
-import AuthProvider from "@/components/auth/auth-provider";
-import {ThemeProvider} from "next-themes";
-import {Toaster} from "@/components/ui/toaster";
-import React from "react";
+'use client';
+import localFont from "next/font/local"
+import "./globals.css"
+import {ThemeProvider} from "next-themes"
+import {Toaster} from "@/components/ui/toaster"
+import {UserProvider} from "@/lib/context/user-context";
 
 const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+    src: "./fonts/GeistVF.woff",
+    variable: "--font-geist-sans",
+    weight: "100 900",
+})
 
-export const metadata: Metadata = {
-  title: "Bella-Openapi",
-  description: "Bella-Openapi",
-};
+const geistMono = localFont({
+    src: "./fonts/GeistMonoVF.woff",
+    variable: "--font-geist-mono",
+    weight: "100 900",
+})
 
 export default function RootLayout({
                                        children,
                                    }: Readonly<{
-    children: React.ReactNode;
+    children: React.ReactNode
 }>) {
     return (
-        <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <AuthProvider>
-            <div>
-                <ThemeProvider
-                    attribute='class'
-                    defaultTheme='dark'
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <div>
-                        <main>{children}</main>
-                        <Toaster/>
-                    </div>
-                </ThemeProvider>
-                <Toaster/>
-            </div>
-        </AuthProvider>
+        <html lang="en" suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-white`}>
+        <UserProvider>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem
+                disableTransitionOnChange
+            >
+                <main className="min-h-screen bg-white text-foreground">
+                    {children}
+                </main>
+                <Toaster />
+            </ThemeProvider>
+        </UserProvider>
         </body>
         </html>
-    );
+    )
 }
