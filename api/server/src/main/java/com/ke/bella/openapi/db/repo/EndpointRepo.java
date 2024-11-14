@@ -2,6 +2,7 @@ package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.tables.pojos.ModelDB;
 import com.ke.bella.openapi.tables.records.EndpointRecord;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.ke.bella.openapi.Tables.ENDPOINT;
 
@@ -52,7 +54,7 @@ public class EndpointRepo extends StatusRepo<EndpointDB, EndpointRecord, String>
                         ? DSL.noCondition()
                         : ENDPOINT.MAINTAINER_NAME.like("%" + op.getMaintainerCode() + "%"))
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : ENDPOINT.STATUS.eq(op.getStatus()))
-                .orderBy(ENDPOINT.ID.desc());
+                .orderBy(ENDPOINT.ID);
     }
 
     @Override

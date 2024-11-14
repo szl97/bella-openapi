@@ -303,7 +303,7 @@ public class ApikeyService {
     }
 
     public void fillPermissionCode(PermissionCondition condition) {
-        ApikeyInfo apikeyInfo = BellaContext.getApikey();
+        ApikeyInfo apikeyInfo = BellaContext.getApikeyIgnoreNull();
         if(apikeyInfo == null) {
             Operator op = ConsoleContext.getOperator();
             if (CollectionUtils.isNotEmpty(condition.getOrgCodes())) {

@@ -101,6 +101,7 @@ public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String>
         return db.selectFrom(CATEGORY)
                 .where(CATEGORY.CATEGORY_CODE.like(categoryCode + "%"))
                 .and(StringUtils.isEmpty(status) ? DSL.noCondition() : CATEGORY.STATUS.eq(status))
+                .orderBy(CATEGORY.CATEGORY_CODE)
                 .fetchInto(CategoryDB.class);
     }
 
@@ -122,6 +123,7 @@ public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String>
     public List<EndpointCategoryRelDB> listEndpointCategoriesByCategoryCodes(List<String> categoryCodes) {
         return db.selectFrom(ENDPOINT_CATEGORY_REL)
                 .where(ENDPOINT_CATEGORY_REL.CATEGORY_CODE.in(categoryCodes))
+                .orderBy(ENDPOINT_CATEGORY_REL.CATEGORY_CODE)
                 .fetchInto(EndpointCategoryRelDB.class);
     }
 
@@ -149,7 +151,7 @@ public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String>
         return queryPage(db, constructSql(op), op.getPage(), op.getSize(), CategoryDB.class);
     }
 
-    private SelectSeekStep1<CategoryRecord, Long> constructSql(Condition.CategoryCondition op) {
+    private SelectSeekStep1<CategoryRecord, String> constructSql(Condition.CategoryCondition op) {
         return db.selectFrom(CATEGORY)
                 .where(StringUtils.isEmpty(op.getCategoryCode()) ? DSL.noCondition() : CATEGORY.CATEGORY_CODE.eq(op.getCategoryCode()))
                 .and(StringUtils.isEmpty(op.getCategoryName())
@@ -158,7 +160,7 @@ public class CategoryRepo extends StatusRepo<CategoryDB, CategoryRecord, String>
                 .and(StringUtils.isEmpty(op.getParentCode()) ? DSL.noCondition() : CATEGORY.PARENT_CODE.eq(op.getParentCode()))
                 .and(Boolean.TRUE.equals(op.getTopCategory()) ? CATEGORY.PARENT_CODE.eq("") : DSL.noCondition())
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : CATEGORY.STATUS.eq(op.getStatus()))
-                .orderBy(CATEGORY.ID.desc());
+                .orderBy(CATEGORY.CATEGORY_CODE);
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.Record2;
+import org.jooq.Result;
 import org.jooq.SelectSeekStep1;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
@@ -12,6 +14,7 @@ import org.jooq.impl.TableImpl;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.ke.bella.openapi.tables.Channel.CHANNEL;
 
@@ -21,6 +24,15 @@ import static com.ke.bella.openapi.tables.Channel.CHANNEL;
 @Component
 public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> implements AutogenCodeRepo<ChannelRecord> {
 
+    public Map<String, String> queryPriceInfo(List<String> entityCodes) {
+        Result<Record2<String, String>> result = db
+                .select(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO)
+                .from(CHANNEL)
+                .where(CHANNEL.ENTITY_CODE.in(entityCodes))
+                .groupBy(CHANNEL.ENTITY_CODE)
+                .fetch();
+        return result.intoMap(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO);
+    }
     public List<ChannelDB> list(Condition.ChannelCondition op) {
         return constructSql(op).fetchInto(ChannelDB.class);
     }

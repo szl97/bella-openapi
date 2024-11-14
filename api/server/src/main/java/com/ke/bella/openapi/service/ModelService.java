@@ -4,14 +4,16 @@ import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelAuthorizerRelDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.ke.bella.openapi.EntityConstants.ACTIVE;
 import static com.ke.bella.openapi.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.EntityConstants.MODEL;
 import static com.ke.bella.openapi.EntityConstants.PRIVATE;
 import static com.ke.bella.openapi.EntityConstants.PUBLIC;
 import static com.ke.bella.openapi.console.MetadataValidator.generateInvalidModelJsonKeyMessage;
@@ -52,6 +55,8 @@ public class ModelService {
     private ModelRepo modelRepo;
     @Autowired
     private EndpointService endpointService;
+    @Autowired
+    private ChannelService channelService;
     @Autowired
     private ApikeyService apikeyService;
     @Autowired
@@ -312,11 +317,35 @@ public class ModelService {
 
     public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition) {
         apikeyService.fillPermissionCode(condition);
+        if(!fillModelNames(condition)) {
+            return Lists.newArrayList();
+        }
         return listByCondition(condition);
     }
 
     public Page<ModelDB> pageByConditionWithPermission(Condition.ModelCondition condition) {
         apikeyService.fillPermissionCode(condition);
+        if(!fillModelNames(condition)) {
+            return new Page<>();
+        }
         return pageByCondition(condition);
+    }
+
+    private boolean fillModelNames(Condition.ModelCondition condition) {
+        if(condition.getDataDestination() == null) {
+            return true;
+        }
+        Condition.ChannelCondition channelCondition = new Condition.ChannelCondition();
+        channelCondition.setStatus(ACTIVE);
+        channelCondition.setDataDestination(condition.getDataDestination());
+        channelCondition.setEntityType(MODEL);
+        List<ChannelDB> channels = channelService.listByCondition(channelCondition);
+        Set<String> modelNames = channels.stream()
+                .map(ChannelDB::getEntityCode)
+                .filter(entityCode -> CollectionUtils.isEmpty(condition.getModelNames())
+                        || condition.getModelNames().contains(entityCode))
+                .collect(Collectors.toSet());
+        condition.setModelNames(modelNames);
+        return CollectionUtils.isNotEmpty(modelNames);
     }
 }

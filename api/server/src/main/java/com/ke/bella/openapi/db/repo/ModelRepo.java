@@ -75,6 +75,30 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
             step = step.leftJoin(MODEL_AUTHORIZER_REL)
                     .on(MODEL.MODEL_NAME.eq(MODEL_AUTHORIZER_REL.MODEL_NAME));
         }
+
+        org.jooq.Condition propertiesCondition = DSL.noCondition();
+        if (op.getMaxInputTokensLimit() != null) {
+            propertiesCondition = propertiesCondition.and(
+                    DSL.field("JSON_EXTRACT({0}, '$.max_input_context') >= {1}", Boolean.class,
+                            MODEL.PROPERTIES, op.getMaxInputTokensLimit()).isTrue()
+            );
+        }
+        if (op.getMaxOutputTokensLimit() != null) {
+            propertiesCondition = propertiesCondition.and(
+                    DSL.field("JSON_EXTRACT({0}, '$.max_output_context') >= {1}", Boolean.class,
+                            MODEL.PROPERTIES, op.getMaxOutputTokensLimit()).isTrue()
+            );
+        }
+
+        org.jooq.Condition featuresCondition = DSL.noCondition();
+        if (CollectionUtils.isNotEmpty(op.getFeatures())) {
+            for (String feature : op.getFeatures()) {
+                featuresCondition = featuresCondition.and(
+                        MODEL.FEATURES.like("%\"" + feature + "\":true%")
+                );
+            }
+        }
+
         return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like(op.getModelName() + "%"))
                 .and(StringUtils.isEmpty(op.getOwnerName()) ? DSL.noCondition() : MODEL.OWNER_NAME.eq(op.getOwnerName()))
                 .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
@@ -83,6 +107,8 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
                 .and(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.eq(op.getEndpoint()))
                 .and(CollectionUtils.isEmpty(op.getEndpoints()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.in(op.getEndpoints()))
                 .and(permissionCondition(op.getPersonalCode(), op.getOrgCodes()))
+                .and(propertiesCondition)
+                .and(featuresCondition)
                 .orderBy(MODEL.ID.desc());
     }
 

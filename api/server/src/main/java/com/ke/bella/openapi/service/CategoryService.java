@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.service;
 
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.db.repo.CategoryRepo;
@@ -155,6 +156,19 @@ public class CategoryService {
         return getTreeByCategoryCode(category,
                 categories.stream().collect(Collectors.groupingBy(CategoryDB::getParentCode)),
                 condition.isIncludeEndpoint());
+    }
+
+    @Cached(name = "category:tree:", key = "'all'")
+    public List<EndpointCategoryTree> listAllTree() {
+        List<CategoryDB> topCategories = categoryRepo.list(Condition.CategoryCondition.builder()
+                .status(ACTIVE).topCategory(true).build());
+        List<EndpointCategoryTree> result = new ArrayList<>();
+        for(CategoryDB top : topCategories) {
+            List<CategoryDB> categories = categoryRepo.queryAllChildrenIncludeSelfByCategoryCode(top.getCategoryCode(), ACTIVE);
+            categories.stream().filter(db -> db.getCategoryCode().equals(top.getCategoryCode())).findAny().ifPresent(
+                    category -> result.add(getTreeByCategoryCode(category, categories.stream().collect(Collectors.groupingBy(CategoryDB::getParentCode)), true)));
+        }
+        return result;
     }
 
     private EndpointCategoryTree getTreeByCategoryCode(CategoryDB root, Map<String, List<CategoryDB>> categories, boolean includeEndpoint) {

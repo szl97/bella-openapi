@@ -2,7 +2,6 @@ package com.ke.bella.openapi.service;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.anno.CachePenetrationProtect;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
@@ -10,11 +9,14 @@ import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
+import com.ke.bella.openapi.metadata.PriceDetails;
 import com.ke.bella.openapi.protocol.AdaptorManager;
+import com.ke.bella.openapi.protocol.IPriceInfo;
 import com.ke.bella.openapi.protocol.cost.CostCalculator;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,9 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.ke.bella.openapi.EntityConstants.ACTIVE;
 import static com.ke.bella.openapi.EntityConstants.ENDPOINT;
@@ -164,6 +172,34 @@ public class ChannelService {
 
     public Page<ChannelDB> pageByCondition(Condition.ChannelCondition condition) {
         return channelRepo.page(condition);
+    }
+
+    public Map<String, PriceDetails> getPriceInfo(List<String> entityCodes, Class<? extends IPriceInfo> type) {
+        Map<String, String> prices = channelRepo.queryPriceInfo(entityCodes);
+        Map<String, Field> fields = Arrays.stream(type.getDeclaredFields()).map(field -> {
+            field.setAccessible(true);
+            return field;
+        }).collect(Collectors.toMap(Field::getName, f -> f));
+        Map<String, PriceDetails> result = new HashMap<>();
+        prices.forEach((k, v) -> {
+            IPriceInfo priceInfo = JacksonUtils.deserialize(v, type);
+            if(priceInfo != null) {
+                PriceDetails details = new PriceDetails();
+                details.setUnit(priceInfo.getUnit());
+                details.setPriceInfo(priceInfo);
+                details.setDisplayPrice(new LinkedHashMap<>());
+                priceInfo.priceDescription().forEach((filedName, desc) -> {
+                    try {
+                        Object val = fields.get(filedName).get(priceInfo);
+                        details.getDisplayPrice().put(desc, val == null ? "N/A" : val.toString());
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                result.put(k, details);
+            }
+        });
+        return result;
     }
 
     @Data

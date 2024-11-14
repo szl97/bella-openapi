@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.metadata;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ke.bella.openapi.BaseDto;
 import com.ke.bella.openapi.protocol.IPriceInfo;
 import com.ke.bella.openapi.protocol.IProtocolProperty;
@@ -9,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Channel extends BaseDto {
     private String entityType;
     private String entityCode;

@@ -3,6 +3,7 @@ package com.ke.bella.openapi.db.repo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public class Page<T> {
     private int page;
     private int pageSize;
     private int total;
-    private List<T> data;
+    private List<T> data = new ArrayList<>();
 
     public static <T> Page<T> from(int page, int pageSize) {
         return new Page<T>().page(page).pageSize(pageSize);

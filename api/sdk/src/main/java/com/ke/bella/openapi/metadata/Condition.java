@@ -8,9 +8,20 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 public class Condition {
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Data
+    public static class EndpointDetailsCondition  {
+        private String endpoint;
+        private String modelName;
+        private List<String> features;
+    }
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -38,6 +49,10 @@ public class Condition {
         private Set<String> modelNames;
         private String visibility;
         private String status;
+        private Integer maxInputTokensLimit;
+        private Integer maxOutputTokensLimit;
+        private List<String> features;
+        private String dataDestination;
     }
 
     @EqualsAndHashCode(callSuper = true)
