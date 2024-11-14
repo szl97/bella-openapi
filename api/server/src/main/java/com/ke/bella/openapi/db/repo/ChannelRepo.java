@@ -29,7 +29,7 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
                 .select(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO)
                 .from(CHANNEL)
                 .where(CHANNEL.ENTITY_CODE.in(entityCodes))
-                .groupBy(CHANNEL.ENTITY_CODE)
+                .groupBy(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO)
                 .fetch();
         return result.intoMap(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO);
     }
