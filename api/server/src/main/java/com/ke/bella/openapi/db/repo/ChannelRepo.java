@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
+import com.ke.bella.openapi.EntityConstants;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.records.ChannelRecord;
@@ -26,12 +27,12 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
 
     public Map<String, String> queryPriceInfo(List<String> entityCodes) {
         Result<Record2<String, String>> result = db
-                .select(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO)
+                .select(CHANNEL.ENTITY_CODE, DSL.field("ANY_VALUE({0})", String.class, CHANNEL.PRICE_INFO))
                 .from(CHANNEL)
-                .where(CHANNEL.ENTITY_CODE.in(entityCodes))
-                .groupBy(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO)
+                .where(CHANNEL.ENTITY_CODE.in(entityCodes).and(CHANNEL.STATUS.eq(EntityConstants.ACTIVE)))
+                .groupBy(CHANNEL.ENTITY_CODE)
                 .fetch();
-        return result.intoMap(CHANNEL.ENTITY_CODE, CHANNEL.PRICE_INFO);
+        return result.intoMap(CHANNEL.ENTITY_CODE, DSL.field("ANY_VALUE({0})", String.class, CHANNEL.PRICE_INFO));
     }
     public List<ChannelDB> list(Condition.ChannelCondition op) {
         return constructSql(op).fetchInto(ChannelDB.class);
