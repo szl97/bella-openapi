@@ -1,4 +1,4 @@
-package com.ke.bella.openapi;
+package com.ke.bella.openapi.common;
 
 import com.google.common.collect.ImmutableList;
 import lombok.AllArgsConstructor;
@@ -6,11 +6,11 @@ import lombok.Getter;
 
 import java.util.List;
 
-import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.AUDIO2TEXT;
-import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.CHAT;
-import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.IMAGES;
-import static com.ke.bella.openapi.EntityConstants.SystemBasicCategory.TEXT2SPEECH;
-import static com.ke.bella.openapi.EntityConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
+import static com.ke.bella.openapi.common.EntityConstants.SystemBasicCategory.AUDIO2TEXT;
+import static com.ke.bella.openapi.common.EntityConstants.SystemBasicCategory.CHAT;
+import static com.ke.bella.openapi.common.EntityConstants.SystemBasicCategory.IMAGES;
+import static com.ke.bella.openapi.common.EntityConstants.SystemBasicCategory.TEXT2SPEECH;
+import static com.ke.bella.openapi.common.EntityConstants.SystemBasicEndpoint.COMPLETION_ENDPOINT;
 
 public class EntityConstants {
     public static final String ACTIVE = "active";

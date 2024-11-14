@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;

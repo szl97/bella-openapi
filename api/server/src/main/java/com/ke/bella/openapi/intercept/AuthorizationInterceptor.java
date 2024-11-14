@@ -5,8 +5,8 @@ import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
+import com.ke.bella.openapi.exception.ChannelException;
 import com.ke.bella.openapi.login.context.ConsoleContext;
-import com.ke.bella.openapi.protocol.ChannelException;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +17,6 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.List;
 
 import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_REQUEST_MARKER;
@@ -47,7 +46,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 excludes.clear();
             }
             if(roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
-            && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url))) {
+                    && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url))) {
                 return true;
             }
         }

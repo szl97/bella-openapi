@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.utils;
 
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
 import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;

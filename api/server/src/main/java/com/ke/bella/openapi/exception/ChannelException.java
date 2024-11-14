@@ -1,7 +1,7 @@
-package com.ke.bella.openapi.protocol;
+package com.ke.bella.openapi.exception;
 
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import lombok.Getter;
-import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
 import org.springframework.beans.factory.annotation.Autowired;

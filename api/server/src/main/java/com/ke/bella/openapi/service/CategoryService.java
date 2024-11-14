@@ -3,7 +3,7 @@ package com.ke.bella.openapi.service;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Sets;
-import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.db.repo.CategoryRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.console.MetadataValidator.matchPath;
-import static com.ke.bella.openapi.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.EntityConstants.INACTIVE;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 12:00 description:

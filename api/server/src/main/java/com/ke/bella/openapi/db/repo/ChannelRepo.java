@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.db.repo;
 
-import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.records.ChannelRecord;

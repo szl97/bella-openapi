@@ -2,7 +2,7 @@ package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.annotations.EndpointAPI;
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import lombok.extern.slf4j.Slf4j;

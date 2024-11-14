@@ -13,12 +13,12 @@ import com.ke.bella.openapi.PermissionCondition;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.apikey.ApikeyOps;
-import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
+import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.safety.SafetyAuditService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
@@ -43,11 +43,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.ke.bella.openapi.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.EntityConstants.INACTIVE;
-import static com.ke.bella.openapi.EntityConstants.ORG;
-import static com.ke.bella.openapi.EntityConstants.PERSON;
-import static com.ke.bella.openapi.EntityConstants.SYSTEM;
+import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.ORG;
+import static com.ke.bella.openapi.common.EntityConstants.PERSON;
+import static com.ke.bella.openapi.common.EntityConstants.SYSTEM;
 
 @Component
 public class ApikeyService {

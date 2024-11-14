@@ -3,7 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.safety.ISafetyCheckService;

@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.ModelService;

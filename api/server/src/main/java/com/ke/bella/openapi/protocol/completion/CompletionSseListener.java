@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.protocol.completion;
 
 import com.google.common.collect.ImmutableSet;
-import com.ke.bella.openapi.protocol.ChannelException;
+import com.ke.bella.openapi.exception.ChannelException;
 import lombok.Setter;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;

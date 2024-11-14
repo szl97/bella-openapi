@@ -1,12 +1,11 @@
 package com.ke.bella.openapi.configuration;
 
-import com.ke.bella.openapi.EntityConstants;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
 import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
 import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 

@@ -29,11 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.EntityConstants.INACTIVE;
-import static com.ke.bella.openapi.EntityConstants.INNER;
-import static com.ke.bella.openapi.EntityConstants.MAINLAND;
-import static com.ke.bella.openapi.EntityConstants.OVERSEAS;
+import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.INNER;
+import static com.ke.bella.openapi.common.EntityConstants.MAINLAND;
+import static com.ke.bella.openapi.common.EntityConstants.OVERSEAS;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 10:41 description:

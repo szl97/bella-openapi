@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.ke.bella.openapi.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.EntityConstants.ENDPOINT;
-import static com.ke.bella.openapi.EntityConstants.INACTIVE;
-import static com.ke.bella.openapi.EntityConstants.MODEL;
+import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
+import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.MODEL;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:35 description:

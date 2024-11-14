@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.common.enums;
+package com.ke.bella.openapi.common;
 
 import lombok.Getter;
 
