@@ -26,6 +26,9 @@ public class EndpointLogger {
         logHandlers.forEach(handler -> handlerMap.put(handler.endpoint(), handler));
     }
     public void log(EndpointProcessData log) {
+        if(log.isMock()) {
+            return;
+        }
         EndpointLogHandler handler = handlerMap.get(log.getEndpoint());
         if(handler != null) {
             handler.process(log);

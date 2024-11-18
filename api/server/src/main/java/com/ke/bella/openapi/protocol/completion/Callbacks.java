@@ -11,6 +11,7 @@ import com.ke.bella.openapi.safety.SafetyCheckRequest;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.PunctuationUtils;
 import com.ke.bella.openapi.utils.SseHelper;
+import lombok.Getter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -40,6 +41,7 @@ public interface Callbacks {
              this.requestRiskData = processData.getRequestRiskData();
          }
 
+         @Getter
          private final SseEmitter sse;
          private final EndpointProcessData processData;
          private final ApikeyInfo apikeyInfo;

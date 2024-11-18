@@ -27,7 +27,10 @@ public class ChannelRouter {
     @Autowired
     private MetricsManager metricsManager;
 
-    public ChannelDB route(String endpoint, String model) {
+    public ChannelDB route(String endpoint, String model, boolean isMock) {
+        if(isMock) {
+            return mockChannel();
+        }
         List<ChannelDB> channels;
         if(model != null) {
             String terminal = modelService.fetchTerminalModelName(model);
@@ -110,6 +113,19 @@ public class ChannelRouter {
         }
         int rand = random.nextInt(list.size());
         return list.get(rand);
+    }
+
+    private ChannelDB mockChannel() {
+        ChannelDB channel = new ChannelDB();
+        channel.setChannelCode("ch-mock");
+        channel.setProtocol("MockAdaptor");
+        channel.setEntityType(EntityConstants.ENDPOINT);
+        channel.setEntityCode("mock");
+        channel.setPriceInfo("{}");
+        channel.setChannelInfo("{}");
+        channel.setSupplier("AIT");
+        channel.setUrl("");
+        return channel;
     }
 
 }

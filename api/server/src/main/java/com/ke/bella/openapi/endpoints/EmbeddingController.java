@@ -3,6 +3,7 @@ package com.ke.bella.openapi.endpoints;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
+import com.ke.bella.openapi.exception.BizParamCheckException;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingAdaptor;
@@ -32,7 +33,8 @@ public class EmbeddingController {
     public Object embedding(@RequestBody EmbeddingRequest request) {
         String endpoint = BellaContext.getRequest().getRequestURI();
         String model = request.getModel();
-        ChannelDB channel = router.route(endpoint, model);
+        boolean isMock = BellaContext.getProcessData().isMock();
+        ChannelDB channel = router.route(endpoint, model, isMock);
         BellaContext.setEndpointData(endpoint, model, channel, request);
         EndpointProcessData processData = BellaContext.getProcessData();
         String protocol = processData.getProtocol();

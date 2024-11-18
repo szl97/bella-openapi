@@ -35,4 +35,5 @@ public class EndpointProcessData {
     private String encodingType;
     private String supplier;
     private Object requestRiskData;
+    private boolean isMock;
 }

@@ -42,11 +42,15 @@ public class ChatController {
     public Object completion(@RequestBody CompletionRequest request) {
         String endpoint = BellaContext.getRequest().getRequestURI();
         String model = request.getModel();
-        ChannelDB channel = router.route(endpoint, model);
+        boolean isMock = BellaContext.getProcessData().isMock();
+        ChannelDB channel = router.route(endpoint, model, isMock);
         BellaContext.setEndpointData(endpoint, model, channel, request);
-        Object requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,
-                BellaContext.getProcessData(), BellaContext.getApikey()));
-        BellaContext.getProcessData().setRequestRiskData(requestRiskData);
+        Object requestRiskData = null;
+        if(!isMock) {
+            requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,
+                    BellaContext.getProcessData(), BellaContext.getApikey()));
+            BellaContext.getProcessData().setRequestRiskData(requestRiskData);
+        }
         EndpointProcessData processData = BellaContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
@@ -62,8 +66,10 @@ public class ChatController {
         CompletionResponse response = adaptor.completion(request, url, property);
         Object responseRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(response,
                 BellaContext.getProcessData(), BellaContext.getApikey()));
-        response.setSensitives(responseRiskData);
-        response.setRequestRiskData(requestRiskData);
+        if(!isMock) {
+            response.setSensitives(responseRiskData);
+            response.setRequestRiskData(requestRiskData);
+        }
         return response;
     }
 }

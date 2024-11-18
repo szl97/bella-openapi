@@ -3,6 +3,7 @@ package com.ke.bella.openapi.configuration;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
 import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
+import com.ke.bella.openapi.intercept.MockEndpointInterceptor;
 import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,8 @@ public class WebConfig implements WebMvcConfigurer {
     private AuthorizationInterceptor authorizationInterceptor;
     @Autowired
     private MonthQuotaInterceptor monthQuotaInterceptor;
+    @Autowired
+    private MockEndpointInterceptor mockEndpointInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -34,5 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns(endpointPathPatterns)
                 .order(110);
         registry.addInterceptor(concurrentStartInterceptor);
+        registry.addInterceptor(mockEndpointInterceptor)
+                .addPathPatterns(endpointPathPatterns);
     }
 }
