@@ -91,6 +91,15 @@ public class JacksonUtils {
         return null;
     }
 
+    public static <T> T deserialize(byte[] bytes, TypeReference<T> tTypeReference) {
+        try {
+            return MAPPER.readValue(bytes, tTypeReference);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
     public static JsonNode deserialize(String jsonText) {
         try {
             return MAPPER.readTree(jsonText);

@@ -3,7 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.exception.BizParamCheckException;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +69,8 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
     @Override
     public void streamCompletion(CompletionRequest request, String url, CompletionProperty property, Callbacks.StreamCompletionCallback callback) {
         MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getRequest());
-        SseEmitter sseEmitter = callback.getSse();
+        StreamCompletionCallback streamCompletionCallback = (StreamCompletionCallback) callback;
+        SseEmitter sseEmitter = streamCompletionCallback.getSse();
         List<String> chunks = mockCompletionRequest.getChunks();
         Runnable runnable = () -> {
             try {

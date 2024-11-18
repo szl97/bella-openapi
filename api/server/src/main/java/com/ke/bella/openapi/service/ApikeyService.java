@@ -17,7 +17,7 @@ import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.exception.ChannelException;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.safety.SafetyAuditService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;

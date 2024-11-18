@@ -2,7 +2,7 @@ package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.Tables;
 import com.ke.bella.openapi.common.StatusEnum;
-import com.ke.bella.openapi.exception.BizParamCheckException;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
 import com.ke.bella.openapi.tables.records.SpaceRecord;
 import com.ke.bella.openapi.tables.records.SpaceRoleRecord;

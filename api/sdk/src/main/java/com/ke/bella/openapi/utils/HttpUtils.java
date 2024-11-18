@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.utils;
 
-import com.ke.bella.openapi.exception.ChannelException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
@@ -11,7 +12,6 @@ import okhttp3.Response;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
-import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -56,7 +56,23 @@ public class HttpUtils {
             T result = JacksonUtils.deserialize(response.body().bytes(), clazz);
             if(result == null && response.code() > 299) {
                 if(response.code() > 499 && response.code() < 600) {
-                    throw ChannelException.fromResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), response.body().string());
+                    throw ChannelException.fromResponse(503, response.body().string());
+                }
+                throw ChannelException.fromResponse(response.code(), response.body().string());
+            }
+            return result;
+        } catch (IOException e) {
+            throw ChannelException.fromException(e);
+        }
+    }
+
+    public static <T> T httpRequest(Request request, TypeReference<T> tTypeReference) {
+        try {
+            Response response = HttpUtils.httpRequest(request);
+            T result = JacksonUtils.deserialize(response.body().bytes(), tTypeReference);
+            if(result == null && response.code() > 299) {
+                if(response.code() > 499 && response.code() < 600) {
+                    throw ChannelException.fromResponse(503, response.body().string());
                 }
                 throw ChannelException.fromResponse(response.code(), response.body().string());
             }

@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.exception;
+package com.ke.bella.openapi.common.exception;
 
 import org.springframework.http.HttpStatus;
 

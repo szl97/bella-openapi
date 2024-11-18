@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ke.bella.openapi.common.RoleCodeEnum;
 import com.ke.bella.openapi.db.repo.SpaceRepo;
-import com.ke.bella.openapi.exception.BizParamCheckException;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.space.ChangeSpaceOwnerOp;
 import com.ke.bella.openapi.space.CreateMemberOp;
 import com.ke.bella.openapi.space.CreateRoleDetail;

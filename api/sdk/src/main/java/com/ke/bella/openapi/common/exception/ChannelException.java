@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.exception;
+package com.ke.bella.openapi.common.exception;
 
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import lombok.Getter;
@@ -8,8 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketException;
+import java.util.concurrent.ExecutionException;
 
 public abstract class ChannelException extends RuntimeException {
 

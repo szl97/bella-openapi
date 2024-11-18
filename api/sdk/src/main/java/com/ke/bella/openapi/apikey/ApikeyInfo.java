@@ -2,6 +2,7 @@ package com.ke.bella.openapi.apikey;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -34,13 +35,19 @@ public class ApikeyInfo implements Serializable {
     private Long userId;
 
     public RolePath getRolePath() {
+        if(rolePath != null) {
+            return rolePath;
+        }
         if(path == null) {
             return new RolePath();
         }
-        if(rolePath == null) {
-            rolePath = JacksonUtils.deserialize(path, RolePath.class);
-        }
+        rolePath = JacksonUtils.deserialize(path, RolePath.class);
         return rolePath;
+    }
+
+    public boolean hasPermission(String url) {
+       return getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
+                && getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
     }
 
     @Data

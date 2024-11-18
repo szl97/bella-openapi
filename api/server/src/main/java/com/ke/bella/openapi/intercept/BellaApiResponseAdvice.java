@@ -2,8 +2,8 @@ package com.ke.bella.openapi.intercept;
 
 import com.ke.bella.openapi.BellaResponse;
 import com.ke.bella.openapi.annotations.BellaAPI;
-import com.ke.bella.openapi.exception.BizParamCheckException;
-import com.ke.bella.openapi.exception.ChannelException;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;

@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol.embedding;
 
-import com.ke.bella.openapi.exception.BizParamCheckException;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import org.springframework.stereotype.Component;
 
 @Component("mockEmbedding")

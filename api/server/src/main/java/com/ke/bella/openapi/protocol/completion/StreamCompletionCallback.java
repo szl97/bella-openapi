@@ -3,7 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
-import com.ke.bella.openapi.exception.ChannelException;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.safety.ISafetyCheckService;
@@ -12,6 +12,7 @@ import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.PunctuationUtils;
 import com.ke.bella.openapi.utils.SseHelper;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -20,14 +21,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public interface Callbacks {
-
-     @FunctionalInterface
-     interface SseEventConverter<T> {
-         T convert(String id, String event, String msg);
-     }
-     class StreamCompletionCallback {
-         public StreamCompletionCallback(SseEmitter sse, EndpointProcessData processData, ApikeyInfo apikeyInfo,
+@Slf4j
+public class StreamCompletionCallback implements Callbacks.StreamCompletionCallback {
+    public StreamCompletionCallback(SseEmitter sse, EndpointProcessData processData, ApikeyInfo apikeyInfo,
                  EndpointLogger logger, ISafetyCheckService<SafetyCheckRequest.Chat> safetyService) {
              this.sse = sse;
              this.processData = processData;
@@ -54,6 +50,7 @@ public interface Callbacks {
          private Long firstPackageTime;
          private Object requestRiskData;
 
+         @Override
          public void callback(StreamCompletionResponse msg) {
              if(requestRiskData != null) {
                  msg.setRequestRiskData(requestRiskData);
@@ -64,6 +61,7 @@ public interface Callbacks {
              safetyCheck(false);
          }
 
+         @Override
          public void done() {
              safetyCheck(true);
              SseHelper.sendEvent(sse, "[DONE]");
@@ -74,6 +72,7 @@ public interface Callbacks {
              log();
          }
 
+         @Override
          public void finish(ChannelException exception) {
              OpenapiResponse.OpenapiError openapiError = exception.convertToOpenapiError();
              StreamCompletionResponse response = StreamCompletionResponse.builder()
@@ -148,5 +147,4 @@ public interface Callbacks {
              }
              dirtyChoice = false;
          }
-     }
 }

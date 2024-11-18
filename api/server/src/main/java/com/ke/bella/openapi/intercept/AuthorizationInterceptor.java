@@ -5,7 +5,7 @@ import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
-import com.ke.bella.openapi.exception.ChannelException;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
@@ -33,6 +33,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         if(Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
             return true;
         }
+        boolean hasPermission;
         String url = request.getRequestURI();
         Operator op = ConsoleContext.getOperatorIgnoreNull();
         if(op != null) {
@@ -42,28 +43,26 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 String akCode = properties.getManagers().get(op.getUserId());
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
                 BellaContext.setApikey(apikeyInfo);
-                roles.add("/console/**");
-                excludes.clear();
+                hasPermission = apikeyInfo.hasPermission(url);
+            } else {
+                hasPermission = roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
+                        && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url));
             }
-            if(roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
-                    && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url))) {
-                return true;
+        } else {
+            String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
+            if(StringUtils.isEmpty(auth)) {
+                throw new ChannelException.AuthorizationException("Invalid Authorization");
             }
+            if(auth.startsWith("Bearer ")) {
+                auth = auth.substring(7);
+            }
+            ApikeyInfo apikeyInfo = apikeyService.verify(auth);
+            BellaContext.setApikey(apikeyInfo);
+            hasPermission = apikeyInfo.hasPermission(url);
         }
-        String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(StringUtils.isEmpty(auth)) {
-            throw new ChannelException.AuthorizationException("Invalid Authorization");
-        }
-        if(auth.startsWith("Bearer ")) {
-            auth = auth.substring(7);
-        }
-        ApikeyInfo apikeyInfo = apikeyService.verify(auth);
-        boolean match = apikeyInfo.getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
-                && apikeyInfo.getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
-        if(!match) {
+        if(!hasPermission) {
             throw new ChannelException.AuthorizationException("没有操作权限");
         }
-        BellaContext.setApikey(apikeyInfo);
         return true;
     }
 }
