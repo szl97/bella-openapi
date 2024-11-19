@@ -6,6 +6,11 @@ import org.springframework.stereotype.Component;
 @Component("mockEmbedding")
 public class MockAdaptor implements EmbeddingAdaptor<EmbeddingProperty> {
     @Override
+    public String getDescription() {
+        return "mock协议";
+    }
+
+    @Override
     public Class<?> getPropertyClass() {
         return EmbeddingAdaptor.class;
     }

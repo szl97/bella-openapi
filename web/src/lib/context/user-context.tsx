@@ -1,12 +1,7 @@
 'use client';
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { getUserInfo } from '@/lib/api/userInfo';
-
-export interface UserInfo {
-    userId: number;
-    userName: string;
-    image?: string;
-}
+import {UserInfo} from "@/lib/types/openapi";
 
 interface UserContextType {
     userInfo: UserInfo | null;

@@ -29,6 +29,12 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
     ExecutorService executor = new ThreadPoolExecutor(500, 500,
             0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000),
             new DefaultThreadFactory("mock-completion"));
+
+    @Override
+    public String getDescription() {
+        return "mock协议";
+    }
+
     @Override
     public Class<?> getPropertyClass() {
         return CompletionProperty.class;

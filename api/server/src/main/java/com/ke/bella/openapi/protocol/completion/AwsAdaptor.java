@@ -20,6 +20,11 @@ import java.util.function.Consumer;
 public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
 
     @Override
+    public String getDescription() {
+        return "亚马逊协议";
+    }
+
+    @Override
     public Class<?> getPropertyClass() {
         return AwsProperty.class;
     }

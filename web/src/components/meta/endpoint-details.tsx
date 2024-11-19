@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getEndpointDetails } from '@/lib/api/endpoint';
+import { getEndpointDetails } from '@/lib/api/meta';
 import { EndpointDetails, Model } from '@/lib/types/openapi';
 import { ModelCard } from './model-card';
 import { SearchBar } from './search-bar';
@@ -16,22 +16,25 @@ export function EndpointDisplay({ endpoint }: EndpointDetailsProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
 
+    async function fetchEndpointModels() {
+        if (endpoint) {
+            const data = await getEndpointDetails(endpoint, searchTerm, selectedFeatures);
+            setEndpointData(data);
+            setEndpointModels(data.models);
+        } else {
+            setEndpointData(null);
+            setEndpointModels([]);
+        }
+    }
+
     useEffect(() => {
         setSelectedFeatures([]);
         setSearchTerm('');
+        fetchEndpointModels();
     }, [endpoint]);
 
+
     useEffect(() => {
-        async function fetchEndpointModels() {
-            if (endpoint) {
-                const data = await getEndpointDetails(endpoint, searchTerm, selectedFeatures);
-                setEndpointData(data);
-                setEndpointModels(data.models);
-            } else {
-                setEndpointData(null);
-                setEndpointModels([]);
-            }
-        }
         fetchEndpointModels();
     }, [searchTerm, selectedFeatures]);
 
@@ -53,7 +56,7 @@ export function EndpointDisplay({ endpoint }: EndpointDetailsProps) {
             </div>
             {endpointModels && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {endpointModels.map(model => (
-                    <ModelCard key={model.modelName} model={model} />
+                    <ModelCard key={model.modelName} model={model} update={false} />
                 ))}
             </div>}
         </div>

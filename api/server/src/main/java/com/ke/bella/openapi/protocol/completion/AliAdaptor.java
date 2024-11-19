@@ -16,6 +16,11 @@ import java.util.List;
 @Component("AliCompletion")
 public class AliAdaptor implements CompletionAdaptor<AliProperty> {
     @Override
+    public String getDescription() {
+        return "阿里协议";
+    }
+
+    @Override
     public Class<?> getPropertyClass() {
         return AliProperty.class;
     }

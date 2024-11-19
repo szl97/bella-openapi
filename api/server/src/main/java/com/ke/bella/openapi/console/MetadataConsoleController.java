@@ -1,7 +1,9 @@
 package com.ke.bella.openapi.console;
 
+import com.ke.bella.openapi.JsonSchema;
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.metadata.MetaDataOps;
+import com.ke.bella.openapi.metadata.ModelDetails;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.EndpointService;
@@ -13,11 +15,16 @@ import com.ke.bella.openapi.tables.pojos.ModelDB;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+import java.util.Set;
 
 import static com.ke.bella.openapi.console.MetadataValidator.checkCategoryCreateOp;
 import static com.ke.bella.openapi.console.MetadataValidator.checkCategoryStatus;
@@ -195,5 +202,35 @@ public class MetadataConsoleController {
         checkReplaceEndpointCategoryOp(op);
         categoryService.replaceCategoryWithEndpoint(op);
         return true;
+    }
+
+    @GetMapping("/model/details")
+    public ModelDetails getModelDetails(@RequestParam String modelName) {
+        return modelService.getModelDetails(modelName);
+    }
+
+    @GetMapping("/schema/modelProperty")
+    public JsonSchema getModelPropertySchema(@RequestParam Set<String> endpoints) {
+        return endpointService.getModelPropertySchema(endpoints);
+    }
+
+    @GetMapping("/schema/modelFeature")
+    public JsonSchema getModelFeatureSchema(@RequestParam Set<String> endpoints) {
+        return endpointService.getModelFeatureSchema(endpoints);
+    }
+
+    @GetMapping("/schema/priceInfo")
+    public JsonSchema getPriceInfoSchema(@RequestParam String entityType, @RequestParam String entityCode) {
+        return endpointService.getPriceInfoSchema(entityType, entityCode);
+    }
+
+    @GetMapping("/schema/channelInfo")
+    public JsonSchema getChannelInfoSchema(@RequestParam String entityType, @RequestParam String entityCode, @RequestParam String protocol) {
+        return endpointService.getChannelInfo(entityType, entityCode, protocol);
+    }
+
+    @GetMapping("/protocol/list")
+    public Map<String, String> listProtocols(@RequestParam String entityType, @RequestParam String entityCode) {
+        return endpointService.listProtocols(entityType, entityCode);
     }
 }

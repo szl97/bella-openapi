@@ -1,8 +1,11 @@
 package com.ke.bella.openapi.service;
 
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EnumDto;
+import com.ke.bella.openapi.JsonSchema;
+import com.ke.bella.openapi.TypeSchema;
 import com.ke.bella.openapi.db.repo.EndpointRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -11,7 +14,11 @@ import com.ke.bella.openapi.metadata.MetaDataOps;
 import com.ke.bella.openapi.metadata.MetadataFeatures;
 import com.ke.bella.openapi.metadata.Model;
 import com.ke.bella.openapi.metadata.PriceDetails;
+import com.ke.bella.openapi.protocol.AdaptorManager;
+import com.ke.bella.openapi.protocol.IModelFeatures;
+import com.ke.bella.openapi.protocol.IModelProperties;
 import com.ke.bella.openapi.protocol.IPriceInfo;
+import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +32,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
 import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.common.EntityConstants.INNER;
 import static com.ke.bella.openapi.common.EntityConstants.MAINLAND;
@@ -46,6 +57,8 @@ public class EndpointService {
     private ModelService modelService;
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    private AdaptorManager adaptorManager;
 
     @Transactional
     public EndpointDB createEndpoint(MetaDataOps.EndpointOp op) {
@@ -88,6 +101,7 @@ public class EndpointService {
     }
 
     @Cached(name = "endpoint:details:", key = "#condition.endpoint + ':' + #identity",
+            cacheType = CacheType.BOTH,
             condition = "(#condition.modelName == null || #condition.modelName == '') "
                     + "&& (#condition.features == null || #condition.features.isEmpty())")
     public EndpointDetails getEndpointDetails(Condition.EndpointDetailsCondition condition, String identity) {
@@ -162,6 +176,58 @@ public class EndpointService {
 
     public Page<EndpointDB> pageByCondition(Condition.EndpointCondition condition) {
         return endpointRepo.page(condition);
+    }
+
+    public JsonSchema getModelPropertySchema(Set<String> endpoints) {
+        Set<TypeSchema> schemas = endpoints.stream()
+                .map(IModelProperties.EndpointModelPropertyType::fetchType)
+                .filter(Objects::nonNull)
+                .map(JsonSchema::toSchema)
+                .map(JsonSchema::getParams)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+        return new JsonSchema(schemas);
+    }
+
+    public JsonSchema getModelFeatureSchema(Set<String> endpoints) {
+        Set<TypeSchema> schemas = endpoints.stream()
+                .map(IModelFeatures.EndpointModelFeatureType::fetchType)
+                .filter(Objects::nonNull)
+                .map(JsonSchema::toSchema)
+                .map(JsonSchema::getParams)
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+        return new JsonSchema(schemas);
+    }
+
+    public Map<String, String> listProtocols(String entityType, String entityCode) {
+        Map<String, IProtocolAdaptor> protocolAdaptors = adaptorManager.getProtocolAdaptors(fetchEndpoint(entityType, entityCode));
+        Map<String, String> result = new HashMap<>();
+        protocolAdaptors.forEach((k, v) -> result.put(k, v.getDescription()));
+        return result;
+    }
+
+
+    public JsonSchema getPriceInfoSchema(String entityType, String entityCode) {
+        String endpoint = fetchEndpoint(entityType, entityCode);
+        Class<? extends IPriceInfo> type = IPriceInfo.EndpointPriceInfoType.fetchType(endpoint);
+        if(type == null) {
+            return null;
+        }
+        return JsonSchema.toSchema(type);
+    }
+
+    public JsonSchema getChannelInfo(String entityType, String entityCode, String protocol) {
+        IProtocolAdaptor protocolAdaptor = adaptorManager.getProtocolAdaptor(fetchEndpoint(entityType, entityCode), protocol);
+        return JsonSchema.toSchema(protocolAdaptor.getPropertyClass());
+    }
+
+    private String fetchEndpoint(String entityType, String entityCode) {
+        if(entityType.equals(ENDPOINT)) {
+            return entityCode;
+        } else {
+            return modelService.getAllEndpoints(entityCode).get(0);
+        }
     }
 
     @Data

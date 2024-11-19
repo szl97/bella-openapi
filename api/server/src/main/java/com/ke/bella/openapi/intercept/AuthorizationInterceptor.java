@@ -42,9 +42,13 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             if(properties.getManagers().containsKey(op.getUserId())) {
                 String akCode = properties.getManagers().get(op.getUserId());
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
+                op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
+                op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
                 BellaContext.setApikey(apikeyInfo);
                 hasPermission = apikeyInfo.hasPermission(url);
             } else {
+                op.getOptionalInfo().put("roles", roles);
+                op.getOptionalInfo().put("excludes", excludes);
                 hasPermission = roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
                         && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url));
             }

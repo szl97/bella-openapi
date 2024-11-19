@@ -36,5 +36,10 @@ public class KeAdaptor extends OpenAIAdaptor {
         }
         return response;
     }
+
+    @Override
+    public String getDescription() {
+        return "贝壳私有协议（未实现OpenAI协议）";
+    }
 }
 

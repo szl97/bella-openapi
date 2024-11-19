@@ -15,6 +15,13 @@ export interface Page<T> {
     total: number;
 }
 
+export interface UserInfo {
+    userId: number;
+    userName: string;
+    image?: string;
+    optionalInfo: Record<string, any>
+}
+
 export interface ApikeyInfo {
     code: string;
     serviceId: string;
@@ -87,7 +94,33 @@ export interface Model {
     documentUrl: string;
     properties: string;
     features: string;
+    ownerType: string;
+    ownerCode:string;
+    ownerName: string;
+    visibility: string;
+    status: string;
+    linkedTo: string;
+    endpoints: string[];
     priceDetails: PriceDetails;
+}
+
+export interface Channel {
+    entityType: string;
+    entityCode: string;
+    channelCode: string;
+    status: string;
+    dataDestination: string;
+    priority: string;
+    protocol: string;
+    supplier: string;
+    url: string;
+    channelInfo: string;
+    priceInfo: string;
+}
+
+export interface ModelDetails {
+    model: Model;
+    channels: Channel[];
 }
 
 export interface EndpointDetails {
@@ -100,4 +133,15 @@ export interface EndpointDetails {
 export interface PriceDetails {
     displayPrice: Record<string, string>;
     unit: string;
+}
+
+export interface TypeSchema {
+    code: string;
+    name: string;
+    valueType: string;
+    child?: JsonSchema;
+}
+
+export interface JsonSchema {
+    params: TypeSchema[];
 }

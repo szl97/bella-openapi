@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/meta/sidebar';
 import { EndpointDisplay } from '@/components/meta/endpoint-details';
-import { getAllCategoryTrees } from '@/lib/api/category';
+import { getAllCategoryTrees } from '@/lib/api/meta';
 import { CategoryTree } from '@/lib/types/openapi';
 import {ClientHeader} from "@/components/user/client-header";
 

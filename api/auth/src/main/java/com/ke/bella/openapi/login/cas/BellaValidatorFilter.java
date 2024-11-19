@@ -39,7 +39,7 @@ public class BellaValidatorFilter extends Cas30ProxyReceivingTicketValidationFil
         if(CollectionUtils.isNotEmpty(optionalAttributes)) {
             for(String attributeName : optionalAttributes) {
                 if(assertion.getPrincipal().getAttributes().containsKey(attributeName)) {
-                    operator.getOptionalInfo().put(attributeName, assertion.getPrincipal().getAttributes().get(attributeName).toString());
+                    operator.getOptionalInfo().put(attributeName, assertion.getPrincipal().getAttributes().get(attributeName));
                 }
             }
         }

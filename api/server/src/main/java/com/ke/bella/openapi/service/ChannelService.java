@@ -7,6 +7,7 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
+import com.ke.bella.openapi.metadata.Channel;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
 import com.ke.bella.openapi.metadata.PriceDetails;
@@ -151,6 +152,10 @@ public class ChannelService {
         return listActivesWithDb(entityType, entityCode);
     }
 
+    public List<String> listSuppliers() {
+        return channelRepo.listSuppliers();
+    }
+
     private void updateCache(String channelCode) {
         ChannelDB db = channelRepo.queryByUniqueKey(channelCode);
         updateCache(db.getEntityType(), db.getEntityCode());
@@ -168,6 +173,10 @@ public class ChannelService {
 
     public List<ChannelDB> listByCondition(Condition.ChannelCondition condition) {
         return channelRepo.list(condition);
+    }
+
+    public <H> List<H> listByCondition(Condition.ChannelCondition condition, Class<H> type) {
+        return channelRepo.list(condition, type);
     }
 
     public Page<ChannelDB> pageByCondition(Condition.ChannelCondition condition) {
@@ -188,7 +197,7 @@ public class ChannelService {
                 details.setUnit(priceInfo.getUnit());
                 details.setPriceInfo(priceInfo);
                 details.setDisplayPrice(new LinkedHashMap<>());
-                priceInfo.priceDescription().forEach((filedName, desc) -> {
+                priceInfo.description().forEach((filedName, desc) -> {
                     try {
                         Object val = fields.get(filedName).get(priceInfo);
                         details.getDisplayPrice().put(desc, val == null ? "N/A" : val.toString());

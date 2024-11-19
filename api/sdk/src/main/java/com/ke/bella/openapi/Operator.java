@@ -19,5 +19,5 @@ public class Operator implements Serializable {
     Long userId;
     String userName;
     String email;
-    Map<String, String> optionalInfo = new HashMap<>();
+    Map<String, Object> optionalInfo = new HashMap<>();
 }

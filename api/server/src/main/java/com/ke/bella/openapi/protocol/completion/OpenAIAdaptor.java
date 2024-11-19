@@ -47,6 +47,11 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
     }
 
     @Override
+    public String getDescription() {
+        return "OpenAI协议";
+    }
+
+    @Override
     public Class<OpenAIProperty> getPropertyClass() {
         return OpenAIProperty.class;
     }

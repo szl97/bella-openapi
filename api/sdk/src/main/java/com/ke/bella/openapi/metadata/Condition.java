@@ -53,6 +53,7 @@ public class Condition {
         private Integer maxOutputTokensLimit;
         private List<String> features;
         private String dataDestination;
+        private String supplier;
     }
 
     @EqualsAndHashCode(callSuper = true)

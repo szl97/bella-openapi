@@ -11,8 +11,11 @@ import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.metadata.Channel;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
+import com.ke.bella.openapi.metadata.Model;
+import com.ke.bella.openapi.metadata.ModelDetails;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelAuthorizerRelDB;
@@ -276,6 +279,17 @@ public class ModelService {
         return path;
     }
 
+     public ModelDetails getModelDetails(String modelName) {
+        Model model = modelRepo.queryByUniqueKey(modelName, Model.class);
+        Assert.notNull(model, "实体不存在");
+        List<Channel> channels = channelService
+                .listByCondition(Condition.ChannelCondition.builder().entityType("model").entityCode(modelName).build(), Channel.class);
+        ModelDetails modelDetails = new ModelDetails();
+        modelDetails.setChannels(channels);
+        modelDetails.setModel(model);
+        return modelDetails;
+    }
+
     private void updateModelCache(String modelName, String terminal) {
         cacheManager.getCache(modelMapCacheKey).tryLockAndRun("lock", 10, TimeUnit.SECONDS, ()-> {
             ModelDB modelDB = modelRepo.queryByUniqueKey(modelName);
@@ -332,12 +346,13 @@ public class ModelService {
     }
 
     private boolean fillModelNames(Condition.ModelCondition condition) {
-        if(condition.getDataDestination() == null) {
+        if(condition.getDataDestination() == null && condition.getSupplier() == null) {
             return true;
         }
         Condition.ChannelCondition channelCondition = new Condition.ChannelCondition();
         channelCondition.setStatus(ACTIVE);
         channelCondition.setDataDestination(condition.getDataDestination());
+        channelCondition.setSupplier(condition.getSupplier());
         channelCondition.setEntityType(MODEL);
         List<ChannelDB> channels = channelService.listByCondition(channelCondition);
         Set<String> modelNames = channels.stream()

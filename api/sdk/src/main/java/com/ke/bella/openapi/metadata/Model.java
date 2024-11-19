@@ -21,6 +21,7 @@ public class Model extends BaseDto {
     private String status;
     private String properties;
     private String features;
+    private String linkedTo;
     private PriceDetails priceDetails;
 
     public <T extends IModelProperties> T toProperties(Class<T> type) {

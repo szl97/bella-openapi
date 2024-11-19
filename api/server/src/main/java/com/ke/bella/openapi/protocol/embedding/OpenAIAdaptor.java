@@ -41,6 +41,11 @@ public class OpenAIAdaptor implements EmbeddingAdaptor<OpenAIProperty> {
     }
 
     @Override
+    public String getDescription() {
+        return "openAI协议";
+    }
+
+    @Override
     public Class<?> getPropertyClass() {
         return OpenAIProperty.class;
     }

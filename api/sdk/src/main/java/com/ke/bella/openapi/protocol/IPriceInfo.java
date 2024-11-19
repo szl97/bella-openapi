@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.protocol;
 
+import com.ke.bella.openapi.IDescription;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
 import lombok.AllArgsConstructor;
@@ -8,10 +9,8 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.Map;
 
-public interface IPriceInfo extends Serializable {
+public interface IPriceInfo extends IDescription {
     String getUnit();
-
-    Map<String, String> priceDescription();
 
     @AllArgsConstructor
     @Getter

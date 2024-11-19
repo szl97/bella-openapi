@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
-public interface IProtocolProperty {
+import com.ke.bella.openapi.IDescription;
+
+public interface IProtocolProperty extends IDescription {
 
 }

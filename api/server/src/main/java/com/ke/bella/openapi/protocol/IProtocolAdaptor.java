@@ -6,6 +6,8 @@ public interface IProtocolAdaptor {
 
     String endpoint();
 
+    String getDescription();
+
     Class<?> getPropertyClass();
 
     default Request.Builder authorizationRequestBuilder(AuthorizationProperty property) {

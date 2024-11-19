@@ -12,7 +12,7 @@ openapi.interceptors.response.use(
             return response.data || null;
         } else {
             console.error('Failed to fetch api:', response.data.message);
-            return null;
+            return Promise.reject({ error: response.data.message });
         }
     },
     (error) => {

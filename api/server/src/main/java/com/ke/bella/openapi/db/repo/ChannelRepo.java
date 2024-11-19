@@ -34,8 +34,16 @@ public class ChannelRepo extends StatusRepo<ChannelDB, ChannelRecord, String> im
                 .fetch();
         return result.intoMap(CHANNEL.ENTITY_CODE, DSL.field("ANY_VALUE({0})", String.class, CHANNEL.PRICE_INFO));
     }
+
+    public List<String> listSuppliers() {
+        return db.selectDistinct(CHANNEL.SUPPLIER).from(CHANNEL).fetchInto(String.class);
+    }
     public List<ChannelDB> list(Condition.ChannelCondition op) {
         return constructSql(op).fetchInto(ChannelDB.class);
+    }
+
+    public <H> List<H> list(Condition.ChannelCondition op, Class<H> type) {
+        return constructSql(op).fetchInto(type);
     }
 
     public Page<ChannelDB> page(Condition.ChannelCondition op) {

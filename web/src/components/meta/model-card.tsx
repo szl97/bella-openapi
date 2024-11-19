@@ -1,15 +1,16 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Edit } from "lucide-react";
 import Link from "next/link";
 import { Model } from "@/lib/types/openapi";
 import { Badge } from "@/components/ui/badge";
 
 interface ModelCardProps {
     model: Model;
+    update: boolean;
 }
 
-export function ModelCard({ model }: ModelCardProps) {
+export function ModelCard({ model, update }: ModelCardProps) {
     const properties = JSON.parse(model.properties) as Record<string, any>;
     const features = JSON.parse(model.features) as Record<string, boolean>;
 
@@ -30,17 +31,30 @@ export function ModelCard({ model }: ModelCardProps) {
             <CardHeader className="bg-gradient-to-r from-blue-100 to-purple-100 pb-8 relative">
                 <CardTitle className="flex items-center justify-between z-10 relative">
                     <span className="text-lg font-bold text-gray-800">{model.modelName}</span>
-                    {model.documentUrl && (
-                        <Link
-                            href={model.documentUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 hover:bg-white/50">
-                                <ExternalLink size={16} />
-                            </Button>
-                        </Link>
-                    )}
+                    <div className="flex items-center space-x-2">
+                        {update && (
+                            <Link href={`/meta/console/model?modelName=${model.modelName}`} passHref>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-600 hover:text-gray-800 hover:bg-white/50"
+                                >
+                                    <Edit size={16} />
+                                </Button>
+                            </Link>
+                        )}
+                        {model.documentUrl && (
+                            <Link
+                                href={model.documentUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-800 hover:bg-white/50">
+                                    <ExternalLink size={16} />
+                                </Button>
+                            </Link>
+                        )}
+                    </div>
                 </CardTitle>
             </CardHeader>
             <CardContent className="-mt-6 relative z-20">

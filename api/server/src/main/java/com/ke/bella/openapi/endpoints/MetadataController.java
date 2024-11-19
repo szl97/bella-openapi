@@ -112,4 +112,8 @@ public class MetadataController {
         return categoryService.listAllTree();
     }
 
+    @GetMapping("/supplier/list")
+    public List<String> listSuppliers() {
+        return channelService.listSuppliers();
+    }
 }
