@@ -62,6 +62,7 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
         try {
             Thread.sleep(mockCompletionRequest.getTtlt());
         } catch (InterruptedException ignore) {
+            Thread.currentThread().interrupt();
         }
         return response;
     }
