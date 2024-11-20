@@ -62,7 +62,7 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
     public Page<ModelDB> page(Condition.ModelCondition op) {
         return queryPage(db, constructSql(op), op.getPage(), op.getSize(), ModelDB.class);
     }
-
+    @SuppressWarnings("all")
     private SelectSeekStep1<Record, Long> constructSql(Condition.ModelCondition op) {
         SelectJoinStep step = db.select(MODEL.fields())
                 .from(MODEL);
@@ -98,7 +98,9 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
             }
         }
 
-        return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : MODEL.MODEL_NAME.like(op.getModelName() + "%"))
+        return step.where(StringUtils.isEmpty(op.getModelName()) ? DSL.noCondition() : op.isIncludeLinkedTo() ?
+                        MODEL.MODEL_NAME.like(op.getModelName() + "%").or(MODEL.LINKED_TO.like(op.getModelName() + "%")) :
+                        MODEL.MODEL_NAME.like(op.getModelName() + "%"))
                 .and(StringUtils.isEmpty(op.getOwnerName()) ? DSL.noCondition() : MODEL.OWNER_NAME.eq(op.getOwnerName()))
                 .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
                 .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : MODEL.VISIBILITY.eq(op.getVisibility()))

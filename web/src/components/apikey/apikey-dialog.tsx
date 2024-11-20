@@ -271,14 +271,14 @@ export const RenameDialog: React.FC<{ code: string; origin: string; refresh: () 
             toast({ title: "修改成功", description: "apikey名称修改为:" + name })
         } else {
             setName(origin)
-            toast({ title: "修改失败", description: "无法提交额度修改申请，请稍后重试。", variant: "destructive" })
+            toast({ title: "修改失败", description: "apikey名称修改失败，请稍后重试。", variant: "destructive" })
         }
     }
 
     return (
         <ActionDialog
-            label="修改额度"
-            description="请输入新的每月额度。"
+            label="修改名称"
+            description="请输入apikey名称"
             onConfirm={handleConfirm}
             inputLabel="名称"
             inputProps={{

@@ -54,6 +54,7 @@ public class Condition {
         private List<String> features;
         private String dataDestination;
         private String supplier;
+        private boolean includeLinkedTo;
     }
 
     @EqualsAndHashCode(callSuper = true)

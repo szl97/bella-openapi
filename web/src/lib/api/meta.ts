@@ -44,9 +44,9 @@ export async function listEndpoints(status: string): Promise<Endpoint[]> {
     return response.data;
 }
 
-export async function listModels(endpoint: string, modelName: string, supplier: string, status: string): Promise<Model[]> {
-    const response = await openapi.get<Model[]>('/v1/meta/model/list', {
-        params: { endpoint, modelName, supplier, status },
+export async function listConsoleModels(endpoint: string, modelName: string, supplier: string, status: string, visibility: string): Promise<Model[]> {
+    const response = await openapi.get<Model[]>('/console/model/list', {
+        params: { endpoint, modelName, supplier, status, visibility, includeLinkedTo : true},
     });
     return response.data;
 }

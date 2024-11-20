@@ -35,7 +35,7 @@ export function ModelForm({ model, onUpdate, onToggleStatus, onToggleVisibility 
                             {model.status === 'active' ? '已启用' : '已停用'}
                         </Badge>
                         <Badge variant={model.visibility === 'publish' ? "default" : "secondary"}>
-                            {model.visibility === 'publish' ? '已公开' : '未公开'}
+                            {model.visibility === 'publish' ? '公开' : '私有'}
                         </Badge>
                     </div>
                 </div>

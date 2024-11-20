@@ -2,6 +2,7 @@ package com.ke.bella.openapi.console;
 
 import com.ke.bella.openapi.JsonSchema;
 import com.ke.bella.openapi.annotations.BellaAPI;
+import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
 import com.ke.bella.openapi.metadata.ModelDetails;
 import com.ke.bella.openapi.service.CategoryService;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -232,5 +234,10 @@ public class MetadataConsoleController {
     @GetMapping("/protocol/list")
     public Map<String, String> listProtocols(@RequestParam String entityType, @RequestParam String entityCode) {
         return endpointService.listProtocols(entityType, entityCode);
+    }
+
+    @GetMapping("/model/list")
+    public List<ModelDB> listModels(Condition.ModelCondition condition) {
+        return modelService.listByCondition(condition);
     }
 }

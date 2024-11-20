@@ -139,6 +139,7 @@ export interface TypeSchema {
     code: string;
     name: string;
     valueType: string;
+    selections: string[]
     child?: JsonSchema;
 }
 

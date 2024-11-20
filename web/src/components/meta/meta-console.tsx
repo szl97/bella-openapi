@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {listModels} from '@/lib/api/meta';
+import {listConsoleModels} from '@/lib/api/meta';
 import {MetadataFeature, Model} from '@/lib/types/openapi';
 import {ModelCard} from './model-card';
 import {SearchBar} from './search-bar';
@@ -18,6 +18,7 @@ export function MetaConsoleDisplay({ endpoint, suppliers }: MetaConsoleProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedSupplier, setSelectedSupplier] = useState<string>('');
     const [selectedStatus, setSelectedStatus] = useState<string>('');
+    const [selectedVisibility, setSelectedVisibility] = useState<string>('');
 
     function convertToMetadataFeatures(features: string[]): MetadataFeature[] {
         return features.map(feature => ({ code: feature, name: feature }));
@@ -25,7 +26,7 @@ export function MetaConsoleDisplay({ endpoint, suppliers }: MetaConsoleProps) {
 
     async function fetchEndpointModels() {
         if (endpoint) {
-            const data = await listModels(endpoint, searchTerm, selectedSupplier, selectedStatus);
+            const data = await listConsoleModels(endpoint, searchTerm, selectedSupplier, selectedStatus, selectedVisibility);
             setEndpointModels(data);
         } else {
             setEndpointModels([]);
@@ -41,7 +42,7 @@ export function MetaConsoleDisplay({ endpoint, suppliers }: MetaConsoleProps) {
 
     useEffect(() => {
         fetchEndpointModels();
-    }, [searchTerm, selectedSupplier, selectedStatus]);
+    }, [searchTerm, selectedSupplier, selectedStatus, selectedVisibility]);
 
     if (!endpoint || !endpointModels) {
         return (
@@ -59,8 +60,18 @@ export function MetaConsoleDisplay({ endpoint, suppliers }: MetaConsoleProps) {
             <div className="mb-6">
                 <FeatureFilter features={convertToMetadataFeatures(suppliers)} onSelect={setSelectedSupplier}
                                selectedFeatures={selectedSupplier}/>
-                <FeatureFilter features={[{code: 'active', name: '启用'}, {code: 'inactive', name: '停用'}]}
-                               onSelect={setSelectedStatus} selectedFeatures={selectedStatus}/>
+                <div className="flex space-x-4">
+                    <FeatureFilter
+                        features={[{code: 'active', name: '已启用'}, {code: 'inactive', name: '已停用'}]}
+                        onSelect={setSelectedStatus}
+                        selectedFeatures={selectedStatus}
+                    />
+                    <FeatureFilter
+                        features={[{code: 'public', name: '公开'}, {code: 'private', name: '私有'}]}
+                        onSelect={setSelectedVisibility}
+                        selectedFeatures={selectedVisibility}
+                    />
+                </div>
             </div>
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-xl font-bold">模型列表</h2>

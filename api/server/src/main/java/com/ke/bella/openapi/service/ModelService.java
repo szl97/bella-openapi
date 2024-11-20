@@ -247,10 +247,13 @@ public class ModelService {
         if(db.getLinkedTo().equals(op.getLinkedTo())) {
             return;
         }
-        List<String> path = getPath(op.getLinkedTo());
-        Assert.isTrue(CollectionUtils.isNotEmpty(path), "linedTo实体不存在");
-        Assert.isTrue(!path.contains(op.getModelName()), "出现循环");
-        String terminal = path.get(path.size() - 1);
+        String terminal = op.getModelName();
+        if(StringUtils.isNotEmpty(op.getLinkedTo())) {
+            List<String> path = getPath(op.getLinkedTo());
+            Assert.isTrue(CollectionUtils.isNotEmpty(path), "linedTo实体不存在");
+            Assert.isTrue(!path.contains(op.getModelName()), "出现循环");
+            terminal = path.get(path.size() - 1);
+        }
         modelRepo.update(op, op.getModelName());
         updateModelCache(op.getModelName(), terminal);
     }

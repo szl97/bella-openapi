@@ -1,18 +1,27 @@
 package com.ke.bella.openapi;
 
+import com.ke.bella.openapi.common.exception.ChannelException;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
+@Slf4j
 public class TypeSchema implements Serializable {
     private static final long serialVersionUID = 1L;
     private String code;
     private String name;
     private String valueType;
+    private List<String> selections;
     private JsonSchema child;
 
     @Override
@@ -32,30 +41,46 @@ public class TypeSchema implements Serializable {
         if(!desc.isEmpty() && !desc.containsKey(field.getName())) {
             return null;
         }
-        TypeSchema schema = new TypeSchema();
-        schema.setCode(field.getName());
-        schema.setName(desc.isEmpty() ? field.getName() : desc.get(field.getName()));
-        Class<?> fieldType = field.getType();
-        if(isPrimitiveOrWrapper(fieldType) || fieldType == String.class || fieldType == BigDecimal.class || fieldType.isEnum()) {
-            // 简单类型： 基本类型、String、BigDecimal、枚举
-            schema.setValueType(fieldType == boolean.class || fieldType == Boolean.class ? "bool" :
-                    fieldType == char.class || fieldType == String.class || fieldType == Character.class || fieldType.isEnum() ? "string" : "number");
-        } else if(fieldType.isArray()) {
-            // 数组类型
-            schema.setValueType("array");
-            if(fieldType.getComponentType().isAssignableFrom(IDescription.class)) {
-                schema.setChild(JsonSchema.toSchema(fieldType.getComponentType()));
+        try {
+            TypeSchema schema = new TypeSchema();
+            schema.setCode(field.getName());
+            schema.setName(desc.isEmpty() ? field.getName() : desc.get(field.getName()));
+            Class<?> fieldType = field.getType();
+            if(fieldType.isEnum()) {
+                //枚举类型
+                Object[] ems = fieldType.getEnumConstants();
+                Method name = fieldType.getMethod("name");
+                schema.setValueType("enum");
+                schema.setSelections(Arrays.stream(ems).map(em -> {
+                    try {
+                        return name.invoke(em).toString();
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw ChannelException.fromException(e);
+                    }
+                }).collect(Collectors.toList()));
+            } else if(isPrimitiveOrWrapper(fieldType) || fieldType == String.class || fieldType == BigDecimal.class) {
+                // 简单类型： 基本类型、String、BigDecimal
+                schema.setValueType(fieldType == boolean.class || fieldType == Boolean.class ? "bool" :
+                        fieldType == char.class || fieldType == String.class || fieldType == Character.class ? "string" : "number");
+            } else if(fieldType.isArray()) {
+                // 数组类型
+                schema.setValueType("array");
+                if(fieldType.getComponentType().isAssignableFrom(IDescription.class)) {
+                    schema.setChild(JsonSchema.toSchema(fieldType.getComponentType()));
+                }
+            } else if(Map.class.isAssignableFrom(fieldType)) {
+                // Map类型
+                schema.setValueType("map");
+            } else {
+                // 其他复杂类型，递归创建JsonSchema
+                schema.setValueType("object");
+                schema.setChild(JsonSchema.toSchema(fieldType));
             }
-        }  else if(Map.class.isAssignableFrom(fieldType)) {
-            // Map类型
-            schema.setValueType("map");
-        } else {
-            // 其他复杂类型，递归创建JsonSchema
-            schema.setValueType("object");
-            schema.setChild(JsonSchema.toSchema(fieldType));
-
+            return schema;
+        } catch (NoSuchMethodException e) {
+            LOGGER.warn(e.getMessage(), e);
+            throw ChannelException.fromException(e);
         }
-        return schema;
     }
 
     private static boolean isPrimitiveOrWrapper(Class<?> type) {

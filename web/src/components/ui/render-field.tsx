@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TypeSchema } from "@/lib/types/openapi";
 
 export const renderField = (schema: TypeSchema, value: any, onChange: (path: string, value: any) => void, path: string = '') => {
@@ -13,6 +14,26 @@ export const renderField = (schema: TypeSchema, value: any, onChange: (path: str
     };
 
     switch (schema.valueType) {
+        case 'enum':
+            return (
+                <div>
+                    <Select
+                        value={value || ''}
+                        onValueChange={(selectedValue) => onChange(path, selectedValue)}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder={`选择 ${schema.name}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {schema.selections?.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                    {option}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
         case 'string':
             return (
                 <Input

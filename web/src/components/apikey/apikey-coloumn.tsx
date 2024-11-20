@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useRef, useEffect, useState, ReactNode} from "react"
+import React, {ReactNode, useEffect, useRef, useState} from "react"
 import {ColumnDef} from "@tanstack/react-table"
 import {ApikeyInfo} from "@/lib/types/openapi"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
@@ -8,7 +8,8 @@ import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} fro
 import {HoverContext} from "@/components/ui/data-table";
 import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
-import {SquarePen} from 'lucide-react'
+import {Copy} from 'lucide-react'
+import {useToast} from "@/hooks/use-toast";
 
 interface EditableCellProps {
     content: ReactNode;
@@ -61,12 +62,36 @@ const RemarkCell = ({ value }: { value: string }) => {
     )
 }
 
-const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => (
-    <div className="flex flex-wrap justify-end gap-2">
-        <DeleteDialog code={code} refresh={refresh}/>
-        <ResetDialog code={code} refresh={refresh}/>
-    </div>
-)
+const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => {
+    const { toast } = useToast();
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(code).then(() => {
+            toast({ title: "复制成功", description: "API Key编码复制成功。" })
+        });
+    };
+
+    return (
+        <div className="flex flex-wrap justify-end gap-2">
+            <Button onClick={copyToClipboard} variant="ghost" size="icon" className="p-0 focus:ring-0">
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div>
+                                <Copy className="h-4 w-4" />
+                                <span className="sr-only">复制ak code</span>
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>复制ak code</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </Button>
+            <DeleteDialog code={code} refresh={refresh}/>
+            <ResetDialog code={code} refresh={refresh}/>
+        </div>
+    )
+}
 
 export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
     {

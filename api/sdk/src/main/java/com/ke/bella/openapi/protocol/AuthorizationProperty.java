@@ -16,7 +16,7 @@ import java.util.Map;
 public class AuthorizationProperty implements IProtocolProperty {
     @Override
     public Map<String, String> description() {
-        return ImmutableSortedMap.of("type", "认证类型（可填 BASIC， BEARER， IAM， CUSTOM）", "header", "自定义的认证头",
+        return ImmutableSortedMap.of("type", "鉴权方式", "header", "自定义的认证头",
                 "apiKey", "apiKey(IAM验签时同ak)", "secret", "sk");
     }
 
