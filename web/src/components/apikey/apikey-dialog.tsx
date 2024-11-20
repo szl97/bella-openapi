@@ -15,13 +15,14 @@ import {Input} from "@/components/ui/input"
 import {useToast} from "@/hooks/use-toast"
 import {ToastAction} from "@/components/ui/toast"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {Trash2, RotateCcw, SquarePen} from 'lucide-react'
+import {Trash2, RotateCcw, SquarePen, ExternalLink} from 'lucide-react'
+import {apikey_quota_apply_url} from "@/config";
 
 
 interface ActionDialogProps {
     label: string
     description: string
-    onConfirm: () => Promise<void>
+    onConfirm: (() => Promise<void>) | (() => void)
     inputLabel?: string
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>
     icon: React.ReactNode
@@ -102,12 +103,17 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void}> = ({ c
     const [isOpen, setIsOpen] = useState(false)
 
     const handleConfirm = async () => {
-        const success = await deleteApikey(code)
-        if (success) {
-            refresh()
-            toast({ title: "API Key 已删除", description: "API Key 已成功删除。" })
-        } else {
-            toast({ title: "删除失败", description: "无法删除 API Key，请稍后重试。", variant: "destructive" })
+        try {
+            const success = await deleteApikey(code)
+            if (success) {
+                refresh()
+                toast({title: "API Key 已删除", description: "API Key 已成功删除。"})
+            } else {
+                toast({title: "删除失败", description: "无法删除 API Key，请稍后重试。", variant: "destructive"})
+            }
+        } catch (error) {
+            // @ts-ignore
+            toast({title: "删除失败", description:error.error , variant: "destructive"})
         }
     }
 
@@ -129,21 +135,26 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({ c
     const [isOpen, setIsOpen] = useState(false)
 
     const handleConfirm = async () => {
-        const apikey = await resetApikey(code)
-        if (apikey) {
-            refresh()
-            const handleCopy = () => {
-                navigator.clipboard.writeText(apikey).catch(err => {
-                    console.error('复制失败:', err)
+        try {
+            const apikey = await resetApikey(code)
+            if (apikey) {
+                refresh()
+                const handleCopy = () => {
+                    navigator.clipboard.writeText(apikey).catch(err => {
+                        console.error('复制失败:', err)
+                    })
+                }
+                toast({
+                    title: "API Key 已重置",
+                    description: `新的 API Key: ${apikey}`,
+                    action: <ToastAction altText="复制 API Key" onClick={handleCopy}>复制</ToastAction>,
                 })
+            } else {
+                toast({title: "重置失败", description: "无法重置 API Key，请稍后重试。", variant: "destructive"})
             }
-            toast({
-                title: "API Key 已重置",
-                description: `新的 API Key: ${apikey}`,
-                action: <ToastAction altText="复制 API Key" onClick={handleCopy}>复制</ToastAction>,
-            })
-        } else {
-            toast({ title: "重置失败", description: "无法重置 API Key，请稍后重试。", variant: "destructive" })
+        } catch (error) {
+            // @ts-ignore
+            toast({title: "重置失败", description:error.error , variant: "destructive"})
         }
     }
 
@@ -170,12 +181,17 @@ export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen
 
     const handleConfirm = async () => {
         if (certify === "") return
-        const success = await updateCertify(code, certify)
-        if (success) {
-            refresh()
-            toast({ title: "安全认证成功", description: "API Key 的安全认证已更新。" })
-        } else {
-            toast({ title: "安全认证失败", description: "无法更新安全认证，请稍后重试。", variant: "destructive" })
+        try {
+            const success = await updateCertify(code, certify)
+            if (success) {
+                refresh()
+                toast({title: "安全认证成功", description: "API Key 的安全认证已更新。"})
+            } else {
+                toast({title: "安全认证失败", description: "无法更新安全认证，请稍后重试。", variant: "destructive"})
+            }
+        } catch (error) {
+            // @ts-ignore
+            toast({title: "安全认证失败", description:error.error , variant: "destructive"})
         }
     }
 
@@ -200,53 +216,24 @@ export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen
 }
 
 export const QuotaDialog: React.FC<{ code: string; origin: number; refresh: () => void; isOpen: boolean; onClose: () => void }> = ({ code, origin, refresh, isOpen, onClose }) => {
-    const [quota, setQuota] = useState(origin)
-    const { toast } = useToast()
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value
-        if (!value) {
-            setQuota(0)
-            return
-        }
-        const numberValue = parseFloat(value)
-        const isValid = /^\d+(\.\d{1,2})?$/.test(value)
-        if (isValid && !isNaN(numberValue)) {
-            setQuota(numberValue)
-        }
-    }
-
-    const handleConfirm = async () => {
-        if (origin === quota) return
-        const success = await updateQuota(code, quota)
-        if (success) {
-            refresh()
-            toast({ title: "额度修改申请已提交", description: "您的额度修改申请已成功提交，请等待审核。" })
-        } else {
-            setQuota(origin)
-            toast({ title: "修改失败", description: "请稍后重试。", variant: "destructive" })
-        }
+    const handleApplyQuota = () => {
+        console.log("apikey_quota_apply_url")
+        console.log(apikey_quota_apply_url)
+        window.open(apikey_quota_apply_url, '_blank')
+        onClose()
     }
 
     return (
         <ActionDialog
-            label="修改额度"
-            description="请输入新的每月额度。"
-            onConfirm={handleConfirm}
-            inputLabel="每月额度"
-            inputProps={{
-                id: "quota",
-                value: quota,
-                onChange: handleChange,
-                type: "number",
-                min: 0,
-                step: 0.01,
-            }}
+            label="申请修改额度"
+            description="点击确认按钮跳转到额度申请页面。"
+            onConfirm={handleApplyQuota}
             icon={<SquarePen className="h-4 w-4" />}
             isIcon={true}
             isOpen={isOpen}
             onClose={onClose}
-        />
+        >
+        </ActionDialog>
     )
 }
 
@@ -265,13 +252,19 @@ export const RenameDialog: React.FC<{ code: string; origin: string; refresh: () 
 
     const handleConfirm = async () => {
         if (origin === name) return
-        const success = await rename(code, name)
-        if (success) {
-            refresh()
-            toast({ title: "修改成功", description: "apikey名称修改为:" + name })
-        } else {
+        try {
+            const success = await rename(code, name)
+            if (success) {
+                refresh()
+                toast({title: "修改成功", description: "apikey名称修改为:" + name})
+            } else {
+                setName(origin)
+                toast({title: "修改失败", description: "apikey名称修改失败，请稍后重试。", variant: "destructive"})
+            }
+        } catch (error) {
             setName(origin)
-            toast({ title: "修改失败", description: "apikey名称修改失败，请稍后重试。", variant: "destructive" })
+            // @ts-ignore
+            toast({title: "修改失败", description:error.error , variant: "destructive"})
         }
     }
 

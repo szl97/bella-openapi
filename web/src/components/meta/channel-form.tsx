@@ -5,6 +5,10 @@ import { EditableField } from './editable-field';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Textarea} from "@/components/ui/textarea";
+import {Input} from "@/components/ui/input";
 
 interface ChannelFormProps {
     channel: Channel;
@@ -37,7 +41,19 @@ export function ChannelForm({ channel, onUpdate, onToggleStatus }: ChannelFormPr
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+                <div className="space-y-2 bg-white bg-opacity-50 p-3 rounded-lg">
+                    <Label className="text-sm font-medium text-gray-700">转发url</Label>
+                    <div className="text-sm font-medium text-gray-700">{channel.url}</div>
+                </div>
+                <div className="space-y-2 bg-white bg-opacity-50 p-3 rounded-lg">
+                    <Label className="text-sm font-medium text-gray-700">协议</Label>
+                    <div className="text-sm font-medium text-gray-700">{channel.protocol}</div>
+                </div>
+                <div className="space-y-2 bg-white bg-opacity-50 p-3 rounded-lg">
+                    <Label className="text-sm font-medium text-gray-700">供应商</Label>
+                    <div className="text-sm font-medium text-gray-700">{channel.supplier}</div>
+                </div>
                 <EditableField
                     label="渠道信息"
                     value={channel.channelInfo}
