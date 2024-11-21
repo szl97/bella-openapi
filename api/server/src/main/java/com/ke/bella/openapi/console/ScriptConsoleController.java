@@ -8,6 +8,7 @@ import com.ke.bella.openapi.tables.pojos.ModelDB;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,9 +32,15 @@ public class ScriptConsoleController {
         return luaScriptManager.reloadScript(script.getScriptName());
     }
 
-    @PostMapping("/check/model/map")
+    @GetMapping("/check/model/map")
     public Map<String, ModelDB> listMap() {
         return modelService.queryWithCache("all");
+    }
+
+   @PostMapping("/model/map/refresh")
+    public Boolean refresh() {
+        modelService.refreshModelMap();
+        return true;
     }
 
 }

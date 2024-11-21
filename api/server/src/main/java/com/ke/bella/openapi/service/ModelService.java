@@ -271,6 +271,12 @@ public class ModelService {
         return list.stream().collect(Collectors.toMap(ModelDB::getModelName, Function.identity()));
     }
 
+    public void refreshModelMap() {
+        List<ModelDB> list = modelRepo.listAll();
+        Map<String, ModelDB> map = list.stream().collect(Collectors.toMap(ModelDB::getModelName, Function.identity()));
+        cacheManager.getCache(modelMapCacheKey).put("all", map);
+    }
+
     public List<String> getPath(String target) {
         Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
         List<String> path = new ArrayList<>();
