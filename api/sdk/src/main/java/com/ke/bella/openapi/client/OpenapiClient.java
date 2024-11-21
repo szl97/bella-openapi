@@ -37,7 +37,7 @@ public class OpenapiClient {
         }
     }
     public boolean validate(String apikey) {
-        return whoami(apikey) == null;
+        return whoami(apikey) != null;
     }
 
     public boolean hasPermission(String apikey, String url) {
