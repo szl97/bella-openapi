@@ -244,9 +244,9 @@ public class ModelService {
     private void doModelLink(MetaDataOps.ModelLinkOp op) {
         ModelDB db = modelRepo.queryByUniqueKeyForUpdateNoWait(op.getModelName());
         Assert.isTrue(db != null, "实体不存在");
-        if(db.getLinkedTo().equals(op.getLinkedTo())) {
-            return;
-        }
+//        if(db.getLinkedTo().equals(op.getLinkedTo())) {
+//            return;
+//        }
         String terminal = op.getModelName();
         if(StringUtils.isNotEmpty(op.getLinkedTo())) {
             List<String> path = getPath(op.getLinkedTo());
