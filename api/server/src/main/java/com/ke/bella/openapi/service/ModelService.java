@@ -300,7 +300,7 @@ public class ModelService {
             map.put(modelName, modelDB);
             cacheManager.getCache(modelMapCacheKey).put("all", map);
             if(StringUtils.isNotEmpty(terminal)) {
-                cacheManager.getCache(modelTerminalCacheKey).put(modelDB, terminal);
+                cacheManager.getCache(modelTerminalCacheKey).put(modelName, terminal);
             }
         });
     }

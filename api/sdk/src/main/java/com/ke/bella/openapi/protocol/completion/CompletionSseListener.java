@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.ImmutableSet;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public class CompletionSseListener extends EventSourceListener {
     @Setter
     private CompletableFuture<?> connectionInitFuture;
@@ -75,6 +77,7 @@ public class CompletionSseListener extends EventSourceListener {
             return new ChannelException.OpenAIException(response.code(),
                     HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
         } catch (Exception e) {
+            LOGGER.warn(e.getMessage(), e);
             return ChannelException.fromResponse(response.code(), "request failed");
         }
     }
