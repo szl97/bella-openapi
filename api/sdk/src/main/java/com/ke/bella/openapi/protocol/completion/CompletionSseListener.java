@@ -74,7 +74,7 @@ public class CompletionSseListener extends EventSourceListener {
         String msg;
         try {
             msg = response.body().string();
-            return new ChannelException.OpenAIException(response.code(),
+            return new ChannelException.OpenAIException(400,
                     HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
