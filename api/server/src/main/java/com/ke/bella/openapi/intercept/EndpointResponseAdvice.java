@@ -45,7 +45,6 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
         }
         BellaContext.getProcessData().setResponse(openapiResponse);
         logger.log(BellaContext.getProcessData());
-        response.getHeaders().add("X-BELLA-REQUEST-ID", requestId);
         return body;
     }
 

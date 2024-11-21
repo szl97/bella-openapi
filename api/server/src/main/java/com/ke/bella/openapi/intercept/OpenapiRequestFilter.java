@@ -28,6 +28,7 @@ public class OpenapiRequestFilter extends OncePerRequestFilter {
             BellaContext.getProcessData().setRequestTime(DateTimeUtils.getCurrentSeconds());
             ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
             BellaContext.setRequest(wrappedRequest);
+            response.addHeader("X-BELLA-REQUEST-ID", requestId);
             chain.doFilter(wrappedRequest, response);
         } finally {
             ConsoleContext.clearAll();
