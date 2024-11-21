@@ -70,8 +70,12 @@ public class CompletionSseListener extends EventSourceListener {
 
     public ChannelException convertToException(Response response) throws IOException {
         String msg;
-        msg = response.body().string();
-        return new ChannelException.OpenAIException(response.code(),
-                HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
+        try {
+            msg = response.body().string();
+            return new ChannelException.OpenAIException(response.code(),
+                    HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
+        } catch (Exception e) {
+            return ChannelException.fromResponse(response.code(), "request failed");
+        }
     }
 }
