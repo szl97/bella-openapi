@@ -56,9 +56,9 @@ public class HttpUtils {
             T result = JacksonUtils.deserialize(response.body().bytes(), clazz);
             if(result == null && response.code() > 299) {
                 if(response.code() > 499 && response.code() < 600) {
-                    throw ChannelException.fromResponse(503, response.body().string());
+                    throw ChannelException.fromResponse(503, response.message());
                 }
-                throw ChannelException.fromResponse(response.code(), response.body().string());
+                throw ChannelException.fromResponse(response.code(), response.message());
             }
             return result;
         } catch (IOException e) {

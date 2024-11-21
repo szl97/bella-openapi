@@ -78,7 +78,7 @@ public class CompletionSseListener extends EventSourceListener {
                     HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
-            return ChannelException.fromResponse(response.code(), "request failed");
+            return ChannelException.fromResponse(response.code(), response.message());
         }
     }
 }
