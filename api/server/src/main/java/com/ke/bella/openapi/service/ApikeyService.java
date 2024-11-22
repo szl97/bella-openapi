@@ -297,7 +297,6 @@ public class ApikeyService {
     }
 
     public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
-        fillPermissionCode(condition);
         return apikeyRepo.pageAccessKeys(condition);
     }
 

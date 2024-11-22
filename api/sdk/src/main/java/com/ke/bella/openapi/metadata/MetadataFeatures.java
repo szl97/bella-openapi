@@ -17,6 +17,7 @@ public enum MetadataFeatures {
     OVERSEAS("overseas", "国外", ImmutableSet.of("*")),
     MAINLAND("mainland", "国内", ImmutableSet.of("*")),
     INNER("inner", "内部", ImmutableSet.of("*")),
+    PROTECTED("protected", "内部已备案", ImmutableSet.of("*")),
     LARGE_INPUT_CONTEXT("long_input_context", "超长上下文", ImmutableSet.of("/v1/chat/completions")),
     LARGE_OUTPUT_CONTEXT("long_output_context", "超长输出", ImmutableSet.of("/v1/chat/completions")),
     STREAM("stream", "流式", ImmutableSet.of("/v1/chat/completions")),
@@ -35,7 +36,7 @@ public enum MetadataFeatures {
     }
 
     public static boolean validate(List<String> features) {
-        Set<String> set = Sets.newHashSet(OVERSEAS.code, MAINLAND.code, INNER.code);
+        Set<String> set = Sets.newHashSet(OVERSEAS.code, MAINLAND.code, INNER.code, PROTECTED.code);
         int i = 0;
         for(String feature : features) {
             if(set.contains(feature)) {

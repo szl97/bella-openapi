@@ -64,14 +64,16 @@ public class ChannelRouter {
 
     private Byte getSafetyLevelLimit(String dataDestination) {
         switch (dataDestination) {
+        case EntityConstants.PROTECTED:
+            return 10;
         case EntityConstants.INNER:
-            return 0;
+            return 20;
         case EntityConstants.MAINLAND:
-            return 1;
+            return 30;
         case EntityConstants.OVERSEAS:
-            return 2;
+            return 40;
         }
-        return 2;
+        return 40;
     }
 
     private List<ChannelDB> pickMaxPriority(List<ChannelDB> channels) {

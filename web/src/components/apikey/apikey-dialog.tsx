@@ -1,5 +1,5 @@
 import React, {ChangeEvent, useState} from 'react'
-import {deleteApikey, resetApikey, updateCertify, updateQuota, rename} from "@/lib/api/apikey"
+import {deleteApikey, rename, resetApikey, updateCertify} from "@/lib/api/apikey"
 import {
     Dialog,
     DialogContent,
@@ -14,14 +14,14 @@ import {Label} from "@/components/ui/label"
 import {Input} from "@/components/ui/input"
 import {useToast} from "@/hooks/use-toast"
 import {ToastAction} from "@/components/ui/toast"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {Trash2, RotateCcw, SquarePen, ExternalLink} from 'lucide-react'
-import {apikey_quota_apply_url} from "@/config";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import {RotateCcw, SquarePen, Trash2} from 'lucide-react'
+import {apikey_quota_apply_url, safety_apply_url} from "@/config";
 
 
 interface ActionDialogProps {
     label: string
-    description: string
+    description: string | React.ReactNode
     onConfirm: (() => Promise<void>) | (() => void)
     inputLabel?: string
     inputProps?: React.InputHTMLAttributes<HTMLInputElement>
@@ -29,10 +29,13 @@ interface ActionDialogProps {
     isIcon: boolean
     isOpen: boolean
     onClose: () => void
+    remark? : string | React.ReactNode
 }
 
-const ActionDialog: React.FC<ActionDialogProps> = ({ label, description, onConfirm, inputLabel, inputProps,
-                                                       icon, isIcon , isOpen, onClose}) => {
+const ActionDialog: React.FC<ActionDialogProps> = ({
+                                                       label, description, onConfirm, inputLabel, inputProps,
+                                                       icon, isIcon, isOpen, onClose, remark
+                                                   }) => {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleConfirm = async () => {
@@ -88,6 +91,11 @@ const ActionDialog: React.FC<ActionDialogProps> = ({ label, description, onConfi
                         </div>
                     </div>
                 )}
+                {
+                    remark && <div className="text-gray-600">
+                        {remark}
+                    </div>
+                }
                 <DialogFooter>
                     <Button type="submit" onClick={handleConfirm} disabled={isLoading}>
                         {isLoading ? "处理中..." : "确认"}
@@ -98,8 +106,8 @@ const ActionDialog: React.FC<ActionDialogProps> = ({ label, description, onConfi
     )
 }
 
-export const DeleteDialog: React.FC<{ code: string; refresh: () => void}> = ({ code, refresh }) => {
-    const { toast } = useToast()
+export const DeleteDialog: React.FC<{ code: string; refresh: () => void }> = ({code, refresh}) => {
+    const {toast} = useToast()
     const [isOpen, setIsOpen] = useState(false)
 
     const handleConfirm = async () => {
@@ -113,7 +121,7 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void}> = ({ c
             }
         } catch (error) {
             // @ts-ignore
-            toast({title: "删除失败", description:error.error , variant: "destructive"})
+            toast({title: "删除失败", description: error.error, variant: "destructive"})
         }
     }
 
@@ -122,7 +130,7 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void}> = ({ c
             label="删除"
             description="确定要删除此 API Key 吗？此操作无法撤销。"
             onConfirm={handleConfirm}
-            icon={<Trash2 className="h-4 w-4" />}
+            icon={<Trash2 className="h-4 w-4"/>}
             isIcon={true}
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
@@ -130,8 +138,8 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void}> = ({ c
     )
 }
 
-export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({ code, refresh }) => {
-    const { toast } = useToast()
+export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({code, refresh}) => {
+    const {toast} = useToast()
     const [isOpen, setIsOpen] = useState(false)
 
     const handleConfirm = async () => {
@@ -154,7 +162,7 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({ c
             }
         } catch (error) {
             // @ts-ignore
-            toast({title: "重置失败", description:error.error , variant: "destructive"})
+            toast({title: "重置失败", description: error.error, variant: "destructive"})
         }
     }
 
@@ -163,7 +171,7 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({ c
             label="重置"
             description="确定要重置此 API Key 吗？重置后，当前的 Key 将失效。"
             onConfirm={handleConfirm}
-            icon={<RotateCcw className="h-4 w-4" />}
+            icon={<RotateCcw className="h-4 w-4"/>}
             isIcon={true}
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
@@ -171,9 +179,14 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({ c
     )
 }
 
-export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen: boolean; onClose: () => void }> = ({ code, refresh, isOpen, onClose }) => {
+export const CertifyDialog: React.FC<{
+    code: string;
+    refresh: () => void;
+    isOpen: boolean;
+    onClose: () => void
+}> = ({code, refresh, isOpen, onClose}) => {
     const [certify, setCertify] = useState("")
-    const { toast } = useToast()
+    const {toast} = useToast()
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setCertify(e.target.value)
@@ -191,14 +204,17 @@ export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen
             }
         } catch (error) {
             // @ts-ignore
-            toast({title: "安全认证失败", description:error.error , variant: "destructive"})
+            toast({title: "安全认证失败", description: error.error, variant: "destructive"})
         }
     }
 
     return (
         <ActionDialog
             label="安全认证"
-            description="请输入新的安全认证码。"
+            description={<div>
+                安全认证码申请请点击跳转：
+                <a href={safety_apply_url} className='text-blue-700' target='_blank'>安全合规申请</a>
+            </div>}
             onConfirm={handleConfirm}
             inputLabel="安全认证码"
             inputProps={{
@@ -207,7 +223,7 @@ export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen
                 onChange: handleChange,
                 placeholder: "输入新的安全认证码",
             }}
-            icon={<SquarePen className="h-4 w-4" />}
+            icon={<SquarePen className="h-4 w-4"/>}
             isIcon={true}
             isOpen={isOpen}
             onClose={onClose}
@@ -215,10 +231,14 @@ export const CertifyDialog: React.FC<{ code: string; refresh: () => void; isOpen
     )
 }
 
-export const QuotaDialog: React.FC<{ code: string; origin: number; refresh: () => void; isOpen: boolean; onClose: () => void }> = ({ code, origin, refresh, isOpen, onClose }) => {
+export const QuotaDialog: React.FC<{
+    code: string;
+    origin: number;
+    refresh: () => void;
+    isOpen: boolean;
+    onClose: () => void
+}> = ({code, origin, refresh, isOpen, onClose}) => {
     const handleApplyQuota = () => {
-        console.log("apikey_quota_apply_url")
-        console.log(apikey_quota_apply_url)
         window.open(apikey_quota_apply_url, '_blank')
         onClose()
     }
@@ -228,7 +248,7 @@ export const QuotaDialog: React.FC<{ code: string; origin: number; refresh: () =
             label="申请修改额度"
             description="点击确认按钮跳转到额度申请页面。"
             onConfirm={handleApplyQuota}
-            icon={<SquarePen className="h-4 w-4" />}
+            icon={<SquarePen className="h-4 w-4"/>}
             isIcon={true}
             isOpen={isOpen}
             onClose={onClose}
@@ -237,9 +257,15 @@ export const QuotaDialog: React.FC<{ code: string; origin: number; refresh: () =
     )
 }
 
-export const RenameDialog: React.FC<{ code: string; origin: string; refresh: () => void; isOpen: boolean; onClose: () => void }> = ({ code, origin, refresh, isOpen, onClose }) => {
+export const RenameDialog: React.FC<{
+    code: string;
+    origin: string;
+    refresh: () => void;
+    isOpen: boolean;
+    onClose: () => void
+}> = ({code, origin, refresh, isOpen, onClose}) => {
     const [name, setName] = useState(origin)
-    const { toast } = useToast()
+    const {toast} = useToast()
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -264,7 +290,7 @@ export const RenameDialog: React.FC<{ code: string; origin: string; refresh: () 
         } catch (error) {
             setName(origin)
             // @ts-ignore
-            toast({title: "修改失败", description:error.error , variant: "destructive"})
+            toast({title: "修改失败", description: error.error, variant: "destructive"})
         }
     }
 
@@ -280,7 +306,7 @@ export const RenameDialog: React.FC<{ code: string; origin: string; refresh: () 
                 onChange: handleChange,
                 placeholder: "输入名称",
             }}
-            icon={<SquarePen className="h-4 w-4" />}
+            icon={<SquarePen className="h-4 w-4"/>}
             isIcon={true}
             isOpen={isOpen}
             onClose={onClose}

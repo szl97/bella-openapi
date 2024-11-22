@@ -153,6 +153,7 @@ export function CreateChannelForm({entityType, entityCode} : Props) {
                                 <SelectValue placeholder="选择数据流向"/>
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="protected">内部已备案</SelectItem>
                                 <SelectItem value="inner">内部</SelectItem>
                                 <SelectItem value="mainland">国内</SelectItem>
                                 <SelectItem value="overseas">海外</SelectItem>

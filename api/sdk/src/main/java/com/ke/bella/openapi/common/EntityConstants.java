@@ -17,10 +17,11 @@ public class EntityConstants {
     public static final String INACTIVE = "inactive";
     public static final String PUBLIC = "public";
     public static final String PRIVATE = "private";
+    public static final String PROTECTED = "protected";
     public static final String INNER = "inner";
     public static final String MAINLAND = "mainland";
     public static final String OVERSEAS = "overseas";
-    public static final List<String> DATA_DESTINATIONS = ImmutableList.of(INNER, MAINLAND, OVERSEAS);
+    public static final List<String> DATA_DESTINATIONS = ImmutableList.of(PROTECTED, INNER, MAINLAND, OVERSEAS);
     public static final String HIGH = "high";
     public static final String NORMAL = "normal";
     public static final String LOW = "low";

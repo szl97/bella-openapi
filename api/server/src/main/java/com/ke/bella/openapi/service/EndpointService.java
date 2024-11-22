@@ -45,6 +45,7 @@ import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.common.EntityConstants.INNER;
 import static com.ke.bella.openapi.common.EntityConstants.MAINLAND;
 import static com.ke.bella.openapi.common.EntityConstants.OVERSEAS;
+import static com.ke.bella.openapi.common.EntityConstants.PROTECTED;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 10:41 description:
@@ -145,7 +146,10 @@ public class EndpointService {
                     modelCondition.setDataDestination(MAINLAND);
                 } else if(f.equals(MetadataFeatures.INNER.getCode())) {
                     modelCondition.setDataDestination(INNER);
-                } else if(f.equals(MetadataFeatures.LARGE_INPUT_CONTEXT.getCode())) {
+                } else if(f.equals(MetadataFeatures.PROTECTED.getCode())) {
+                    modelCondition.setDataDestination(PROTECTED);
+                }
+                else if(f.equals(MetadataFeatures.LARGE_INPUT_CONTEXT.getCode())) {
                     modelCondition.setMaxInputTokensLimit(100000);
                 } else if(f.equals(MetadataFeatures.LARGE_OUTPUT_CONTEXT.getCode())) {
                     modelCondition.setMaxOutputTokensLimit(8000);

@@ -93,6 +93,21 @@ const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => {
     )
 }
 
+function getSafetyLevel(level: number) : string {
+    switch (level) {
+        case 10:
+            return "极低";
+        case 20:
+            return "低";
+        case 30:
+            return "中";
+        case 40:
+            return "高";
+        default:
+            return "N/A";
+    }
+}
+
 export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
     {
         accessorKey: "akDisplay",
@@ -145,7 +160,8 @@ export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
 
             return (
                 <EditableCell
-                    content={<Badge className={`${color} capitalize`}>{level}</Badge>}
+                    content={<Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
+                </Badge>}
                     dialogComponent={(isOpen, onClose) => (
                         <CertifyDialog
                             code={row.original.code}
