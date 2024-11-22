@@ -331,6 +331,7 @@ public class ModelService {
     }
 
     public List<ModelDB> listByCondition(Condition.ModelCondition condition) {
+        fillModelNames(condition);
         return modelRepo.list(condition);
     }
 
