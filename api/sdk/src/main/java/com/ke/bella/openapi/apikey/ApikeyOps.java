@@ -2,6 +2,7 @@ package com.ke.bella.openapi.apikey;
 
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.PageCondition;
+import com.ke.bella.openapi.PermissionCondition;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -80,7 +81,7 @@ public class ApikeyOps {
     }
 
     @Data
-    public class ApikeyCondition extends PageCondition {
+    public class ApikeyCondition extends PermissionCondition {
         private String ownerType;
         private String ownerCode;
         private String parentCode;
