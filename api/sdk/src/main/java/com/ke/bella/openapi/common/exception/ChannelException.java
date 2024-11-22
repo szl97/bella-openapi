@@ -146,7 +146,10 @@ public abstract class ChannelException extends RuntimeException {
 
         public OpenAIException(Integer httpCode, String type, String message, OpenapiResponse.OpenapiError error) {
             super(message);
-            this.httpCode = httpCode >= 500 ? HttpStatus.NOT_ACCEPTABLE.value() : httpCode;
+            this.httpCode = httpCode >= 500 ? HttpStatus.SERVICE_UNAVAILABLE.value() : httpCode;
+            if(httpCode > 500) {
+                message = "供应商返回：code: " +  httpCode + " message: " + message;
+            }
             this.type = type;
             if(error == null) {
                 this.response = new OpenapiResponse.OpenapiError(type, message, httpCode);

@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Author: Stan Sai Date: 2024/8/14 12:09 description:
@@ -46,35 +47,31 @@ public class HttpUtils {
         return client.newCall(request).execute();
     }
 
-    public static void streamRequest(Request request, Callback callback) throws IOException {
+    public static void streamRequest(Request request, Callback callback) {
         client.newCall(request).enqueue(callback);
     }
 
     public static <T> T httpRequest(Request request, Class<T> clazz) {
-        try {
-            Response response = HttpUtils.httpRequest(request);
-            T result = JacksonUtils.deserialize(response.body().bytes(), clazz);
-            if(result == null && response.code() > 299) {
-                if(response.code() > 499 && response.code() < 600) {
-                    throw ChannelException.fromResponse(503, response.message());
-                }
-                throw ChannelException.fromResponse(response.code(), response.message());
-            }
-            return result;
-        } catch (IOException e) {
-            throw ChannelException.fromException(e);
-        }
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, clazz));
     }
 
-    public static <T> T httpRequest(Request request, TypeReference<T> tTypeReference) {
+    public static <T> T httpRequest(Request request, TypeReference<T> typeReference) {
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, typeReference));
+    }
+
+    private static  <T> T doHttpRequest(Request request, Function<byte[], T> fun) {
+        T result = null;
         try {
             Response response = HttpUtils.httpRequest(request);
-            T result = JacksonUtils.deserialize(response.body().bytes(), tTypeReference);
+            if(response.body() != null) {
+                result = fun.apply(response.body().bytes());
+            }
             if(result == null && response.code() > 299) {
                 if(response.code() > 499 && response.code() < 600) {
-                    throw ChannelException.fromResponse(503, response.body().string());
+                    String message = "供应商返回：code: " +  response.code() + " message: " + response.message();
+                    throw ChannelException.fromResponse(503, message);
                 }
-                throw ChannelException.fromResponse(response.code(), response.body().string());
+                throw ChannelException.fromResponse(response.code(), response.message());
             }
             return result;
         } catch (IOException e) {
