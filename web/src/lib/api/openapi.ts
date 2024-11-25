@@ -1,8 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import { api_host } from '@/config';
 
+const baseURL = typeof window !== 'undefined'
+    ? `${window.location.protocol}//${api_host}`
+    : `http://${api_host}`;
+
+
 export const openapi: AxiosInstance = axios.create({
-    baseURL: api_host,
+    baseURL: baseURL,
     withCredentials: true
 });
 

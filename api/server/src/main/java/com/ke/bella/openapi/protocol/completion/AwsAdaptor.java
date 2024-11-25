@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
+import software.amazon.awssdk.services.bedrockruntime.model.BedrockRuntimeException;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlockDeltaEvent;
 import software.amazon.awssdk.services.bedrockruntime.model.ContentBlockStartEvent;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseRequest;
@@ -34,8 +35,12 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
         request.setModel(property.deployName);
         ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request);
         BedrockRuntimeClient client = AwsClientManager.client(property.region, property.auth.getApiKey(), property.auth.getSecret());
-        ConverseResponse response = client.converse(awsRequest);
-        return AwsCompletionConverter.convert2OpenAIResponse(response);
+        try {
+            ConverseResponse response = client.converse(awsRequest);
+            return AwsCompletionConverter.convert2OpenAIResponse(response);
+        } catch (BedrockRuntimeException bedrockException) {
+            throw ChannelException.fromResponse(bedrockException.statusCode(), bedrockException.getMessage());
+        }
     }
 
     @Override
@@ -82,6 +87,11 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
 
         @Override
         public void accept(Throwable throwable) {
+            if (throwable instanceof BedrockRuntimeException) {
+                BedrockRuntimeException bedrockException = (BedrockRuntimeException) throwable;
+                callback.finish(ChannelException.fromResponse(bedrockException.statusCode(), bedrockException.getMessage()));
+                return;
+            }
             callback.finish(ChannelException.fromException(throwable));
         }
     }
