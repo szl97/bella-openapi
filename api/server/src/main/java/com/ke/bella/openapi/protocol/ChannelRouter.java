@@ -40,7 +40,7 @@ public class ChannelRouter {
         }
         Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
         channels = filter(channels);
-        Assert.notNull(channels, "没有可用渠道");
+        Assert.notEmpty(channels, "没有可用渠道");
         channels = pickMaxPriority(channels);
         return random(channels);
     }

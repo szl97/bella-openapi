@@ -4,6 +4,7 @@ import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.concurrent.De
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.common.exception.BizParamCheckException;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +45,7 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
     public CompletionResponse completion(CompletionRequest request, String url, CompletionProperty property) {
         MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getRequest());
         CompletionResponse response = new CompletionResponse();
-        response.setCreated(Integer.parseInt(String.valueOf(System.currentTimeMillis() / 1000)));
+        response.setCreated(DateTimeUtils.getCurrentSeconds());
         response.setModel("mock-model");
         response.setId("chatcmpl-" + UUID.randomUUID());
         CompletionResponse.Choice choice = new CompletionResponse.Choice();

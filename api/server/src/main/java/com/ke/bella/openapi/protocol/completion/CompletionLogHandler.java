@@ -28,7 +28,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
         if(processData.getResponse() instanceof CompletionResponse) {
             response = (CompletionResponse) processData.getResponse();
         }
-        long created = response == null ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
+        long created = response == null || response.getCreated() <= 0 ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
         long firstPackageTime = processData.getFirstPackageTime();
         CompletionRequest request = (CompletionRequest) processData.getRequest();
         String encodingType = processData.getEncodingType();

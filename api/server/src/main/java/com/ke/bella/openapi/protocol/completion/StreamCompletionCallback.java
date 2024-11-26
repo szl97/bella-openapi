@@ -117,7 +117,8 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
 
          private void log() {
              CompletionResponse response = responseBuffer;
-             processData.setDuration(response.getCreated() - processData.getRequestTime());
+             long created = response.getCreated() <= 0 ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
+             processData.setDuration(created - processData.getRequestTime());
              processData.setFirstPackageTime(firstPackageTime == null ? DateTimeUtils.getCurrentSeconds() : firstPackageTime);
              response.setChoices(Lists.newArrayList(choiceBuffer.values()));
              processData.setResponse(response);

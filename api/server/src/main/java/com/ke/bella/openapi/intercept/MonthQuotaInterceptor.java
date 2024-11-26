@@ -27,7 +27,8 @@ public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
         ApikeyInfo apikey = BellaContext.getApikey();
         BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
         if(apikey.getMonthQuota().doubleValue() <= cost.doubleValue()) {
-            throw new ChannelException.RateLimitException("已达每月额度上限");
+            String msg = "已达每月额度上限, limit:" + apikey.getMonthQuota() + ", cost:" + cost;
+            throw new ChannelException.RateLimitException(msg);
         }
         return true;
     }
