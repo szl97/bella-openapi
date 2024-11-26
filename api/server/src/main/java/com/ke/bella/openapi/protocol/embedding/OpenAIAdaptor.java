@@ -5,6 +5,7 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -24,7 +25,7 @@ public class OpenAIAdaptor implements EmbeddingAdaptor<OpenAIProperty> {
             Assert.isTrue(inputs.size() <= property.getBatchSize(),
                     "input 长度不能超过" + property.getBatchSize());
         }
-        if(property.getApiVersion() != null) {
+        if(StringUtils.isNotEmpty(property.getApiVersion())) {
             url += property.getApiVersion();
         }
         request.setInput(inputs);

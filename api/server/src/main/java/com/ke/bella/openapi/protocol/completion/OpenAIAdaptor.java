@@ -7,6 +7,7 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component("OpenAICompletion")
@@ -36,7 +37,7 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
     }
 
     private Request buildRequest(CompletionRequest request, String url, OpenAIProperty property) {
-        if(property.getApiVersion() != null) {
+        if(StringUtils.isNotEmpty(property.getApiVersion())) {
             url += property.getApiVersion();
         }
         request.setModel(property.getDeployName());
