@@ -34,8 +34,8 @@ export function ModelForm({ model, onUpdate, onToggleStatus, onToggleVisibility 
                         <Badge variant={model.status === 'active' ? "default" : "destructive"}>
                             {model.status === 'active' ? '已启用' : '已停用'}
                         </Badge>
-                        <Badge variant={model.visibility === 'publish' ? "default" : "secondary"}>
-                            {model.visibility === 'publish' ? '公开' : '私有'}
+                        <Badge variant={model.visibility === 'public' ? "default" : "secondary"}>
+                            {model.visibility === 'public' ? '公开' : '私有'}
                         </Badge>
                     </div>
                 </div>
@@ -48,9 +48,9 @@ export function ModelForm({ model, onUpdate, onToggleStatus, onToggleVisibility 
                     </Button>
                     <Button
                         onClick={handleToggleVisibility}
-                        variant={model.visibility === 'publish' ? "secondary" : "default"}
+                        variant={model.visibility === 'public' ? "secondary" : "default"}
                     >
-                        {model.visibility === 'publish' ? '取消公开' : '公开'}
+                        {model.visibility === 'public' ? '取消公开' : '公开'}
                     </Button>
                 </div>
             </CardHeader>
@@ -112,8 +112,8 @@ export function ModelForm({ model, onUpdate, onToggleStatus, onToggleVisibility 
                     onToggleVisibility();
                     setIsVisibilityDialogOpen(false);
                 }}
-                title={`确认${model.visibility === 'publish' ? '取消公开' : '公开'}模型`}
-                description={`您确定要${model.visibility === 'publish' ? '取消公开' : '公开'}该模型吗？`}
+                title={`确认${model.visibility === 'public' ? '取消公开' : '公开'}模型`}
+                description={`您确定要${model.visibility === 'public' ? '取消公开' : '公开'}该模型吗？`}
             />
         </Card>
     );

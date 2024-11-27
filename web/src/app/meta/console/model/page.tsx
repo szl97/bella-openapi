@@ -73,7 +73,7 @@ export default function ModelConsolePage({ searchParams }: { searchParams: { mod
             await updateModelVisibility(modelName, publish);
             setModelDetails(prev => prev ? {
                 ...prev,
-                model: {...prev.model, visibility : publish ? 'publish' : 'private'}
+                model: {...prev.model, visibility : publish ? 'public' : 'private'}
             } : null);
         } catch (error) {
             console.error('Failed to update model:', error);

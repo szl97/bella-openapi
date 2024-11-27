@@ -119,7 +119,8 @@ public class EndpointService {
             if(CollectionUtils.isNotEmpty(models)) {
                 priceDetails = channelService.getPriceInfo(models.stream().map(Model::getModelName).collect(Collectors.toList()), priceType);
                 endpoint.getModels().forEach(model -> {
-                    model.setPriceDetails(priceDetails.get(model.getModelName()));
+                    String terminal = modelService.fetchTerminalModelName(model.getModelName());
+                    model.setPriceDetails(priceDetails.get(terminal));
                 });
             } else {
                 priceDetails = channelService.getPriceInfo(Lists.newArrayList(endpoint.getEndpoint()), priceType);
