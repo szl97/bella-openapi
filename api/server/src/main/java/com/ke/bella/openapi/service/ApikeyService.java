@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -221,7 +222,29 @@ public class ApikeyService {
 
     public ApikeyInfo verify(String ak) {
         String sha = EncryptUtils.sha256(ak);
-        return queryBySha(sha, true);
+        ApikeyInfo info = queryBySha(sha, true);
+        String display = EncryptUtils.desensitize(ak);
+        if(info == null) {
+            throw new ChannelException.AuthorizationException("api key不存在，请求的非法ak为：" + display);
+        }
+        return info;
+    }
+
+    public ApikeyInfo verifyAuthHeader(String auth) {
+        String ak;
+        if(auth.startsWith("Bearer ")) {
+            ak = auth.substring(7);
+        } else {
+            ak = auth;
+        }
+        String sha = EncryptUtils.sha256(ak);
+        ApikeyInfo info = queryBySha(sha, true);
+        String display = EncryptUtils.desensitizeByLength(auth);
+        String displayAk = EncryptUtils.desensitize(ak);
+        if(info == null) {
+            throw new ChannelException.AuthorizationException("api key不存在，请求的header为：" + display + ", apikey为：" + displayAk);
+        }
+        return info;
     }
 
     public ApikeyInfo queryBySha(String sha, boolean onlyActive) {
@@ -231,13 +254,12 @@ public class ApikeyService {
         } else {
             apikeyInfo = apikeyRepo.queryBySha(sha);
         }
-        if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
-            throw new ChannelException.AuthorizationException("api key不存在");
-        }
-        if(apikeyInfo.getOwnerType().equals(PERSON)) {
-            apikeyInfo.setUserId(Long.parseLong(apikeyInfo.getOwnerCode()));
-        } else {
-            apikeyInfo.setUserId(0L);
+        if(apikeyInfo != null) {
+            if(apikeyInfo.getOwnerType().equals(PERSON)) {
+                apikeyInfo.setUserId(Long.parseLong(apikeyInfo.getOwnerCode()));
+            } else {
+                apikeyInfo.setUserId(0L);
+            }
         }
         return apikeyInfo;
     }
@@ -299,6 +321,7 @@ public class ApikeyService {
     }
 
     public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
+        fillPermissionCode(condition);
         return apikeyRepo.pageAccessKeys(condition);
     }
 

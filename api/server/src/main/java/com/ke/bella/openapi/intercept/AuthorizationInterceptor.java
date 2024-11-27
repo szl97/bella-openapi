@@ -57,13 +57,9 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         } else {
             String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
             if(StringUtils.isEmpty(auth)) {
-                throw new ChannelException.AuthorizationException("Invalid Authorization");
+                throw new ChannelException.AuthorizationException("Authorization is empty");
             }
-            LOGGER.info("Bearer token: {}", auth);
-            if(auth.startsWith("Bearer ")) {
-                auth = auth.substring(7);
-            }
-            ApikeyInfo apikeyInfo = apikeyService.verify(auth);
+            ApikeyInfo apikeyInfo = apikeyService.verifyAuthHeader(auth);
             BellaContext.setApikey(apikeyInfo);
             hasPermission = apikeyInfo.hasPermission(url);
         }

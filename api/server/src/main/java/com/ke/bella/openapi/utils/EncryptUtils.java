@@ -17,6 +17,14 @@ public class EncryptUtils {
         return plainText.substring(0, 2) + "****" + plainText.substring(plainText.length() - 4);
     }
 
+    public static String desensitizeByLength(String plainText) {
+        if(plainText == null || plainText.length() < 6) {
+            return plainText;
+        }
+        int index = plainText.length() / 3;
+        return plainText.substring(0, index) + "****" + plainText.substring(plainText.length() - 4);
+    }
+
     /**
      * sha256
      */

@@ -257,7 +257,7 @@ public class MetadataValidator {
         if(CollectionUtils.isEmpty(keys)) {
             return null;
         }
-        List<ModelJsonKey> invalidKeys = keys.stream().filter(key -> !map.get(key.getCode()).getClass().equals(key.getType()))
+        List<ModelJsonKey> invalidKeys = keys.stream().filter(key -> map.containsKey(key.getCode()) && !map.get(key.getCode()).getClass().equals(key.getType()))
                 .collect(Collectors.toList());
         if(CollectionUtils.isNotEmpty(invalidKeys)) {
             StringBuilder sb = new StringBuilder(field).append("中以下内容不符合规范：\r\n");
