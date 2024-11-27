@@ -13,6 +13,7 @@ import com.ke.bella.openapi.PermissionCondition;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.apikey.ApikeyOps;
+import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
@@ -107,6 +108,7 @@ public class ApikeyService {
         db.setOwnerCode(op.getOwnerCode());
         db.setOwnerName(op.getOwnerName());
         db.setRoleCode(StringUtils.isEmpty(op.getRoleCode()) ? basicRoleCode : op.getRoleCode());
+        db.setSafetyLevel(EntityConstants.LOWEST_SAFETY_LEVEL);
         db.setMonthQuota(op.getMonthQuota() == null ? BigDecimal.valueOf(basicMonthQuota) : op.getMonthQuota());
         db.setName(op.getName());
         db.setRemark(op.getRemark());

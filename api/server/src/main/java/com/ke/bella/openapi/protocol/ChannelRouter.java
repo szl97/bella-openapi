@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.common.EntityConstants;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.ModelService;
@@ -40,7 +41,6 @@ public class ChannelRouter {
         }
         Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
         channels = filter(channels);
-        Assert.notEmpty(channels, "没有可用渠道");
         channels = pickMaxPriority(channels);
         return random(channels);
     }
@@ -54,11 +54,18 @@ public class ChannelRouter {
      */
     private List<ChannelDB> filter(List<ChannelDB> channels) {
         Byte safetyLevel = BellaContext.getApikey().getSafetyLevel();
+        channels = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
+                .collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(channels)) {
+            throw new ChannelException.AuthorizationException("未经安全合规审核，没有使用权限");
+        }
         Set<String> unavailableSet = metricsManager.getAllUnavailableChannels(
                 channels.stream().map(ChannelDB::getChannelCode).collect(Collectors.toList()));
-        channels = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
-                .filter(channel -> !unavailableSet.contains(channel.getChannelCode()))
+        channels = channels.stream().filter(channel -> !unavailableSet.contains(channel.getChannelCode()))
                 .collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(channels)) {
+            throw new ChannelException.RateLimitException("渠道当前负载过高，请稍后重试");
+        }
         return channels;
     }
 

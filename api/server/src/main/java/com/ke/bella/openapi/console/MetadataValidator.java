@@ -257,11 +257,6 @@ public class MetadataValidator {
         if(CollectionUtils.isEmpty(keys)) {
             return null;
         }
-        List<String> notExists = keys.stream().map(ModelJsonKey::getCode).filter(key -> !map.containsKey(key)).collect(Collectors.toList());
-        if(CollectionUtils.isNotEmpty(notExists)) {
-            String codes = String.join(",", notExists);
-            return field + "中缺少：" + codes;
-        }
         List<ModelJsonKey> invalidKeys = keys.stream().filter(key -> !map.get(key.getCode()).getClass().equals(key.getType()))
                 .collect(Collectors.toList());
         if(CollectionUtils.isNotEmpty(invalidKeys)) {

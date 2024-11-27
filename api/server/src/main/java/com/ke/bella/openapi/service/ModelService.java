@@ -255,7 +255,7 @@ public class ModelService {
             terminal = path.get(path.size() - 1);
         }
         modelRepo.update(op, op.getModelName());
-        updateModelCache(op.getModelName(), terminal);
+        doUpdateModelCache(op.getModelName(), terminal);
     }
 
     @Cached(name = modelTerminalCacheKey, key = "#modelName")
@@ -301,14 +301,18 @@ public class ModelService {
 
     private void updateModelCache(String modelName, String terminal) {
         cacheManager.getCache(modelMapCacheKey).tryLockAndRun("lock", 10, TimeUnit.SECONDS, ()-> {
-            ModelDB modelDB = modelRepo.queryByUniqueKey(modelName);
-            Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
-            map.put(modelName, modelDB);
-            cacheManager.getCache(modelMapCacheKey).put("all", map);
-            if(StringUtils.isNotEmpty(terminal)) {
-                cacheManager.getCache(modelTerminalCacheKey).put(modelName, terminal);
-            }
+            doUpdateModelCache(modelName, terminal);
         });
+    }
+
+    private void doUpdateModelCache(String modelName, String terminal) {
+        ModelDB modelDB = modelRepo.queryByUniqueKey(modelName);
+        Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
+        map.put(modelName, modelDB);
+        cacheManager.getCache(modelMapCacheKey).put("all", map);
+        if(StringUtils.isNotEmpty(terminal)) {
+            cacheManager.getCache(modelTerminalCacheKey).put(modelName, terminal);
+        }
     }
 
     private void checkOwnerPermission(String model) {
@@ -356,7 +360,7 @@ public class ModelService {
     }
 
     private boolean fillModelNames(Condition.ModelCondition condition) {
-        if(condition.getDataDestination() == null && condition.getSupplier() == null) {
+        if(StringUtils.isEmpty(condition.getDataDestination()) && StringUtils.isEmpty(condition.getSupplier())) {
             return true;
         }
         Condition.ChannelCondition channelCondition = new Condition.ChannelCondition();
@@ -371,6 +375,7 @@ public class ModelService {
                         || condition.getModelNames().contains(entityCode))
                 .collect(Collectors.toSet());
         condition.setModelNames(modelNames);
+        condition.setIncludeLinkedTo(true);
         return CollectionUtils.isNotEmpty(modelNames);
     }
 }

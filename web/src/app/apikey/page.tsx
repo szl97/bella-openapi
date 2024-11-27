@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Search, Plus, ChevronLeft, ChevronRight } from "lucide-react"
 import { useUser } from "@/lib/context/user-context"
 import { useToast } from "@/hooks/use-toast"
+import {ToastAction} from "@/components/ui/toast";
 
 const ApikeyPage: React.FC = () => {
     const [page, setPage] = useState<number>(1)
@@ -69,13 +70,19 @@ const ApikeyPage: React.FC = () => {
 
         try {
             setIsLoading(true)
-            const success = await applyApikey(userInfo.userId.toString(), userInfo.userName)
-            if (success) {
-                toast({
-                    title: "成功",
-                    description: "API Key 创建成功",
-                })
+            const apikey = await applyApikey(userInfo.userId.toString(), userInfo.userName)
+            if (apikey) {
                 await refresh()
+                const handleCopy = () => {
+                    navigator.clipboard.writeText(apikey).catch(err => {
+                        console.error('复制失败:', err)
+                    })
+                }
+                toast({
+                    title: "申请成功",
+                    description: `新的 API Key: ${apikey}`,
+                    action: <ToastAction altText="复制 API Key" onClick={handleCopy}>复制</ToastAction>,
+                })
             } else {
                 toast({
                     title: "错误",

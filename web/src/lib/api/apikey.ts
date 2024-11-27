@@ -13,10 +13,10 @@ export async function getApikeyInfos(page: number, search: string | null): Promi
     }
 }
 
-export async function applyApikey(ownerCode: string, ownerName: string): Promise<boolean> {
-    const response = await openapi.post<boolean>(`/console/apikey/apply`,
+export async function applyApikey(ownerCode: string, ownerName: string): Promise<string> {
+    const response = await openapi.post<string>(`/console/apikey/apply`,
         {ownerType:'person', ownerCode: ownerCode, ownerName: ownerName, monthQuota: 50});
-    return response.data ?? false;
+    return response.data;
 }
 
 export async function deleteApikey(code: string): Promise<boolean> {

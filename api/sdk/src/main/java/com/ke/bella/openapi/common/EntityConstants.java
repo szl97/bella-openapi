@@ -35,6 +35,8 @@ public class EntityConstants {
     public static final List<String> OWNER_TYPES = ImmutableList.of(SYSTEM, ORG, PERSON);
     public static final List<String> AUTHORIZER_TYPES = ImmutableList.of(ORG, PERSON);
 
+    public static final Byte LOWEST_SAFETY_LEVEL = 10;
+
     @AllArgsConstructor
     @Getter
     public enum SystemBasicEndpoint {

@@ -102,7 +102,9 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
                         MODEL.MODEL_NAME.like(op.getModelName() + "%").or(MODEL.LINKED_TO.like(op.getModelName() + "%")) :
                         MODEL.MODEL_NAME.like(op.getModelName() + "%"))
                 .and(StringUtils.isEmpty(op.getOwnerName()) ? DSL.noCondition() : MODEL.OWNER_NAME.eq(op.getOwnerName()))
-                .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : MODEL.MODEL_NAME.in(op.getModelNames()))
+                .and(CollectionUtils.isEmpty(op.getModelNames()) ? DSL.noCondition() : op.isIncludeLinkedTo() ?
+                        MODEL.MODEL_NAME.in(op.getModelNames()).or(MODEL.LINKED_TO.in(op.getModelNames())) :
+                        MODEL.MODEL_NAME.in(op.getModelNames()))
                 .and(StringUtils.isEmpty(op.getVisibility()) ? DSL.noCondition() : MODEL.VISIBILITY.eq(op.getVisibility()))
                 .and(StringUtils.isEmpty(op.getStatus()) ? DSL.noCondition() : MODEL.STATUS.eq(op.getStatus()))
                 .and(StringUtils.isEmpty(op.getEndpoint()) ? DSL.noCondition() : MODEL_ENDPOINT_REL.ENDPOINT.eq(op.getEndpoint()))
