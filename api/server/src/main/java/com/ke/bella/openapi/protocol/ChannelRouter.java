@@ -61,7 +61,10 @@ public class ChannelRouter {
         }
         Set<String> unavailableSet = metricsManager.getAllUnavailableChannels(
                 channels.stream().map(ChannelDB::getChannelCode).collect(Collectors.toList()));
-        channels = channels.stream().filter(channel -> !unavailableSet.contains(channel.getChannelCode()))
+        channels = channels.stream()
+                .filter(channel -> channel.getDataDestination().equals(EntityConstants.PROTECTED) ||
+                        channel.getDataDestination().equals(EntityConstants.INNER) ||
+                        !unavailableSet.contains(channel.getChannelCode()))
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(channels)) {
             throw new ChannelException.RateLimitException("渠道当前负载过高，请稍后重试");
