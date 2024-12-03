@@ -1,9 +1,16 @@
 package com.ke.bella.openapi.script;
 
-public enum ScriptType {
-    metrics;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
+public enum ScriptType {
+    metrics("metrics"),
+    metricsQuery("metrics/query");
+
+    final String path;
     public String getScriptName(String endpoint) {
-        return this.name() + endpoint;
+        return this.path + endpoint;
     }
 }
