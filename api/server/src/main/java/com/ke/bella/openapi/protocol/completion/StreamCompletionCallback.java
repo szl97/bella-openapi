@@ -56,8 +56,12 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
                  msg.setRequestRiskData(requestRiskData);
                  requestRiskData = null;
              }
+             //第一包发两遍的问题，阻塞一下就正常，待优化
              if(firstPackageTime == null) {
-                 LOGGER.info("Received SSE: msg={}", msg);
+                 try {
+                     Thread.sleep(5);
+                 } catch (InterruptedException ignore) {
+                 }
              }
              SseHelper.sendEvent(sse, msg);
              updateBuffer(msg);
