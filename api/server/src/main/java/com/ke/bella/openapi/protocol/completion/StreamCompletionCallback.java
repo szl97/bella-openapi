@@ -56,6 +56,9 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
                  msg.setRequestRiskData(requestRiskData);
                  requestRiskData = null;
              }
+             if(firstPackageTime == null) {
+                 LOGGER.info("Received SSE: msg={}", msg);
+             }
              SseHelper.sendEvent(sse, msg);
              updateBuffer(msg);
              safetyCheck(false);
