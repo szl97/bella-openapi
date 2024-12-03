@@ -213,7 +213,7 @@ export const CertifyDialog: React.FC<{
             label="安全认证"
             description={<div>
                 安全认证码申请请点击跳转：
-                <a href={safety_apply_url} className='text-blue-700' target='_blank'>安全合规申请</a>
+                <a href={safety_apply_url + '#/aigc/applicationEvaluation?pageNum=1&pageSize=20&type=ait'} className='text-blue-700' target='_blank'>安全合规申请</a>
             </div>}
             onConfirm={handleConfirm}
             inputLabel="安全认证码"
