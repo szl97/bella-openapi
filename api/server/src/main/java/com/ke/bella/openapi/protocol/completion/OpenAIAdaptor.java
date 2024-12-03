@@ -15,7 +15,7 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
 
     private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> {
         StreamCompletionResponse response = JacksonUtils.deserialize(str, StreamCompletionResponse.class);
-        if(response != null && response.getCreated() == 0) {
+        if(response != null) {
             response.setCreated(DateTimeUtils.getCurrentSeconds());
         }
         return response;
@@ -24,7 +24,9 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property) {
         Request httpRequest = buildRequest(request, url, property);
-        return HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
+        CompletionResponse response = HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
+        response.setCreated(DateTimeUtils.getCurrentSeconds());
+        return response;
     }
 
     @Override
