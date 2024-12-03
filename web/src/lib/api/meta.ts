@@ -95,7 +95,7 @@ export async function updateChannel(channelCode: string, update: Partial<Channel
         ...update,
         channelCode,
     } as Channel;
-    const response = await openapi.post<Boolean>('/console/channel', requestBody);
+    const response = await openapi.put<Boolean>('/console/channel', requestBody);
     return response.data;
 }
 
