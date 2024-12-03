@@ -23,13 +23,13 @@ public class ResponseHelper {
         CompletionResponse.Choice choice = new CompletionResponse.Choice();
         choice.setIndex(streamChoice.getIndex());
         choice.setFinish_reason(streamChoice.getFinish_reason());
-        choice.setMessage(streamChoice.getDelta());
+        choice.setMessage(combineMessage(null, streamChoice.getDelta()));
         return choice;
     }
 
     public static Message combineMessage(Message target, Message message) {
         if(target == null) {
-            return message;
+            target = new Message();
         }
         Object contentObj = message.getContent();
         List<Message.ToolCall> toolCallList = message.getTool_calls();
