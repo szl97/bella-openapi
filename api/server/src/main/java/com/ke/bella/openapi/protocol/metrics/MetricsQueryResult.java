@@ -8,5 +8,5 @@ public class MetricsQueryResult {
     private String channelCode;
     private String entityCode;
     private String endpoint;
-    private Map<String, Long> Metrics;
+    private Map<String, Object> metrics;
 }

@@ -18,6 +18,7 @@ end
 local function get_channel_metrics(channel_id)
     local prefix_key = "bella-openapi-channel-metrics:" .. channel_id
     local total_key = prefix_key .. ":total"
+    local mark_key = prefix_key .. ":unavailable"
 
     -- 检查 total_key 是否存在
     local exists = redis.call("EXISTS", total_key)
@@ -26,6 +27,13 @@ local function get_channel_metrics(channel_id)
     end
 
     local result = {}
+
+    local unavailable = redis.call("GET", mark_key)
+    if unavailable then
+        result.status = 0
+    else
+        result.status = 1
+    end
 
     for _, metric_name in ipairs(metric_names) do
         local value = redis.call("HGET", total_key, metric_name)

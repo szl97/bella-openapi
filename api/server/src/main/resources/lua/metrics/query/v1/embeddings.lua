@@ -18,6 +18,7 @@ end
 local function get_channel_metrics(channel_id)
     local prefix_key = "bella-openapi-channel-metrics:" .. channel_id
     local total_key = prefix_key .. ":total"
+    local mark_key = prefix_key .. ":unavailable"
 
     -- 检查 total_key 是否存在
     local exists = redis.call("EXISTS", total_key)

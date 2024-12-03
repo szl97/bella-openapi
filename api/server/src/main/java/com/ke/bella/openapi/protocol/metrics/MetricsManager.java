@@ -83,7 +83,7 @@ public class MetricsManager {
         return map.keySet().stream().map(s -> s.split(":")[1]).collect(Collectors.toSet());
     }
 
-    public Map<String, Map<String, Long>> queryMetrics(String endpoint, Collection<String> channelCodes) throws IOException {
+    public Map<String, Map<String, Object>> queryMetrics(String endpoint, Collection<String> channelCodes) throws IOException {
         MetricsResolver resolver = resolvers.stream()
                 .filter(t -> MatchUtils.matchUrl(t.support(), endpoint))
                 .findAny()
@@ -98,19 +98,18 @@ public class MetricsManager {
         List<Object> params  = new ArrayList<>();
         params.add("completed");
         params.add("errors");
-        params.add("status");
         params.addAll(metricsName);
 
         Object result = executor.execute(endpoint, ScriptType.metricsQuery, keys, params);
         return convertToQueryResult(result);
     }
 
-    private Map<String, Map<String, Long>> convertToQueryResult(Object result) {
+    private Map<String, Map<String, Object>> convertToQueryResult(Object result) {
         if(result == null) {
             return Maps.newHashMap();
         }
         if(result instanceof String) {
-            return JacksonUtils.deserialize((String)result, new TypeReference<Map<String, Map<String, Long>>>(){});
+            return JacksonUtils.deserialize((String)result, new TypeReference<Map<String, Map<String, Object>>>(){});
         }
         return Maps.newHashMap();
     }
