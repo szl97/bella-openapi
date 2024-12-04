@@ -55,6 +55,9 @@ public class Message {
     private String tool_call_id;
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
     public static class ToolCall {
 
         private int index;
@@ -120,6 +123,9 @@ public class Message {
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
     public static class FunctionCall {
 
         /**

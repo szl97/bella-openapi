@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ke.bella.openapi.protocol.completion.StreamCompletionResponse.CHAT_COMPLETION_CHUNK_OBJECT;
@@ -42,36 +43,41 @@ public class ResponseHelper {
             }
         } else if(CollectionUtils.isNotEmpty(toolCallList)) {
             if(target.getTool_calls() == null) {
-                target.setTool_calls(toolCallList);
-            } else {
-                for (Message.ToolCall streamToolCall : toolCallList) {
-                    //拼接对应index的function
-                    int toolIndex = streamToolCall.getIndex();
-                    String name = streamToolCall.getFunction().getName();
-                    String arguments = streamToolCall.getFunction().getArguments();
-                    if(StringUtils.isBlank(name) && StringUtils.isEmpty(arguments)) {
-                        return target;
-                    }
-                    boolean add = true;
-                    for (Message.ToolCall toolCall : target.getTool_calls()) {
-                        if(toolCall.getIndex() == toolIndex) {
-                            add = false;
-                            if(StringUtils.isNotBlank(name) && StringUtils.isBlank(toolCall.getFunction().getName())) {
-                                toolCall.getFunction().setName(name);
-                            }
-                            if(toolCall.getFunction().getArguments() == null) {
-                                toolCall.getFunction().setArguments(arguments);
-                            } else {
-                                toolCall.getFunction().setArguments(toolCall.getFunction().getArguments() + arguments);
-                            }
+                target.setTool_calls(new ArrayList<>());
+            }
+            for (Message.ToolCall streamToolCall : toolCallList) {
+                //拼接对应index的function
+                int toolIndex = streamToolCall.getIndex();
+                String name = streamToolCall.getFunction().getName();
+                String arguments = streamToolCall.getFunction().getArguments();
+                if(StringUtils.isBlank(name) && StringUtils.isEmpty(arguments)) {
+                    return target;
+                }
+                boolean add = true;
+                for (Message.ToolCall toolCall : target.getTool_calls()) {
+                    if(toolCall.getIndex() == toolIndex) {
+                        add = false;
+                        if(StringUtils.isNotBlank(name) && StringUtils.isBlank(toolCall.getFunction().getName())) {
+                            toolCall.getFunction().setName(name);
+                        }
+                        if(toolCall.getFunction().getArguments() == null) {
+                            toolCall.getFunction().setArguments(arguments);
+                        } else {
+                            toolCall.getFunction().setArguments(toolCall.getFunction().getArguments() + arguments);
                         }
                     }
-                    if(add) {
-                        target.getTool_calls().add(streamToolCall);
-                    }
+                }
+                if(add) {
+                    target.getTool_calls().add(copyToolCall(streamToolCall));
                 }
             }
         }
         return target;
     }
+
+    public static Message.ToolCall copyToolCall(Message.ToolCall toolCall) {
+        return new Message.ToolCall(toolCall.getIndex(), toolCall.getId(), toolCall.getType(),
+                Message.FunctionCall.builder().name(toolCall.getFunction().getName()).arguments(toolCall.getFunction().getArguments()).build());
+    }
+
 }
