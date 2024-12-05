@@ -12,7 +12,7 @@ import {renderField} from "@/components/ui/render-field";
 import {listEndpoints} from "@/lib/api/meta";
 
 
-type ModelWithoutPriceDetails = Omit<Model, 'priceDetails'>;
+type ModelWithoutPriceDetails = Omit<Model, 'priceDetails' | 'terminalModel'>;
 
 
 export function CreateModelForm() {
