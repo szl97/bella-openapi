@@ -352,7 +352,8 @@ public class ModelService {
         return modelRepo.page(condition);
     }
 
-    public List<Model> listByConditionForSelectList(Condition.ModelCondition condition) {
+    public List<Model> listByConditionPermissionForSelectList(Condition.ModelCondition condition) {
+        apikeyService.fillPermissionCode(condition);
         if(!fillModelNames(condition)) {
             return Lists.newArrayList();
         }
