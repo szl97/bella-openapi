@@ -156,7 +156,7 @@ export async function getChannelInfoSchema(entityType: string, entityCode: strin
 
 export async function listModels(endpoint?: string): Promise<Model[]> {
     const response = await openapi.get<Model[]>('/v1/meta/model/list', {
-        params: { endpoint },
+        params: { endpoint, status: 'active' },
     });
     return response.data;
 }

@@ -103,7 +103,6 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   const [intervalMinutes, setIntervalMinutes] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     async function fetchCategoryTrees() {
@@ -117,7 +116,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
     async function fetchModels() {
       try {
         const models = hasPermission(userInfo, '/console/model/**')
-          ? await listConsoleModels(selectedEndpoint, '', '', '', '')
+          ? await listConsoleModels(selectedEndpoint, '', '', 'active', '')
           : await listModels(selectedEndpoint);
         setAvailableModels(models || []);
         const validModel = models?.find(m => m.modelName === selectedModel) || models?.[0];
@@ -190,7 +189,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
 
     // 计算新的时间范围（分钟）
     const minutesDiff = (newEndDate.getTime() - newStartDate.getTime()) / (1000 * 60);
-    
+
     // 检查时间范围/时间间隔是否大于60
     if (minutesDiff / intervalMinutes > 60 && intervalMinutes < 720) {
       // 如果大于60，调整时间间隔为合法的最小值
@@ -218,12 +217,12 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   // 处理时间间隔变化
   const handleIntervalChange = (newInterval: number) => {
     const minutesDiff = (endDate.getTime() - startDate.getTime()) / (1000 * 60);
-    
+
     // 如果新的时间间隔会导致时间范围/时间间隔大于60，且不是12小时或1天，则不允许更改
     if (minutesDiff / newInterval > 60 && newInterval < 720) {
       return;
     }
-    
+
     setIntervalMinutes(newInterval);
   };
 
