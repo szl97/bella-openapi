@@ -65,7 +65,7 @@ public class MetadataController {
 
     @GetMapping("/model/list/for-selection")
     public List<Model> listModelForSelection(Condition.ModelCondition condition) {
-        return modelService.listByConditionPermissionForSelectList(condition);
+        return modelService.listByConditionForSelectList(condition);
     }
 
     @GetMapping("/model/list")
