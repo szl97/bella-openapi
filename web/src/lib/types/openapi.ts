@@ -102,6 +102,7 @@ export interface Model {
     linkedTo: string;
     endpoints: string[];
     priceDetails: PriceDetails;
+    terminalModel: string;
 }
 
 export interface Channel {

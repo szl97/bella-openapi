@@ -23,6 +23,7 @@ public class Model extends BaseDto {
     private String features;
     private String linkedTo;
     private PriceDetails priceDetails;
+    private String terminalModel;
 
     public <T extends IModelProperties> T toProperties(Class<T> type) {
         return JacksonUtils.deserialize(properties, type);

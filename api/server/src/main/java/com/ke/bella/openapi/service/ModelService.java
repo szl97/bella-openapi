@@ -279,6 +279,10 @@ public class ModelService {
 
     public List<String> getPath(String target) {
         Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
+        return getPath(target, map);
+    }
+
+    private List<String> getPath(String target, Map<String, ModelDB> map) {
         List<String> path = new ArrayList<>();
         String name = target;
         while(StringUtils.isNotEmpty(name) && map.containsKey(name)) {
@@ -286,6 +290,11 @@ public class ModelService {
             name = map.get(name).getLinkedTo();
         }
         return path;
+    }
+
+    private String getTerminalName(String modelName, Map<String, ModelDB> map)  {
+        List<String> path = getPath(modelName, map);
+        return CollectionUtils.isEmpty(path) ? modelName : path.get(path.size() - 1);
     }
 
      public ModelDetails getModelDetails(String modelName) {
@@ -341,6 +350,22 @@ public class ModelService {
 
     public Page<ModelDB> pageByCondition(Condition.ModelCondition condition) {
         return modelRepo.page(condition);
+    }
+
+    public List<Model> listByConditionPermissionForSelectList(Condition.ModelCondition condition) {
+        apikeyService.fillPermissionCode(condition);
+        if(!fillModelNames(condition)) {
+            return Lists.newArrayList();
+        }
+        Map<String, ModelDB> map = applicationContext.getBean(ModelService.class).queryWithCache("all");
+        return listByCondition(condition).stream()
+                .map(db->{
+                    Model model = new Model();
+                    model.setModelName(db.getModelName());
+                    model.setTerminalModel(getTerminalName(db.getModelName(), map));
+                    return model;
+                })
+                .collect(Collectors.toList());
     }
 
     public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition) {

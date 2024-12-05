@@ -7,6 +7,7 @@ import com.ke.bella.openapi.login.context.ConsoleContext;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.EndpointCategoryTree;
 import com.ke.bella.openapi.metadata.EndpointDetails;
+import com.ke.bella.openapi.metadata.Model;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.EndpointService;
@@ -60,6 +61,11 @@ public class MetadataController {
     @GetMapping("/endpoint/info/{code}")
     public EndpointDB getEndpoint(@PathVariable String code) {
         return endpointService.getOne(EndpointService.UniqueKeyQuery.builder().endpointCode(code).build());
+    }
+
+    @GetMapping("/model/list/for-selection")
+    public List<Model> listModelForSelection(Condition.ModelCondition condition) {
+        return modelService.listByConditionPermissionForSelectList(condition);
     }
 
     @GetMapping("/model/list")

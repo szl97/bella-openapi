@@ -121,7 +121,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
         setAvailableModels(models || []);
         const validModel = models?.find(m => m.modelName === selectedModel) || models?.[0];
         if (validModel) {
-          setSelectedModel(validModel.modelName);
+          setSelectedModel(validModel.terminalModel ? validModel.terminalModel : validModel.modelName);
         }
       } catch (error) {
         console.error('Error fetching models:', error);
@@ -281,7 +281,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
                                   selectedModel === model.modelName ? 'bg-gray-100' : ''
                                 }`}
                                 onClick={() => {
-                                  setSelectedModel(model.modelName);
+                                  setSelectedModel(model.terminalModel ? model.terminalModel : model.modelName);
                                   setShowModelList(false);
                                   setSearchQuery('');
                                 }}
