@@ -11,8 +11,8 @@ export async function getUserInfo() : Promise<UserInfo> {
     }
 }
 
-export function hasPermission(user: UserInfo, url: string): boolean {
-    if (user.optionalInfo == null) {
+export function hasPermission(user: UserInfo | null, url: string): boolean {
+    if (user?.optionalInfo == null) {
         return false;
     }
     const included: string[] = user.optionalInfo['roles'] as string[] || [];

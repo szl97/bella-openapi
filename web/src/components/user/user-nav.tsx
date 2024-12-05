@@ -23,6 +23,11 @@ export function UserNav({ user }: UserNavProps) {
                 <div className="flex items-center justify-center p-2">
                     <span className="text-sm font-medium">{user.userName}</span>
                 </div>
+                <DropdownMenuItem>
+                    <Link href="/" className="w-full text-sm">
+                        主页
+                    </Link>
+                </DropdownMenuItem>
                 {hasPermission(user, '/console/model/**') && (
                     <DropdownMenuItem>
                         <Link href="/meta/console" className="w-full text-sm">
@@ -30,6 +35,11 @@ export function UserNav({ user }: UserNavProps) {
                         </Link>
                     </DropdownMenuItem>
                 )}
+                <DropdownMenuItem>
+                    <Link href="/monitor" className="w-full text-sm">
+                        能力点监控
+                    </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

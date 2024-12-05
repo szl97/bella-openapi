@@ -146,3 +146,9 @@ export interface TypeSchema {
 export interface JsonSchema {
     params: TypeSchema[];
 }
+
+export interface MonitorData {
+    time: string;
+    channel_code: string;
+    metrics: Record<string, number>;
+}

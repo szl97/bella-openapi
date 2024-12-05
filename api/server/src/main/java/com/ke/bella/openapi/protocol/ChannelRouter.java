@@ -98,8 +98,8 @@ public class ChannelRouter {
             if(compare > 0) {
                 highest.clear();
                 max = priority;
-                highest.add(channel);
             }
+            highest.add(channel);
         }
         return highest;
     }

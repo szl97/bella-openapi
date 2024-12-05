@@ -153,3 +153,10 @@ export async function getChannelInfoSchema(entityType: string, entityCode: strin
     });
     return response.data;
 }
+
+export async function listModels(endpoint?: string): Promise<Model[]> {
+    const response = await openapi.get<Model[]>('/v1/meta/model/list', {
+        params: { endpoint },
+    });
+    return response.data;
+}

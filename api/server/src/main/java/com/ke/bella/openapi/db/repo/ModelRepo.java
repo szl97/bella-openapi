@@ -112,7 +112,7 @@ public class ModelRepo extends StatusRepo<ModelDB, ModelRecord, String> {
                 .and(permissionCondition(op.getPersonalCode(), op.getOrgCodes()))
                 .and(propertiesCondition)
                 .and(featuresCondition)
-                .orderBy(MODEL.ID.desc());
+                .orderBy(MODEL.ID);
     }
 
     private org.jooq.Condition permissionCondition(String personalCode, Set<String> orgCodes) {
