@@ -42,9 +42,10 @@ public class ChatController {
     public Object completion(@RequestBody CompletionRequest request) {
         String endpoint = BellaContext.getRequest().getRequestURI();
         String model = request.getModel();
+        BellaContext.setEndpointData(endpoint, model, request);
         boolean isMock = BellaContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
-        BellaContext.setEndpointData(endpoint, model, channel, request);
+        BellaContext.setEndpointData(channel);
         Object requestRiskData = null;
         if(!isMock) {
             requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,

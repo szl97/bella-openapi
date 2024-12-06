@@ -59,6 +59,20 @@ public class BellaContext {
         BellaContext.getProcessData().setSupplier(channel.getSupplier());
     }
 
+    public static void setEndpointData(String endpoint, String model, Object request) {
+        BellaContext.getProcessData().setRequest(request);
+        BellaContext.getProcessData().setEndpoint(endpoint);
+        BellaContext.getProcessData().setModel(model);
+    }
+
+    public static void setEndpointData(ChannelDB channel) {
+        BellaContext.getProcessData().setChannelCode(channel.getChannelCode());
+        BellaContext.getProcessData().setForwardUrl(channel.getUrl());
+        BellaContext.getProcessData().setProtocol(channel.getProtocol());
+        BellaContext.getProcessData().setPriceInfo(channel.getPriceInfo());
+        BellaContext.getProcessData().setSupplier(channel.getSupplier());
+    }
+
     public static void setEncodingType(String encodingType) {
         getProcessData().setEncodingType(encodingType);
     }

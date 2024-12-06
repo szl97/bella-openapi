@@ -31,9 +31,10 @@ public class EmbeddingController {
     public Object embedding(@RequestBody EmbeddingRequest request) {
         String endpoint = BellaContext.getRequest().getRequestURI();
         String model = request.getModel();
+        BellaContext.setEndpointData(endpoint, model, request);
         boolean isMock = BellaContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
-        BellaContext.setEndpointData(endpoint, model, channel, request);
+        BellaContext.setEndpointData(channel);
         EndpointProcessData processData = BellaContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();

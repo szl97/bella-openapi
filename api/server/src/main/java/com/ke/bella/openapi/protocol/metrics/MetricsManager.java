@@ -37,7 +37,7 @@ public class MetricsManager {
 
     public void record(EndpointProcessData processData) throws IOException {
         String endpoint = processData.getEndpoint();
-        if(endpoint == null) {
+        if(endpoint == null || processData.getChannelCode() == null) {
             return;
         }
         MetricsResolver resolver = resolvers.stream().filter(t -> MatchUtils.matchUrl(t.support(), endpoint))
