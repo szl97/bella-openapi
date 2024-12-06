@@ -92,7 +92,7 @@ export function DynamicLineChart({
             const channelStatus = originalData?.channels[name]?.status;
             return [
               valueFormatter(value),
-              `${name}${channelStatus === 1 ? ' (不可用)' : ''}`
+              `${name}${channelStatus === 0 ? ' (不可用)' : ''}`
             ];
           }}
           labelFormatter={formatTime}

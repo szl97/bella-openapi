@@ -69,7 +69,7 @@ const transformData = (data: MonitorData[], metricType: keyof MonitorData['metri
       const value = item.metrics[metricType];
       channels[item.channel_code] = {
         value: metricType === 'status' ? (value === 1 ? 0 : 1) : value,
-        status: metricType === 'status' ? (item.metrics.status === 1 ? 0 : 1) : 1,
+        status: item.metrics.status === 0 ? 0 : 1,
         rawData: [metricType === 'status' ? (value === 1 ? 0 : 1) : value]
       };
     });
