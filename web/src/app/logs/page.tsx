@@ -45,7 +45,8 @@ const LogsPage = () => {
   const [showConsultDialog, setShowConsultDialog] = useState(false)
   const [showAkCodeDialog, setShowAkCodeDialog] = useState(false)
   const [limit, setLimit] = useState(100)
-  const [searchType, setSearchType] = useState<'akCode' | 'requestId'>('akCode')
+  const [searchType, setSearchType] = useState<'akCode' | 'requestId' | 'bellaTraceId'>('akCode')
+  const [bellaTraceId, setBellaTraceId] = useState('')
 
   const pageSizeOptions = [10, 20, 50, 100]
   const totalPages = Math.ceil(totalLogs / pageSize)
@@ -112,7 +113,7 @@ const LogsPage = () => {
   }
 
   const handleSearch = async () => {
-    if (!akCode.trim() && !requestId.trim()) {
+    if (!akCode.trim() && !requestId.trim() && !bellaTraceId.trim()) {
       setIsAkCodeError(true)
       return
     }
@@ -130,6 +131,8 @@ const LogsPage = () => {
         queryParts.push(`data_info_msg_requestId:\"${requestId}\"`)
       } else if (akCode) {
         queryParts.push(`data_info_msg_akCode : \"${akCode}\"`)
+      } else if (bellaTraceId) {
+        queryParts.push(`data_info_msg_bellaTraceId:\"${bellaTraceId}\"`)
       }
       
       if (model) {
@@ -240,11 +243,12 @@ const LogsPage = () => {
               <div className="flex gap-2">
                 <Select
                   value={searchType}
-                  onValueChange={(value: 'akCode' | 'requestId') => {
+                  onValueChange={(value: 'akCode' | 'requestId' | 'bellaTraceId') => {
                     setSearchType(value)
-                    // Clear both fields when switching
+                    // Clear all fields when switching
                     setAkCode('')
                     setRequestId('')
+                    setBellaTraceId('')
                     setIsAkCodeError(false)
                   }}
                 >
@@ -254,6 +258,7 @@ const LogsPage = () => {
                   <SelectContent>
                     <SelectItem value="akCode">AK Code</SelectItem>
                     <SelectItem value="requestId">Request ID</SelectItem>
+                    <SelectItem value="bellaTraceId">Bella TraceID</SelectItem>
                   </SelectContent>
                 </Select>
 
@@ -274,7 +279,7 @@ const LogsPage = () => {
                       }}
                     />
                   </div>
-                ) : (
+                ) : searchType === 'requestId' ? (
                   <div className="flex-1">
                     <input
                       type="text"
@@ -291,12 +296,29 @@ const LogsPage = () => {
                       }}
                     />
                   </div>
+                ) : (
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      className={`w-full p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                        isAkCodeError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="请输入 Bella TraceID"
+                      value={bellaTraceId}
+                      onChange={(e) => {
+                        setBellaTraceId(e.target.value)
+                        if (isAkCodeError) {
+                          setIsAkCodeError(false)
+                        }
+                      }}
+                    />
+                  </div>
                 )}
               </div>
 
               {isAkCodeError && (
                 <p className="text-sm text-red-500 mt-1">
-                  请输入{searchType === 'akCode' ? 'AK Code' : 'Request ID'}
+                  请输入{searchType === 'akCode' ? 'AK Code' : searchType === 'requestId' ? 'Request ID' : 'Bella TraceID'}
                 </p>
               )}
             </div>
@@ -429,7 +451,7 @@ const LogsPage = () => {
                 </div>
               </div>
             )}
-            {logs.length > 0 && (
+            {logs.length > 0 ? (
               <>
                 <div className="bg-white p-4 rounded-lg shadow-sm mb-4 flex justify-between items-center">
                   <div className="text-sm text-gray-600">
@@ -508,6 +530,10 @@ const LogsPage = () => {
                           <span className="text-gray-900">{log.data_info_msg_akCode}</span>
                         </div>
                         <div>
+                          <span className="font-medium text-gray-700">Bella TraceID：</span>{" "}
+                          <span className="text-gray-900">{log.data_info_msg_bellaTraceId}</span>
+                        </div>
+                        <div>
                           <span className="font-medium text-gray-700">模型：</span>{" "}
                           <span className="text-gray-900">{log.data_info_msg_model}</span>
                         </div>
@@ -563,6 +589,10 @@ const LogsPage = () => {
                   ))}
                 </div>
               </>
+            ) : (
+              <div className="mt-8 text-center p-8 bg-white rounded-lg shadow-sm">
+                <p className="text-gray-600">没有日志，请确认查询条件</p>
+              </div>
             )}
           </div>
         </div>
