@@ -36,4 +36,5 @@ public class EndpointProcessData {
     private String supplier;
     private Object requestRiskData;
     private boolean isMock;
+    private String bellaTraceId;
 }
