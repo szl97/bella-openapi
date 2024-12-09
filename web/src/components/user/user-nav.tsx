@@ -40,6 +40,11 @@ export function UserNav({ user }: UserNavProps) {
                         能力点监控
                     </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href="/logs" className="w-full text-sm">
+                        日志查询
+                    </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

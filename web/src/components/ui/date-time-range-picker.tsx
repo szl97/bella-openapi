@@ -86,56 +86,58 @@ export function DateTimeRangePicker({
 
   return (
     <div className="flex items-center gap-2">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant={"outline"}
-            className={cn(
-              "w-[300px] justify-start text-left font-normal",
-              !startDate && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedRange?.from ? (
-              selectedRange.to ? (
-                <>
-                  {selectedRange.from ? format(selectedRange.from, "yyyy-MM-dd") : ''} -{" "}
-                  {selectedRange.to ? format(selectedRange.to, "yyyy-MM-dd") : ''}
-                </>
+      <div className="flex items-center gap-2 border border-gray-300 rounded p-2 bg-white">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[240px] justify-start text-left font-normal border-none p-0 focus:outline-none focus:ring-0",
+                !startDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedRange?.from ? (
+                selectedRange.to ? (
+                  <>
+                    {format(selectedRange.from, "yyyy-MM-dd")} -{" "}
+                    {format(selectedRange.to, "yyyy-MM-dd")}
+                  </>
+                ) : (
+                  format(selectedRange.from, "yyyy-MM-dd")
+                )
               ) : (
-                selectedRange.from ? format(selectedRange.from, "yyyy-MM-dd") : ''
-              )
-            ) : (
-              <span>Pick a date range</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            initialFocus
-            mode="range"
-            defaultMonth={startDate}
-            selected={selectedRange}
-            onSelect={handleDateRangeSelect}
-            numberOfMonths={2}
-          />
-        </PopoverContent>
-      </Popover>
-      <Input
-        type="time"
-        value={selectedRange.from ? format(selectedRange.from, "HH:mm") : format(startDate, "HH:mm")}
-        onChange={handleStartTimeChange}
-        className="w-[120px]"
-        step="60"
-      />
+                <span>Pick a date range</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={startDate}
+              selected={selectedRange}
+              onSelect={handleDateRangeSelect}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+        <Input
+          type="time"
+          className="bg-white border-0 focus:outline-none focus:ring-0 p-0 w-[120px]"
+          value={selectedRange.from ? format(selectedRange.from, "HH:mm") : format(startDate, "HH:mm")}
+          onChange={handleStartTimeChange}
+        />
+      </div>
       <span>至</span>
-      <Input
-        type="time"
-        value={selectedRange.to ? format(selectedRange.to, "HH:mm") : format(endDate, "HH:mm")}
-        onChange={handleEndTimeChange}
-        className="w-[120px]"
-        step="60"
-      />
+      <div className="flex items-center gap-2 border border-gray-300 rounded p-2 bg-white">
+        <Input
+          type="time"
+          className="bg-white border-0 focus:outline-none focus:ring-0 p-0 w-[120px]"
+          value={selectedRange.to ? format(selectedRange.to, "HH:mm") : format(endDate, "HH:mm")}
+          onChange={handleEndTimeChange}
+        />
+      </div>
     </div>
   );
 }

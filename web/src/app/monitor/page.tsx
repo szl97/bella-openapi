@@ -4,6 +4,7 @@ import {Suspense, useEffect, useState} from 'react';
 import {MetricsLineChart} from '@/components/ui/metrics-line-chart';
 import {ClientHeader} from "@/components/user/client-header";
 import {DateTimeRangePicker} from "@/components/ui/date-time-range-picker";
+import {ModelSelect} from "@/components/ui/model-select";
 import {format, subDays, subMinutes} from 'date-fns';
 import {Sidebar} from '@/components/meta/sidebar';
 import {getAllCategoryTrees, listModels, listConsoleModels} from '@/lib/api/meta';
@@ -89,9 +90,10 @@ const getUniqueChannels = (data: MonitorData[]) => {
 function MonitorPageContent({ params }: { params: { model: string } }) {
   const { userInfo } = useUser();
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('/v1/chat/completions');
-  const [selectedModel, setSelectedModel] = useState<string>(params.model);
-  const [availableModels, setAvailableModels] = useState<Model[]>([]);
+  const [models, setModels] = useState<Model[]>([]);
+  const [filteredModels, setFilteredModels] = useState<Model[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedModel, setSelectedModel] = useState<string>(params.model);
   const [showModelList, setShowModelList] = useState(false);
   const [categoryTrees, setCategoryTrees] = useState<CategoryTree[]>([]);
   const [startDate, setStartDate] = useState(subMinutes(new Date(), 30));
@@ -118,14 +120,14 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
         const models = hasPermission(userInfo, '/console/model/**')
           ? await listConsoleModels(selectedEndpoint, '', '', 'active', '')
           : await listModels(selectedEndpoint);
-        setAvailableModels(models || []);
+        setModels(models || []);
         const validModel = models?.find(m => m.modelName === selectedModel) || models?.[0];
         if (validModel) {
           setSelectedModel(validModel.terminalModel ? validModel.terminalModel : validModel.modelName);
         }
       } catch (error) {
         console.error('Error fetching models:', error);
-        setAvailableModels([]);
+        setModels([]);
       }
     }
     if (userInfo) {
@@ -133,9 +135,12 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
     }
   }, [selectedEndpoint, userInfo]);
 
-  const filteredModels = availableModels.filter(model =>
-    model.modelName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  useEffect(() => {
+    const filtered = models.filter((model) =>
+      model.modelName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredModels(filtered);
+  }, [searchQuery, models]);
 
   useEffect(() => {
     if (!selectedModel) return;  // 如果没有选中的模型，不获取数据
@@ -249,56 +254,17 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
           <div className="p-6">
             <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
               <div className="flex flex-col space-y-4">
-                <div className="flex items-center space-x-4">
-                  <span className="text-sm font-medium text-gray-700">模型:</span>
-                  <div className="relative w-[300px]">
-                    <div
-                      className="flex items-center border rounded-md p-2 cursor-pointer"
-                      onClick={() => setShowModelList(!showModelList)}
-                    >
-                      <span className="flex-1">
-                        {selectedModel || "选择模型..."}
-                      </span>
-                      <Search className="h-4 w-4 text-gray-500" />
-                    </div>
-
-                    {showModelList && (
-                      <div className="absolute w-full mt-1 bg-white border rounded-md shadow-lg z-50">
-                        <div className="p-2">
-                          <Input
-                            placeholder="搜索模型..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                        </div>
-                        <ScrollArea className="h-[200px]">
-                          <div className="p-2">
-                            {filteredModels.map((model) => (
-                              <div
-                                key={model.modelName}
-                                className={`p-2 cursor-pointer hover:bg-gray-100 rounded-md ${
-                                  selectedModel === model.modelName ? 'bg-gray-100' : ''
-                                }`}
-                                onClick={() => {
-                                  setSelectedModel(model.terminalModel ? model.terminalModel : model.modelName);
-                                  setShowModelList(false);
-                                  setSearchQuery('');
-                                }}
-                              >
-                                {model.modelName}
-                              </div>
-                            ))}
-                            {filteredModels.length === 0 && (
-                              <div className="p-2 text-gray-500 text-center">
-                                未找到模型
-                              </div>
-                            )}
-                          </div>
-                        </ScrollArea>
-                      </div>
-                    )}
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">模型:</label>
+                  <ModelSelect
+                    value={selectedModel}
+                    onChange={(value) => {
+                      const model = models.find(m => m.modelName === value);
+                      setSelectedModel(model?.terminalModel || model?.modelName || value);
+                    }}
+                    models={models.map(m => m.modelName || '')}
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="flex items-center space-x-4">
@@ -315,7 +281,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
                 <div className="flex items-center space-x-4">
                   <span className="text-sm font-medium text-gray-700">时间间隔:</span>
                   <select
-                    className="bg-white border rounded-md p-2"
+                    className="bg-white border border-gray-300 rounded p-2"
                     value={intervalMinutes}
                     onChange={(e) => handleIntervalChange(Number(e.target.value))}
                   >
