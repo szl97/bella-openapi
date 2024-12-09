@@ -7,7 +7,7 @@ const API_URL = es_url;
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
+    
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -25,7 +25,6 @@ export async function POST(request: Request) {
           "data_info_msg_response",
           "data_info_msg_endpoint",
           "data_info_msg_requestId",
-          "data_info_msg_bellaTraceId",
           "data_info_msg_requestTime",
           "data_info_msg_user"
         ],
