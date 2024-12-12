@@ -172,6 +172,11 @@ public class JacksonUtils {
         return map;
     }
 
+    public static <T> T convertValue(Map source, Class<T> clazz) {
+        return MAPPER.convertValue(source, clazz);
+    }
+
+
     /**
      * jackson2 json序列化 null字段输出为空串
      */

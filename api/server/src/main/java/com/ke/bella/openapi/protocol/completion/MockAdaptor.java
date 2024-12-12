@@ -2,8 +2,8 @@ package com.ke.bella.openapi.protocol.completion;
 
 import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import com.google.common.collect.Lists;
-import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.common.exception.BizParamCheckException;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import lombok.Data;
@@ -11,13 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +43,7 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
 
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, CompletionProperty property) {
-        MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getRequest());
+        MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getHeaders());
         CompletionResponse response = new CompletionResponse();
         response.setCreated(DateTimeUtils.getCurrentSeconds());
         response.setModel("mock-model");
@@ -76,7 +76,7 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
 
     @Override
     public void streamCompletion(CompletionRequest request, String url, CompletionProperty property, Callbacks.StreamCompletionCallback callback) {
-        MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getRequest());
+        MockCompletionRequest mockCompletionRequest = buildMockRequest(BellaContext.getHeaders());
         StreamCompletionCallback streamCompletionCallback = (StreamCompletionCallback) callback;
         SseEmitter sseEmitter = streamCompletionCallback.getSse();
         List<String> chunks = mockCompletionRequest.getChunks();
@@ -114,12 +114,12 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
         executor.submit(runnable);
     }
 
-    private MockCompletionRequest buildMockRequest(HttpServletRequest request) {
-        String text = request.getHeader("X-BELLA-MOCK-TEXT");
-        String function = request.getHeader("X-BELLA-MOCK-FUNCTION");
-        String ttft = request.getHeader("X-BELLA-MOCK-TTFT");
-        String ttlt = request.getHeader("X-BELLA-MOCK-TTLT");
-        String interval = request.getHeader("X-BELLA-MOCK-INTERVAL");
+    private MockCompletionRequest buildMockRequest(Map<String, String> requestInfo) {
+        String text = requestInfo.get("X-BELLA-MOCK-TEXT");
+        String function = requestInfo.get("X-BELLA-MOCK-FUNCTION");
+        String ttft = requestInfo.get("X-BELLA-MOCK-TTFT");
+        String ttlt = requestInfo.get("X-BELLA-MOCK-TTLT");
+        String interval = requestInfo.get("X-BELLA-MOCK-INTERVAL");
         MockCompletionRequest mockCompletionRequest = new MockCompletionRequest();
         try {
             if(StringUtils.isNotBlank(text)) {

@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.endpoints;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.AdaptorManager;
@@ -29,19 +29,19 @@ public class EmbeddingController {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping
     public Object embedding(@RequestBody EmbeddingRequest request) {
-        String endpoint = BellaContext.getRequest().getRequestURI();
+        String endpoint = EndpointContext.getRequest().getRequestURI();
         String model = request.getModel();
-        BellaContext.setEndpointData(endpoint, model, request);
-        boolean isMock = BellaContext.getProcessData().isMock();
+        EndpointContext.setEndpointData(endpoint, model, request);
+        boolean isMock = EndpointContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
-        BellaContext.setEndpointData(channel);
-        EndpointProcessData processData = BellaContext.getProcessData();
+        EndpointContext.setEndpointData(channel);
+        EndpointProcessData processData = EndpointContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
         String channelInfo = channel.getChannelInfo();
         EmbeddingAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, EmbeddingAdaptor.class);
         EmbeddingProperty property = (EmbeddingProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
-        BellaContext.setEncodingType(property.getEncodingType());
+        EndpointContext.setEncodingType(property.getEncodingType());
         return adaptor.embedding(request, url, property);
     }
 }

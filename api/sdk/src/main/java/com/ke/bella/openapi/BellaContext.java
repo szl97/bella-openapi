@@ -1,0 +1,100 @@
+package com.ke.bella.openapi;
+
+import com.ke.bella.openapi.apikey.ApikeyInfo;
+import com.ke.bella.openapi.utils.JacksonUtils;
+import org.springframework.util.Assert;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class BellaContext {
+    public static final String BELLA_TRACE_HEADER = "X-BELLA-TRACE-ID";
+    public static final String BELLA_REQUEST_ID_HEADER = "X-BELLA-REQUEST-ID";
+    public static final String BELLA_REQUEST_MOCK_HEADER = "X-BELLA-MOCK-REQUEST";
+
+    private static final ThreadLocal<Operator> operatorLocal = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, String>> headersThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<ApikeyInfo> akThreadLocal = new ThreadLocal<>();
+    public static String generateTraceId(String serviceId) {
+        return serviceId + "-" + UUID.randomUUID();
+    }
+
+    public static Map<String, String> getHeaders() {
+        if(headersThreadLocal.get() == null) {
+            headersThreadLocal.set(new HashMap<>());
+        }
+        return headersThreadLocal.get();
+    }
+
+    public static ApikeyInfo getApikey() {
+        Assert.notNull(akThreadLocal.get(), "ak is empty");
+        return akThreadLocal.get();
+    }
+
+    public static String getTraceId() {
+        return getHeaders().get(BELLA_TRACE_HEADER);
+    }
+
+    public static String getRequestId() {
+        return getHeaders().get(BELLA_REQUEST_ID_HEADER);
+    }
+
+    public static boolean isMock() {
+        return "true".equalsIgnoreCase(getHeaders().get(BELLA_REQUEST_MOCK_HEADER));
+    }
+
+    public static ApikeyInfo getApikeyIgnoreNull() {
+        return akThreadLocal.get();
+    }
+
+    public static void setApikey(ApikeyInfo ak) {
+        akThreadLocal.set(ak);
+    }
+
+    public static Operator getOperator() {
+        Operator userInfo = operatorLocal.get();
+        Assert.notNull(userInfo, "userInfo is null");
+        return userInfo;
+    }
+
+    public static Operator getOperatorIgnoreNull() {
+        return operatorLocal.get();
+    }
+
+    public static void setOperator(Operator operator) {
+        operatorLocal.set(operator);
+    }
+
+    public static Map<String, Object> snapshot() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("oper", operatorLocal.get());
+        map.put("ak", akThreadLocal.get());
+        map.put("bellaRequestInfo", headersThreadLocal.get());
+        return map;
+    }
+
+    public static void replace(Map<String, Object> map) {
+        operatorLocal.set((Operator) map.get("oper"));
+        akThreadLocal.set((ApikeyInfo) map.get("ak"));
+        headersThreadLocal.set((Map<String, String>) map.get("bellaRequestInfo"));
+    }
+
+    public static void replace(String json) {
+        Map map = JacksonUtils.deserialize(json, Map.class);
+        map.put("oper", JacksonUtils.convertValue((Map) map.get("oper"), Operator.class));
+        map.put("ak", JacksonUtils.convertValue((Map) map.get("ak"), ApikeyInfo.class));
+        replace(map);
+    }
+
+    public static final Operator SYS = Operator.builder()
+            .userId(0L).userName("system")
+            .build();
+
+    public static void clearAll() {
+        headersThreadLocal.remove();
+        akThreadLocal.remove();
+        operatorLocal.remove();
+    }
+
+}

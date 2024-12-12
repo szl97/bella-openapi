@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.protocol.UserRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -29,9 +29,9 @@ public class RequestUserAdvice extends RequestBodyAdviceAdapter  {
             user = ((UserRequest) request).getUser();
         }
         if(StringUtils.isEmpty(user)) {
-            user = BellaContext.getRequest().getHeader("ucid");
+            user = EndpointContext.getRequest().getHeader("ucid");
         }
-        BellaContext.getProcessData().setUser(user);
+        EndpointContext.getProcessData().setUser(user);
         return super.afterBodyRead(request, inputMessage, parameter, targetType, converterType);
     }
 }

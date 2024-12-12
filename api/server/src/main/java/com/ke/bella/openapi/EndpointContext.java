@@ -6,17 +6,19 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.Assert;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-public class BellaContext {
+public class EndpointContext {
     private static final ThreadLocal<EndpointProcessData> endpointRequestInfo = new ThreadLocal<>();
 
     private static final ThreadLocal<ContentCachingRequestWrapper> requestCache = new ThreadLocal<>();
 
-    private static final ThreadLocal<ApikeyInfo> akThreadLocal = new ThreadLocal<>();
 
     public static EndpointProcessData getProcessData() {
         if(endpointRequestInfo.get() == null) {
-
-            endpointRequestInfo.set(new EndpointProcessData());
+            EndpointProcessData endpointProcessData = EndpointProcessData.builder().build();
+            endpointProcessData.setBellaTraceId(BellaContext.getTraceId());
+            endpointProcessData.setRequestId(BellaContext.getRequestId());
+            endpointProcessData.setMock(BellaContext.isMock());
+            endpointRequestInfo.set(endpointProcessData);
         }
         return endpointRequestInfo.get();
     }
@@ -33,44 +35,43 @@ public class BellaContext {
 
 
     public static ApikeyInfo getApikey() {
-        Assert.notNull(akThreadLocal.get(), "ak is empty");
-        return akThreadLocal.get();
+        return BellaContext.getApikey();
     }
 
     public static ApikeyInfo getApikeyIgnoreNull() {
-        return akThreadLocal.get();
+        return BellaContext.getApikeyIgnoreNull();
     }
 
     public static void setApikey(ApikeyInfo ak) {
-        akThreadLocal.set(ak);
+        BellaContext.setApikey(ak);
         getProcessData().setAkCode(ak.getCode());
         getProcessData().setAccountType(ak.getOwnerType());
         getProcessData().setAccountCode(ak.getOwnerCode());
     }
 
     public static void setEndpointData(String endpoint, String model, ChannelDB channel, Object request) {
-        BellaContext.getProcessData().setRequest(request);
-        BellaContext.getProcessData().setEndpoint(endpoint);
-        BellaContext.getProcessData().setModel(model);
-        BellaContext.getProcessData().setChannelCode(channel.getChannelCode());
-        BellaContext.getProcessData().setForwardUrl(channel.getUrl());
-        BellaContext.getProcessData().setProtocol(channel.getProtocol());
-        BellaContext.getProcessData().setPriceInfo(channel.getPriceInfo());
-        BellaContext.getProcessData().setSupplier(channel.getSupplier());
+        EndpointContext.getProcessData().setRequest(request);
+        EndpointContext.getProcessData().setEndpoint(endpoint);
+        EndpointContext.getProcessData().setModel(model);
+        EndpointContext.getProcessData().setChannelCode(channel.getChannelCode());
+        EndpointContext.getProcessData().setForwardUrl(channel.getUrl());
+        EndpointContext.getProcessData().setProtocol(channel.getProtocol());
+        EndpointContext.getProcessData().setPriceInfo(channel.getPriceInfo());
+        EndpointContext.getProcessData().setSupplier(channel.getSupplier());
     }
 
     public static void setEndpointData(String endpoint, String model, Object request) {
-        BellaContext.getProcessData().setRequest(request);
-        BellaContext.getProcessData().setEndpoint(endpoint);
-        BellaContext.getProcessData().setModel(model);
+        EndpointContext.getProcessData().setRequest(request);
+        EndpointContext.getProcessData().setEndpoint(endpoint);
+        EndpointContext.getProcessData().setModel(model);
     }
 
     public static void setEndpointData(ChannelDB channel) {
-        BellaContext.getProcessData().setChannelCode(channel.getChannelCode());
-        BellaContext.getProcessData().setForwardUrl(channel.getUrl());
-        BellaContext.getProcessData().setProtocol(channel.getProtocol());
-        BellaContext.getProcessData().setPriceInfo(channel.getPriceInfo());
-        BellaContext.getProcessData().setSupplier(channel.getSupplier());
+        EndpointContext.getProcessData().setChannelCode(channel.getChannelCode());
+        EndpointContext.getProcessData().setForwardUrl(channel.getUrl());
+        EndpointContext.getProcessData().setProtocol(channel.getProtocol());
+        EndpointContext.getProcessData().setPriceInfo(channel.getPriceInfo());
+        EndpointContext.getProcessData().setSupplier(channel.getSupplier());
     }
 
     public static void setEncodingType(String encodingType) {
@@ -84,7 +85,7 @@ public class BellaContext {
     public static void clearAll() {
         endpointRequestInfo.remove();
         requestCache.remove();
-        akThreadLocal.remove();
+        BellaContext.clearAll();
     }
 
 }

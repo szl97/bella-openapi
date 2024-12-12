@@ -1,12 +1,12 @@
 package com.ke.bella.openapi.intercept;
 
 import com.google.common.collect.Lists;
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         }
         boolean hasPermission;
         String url = request.getRequestURI();
-        Operator op = ConsoleContext.getOperatorIgnoreNull();
+        Operator op = BellaContext.getOperatorIgnoreNull();
         if(op != null) {
             List<String> roles = Lists.newArrayList(properties.getLoginRoles());
             List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
@@ -46,7 +46,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
                 op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
                 op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
-                BellaContext.setApikey(apikeyInfo);
+                EndpointContext.setApikey(apikeyInfo);
                 hasPermission = apikeyInfo.hasPermission(url);
             } else {
                 op.getOptionalInfo().put("roles", roles);
@@ -60,7 +60,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 throw new ChannelException.AuthorizationException("Authorization is empty");
             }
             ApikeyInfo apikeyInfo = apikeyService.verifyAuthHeader(auth);
-            BellaContext.setApikey(apikeyInfo);
+            EndpointContext.setApikey(apikeyInfo);
             hasPermission = apikeyInfo.hasPermission(url);
         }
         if(!hasPermission) {

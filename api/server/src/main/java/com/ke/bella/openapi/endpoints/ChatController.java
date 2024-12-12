@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.endpoints;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.AdaptorManager;
@@ -40,33 +40,33 @@ public class ChatController {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping("/completions")
     public Object completion(@RequestBody CompletionRequest request) {
-        String endpoint = BellaContext.getRequest().getRequestURI();
+        String endpoint = EndpointContext.getRequest().getRequestURI();
         String model = request.getModel();
-        BellaContext.setEndpointData(endpoint, model, request);
-        boolean isMock = BellaContext.getProcessData().isMock();
+        EndpointContext.setEndpointData(endpoint, model, request);
+        boolean isMock = EndpointContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
-        BellaContext.setEndpointData(channel);
+        EndpointContext.setEndpointData(channel);
         Object requestRiskData = null;
         if(!isMock) {
             requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,
-                    BellaContext.getProcessData(), BellaContext.getApikey()));
-            BellaContext.getProcessData().setRequestRiskData(requestRiskData);
+                    EndpointContext.getProcessData(), EndpointContext.getApikey()));
+            EndpointContext.getProcessData().setRequestRiskData(requestRiskData);
         }
-        EndpointProcessData processData = BellaContext.getProcessData();
+        EndpointProcessData processData = EndpointContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
         String channelInfo = channel.getChannelInfo();
         CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, CompletionAdaptor.class);
         CompletionProperty property = (CompletionProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
-        BellaContext.setEncodingType(property.getEncodingType());
+        EndpointContext.setEncodingType(property.getEncodingType());
         if(request.isStream()) {
-            SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, BellaContext.getProcessData().getRequestId());
-            adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, BellaContext.getApikey(), logger, safetyCheckService));
+            SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, EndpointContext.getProcessData().getRequestId());
+            adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService));
             return sse;
         }
         CompletionResponse response = adaptor.completion(request, url, property);
         Object responseRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(response,
-                BellaContext.getProcessData(), BellaContext.getApikey()));
+                EndpointContext.getProcessData(), EndpointContext.getApikey()));
         if(!isMock) {
             response.setSensitives(responseRiskData);
             response.setRequestRiskData(requestRiskData);

@@ -7,7 +7,7 @@ import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.PermissionCondition;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
@@ -19,7 +19,7 @@ import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.safety.SafetyAuditService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -119,7 +118,7 @@ public class ApikeyService {
 
     @Transactional
     public String createByParentCode(ApikeyCreateOp op) {
-        ApikeyInfo apikey = BellaContext.getApikey();
+        ApikeyInfo apikey = EndpointContext.getApikey();
         if(!apikey.getCode().equals(op.getParentCode())) {
             throw new ChannelException.AuthorizationException("没有操作权限");
         }
@@ -239,9 +238,9 @@ public class ApikeyService {
         }
         String sha = EncryptUtils.sha256(ak);
         ApikeyInfo info = queryBySha(sha, true);
-        String display = EncryptUtils.desensitizeByLength(auth);
-        String displayAk = EncryptUtils.desensitize(ak);
         if(info == null) {
+            String display = EncryptUtils.desensitizeByLength(auth);
+            String displayAk = EncryptUtils.desensitize(ak);
             throw new ChannelException.AuthorizationException("api key不存在，请求的header为：" + display + ", apikey为：" + displayAk);
         }
         return info;
@@ -297,9 +296,9 @@ public class ApikeyService {
 
     private void checkPermission(String code) {
         ApikeyDB db = apikeyRepo.queryByUniqueKey(code);
-        ApikeyInfo apikeyInfo = BellaContext.getApikeyIgnoreNull();
+        ApikeyInfo apikeyInfo = EndpointContext.getApikeyIgnoreNull();
         if(apikeyInfo == null) {
-            Operator op = ConsoleContext.getOperator();
+            Operator op = BellaContext.getOperator();
             Assert.isTrue(db.getOwnerType().equals(PERSON) && db.getOwnerCode().equals(op.getUserId().toString()),
                     "没有操作权限");
             return;
@@ -326,9 +325,9 @@ public class ApikeyService {
     }
 
     public void fillPermissionCode(PermissionCondition condition) {
-        ApikeyInfo apikeyInfo = BellaContext.getApikeyIgnoreNull();
+        ApikeyInfo apikeyInfo = EndpointContext.getApikeyIgnoreNull();
         if(apikeyInfo == null) {
-            Operator op = ConsoleContext.getOperator();
+            Operator op = BellaContext.getOperator();
             if (CollectionUtils.isNotEmpty(condition.getOrgCodes())) {
                 throw new ChannelException.AuthorizationException("没有操作权限");
             }

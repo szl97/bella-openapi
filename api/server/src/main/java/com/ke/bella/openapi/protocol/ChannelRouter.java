@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
@@ -53,7 +53,7 @@ public class ChannelRouter {
      * @return
      */
     private List<ChannelDB> filter(List<ChannelDB> channels) {
-        Byte safetyLevel = BellaContext.getApikey().getSafetyLevel();
+        Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
         channels = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(channels)) {

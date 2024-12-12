@@ -10,7 +10,7 @@ import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.db.repo.ModelRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.metadata.Channel;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
@@ -326,7 +326,7 @@ public class ModelService {
 
     private void checkOwnerPermission(String model) {
         ModelDB db = modelRepo.queryByUniqueKey(model);
-        Operator operator = ConsoleContext.getOperator();
+        Operator operator = BellaContext.getOperator();
         //todo: 检查 operator 是否是 Owner
     }
 

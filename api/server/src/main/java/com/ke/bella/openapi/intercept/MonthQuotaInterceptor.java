@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.service.ApikeyService;
@@ -24,7 +24,7 @@ public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
         if (Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
             return true;
         }
-        ApikeyInfo apikey = BellaContext.getApikey();
+        ApikeyInfo apikey = EndpointContext.getApikey();
         BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
         double costVal = cost.doubleValue() / 100.0;
         if(apikey.getMonthQuota().doubleValue() <= costVal) {

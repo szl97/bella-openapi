@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.endpoints;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
@@ -28,7 +28,7 @@ public class ApikeyController {
 
     @PostMapping("/create")
     public String createApikey(@RequestBody ApikeyCreateOp op) {
-        ApikeyInfo cur = BellaContext.getApikey();
+        ApikeyInfo cur = EndpointContext.getApikey();
         Assert.isTrue(StringUtils.isEmpty(cur.getParentCode()), "当前AK无创建子AK权限");
         Assert.isTrue(op.getMonthQuota() == null || op.getMonthQuota().doubleValue() > 0, "配额应大于0");
         Assert.notNull(op.getSafetyLevel(), "安全等级不可为空");
@@ -41,11 +41,11 @@ public class ApikeyController {
 
     @GetMapping("/whoami")
     public ApikeyInfo whoami() {
-        return BellaContext.getApikey();
+        return EndpointContext.getApikey();
     }
 
     @GetMapping("/permission/check")
     public Boolean permissionCheck(@RequestParam String url) {
-        return BellaContext.getApikey().hasPermission(url);
+        return EndpointContext.getApikey().hasPermission(url);
     }
 }

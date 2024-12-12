@@ -1,9 +1,9 @@
 package com.ke.bella.openapi.endpoints;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.annotations.BellaAPI;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.EndpointCategoryTree;
 import com.ke.bella.openapi.metadata.EndpointDetails;
@@ -43,8 +43,8 @@ public class MetadataController {
     @GetMapping("/endpoint/details")
     public EndpointDetails listEndpointDetails(Condition.EndpointDetailsCondition condition) {
         Assert.notNull(condition.getEndpoint(), "能力点不可为空");
-        String identity = BellaContext.getApikeyIgnoreNull() == null ?
-                ConsoleContext.getOperator().getUserId().toString() : BellaContext.getApikeyIgnoreNull().getCode();
+        String identity = EndpointContext.getApikeyIgnoreNull() == null ?
+                BellaContext.getOperator().getUserId().toString() : EndpointContext.getApikeyIgnoreNull().getCode();
         return endpointService.getEndpointDetails(condition, identity);
     }
 

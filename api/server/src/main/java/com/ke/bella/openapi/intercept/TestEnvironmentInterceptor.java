@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.configuration.OpenApiProperties;
@@ -21,7 +21,7 @@ public class TestEnvironmentInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if("test".equals(profile)) {
-            ApikeyInfo apikey = BellaContext.getApikey();
+            ApikeyInfo apikey = EndpointContext.getApikey();
             if(apikey.getOwnerType().equals(EntityConstants.SYSTEM) || properties.getManagers().containsValue(apikey.getCode())) {
                 return true;
             }

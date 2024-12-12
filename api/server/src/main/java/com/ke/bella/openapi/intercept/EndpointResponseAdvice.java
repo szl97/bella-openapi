@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
@@ -35,7 +35,7 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         OpenapiResponse openapiResponse = (OpenapiResponse) body;
-        String requestId = BellaContext.getProcessData().getRequestId();
+        String requestId = EndpointContext.getProcessData().getRequestId();
         if(openapiResponse.getError() == null) {
             response.setStatusCode(HttpStatus.OK);
         } else {
@@ -43,15 +43,15 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
             response.setStatusCode(httpCode == null ? HttpStatus.SERVICE_UNAVAILABLE : HttpStatus.valueOf(httpCode));
             logError(httpCode, requestId, openapiResponse.getError().getMessage(), null);
         }
-        BellaContext.getProcessData().setResponse(openapiResponse);
-        logger.log(BellaContext.getProcessData());
+        EndpointContext.getProcessData().setResponse(openapiResponse);
+        logger.log(EndpointContext.getProcessData());
         return body;
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public OpenapiResponse exceptionHandler(Exception exception) {
-        String requestId = BellaContext.getProcessData().getRequestId();
+        String requestId = EndpointContext.getProcessData().getRequestId();
         ChannelException e = ChannelException.fromException(exception);
         logError(e.getHttpCode(), requestId, e.getMessage(), e);
         OpenapiResponse.OpenapiError error = e.convertToOpenapiError();

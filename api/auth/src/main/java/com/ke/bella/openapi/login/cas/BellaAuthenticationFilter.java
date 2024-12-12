@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.login.cas;
 
 import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.login.context.ConsoleContext;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.login.session.SessionManager;
 import org.apache.commons.lang3.StringUtils;
 
@@ -78,11 +78,13 @@ public class BellaAuthenticationFilter implements Filter {
             return;
         }
         try {
-            ConsoleContext.setOperator(operator);
+            BellaContext.setOperator(operator);
             chain.doFilter(request, response);
         } finally {
-            ConsoleContext.clearAll();
+            BellaContext.clearAll();
             sessionManager.renew(httpRequest);
         }
     }
+
+
 }
