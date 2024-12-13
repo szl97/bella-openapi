@@ -78,14 +78,14 @@ public class BellaContext {
         Map<String, Object> map = new HashMap<>();
         map.put("oper", operatorLocal.get());
         map.put("ak", akThreadLocal.get());
-        map.put("bellaRequestInfo", headersThreadLocal.get());
+        map.put("headers", headersThreadLocal.get());
         return map;
     }
 
     public static void replace(Map<String, Object> map) {
         operatorLocal.set((Operator) map.get("oper"));
         akThreadLocal.set((ApikeyInfo) map.get("ak"));
-        headersThreadLocal.set((Map<String, String>) map.get("bellaRequestInfo"));
+        headersThreadLocal.set((Map<String, String>) map.get("headers"));
     }
 
     public static void replace(String json) {
