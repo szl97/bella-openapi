@@ -27,6 +27,10 @@ public class BellaContext {
         return headersThreadLocal.get();
     }
 
+    public static String getHeader(String key)  {
+        return getHeaders().get(key);
+    }
+
     public static ApikeyInfo getApikey() {
         Assert.notNull(akThreadLocal.get(), "ak is empty");
         return akThreadLocal.get();
@@ -46,6 +50,10 @@ public class BellaContext {
 
     public static ApikeyInfo getApikeyIgnoreNull() {
         return akThreadLocal.get();
+    }
+
+    public static String getAkCode() {
+        return getApikeyIgnoreNull() == null ? null : getApikey().getCode();
     }
 
     public static void setApikey(ApikeyInfo ak) {
