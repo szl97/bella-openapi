@@ -110,6 +110,7 @@ export interface Channel {
     entityCode: string;
     channelCode: string;
     status: string;
+    trialEnabled: number;
     dataDestination: string;
     priority: string;
     protocol: string;

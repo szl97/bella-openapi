@@ -95,7 +95,7 @@ public class DefaultSchema extends SchemaImpl {
     public final Space SPACE = Space.SPACE;
 
     /**
-     * 团队成员信息表
+     * 空间成员信息表
      */
     public final SpaceMember SPACE_MEMBER = SpaceMember.SPACE_MEMBER;
 

@@ -81,7 +81,7 @@ public class Tables {
     public static final Space SPACE = Space.SPACE;
 
     /**
-     * 团队成员信息表
+     * 空间成员信息表
      */
     public static final SpaceMember SPACE_MEMBER = SpaceMember.SPACE_MEMBER;
 

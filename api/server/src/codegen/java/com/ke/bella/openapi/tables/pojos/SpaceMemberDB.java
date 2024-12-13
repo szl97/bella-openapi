@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 
 /**
- * 团队成员信息表
+ * 空间成员信息表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SpaceMemberDB implements Timed, Serializable {
@@ -125,14 +125,14 @@ public class SpaceMemberDB implements Timed, Serializable {
     }
 
     /**
-     * Getter for <code>space_member.member_uid</code>. 成员系统号
+     * Getter for <code>space_member.member_uid</code>. 成员id
      */
     public String getMemberUid() {
         return this.memberUid;
     }
 
     /**
-     * Setter for <code>space_member.member_uid</code>. 成员系统号
+     * Setter for <code>space_member.member_uid</code>. 成员id
      */
     public void setMemberUid(String memberUid) {
         this.memberUid = memberUid;
@@ -181,28 +181,28 @@ public class SpaceMemberDB implements Timed, Serializable {
     }
 
     /**
-     * Getter for <code>space_member.cuid</code>. 创建人系统号
+     * Getter for <code>space_member.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>space_member.cuid</code>. 创建人系统号
+     * Setter for <code>space_member.cuid</code>. 创建人id
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>space_member.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_member.muid</code>. 最后一次更新人id
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>space_member.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_member.muid</code>. 最后一次更新人id
      */
     public void setMuid(Long muid) {
         this.muid = muid;

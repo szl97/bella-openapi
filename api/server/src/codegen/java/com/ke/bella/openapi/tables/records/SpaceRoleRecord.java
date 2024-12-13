@@ -3,6 +3,7 @@
  */
 package com.ke.bella.openapi.tables.records;
 
+
 import com.ke.bella.openapi.db.repo.Timed;
 import com.ke.bella.openapi.tables.SpaceRole;
 
@@ -14,12 +15,12 @@ import org.jooq.Record11;
 import org.jooq.Row11;
 import org.jooq.impl.UpdatableRecordImpl;
 
+
 /**
  * 空间角色
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord>
-        implements Timed, Record11<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long> {
+public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord> implements Timed, Record11<Long, String, String, String, String, Byte, Byte, LocalDateTime, LocalDateTime, Long, Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -150,28 +151,28 @@ public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord>
     }
 
     /**
-     * Setter for <code>space_role.cuid</code>. 创建人系统号
+     * Setter for <code>space_role.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>space_role.cuid</code>. 创建人系统号
+     * Getter for <code>space_role.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return (Long) get(9);
     }
 
     /**
-     * Setter for <code>space_role.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_role.muid</code>. 最后一次更新人id
      */
     public void setMuid(Long value) {
         set(10, value);
     }
 
     /**
-     * Getter for <code>space_role.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_role.muid</code>. 最后一次更新人id
      */
     public Long getMuid() {
         return (Long) get(10);
@@ -432,8 +433,7 @@ public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord>
     }
 
     @Override
-    public SpaceRoleRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, Byte value7,
-            LocalDateTime value8, LocalDateTime value9, Long value10, Long value11) {
+    public SpaceRoleRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, Byte value7, LocalDateTime value8, LocalDateTime value9, Long value10, Long value11) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -462,8 +462,7 @@ public class SpaceRoleRecord extends UpdatableRecordImpl<SpaceRoleRecord>
     /**
      * Create a detached, initialised SpaceRoleRecord
      */
-    public SpaceRoleRecord(Long id, String spaceCode, String roleCode, String roleName, String roleDesc, Byte roleType, Byte status,
-            LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid) {
+    public SpaceRoleRecord(Long id, String spaceCode, String roleCode, String roleName, String roleDesc, Byte roleType, Byte status, LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid) {
         super(SpaceRole.SPACE_ROLE);
 
         setId(id);

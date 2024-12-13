@@ -199,28 +199,28 @@ public class SpaceRoleDB implements Timed, Serializable {
     }
 
     /**
-     * Getter for <code>space_role.cuid</code>. 创建人系统号
+     * Getter for <code>space_role.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return this.cuid;
     }
 
     /**
-     * Setter for <code>space_role.cuid</code>. 创建人系统号
+     * Setter for <code>space_role.cuid</code>. 创建人id
      */
     public void setCuid(Long cuid) {
         this.cuid = cuid;
     }
 
     /**
-     * Getter for <code>space_role.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_role.muid</code>. 最后一次更新人id
      */
     public Long getMuid() {
         return this.muid;
     }
 
     /**
-     * Setter for <code>space_role.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_role.muid</code>. 最后一次更新人id
      */
     public void setMuid(Long muid) {
         this.muid = muid;

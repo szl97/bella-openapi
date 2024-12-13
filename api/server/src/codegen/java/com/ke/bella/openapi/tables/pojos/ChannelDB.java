@@ -23,6 +23,7 @@ public class ChannelDB implements Operator, Serializable {
     private String        entityCode;
     private String        channelCode;
     private String        status;
+    private Byte          trialEnabled;
     private String        dataDestination;
     private String        priority;
     private String        protocol;
@@ -45,6 +46,7 @@ public class ChannelDB implements Operator, Serializable {
         this.entityCode = value.entityCode;
         this.channelCode = value.channelCode;
         this.status = value.status;
+        this.trialEnabled = value.trialEnabled;
         this.dataDestination = value.dataDestination;
         this.priority = value.priority;
         this.protocol = value.protocol;
@@ -66,6 +68,7 @@ public class ChannelDB implements Operator, Serializable {
         String        entityCode,
         String        channelCode,
         String        status,
+        Byte          trialEnabled,
         String        dataDestination,
         String        priority,
         String        protocol,
@@ -85,6 +88,7 @@ public class ChannelDB implements Operator, Serializable {
         this.entityCode = entityCode;
         this.channelCode = channelCode;
         this.status = status;
+        this.trialEnabled = trialEnabled;
         this.dataDestination = dataDestination;
         this.priority = priority;
         this.protocol = protocol;
@@ -168,6 +172,20 @@ public class ChannelDB implements Operator, Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Getter for <code>channel.trial_enabled</code>. 是否支持试用
+     */
+    public Byte getTrialEnabled() {
+        return this.trialEnabled;
+    }
+
+    /**
+     * Setter for <code>channel.trial_enabled</code>. 是否支持试用
+     */
+    public void setTrialEnabled(Byte trialEnabled) {
+        this.trialEnabled = trialEnabled;
     }
 
     /**
@@ -361,6 +379,7 @@ public class ChannelDB implements Operator, Serializable {
         sb.append(", ").append(entityCode);
         sb.append(", ").append(channelCode);
         sb.append(", ").append(status);
+        sb.append(", ").append(trialEnabled);
         sb.append(", ").append(dataDestination);
         sb.append(", ").append(priority);
         sb.append(", ").append(protocol);

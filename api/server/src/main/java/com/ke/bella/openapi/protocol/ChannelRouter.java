@@ -3,12 +3,14 @@ package com.ke.bella.openapi.protocol;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.ModelService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.ke.bella.openapi.common.EntityConstants.LOWEST_SAFETY_LEVEL;
 
 @Component
 public class ChannelRouter {
@@ -27,20 +31,29 @@ public class ChannelRouter {
     private ModelService modelService;
     @Autowired
     private MetricsManager metricsManager;
+    @Autowired
+    private LimiterManager limiterManager;
+    @Value("${bella.openapi.free.rpm:5}")
+    private Integer freeRpm;
+    @Value("${bella.openapi.free.concurrent:1}")
+    private Integer freeConcurrent;
 
     public ChannelDB route(String endpoint, String model, boolean isMock) {
         if(isMock) {
             return mockChannel();
         }
         List<ChannelDB> channels;
+        String entityCode;
         if(model != null) {
             String terminal = modelService.fetchTerminalModelName(model);
+            entityCode = terminal;
             channels = channelService.listActives(EntityConstants.MODEL, terminal);
         } else {
-            channels = channelService.listActives(EntityConstants.MODEL, endpoint);
+            entityCode = endpoint;
+            channels = channelService.listActives(EntityConstants.ENDPOINT, endpoint);
         }
         Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
-        channels = filter(channels);
+        channels = filter(channels, entityCode);
         channels = pickMaxPriority(channels);
         return random(channels);
     }
@@ -52,24 +65,42 @@ public class ChannelRouter {
      *
      * @return
      */
-    private List<ChannelDB> filter(List<ChannelDB> channels) {
+    private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode) {
         Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
-        channels = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
+        List<ChannelDB> filtered = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(channels)) {
-            throw new ChannelException.AuthorizationException("未经安全合规审核，没有使用权限");
+        if(CollectionUtils.isEmpty(filtered)) {
+            if(LOWEST_SAFETY_LEVEL.equals(safetyLevel)) {
+                filtered = channels.stream().filter(this::isTestUsed)
+                        .collect(Collectors.toList());
+            }
+            if(CollectionUtils.isEmpty(filtered)) {
+                throw new ChannelException.AuthorizationException("未经安全合规审核，没有使用权限");
+            }
+            if(freeAkOverload(EndpointContext.getProcessData().getAkCode(), entityCode)) {
+                throw new ChannelException.RateLimitException("当前使用试用额度,每分钟最多请求" + freeRpm + "次, 且不能高于" + freeConcurrent);
+            }
         }
         Set<String> unavailableSet = metricsManager.getAllUnavailableChannels(
-                channels.stream().map(ChannelDB::getChannelCode).collect(Collectors.toList()));
-        channels = channels.stream()
+                filtered.stream().map(ChannelDB::getChannelCode).collect(Collectors.toList()));
+        filtered = filtered.stream()
                 .filter(channel -> channel.getDataDestination().equals(EntityConstants.PROTECTED) ||
                         channel.getDataDestination().equals(EntityConstants.INNER) ||
                         !unavailableSet.contains(channel.getChannelCode()))
                 .collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(channels)) {
+        if(CollectionUtils.isEmpty(filtered)) {
             throw new ChannelException.RateLimitException("渠道当前负载过高，请稍后重试");
         }
-        return channels;
+        return filtered;
+    }
+
+    private boolean isTestUsed(ChannelDB channel) {
+        return 1 == channel.getTrialEnabled();
+    }
+
+    private boolean freeAkOverload(String akCode, String entityCode) {
+        return limiterManager.getRequestCountPerMinute(akCode, entityCode) >= freeRpm
+                || limiterManager.getCurrentConcurrentCount(akCode, entityCode) >= freeConcurrent;
     }
 
     private Byte getSafetyLevelLimit(String dataDestination) {

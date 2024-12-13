@@ -3,6 +3,7 @@
  */
 package com.ke.bella.openapi.tables.records;
 
+
 import com.ke.bella.openapi.db.repo.Timed;
 import com.ke.bella.openapi.tables.Space;
 
@@ -14,12 +15,12 @@ import org.jooq.Record10;
 import org.jooq.Row10;
 import org.jooq.impl.UpdatableRecordImpl;
 
+
 /**
  * 空间表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord>
-        implements Timed, Record10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> {
+public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord> implements Timed, Record10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -122,42 +123,42 @@ public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord>
     }
 
     /**
-     * Setter for <code>space.owner_uid</code>. 空间拥有人系统号
+     * Setter for <code>space.owner_uid</code>. 空间拥有人id
      */
     public void setOwnerUid(String value) {
         set(7, value);
     }
 
     /**
-     * Getter for <code>space.owner_uid</code>. 空间拥有人系统号
+     * Getter for <code>space.owner_uid</code>. 空间拥有人id
      */
     public String getOwnerUid() {
         return (String) get(7);
     }
 
     /**
-     * Setter for <code>space.cuid</code>. 空间创建人系统号
+     * Setter for <code>space.cuid</code>. 空间创建人id
      */
     public void setCuid(Long value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>space.cuid</code>. 空间创建人系统号
+     * Getter for <code>space.cuid</code>. 空间创建人id
      */
     public Long getCuid() {
         return (Long) get(8);
     }
 
     /**
-     * Setter for <code>space.muid</code>. 空间最后一次更新人系统号
+     * Setter for <code>space.muid</code>. 空间最后一次更新人id
      */
     public void setMuid(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>space.muid</code>. 空间最后一次更新人系统号
+     * Getter for <code>space.muid</code>. 空间最后一次更新人id
      */
     public Long getMuid() {
         return (Long) get(9);
@@ -397,8 +398,7 @@ public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord>
     }
 
     @Override
-    public SpaceRecord values(Long value1, String value2, String value3, String value4, Byte value5, LocalDateTime value6, LocalDateTime value7,
-            String value8, Long value9, Long value10) {
+    public SpaceRecord values(Long value1, String value2, String value3, String value4, Byte value5, LocalDateTime value6, LocalDateTime value7, String value8, Long value9, Long value10) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -426,8 +426,7 @@ public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord>
     /**
      * Create a detached, initialised SpaceRecord
      */
-    public SpaceRecord(Long id, String spaceCode, String spaceName, String spaceDescription, Byte status, LocalDateTime ctime, LocalDateTime mtime,
-            String ownerUid, Long cuid, Long muid) {
+    public SpaceRecord(Long id, String spaceCode, String spaceName, String spaceDescription, Byte status, LocalDateTime ctime, LocalDateTime mtime, String ownerUid, Long cuid, Long muid) {
         super(Space.SPACE);
 
         setId(id);

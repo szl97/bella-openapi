@@ -16,8 +16,8 @@ public class LuaScriptExecutor {
     @Autowired
     private LuaScriptManager luaScriptManager;
 
-    public Object execute(String endpoint, ScriptType scriptType, List<Object> keys, List<Object> args) throws IOException {
-        String scriptName = scriptType.getScriptName(endpoint);
+    public Object execute(String fileName, ScriptType scriptType, List<Object> keys, List<Object> args) throws IOException {
+        String scriptName = scriptType.getScriptName(fileName);
         String sha = luaScriptManager.getScriptSha(scriptName);
         if(StringUtils.isBlank(sha)) {
             return null;

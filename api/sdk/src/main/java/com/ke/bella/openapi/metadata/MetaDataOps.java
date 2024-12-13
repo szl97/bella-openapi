@@ -129,6 +129,7 @@ public class MetaDataOps {
         private String url;
         private String channelInfo;
         private String priceInfo;
+        private Byte trialEnabled = 0;
     }
 
     @EqualsAndHashCode(callSuper = true)
@@ -141,6 +142,7 @@ public class MetaDataOps {
         private String channelCode;
         private String channelInfo;
         private String priceInfo;
+        private Byte trialEnabled;
     }
 
     @EqualsAndHashCode(callSuper = true)

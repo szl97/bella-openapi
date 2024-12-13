@@ -10,6 +10,7 @@ import com.ke.bella.openapi.protocol.completion.CompletionProperty;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 import com.ke.bella.openapi.protocol.completion.StreamCompletionCallback;
+import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.safety.ISafetyCheckService;
 import com.ke.bella.openapi.safety.SafetyCheckRequest;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
+
 @EndpointAPI
 @RestController
 @RequestMapping("/v1/chat")
@@ -33,6 +36,8 @@ public class ChatController {
     private ChannelRouter router;
     @Autowired
     private AdaptorManager adaptorManager;
+    @Autowired
+    private LimiterManager limiterManager;
     @Autowired
     private EndpointLogger logger;
     @Autowired
@@ -46,6 +51,7 @@ public class ChatController {
         boolean isMock = EndpointContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
         EndpointContext.setEndpointData(channel);
+        limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
         Object requestRiskData = null;
         if(!isMock) {
             requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,

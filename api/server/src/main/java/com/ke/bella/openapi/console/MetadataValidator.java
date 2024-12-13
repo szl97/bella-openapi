@@ -149,6 +149,7 @@ public class MetadataValidator {
                 "通道的数据流向只能是：" + String.join("或", DATA_DESTINATIONS));
         Assert.isTrue(CHANNEL_PRIORITY.contains(op.getPriority()),
                 "通道的优先级只能是：" + String.join("或", CHANNEL_PRIORITY));
+        Assert.isTrue(op.getTrialEnabled() == 1 || op.getTrialEnabled() == 0, "试用开关只能是0或1");
         Assert.hasText(op.getProtocol(), "请求协议不可为空字符串");
         Assert.hasText(op.getSupplier(), "供应商不可为空字符串");
         Assert.isTrue(StringUtils.isEmpty(op.getUrl()) || isValidURL(op.getUrl()), "url必须以http://或https://开头");
@@ -165,6 +166,7 @@ public class MetadataValidator {
             Assert.isTrue(CHANNEL_PRIORITY.contains(op.getPriority()),
                     "通道的优先级只能是：" + String.join("或", CHANNEL_PRIORITY));
         }
+        Assert.isTrue(op.getTrialEnabled() == 1 || op.getTrialEnabled() == 0, "试用开关只能是0或1");
         checkJsonInfo(op.getChannelInfo());
         checkJsonInfo(op.getPriceInfo());
     }

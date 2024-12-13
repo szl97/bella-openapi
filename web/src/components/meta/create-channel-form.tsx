@@ -10,6 +10,8 @@ import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {NestedObject} from "@/lib/types/common";
 import {renderField} from "@/components/ui/render-field";
+import {Switch} from "@/components/ui/switch";
+import {Badge} from "@/components/ui/badge";
 
 interface Props {
     entityType: string,
@@ -30,6 +32,7 @@ export function CreateChannelForm({entityType, entityCode} : Props) {
         url: '',
         channelInfo: '{}',
         priceInfo: '{}',
+        trialEnabled: 1,
     });
     const [protocols, setProtocols] = useState<Record<string, string>>({})
     const [selectedProtocol, setSelectedProtocol] = useState<string>('')
@@ -38,9 +41,9 @@ export function CreateChannelForm({entityType, entityCode} : Props) {
     const [priceInfoValue, setPriceInfoValue] = useState<NestedObject>({});
     const [channelInfoValue, setChannelInfoValue] = useState<NestedObject>({});
 
-    const handleChange = (field: keyof Channel, value: string) => {
+    const handleChange = (field: keyof Channel, value: string | number) => {
         if(field == 'protocol') {
-            setSelectedProtocol(value)
+            setSelectedProtocol(value as string)
         }
         setChannel(prev => ({ ...prev, [field]: value }));
     };
@@ -145,6 +148,20 @@ export function CreateChannelForm({entityType, entityCode} : Props) {
             </CardHeader>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4 text-gray-800">
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-4">
+                            <Label>是否支持试用</Label>
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    checked={channel.trialEnabled === 1}
+                                    onCheckedChange={(checked) => handleChange('trialEnabled', checked ? 1 : 0)}
+                                />
+                                <span className="text-sm text-gray-600">
+                                    {channel.trialEnabled === 1 ? '是' : '否'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="dataDestination">数据流向</Label>
                         <Select value={channel.dataDestination}

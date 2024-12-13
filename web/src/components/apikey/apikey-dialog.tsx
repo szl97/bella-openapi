@@ -125,16 +125,25 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void }> = ({c
         }
     }
 
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isOpen) {
+            setIsOpen(true);
+        }
+    };
+
     return (
-        <ActionDialog
-            label="删除"
-            description="确定要删除此 API Key 吗？此操作无法撤销。"
-            onConfirm={handleConfirm}
-            icon={<Trash2 className="h-4 w-4"/>}
-            isIcon={true}
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-        />
+        <div onClick={handleClick} className="cursor-pointer">
+            <ActionDialog
+                label="删除"
+                description="确定要删除此 API Key 吗？此操作无法撤销。"
+                onConfirm={handleConfirm}
+                icon={<Trash2 className="h-4 w-4"/>}
+                isIcon={true}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+            />
+        </div>
     )
 }
 
@@ -166,16 +175,25 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({co
         }
     }
 
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isOpen) {
+            setIsOpen(true);
+        }
+    };
+
     return (
-        <ActionDialog
-            label="重置"
-            description="确定要重置此 API Key 吗？重置后，当前的 Key 将失效。"
-            onConfirm={handleConfirm}
-            icon={<RotateCcw className="h-4 w-4"/>}
-            isIcon={true}
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-        />
+        <div onClick={handleClick} className="cursor-pointer">
+            <ActionDialog
+                label="重置"
+                description="确定要重置此 API Key 吗？重置后，当前的 Key 将失效。"
+                onConfirm={handleConfirm}
+                icon={<RotateCcw className="h-4 w-4"/>}
+                isIcon={true}
+                isOpen={isOpen}
+                onClose={() => setIsOpen(false)}
+            />
+        </div>
     )
 }
 

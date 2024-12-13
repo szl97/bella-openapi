@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row18;
+import org.jooq.Row19;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -75,6 +75,11 @@ public class Channel extends TableImpl<ChannelRecord> {
      * The column <code>channel.status</code>. 状态状态(active/inactive)
      */
     public final TableField<ChannelRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("active", SQLDataType.VARCHAR)), this, "状态状态(active/inactive)");
+
+    /**
+     * The column <code>channel.trial_enabled</code>. 是否支持试用
+     */
+    public final TableField<ChannelRecord, Byte> TRIAL_ENABLED = createField(DSL.name("trial_enabled"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("1", SQLDataType.TINYINT)), this, "是否支持试用");
 
     /**
      * The column <code>channel.data_destination</code>. 数据流向(inner/mainland/overseas)
@@ -226,11 +231,11 @@ public class Channel extends TableImpl<ChannelRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row18 type methods
+    // Row19 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row18<Long, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row18) super.fieldsRow();
+    public Row19<Long, String, String, String, String, Byte, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 }

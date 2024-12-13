@@ -3,7 +3,10 @@ package com.ke.bella.openapi.apikey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,8 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApikeyInfo implements Serializable {
     private static final long serialVersionUID = 1L;
+    private String apikey;
     private String code;
     private String serviceId;
     private String akSha;

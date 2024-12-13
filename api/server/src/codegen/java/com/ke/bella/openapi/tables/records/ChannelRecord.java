@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record18;
-import org.jooq.Row18;
+import org.jooq.Record19;
+import org.jooq.Row19;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 通道
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements Operator, Record18<Long, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
+public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements Operator, Record19<Long, String, String, String, String, Byte, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -95,185 +95,199 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     /**
+     * Setter for <code>channel.trial_enabled</code>. 是否支持试用
+     */
+    public void setTrialEnabled(Byte value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>channel.trial_enabled</code>. 是否支持试用
+     */
+    public Byte getTrialEnabled() {
+        return (Byte) get(5);
+    }
+
+    /**
      * Setter for <code>channel.data_destination</code>. 数据流向(inner/mainland/overseas)
      */
     public void setDataDestination(String value) {
-        set(5, value);
+        set(6, value);
     }
 
     /**
      * Getter for <code>channel.data_destination</code>. 数据流向(inner/mainland/overseas)
      */
     public String getDataDestination() {
-        return (String) get(5);
+        return (String) get(6);
     }
 
     /**
      * Setter for <code>channel.priority</code>. 优先级(high/normal/low)
      */
     public void setPriority(String value) {
-        set(6, value);
+        set(7, value);
     }
 
     /**
      * Getter for <code>channel.priority</code>. 优先级(high/normal/low)
      */
     public String getPriority() {
-        return (String) get(6);
+        return (String) get(7);
     }
 
     /**
      * Setter for <code>channel.protocol</code>. 协议
      */
     public void setProtocol(String value) {
-        set(7, value);
+        set(8, value);
     }
 
     /**
      * Getter for <code>channel.protocol</code>. 协议
      */
     public String getProtocol() {
-        return (String) get(7);
+        return (String) get(8);
     }
 
     /**
      * Setter for <code>channel.supplier</code>. 服务商
      */
     public void setSupplier(String value) {
-        set(8, value);
+        set(9, value);
     }
 
     /**
      * Getter for <code>channel.supplier</code>. 服务商
      */
     public String getSupplier() {
-        return (String) get(8);
+        return (String) get(9);
     }
 
     /**
      * Setter for <code>channel.url</code>. 请求通道的url
      */
     public void setUrl(String value) {
-        set(9, value);
+        set(10, value);
     }
 
     /**
      * Getter for <code>channel.url</code>. 请求通道的url
      */
     public String getUrl() {
-        return (String) get(9);
+        return (String) get(10);
     }
 
     /**
      * Setter for <code>channel.channel_info</code>. 渠道信息
      */
     public void setChannelInfo(String value) {
-        set(10, value);
+        set(11, value);
     }
 
     /**
      * Getter for <code>channel.channel_info</code>. 渠道信息
      */
     public String getChannelInfo() {
-        return (String) get(10);
+        return (String) get(11);
     }
 
     /**
      * Setter for <code>channel.price_info</code>. 单价
      */
     public void setPriceInfo(String value) {
-        set(11, value);
+        set(12, value);
     }
 
     /**
      * Getter for <code>channel.price_info</code>. 单价
      */
     public String getPriceInfo() {
-        return (String) get(11);
+        return (String) get(12);
     }
 
     /**
      * Setter for <code>channel.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
-        set(12, value);
+        set(13, value);
     }
 
     /**
      * Getter for <code>channel.cuid</code>. 创建人id
      */
     public Long getCuid() {
-        return (Long) get(12);
+        return (Long) get(13);
     }
 
     /**
      * Setter for <code>channel.cu_name</code>. 创建人姓名
      */
     public void setCuName(String value) {
-        set(13, value);
+        set(14, value);
     }
 
     /**
      * Getter for <code>channel.cu_name</code>. 创建人姓名
      */
     public String getCuName() {
-        return (String) get(13);
+        return (String) get(14);
     }
 
     /**
      * Setter for <code>channel.muid</code>. 编辑人id
      */
     public void setMuid(Long value) {
-        set(14, value);
+        set(15, value);
     }
 
     /**
      * Getter for <code>channel.muid</code>. 编辑人id
      */
     public Long getMuid() {
-        return (Long) get(14);
+        return (Long) get(15);
     }
 
     /**
      * Setter for <code>channel.mu_name</code>. 编辑人姓名
      */
     public void setMuName(String value) {
-        set(15, value);
+        set(16, value);
     }
 
     /**
      * Getter for <code>channel.mu_name</code>. 编辑人姓名
      */
     public String getMuName() {
-        return (String) get(15);
+        return (String) get(16);
     }
 
     /**
      * Setter for <code>channel.ctime</code>.
      */
     public void setCtime(LocalDateTime value) {
-        set(16, value);
+        set(17, value);
     }
 
     /**
      * Getter for <code>channel.ctime</code>.
      */
     public LocalDateTime getCtime() {
-        return (LocalDateTime) get(16);
+        return (LocalDateTime) get(17);
     }
 
     /**
      * Setter for <code>channel.mtime</code>.
      */
     public void setMtime(LocalDateTime value) {
-        set(17, value);
+        set(18, value);
     }
 
     /**
      * Getter for <code>channel.mtime</code>.
      */
     public LocalDateTime getMtime() {
-        return (LocalDateTime) get(17);
+        return (LocalDateTime) get(18);
     }
 
     // -------------------------------------------------------------------------
@@ -286,17 +300,17 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     // -------------------------------------------------------------------------
-    // Record18 type implementation
+    // Record19 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row18<Long, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row18) super.fieldsRow();
+    public Row19<Long, String, String, String, String, Byte, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row19) super.fieldsRow();
     }
 
     @Override
-    public Row18<Long, String, String, String, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> valuesRow() {
-        return (Row18) super.valuesRow();
+    public Row19<Long, String, String, String, String, Byte, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> valuesRow() {
+        return (Row19) super.valuesRow();
     }
 
     @Override
@@ -325,67 +339,72 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     @Override
-    public Field<String> field6() {
-        return Channel.CHANNEL.DATA_DESTINATION;
+    public Field<Byte> field6() {
+        return Channel.CHANNEL.TRIAL_ENABLED;
     }
 
     @Override
     public Field<String> field7() {
-        return Channel.CHANNEL.PRIORITY;
+        return Channel.CHANNEL.DATA_DESTINATION;
     }
 
     @Override
     public Field<String> field8() {
-        return Channel.CHANNEL.PROTOCOL;
+        return Channel.CHANNEL.PRIORITY;
     }
 
     @Override
     public Field<String> field9() {
-        return Channel.CHANNEL.SUPPLIER;
+        return Channel.CHANNEL.PROTOCOL;
     }
 
     @Override
     public Field<String> field10() {
-        return Channel.CHANNEL.URL;
+        return Channel.CHANNEL.SUPPLIER;
     }
 
     @Override
     public Field<String> field11() {
-        return Channel.CHANNEL.CHANNEL_INFO;
+        return Channel.CHANNEL.URL;
     }
 
     @Override
     public Field<String> field12() {
+        return Channel.CHANNEL.CHANNEL_INFO;
+    }
+
+    @Override
+    public Field<String> field13() {
         return Channel.CHANNEL.PRICE_INFO;
     }
 
     @Override
-    public Field<Long> field13() {
+    public Field<Long> field14() {
         return Channel.CHANNEL.CUID;
     }
 
     @Override
-    public Field<String> field14() {
+    public Field<String> field15() {
         return Channel.CHANNEL.CU_NAME;
     }
 
     @Override
-    public Field<Long> field15() {
+    public Field<Long> field16() {
         return Channel.CHANNEL.MUID;
     }
 
     @Override
-    public Field<String> field16() {
+    public Field<String> field17() {
         return Channel.CHANNEL.MU_NAME;
     }
 
     @Override
-    public Field<LocalDateTime> field17() {
+    public Field<LocalDateTime> field18() {
         return Channel.CHANNEL.CTIME;
     }
 
     @Override
-    public Field<LocalDateTime> field18() {
+    public Field<LocalDateTime> field19() {
         return Channel.CHANNEL.MTIME;
     }
 
@@ -415,67 +434,72 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     @Override
-    public String component6() {
-        return getDataDestination();
+    public Byte component6() {
+        return getTrialEnabled();
     }
 
     @Override
     public String component7() {
-        return getPriority();
+        return getDataDestination();
     }
 
     @Override
     public String component8() {
-        return getProtocol();
+        return getPriority();
     }
 
     @Override
     public String component9() {
-        return getSupplier();
+        return getProtocol();
     }
 
     @Override
     public String component10() {
-        return getUrl();
+        return getSupplier();
     }
 
     @Override
     public String component11() {
-        return getChannelInfo();
+        return getUrl();
     }
 
     @Override
     public String component12() {
+        return getChannelInfo();
+    }
+
+    @Override
+    public String component13() {
         return getPriceInfo();
     }
 
     @Override
-    public Long component13() {
+    public Long component14() {
         return getCuid();
     }
 
     @Override
-    public String component14() {
+    public String component15() {
         return getCuName();
     }
 
     @Override
-    public Long component15() {
+    public Long component16() {
         return getMuid();
     }
 
     @Override
-    public String component16() {
+    public String component17() {
         return getMuName();
     }
 
     @Override
-    public LocalDateTime component17() {
+    public LocalDateTime component18() {
         return getCtime();
     }
 
     @Override
-    public LocalDateTime component18() {
+    public LocalDateTime component19() {
         return getMtime();
     }
 
@@ -505,67 +529,72 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     @Override
-    public String value6() {
-        return getDataDestination();
+    public Byte value6() {
+        return getTrialEnabled();
     }
 
     @Override
     public String value7() {
-        return getPriority();
+        return getDataDestination();
     }
 
     @Override
     public String value8() {
-        return getProtocol();
+        return getPriority();
     }
 
     @Override
     public String value9() {
-        return getSupplier();
+        return getProtocol();
     }
 
     @Override
     public String value10() {
-        return getUrl();
+        return getSupplier();
     }
 
     @Override
     public String value11() {
-        return getChannelInfo();
+        return getUrl();
     }
 
     @Override
     public String value12() {
+        return getChannelInfo();
+    }
+
+    @Override
+    public String value13() {
         return getPriceInfo();
     }
 
     @Override
-    public Long value13() {
+    public Long value14() {
         return getCuid();
     }
 
     @Override
-    public String value14() {
+    public String value15() {
         return getCuName();
     }
 
     @Override
-    public Long value15() {
+    public Long value16() {
         return getMuid();
     }
 
     @Override
-    public String value16() {
+    public String value17() {
         return getMuName();
     }
 
     @Override
-    public LocalDateTime value17() {
+    public LocalDateTime value18() {
         return getCtime();
     }
 
     @Override
-    public LocalDateTime value18() {
+    public LocalDateTime value19() {
         return getMtime();
     }
 
@@ -600,85 +629,91 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     }
 
     @Override
-    public ChannelRecord value6(String value) {
-        setDataDestination(value);
+    public ChannelRecord value6(Byte value) {
+        setTrialEnabled(value);
         return this;
     }
 
     @Override
     public ChannelRecord value7(String value) {
-        setPriority(value);
+        setDataDestination(value);
         return this;
     }
 
     @Override
     public ChannelRecord value8(String value) {
-        setProtocol(value);
+        setPriority(value);
         return this;
     }
 
     @Override
     public ChannelRecord value9(String value) {
-        setSupplier(value);
+        setProtocol(value);
         return this;
     }
 
     @Override
     public ChannelRecord value10(String value) {
-        setUrl(value);
+        setSupplier(value);
         return this;
     }
 
     @Override
     public ChannelRecord value11(String value) {
-        setChannelInfo(value);
+        setUrl(value);
         return this;
     }
 
     @Override
     public ChannelRecord value12(String value) {
+        setChannelInfo(value);
+        return this;
+    }
+
+    @Override
+    public ChannelRecord value13(String value) {
         setPriceInfo(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value13(Long value) {
+    public ChannelRecord value14(Long value) {
         setCuid(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value14(String value) {
+    public ChannelRecord value15(String value) {
         setCuName(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value15(Long value) {
+    public ChannelRecord value16(Long value) {
         setMuid(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value16(String value) {
+    public ChannelRecord value17(String value) {
         setMuName(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value17(LocalDateTime value) {
+    public ChannelRecord value18(LocalDateTime value) {
         setCtime(value);
         return this;
     }
 
     @Override
-    public ChannelRecord value18(LocalDateTime value) {
+    public ChannelRecord value19(LocalDateTime value) {
         setMtime(value);
         return this;
     }
 
     @Override
-    public ChannelRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, String value8, String value9, String value10, String value11, String value12, Long value13, String value14, Long value15, String value16, LocalDateTime value17, LocalDateTime value18) {
+    public ChannelRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, String value7, String value8, String value9, String value10, String value11, String value12, String value13, Long value14, String value15, Long value16, String value17, LocalDateTime value18, LocalDateTime value19) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -697,6 +732,7 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
         value16(value16);
         value17(value17);
         value18(value18);
+        value19(value19);
         return this;
     }
 
@@ -714,7 +750,7 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
     /**
      * Create a detached, initialised ChannelRecord
      */
-    public ChannelRecord(Long id, String entityType, String entityCode, String channelCode, String status, String dataDestination, String priority, String protocol, String supplier, String url, String channelInfo, String priceInfo, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
+    public ChannelRecord(Long id, String entityType, String entityCode, String channelCode, String status, Byte trialEnabled, String dataDestination, String priority, String protocol, String supplier, String url, String channelInfo, String priceInfo, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
         super(Channel.CHANNEL);
 
         setId(id);
@@ -722,6 +758,7 @@ public class ChannelRecord extends UpdatableRecordImpl<ChannelRecord> implements
         setEntityCode(entityCode);
         setChannelCode(channelCode);
         setStatus(status);
+        setTrialEnabled(trialEnabled);
         setDataDestination(dataDestination);
         setPriority(priority);
         setProtocol(protocol);

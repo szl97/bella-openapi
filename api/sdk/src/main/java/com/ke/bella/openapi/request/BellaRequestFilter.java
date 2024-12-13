@@ -93,6 +93,7 @@ public class BellaRequestFilter extends OncePerRequestFilter {
             String displayAk = EncryptUtils.desensitize(ak);
             throw new ChannelException.AuthorizationException("api key不存在，请求的header为：" + display + ", apikey为：" + displayAk);
         }
+        info.setApikey(ak);
         return info;
     }
 

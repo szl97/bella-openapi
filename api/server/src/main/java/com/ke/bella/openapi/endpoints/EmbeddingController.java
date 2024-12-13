@@ -8,6 +8,7 @@ import com.ke.bella.openapi.protocol.ChannelRouter;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingAdaptor;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingProperty;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingRequest;
+import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,9 @@ public class EmbeddingController {
     private ChannelRouter router;
     @Autowired
     private AdaptorManager adaptorManager;
+    @Autowired
+    private LimiterManager limiterManager;
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping
     public Object embedding(@RequestBody EmbeddingRequest request) {
@@ -35,6 +39,7 @@ public class EmbeddingController {
         boolean isMock = EndpointContext.getProcessData().isMock();
         ChannelDB channel = router.route(endpoint, model, isMock);
         EndpointContext.setEndpointData(channel);
+        limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
         EndpointProcessData processData = EndpointContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();

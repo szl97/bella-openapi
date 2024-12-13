@@ -2,7 +2,6 @@
 
 import {ClientHeader} from "@/components/user/client-header";
 import {CreateChannelForm} from "@/components/meta/create-channel-form";
-import {Button} from "@/components/ui/button";
 import React from "react";
 
 export default function CreateModelPage({ searchParams }: { searchParams: { entityType: string, entityCode: string} }) {

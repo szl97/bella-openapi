@@ -7,10 +7,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ScriptType {
     metrics("metrics"),
-    metricsQuery("metrics/query");
+    metricsQuery("metrics/query"),
+    limiter("limiter"),
+    ;
 
     final String path;
-    public String getScriptName(String endpoint) {
-        return this.path + endpoint;
+    public String getScriptName(String fileName) {
+        return this.path + fileName;
     }
 }

@@ -3,6 +3,7 @@
  */
 package com.ke.bella.openapi.tables.records;
 
+
 import com.ke.bella.openapi.db.repo.Timed;
 import com.ke.bella.openapi.tables.SpaceMember;
 
@@ -14,12 +15,12 @@ import org.jooq.Record10;
 import org.jooq.Row10;
 import org.jooq.impl.UpdatableRecordImpl;
 
+
 /**
- * 团队成员信息表
+ * 空间成员信息表
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord>
-        implements Timed, Record10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> {
+public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord> implements Timed, Record10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -80,14 +81,14 @@ public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord>
     }
 
     /**
-     * Setter for <code>space_member.member_uid</code>. 成员系统号
+     * Setter for <code>space_member.member_uid</code>. 成员id
      */
     public void setMemberUid(String value) {
         set(4, value);
     }
 
     /**
-     * Getter for <code>space_member.member_uid</code>. 成员系统号
+     * Getter for <code>space_member.member_uid</code>. 成员id
      */
     public String getMemberUid() {
         return (String) get(4);
@@ -136,28 +137,28 @@ public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord>
     }
 
     /**
-     * Setter for <code>space_member.cuid</code>. 创建人系统号
+     * Setter for <code>space_member.cuid</code>. 创建人id
      */
     public void setCuid(Long value) {
         set(8, value);
     }
 
     /**
-     * Getter for <code>space_member.cuid</code>. 创建人系统号
+     * Getter for <code>space_member.cuid</code>. 创建人id
      */
     public Long getCuid() {
         return (Long) get(8);
     }
 
     /**
-     * Setter for <code>space_member.muid</code>. 最后一次更新人系统号
+     * Setter for <code>space_member.muid</code>. 最后一次更新人id
      */
     public void setMuid(Long value) {
         set(9, value);
     }
 
     /**
-     * Getter for <code>space_member.muid</code>. 最后一次更新人系统号
+     * Getter for <code>space_member.muid</code>. 最后一次更新人id
      */
     public Long getMuid() {
         return (Long) get(9);
@@ -397,8 +398,7 @@ public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord>
     }
 
     @Override
-    public SpaceMemberRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, LocalDateTime value7,
-            LocalDateTime value8, Long value9, Long value10) {
+    public SpaceMemberRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, LocalDateTime value7, LocalDateTime value8, Long value9, Long value10) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -426,8 +426,7 @@ public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord>
     /**
      * Create a detached, initialised SpaceMemberRecord
      */
-    public SpaceMemberRecord(Long id, String spaceCode, String roleCode, String memberName, String memberUid, Byte status, LocalDateTime ctime,
-            LocalDateTime mtime, Long cuid, Long muid) {
+    public SpaceMemberRecord(Long id, String spaceCode, String roleCode, String memberName, String memberUid, Byte status, LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid) {
         super(SpaceMember.SPACE_MEMBER);
 
         setId(id);

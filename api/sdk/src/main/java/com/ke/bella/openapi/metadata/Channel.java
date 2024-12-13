@@ -23,6 +23,7 @@ public class Channel extends BaseDto {
     private String url;
     private String channelInfo;
     private String priceInfo;
+    private Byte trialEnabled;
 
     public <T extends IProtocolProperty> T toChannelInfo(Class<T> type) {
         return JacksonUtils.deserialize(channelInfo, type);

@@ -21,6 +21,7 @@ export default function ModelConsolePage({ searchParams }: { searchParams: { mod
     const {modelName} = searchParams;
     const [modelDetails, setModelDetails] = useState<ModelDetails | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showActiveOnly, setShowActiveOnly] = useState(true);
     const { toast } = useToast()
     useEffect(() => {
         if (modelName) {
@@ -82,7 +83,7 @@ export default function ModelConsolePage({ searchParams }: { searchParams: { mod
         }
     };
 
-    const handleChannelUpdate = async (channelCode: string, field: keyof Channel, value: string) => {
+    const handleChannelUpdate = async (channelCode: string, field: keyof Channel, value: string | number) => {
         try {
             const channelToUpdate = modelDetails.channels.find(ch => ch.channelCode === channelCode);
             if (!channelToUpdate) {
@@ -134,7 +135,25 @@ export default function ModelConsolePage({ searchParams }: { searchParams: { mod
                            onToggleVisibility={handleVisibilityUpdate}/>
 
                 <div className="flex justify-between items-center mt-12 mb-6">
-                    <h2 className="text-xl font-bold">渠道</h2>
+                    <div className="flex items-center gap-4">
+                        <h2 className="text-xl font-bold">渠道</h2>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowActiveOnly(false)}
+                                className={!showActiveOnly ? "bg-black text-white hover:bg-black/90" : ""}
+                            >
+                                显示所有渠道
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowActiveOnly(true)}
+                                className={showActiveOnly ? "bg-black text-white hover:bg-black/90" : ""}
+                            >
+                                显示可用渠道
+                            </Button>
+                        </div>
+                    </div>
                     <Link href={`/meta/console/channel?entityType=model&entityCode=${modelName}`}>
                         <Button
                             className="bg-purple-100 hover:bg-purple-200 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
@@ -149,7 +168,9 @@ export default function ModelConsolePage({ searchParams }: { searchParams: { mod
                     </Link>
                 </div>
 
-                {modelDetails.channels.map(channel => (
+                {modelDetails.channels
+                    .filter(channel => !showActiveOnly || channel.status === 'active')
+                    .map(channel => (
                     <div key={channel.channelCode} className="mb-6">
                         <ChannelForm channel={channel} onUpdate={handleChannelUpdate}
                                      onToggleStatus={handleChannelStatusUpdate}/>

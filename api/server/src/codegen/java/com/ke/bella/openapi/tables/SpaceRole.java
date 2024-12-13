@@ -95,14 +95,14 @@ public class SpaceRole extends TableImpl<SpaceRoleRecord> {
     public final TableField<SpaceRoleRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "最后一次更新时间");
 
     /**
-     * The column <code>space_role.cuid</code>. 创建人系统号
+     * The column <code>space_role.cuid</code>. 创建人id
      */
-    public final TableField<SpaceRoleRecord, Long> CUID = createField(DSL.name("cuid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "创建人系统号");
+    public final TableField<SpaceRoleRecord, Long> CUID = createField(DSL.name("cuid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "创建人id");
 
     /**
-     * The column <code>space_role.muid</code>. 最后一次更新人系统号
+     * The column <code>space_role.muid</code>. 最后一次更新人id
      */
-    public final TableField<SpaceRoleRecord, Long> MUID = createField(DSL.name("muid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "最后一次更新人系统号");
+    public final TableField<SpaceRoleRecord, Long> MUID = createField(DSL.name("muid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "最后一次更新人id");
 
     private SpaceRole(Name alias, Table<SpaceRoleRecord> aliased) {
         this(alias, aliased, null);
