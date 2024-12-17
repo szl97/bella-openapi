@@ -28,7 +28,7 @@ public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
         BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
         double costVal = cost.doubleValue() / 100.0;
         if(apikey.getMonthQuota().doubleValue() <= costVal) {
-            String msg = "已达每月额度上限, limit:" + apikey.getMonthQuota() + ", cost:" + cost;
+            String msg = "已达每月额度上限, limit:" + apikey.getMonthQuota() + ", cost:" + costVal;
             throw new ChannelException.RateLimitException(msg);
         }
         return true;

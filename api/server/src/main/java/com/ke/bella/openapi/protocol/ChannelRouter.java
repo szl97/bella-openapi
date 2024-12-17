@@ -78,7 +78,7 @@ public class ChannelRouter {
                 throw new ChannelException.AuthorizationException("未经安全合规审核，没有使用权限");
             }
             if(freeAkOverload(EndpointContext.getProcessData().getAkCode(), entityCode)) {
-                throw new ChannelException.RateLimitException("当前使用试用额度,每分钟最多请求" + freeRpm + "次, 且不能高于" + freeConcurrent);
+                throw new ChannelException.RateLimitException("当前使用试用额度,每分钟最多请求" + freeRpm + "次, 且并行请求数不能高于" + freeConcurrent);
             }
         }
         Set<String> unavailableSet = metricsManager.getAllUnavailableChannels(
