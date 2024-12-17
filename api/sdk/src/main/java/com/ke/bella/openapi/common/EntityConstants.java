@@ -90,7 +90,8 @@ public class EntityConstants {
     public enum Protocol {
         OPENAPI("OpenAIAdaptor"),
         ALI("AliAdaptor"),
-        AWS("AwsAdaptor")
+        AWS("AwsAdaptor"),
+        HUOSHAN("HuoShanAdaptor"),
         ;
         private final String code;
     }

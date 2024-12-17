@@ -3,7 +3,10 @@ package com.ke.bella.openapi.protocol.cost;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
+import com.ke.bella.openapi.protocol.embedding.EmbeddingRequest;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingResponse;
+import com.ke.bella.openapi.protocol.tts.TtsPriceInfo;
+import com.ke.bella.openapi.protocol.tts.TtsRequest;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.AllArgsConstructor;
@@ -41,6 +44,7 @@ public class CostCalculator  {
     enum CostCalculators {
         COMPLETION("/v*/chat/completions", completion),
         EMBEDDING("/v*/embeddings", embedding),
+        TTS("/v*/audio/speech", tts),
         ;
         final String endpoint;
         final EndpointCostCalculator calculator;
@@ -73,6 +77,21 @@ public class CostCalculator  {
         @Override
         public boolean checkPriceInfo(String priceInfo) {
             EmbeddingPriceInfo price = JacksonUtils.deserialize(priceInfo, EmbeddingPriceInfo.class);
+            return price != null && price.getInput() != null;
+        }
+    };
+
+    static EndpointCostCalculator tts = new EndpointCostCalculator() {
+        @Override
+        public BigDecimal calculate(String priceInfo, Object usage) {
+            TtsPriceInfo price = JacksonUtils.deserialize(priceInfo, TtsPriceInfo.class);
+            int inputLength = (int) usage;
+            return price.getInput().multiply(BigDecimal.valueOf(inputLength / 10000.0));
+        }
+
+        @Override
+        public boolean checkPriceInfo(String priceInfo) {
+            TtsPriceInfo price = JacksonUtils.deserialize(priceInfo, TtsPriceInfo.class);
             return price != null && price.getInput() != null;
         }
     };

@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol;
 import com.ke.bella.openapi.IDescription;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
+import com.ke.bella.openapi.protocol.tts.TtsPriceInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,6 +18,7 @@ public interface IPriceInfo extends IDescription {
     enum EndpointPriceInfoType {
         COMPLETION("/v1/chat/completions", CompletionPriceInfo.class),
         EMBEDDING("/v1/embeddings", EmbeddingPriceInfo.class),
+        TTS("/v1/audio/speech", TtsPriceInfo.class),
         ;
 
         private final String endpoint;

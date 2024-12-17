@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import java.util.Arrays;
+
 @RestControllerAdvice(annotations = EndpointAPI.class)
 @EndpointAPI
 @Slf4j
@@ -34,7 +36,7 @@ public class EndpointResponseAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
             Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        OpenapiResponse openapiResponse = (OpenapiResponse) body;
+        OpenapiResponse openapiResponse = body instanceof OpenapiResponse ? (OpenapiResponse) body :new OpenapiResponse();
         String requestId = EndpointContext.getProcessData().getRequestId();
         if(openapiResponse.getError() == null) {
             response.setStatusCode(HttpStatus.OK);

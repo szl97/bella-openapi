@@ -1,0 +1,146 @@
+package com.ke.bella.openapi.protocol.tts;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
+import com.ke.bella.openapi.utils.HttpUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+import static org.springframework.data.redis.connection.ReactiveStreamCommands.AddStreamRecord.body;
+
+@Slf4j
+@Component("HuoShanTts")
+public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
+    @Autowired
+    private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
+    @Override
+    public ResponseEntity<byte[]> tts(TtsRequest request, String url, HuoShanProperty property){
+        HuoShanRequest huoShanRequest = convertTtsRequestToHuoShanRequest(request, property);
+        Request.Builder builder = authorizationRequestBuilder(property.getAuth())
+                .url(url)
+                .post(RequestBody.create(JacksonUtils.serialize(huoShanRequest), MediaType.parse("application/json")));
+        Request httpRequest = builder.build();
+        return processHuoShanResponse(httpRequest);
+    }
+
+    private HuoShanRequest convertTtsRequestToHuoShanRequest(TtsRequest ttsRequest, HuoShanProperty property) {
+        HuoShanRequest.App app = HuoShanRequest.App.builder()
+                .appId(property.getAppId())
+                .token(property.getAuth().getApiKey().substring(property.getAuth().getApiKey().indexOf(";") + 1))
+                .cluster(property.getCluster())
+                .build();
+
+        HuoShanRequest.User user = HuoShanRequest.User.builder()
+                .uid("ke_uid") //ttsRequest.getUser() 这个字段是否可以给厂商
+                .build();
+
+        HuoShanRequest.Audio audio = HuoShanRequest.Audio.builder()
+                .voiceType(ttsRequest.getVoice() != null ? ttsRequest.getVoice() : "BV001_streaming")
+                .encoding(ttsRequest.getResponseFormat())
+                .speedRatio(ttsRequest.getSpeed() != null ? ttsRequest.getSpeed() : 1.0)
+                .build();
+
+        HuoShanRequest.TextRequest request = HuoShanRequest.TextRequest.builder()
+                .reqId(String.valueOf(UUID.randomUUID()))
+                .text(ttsRequest.getInput())
+                .operation("query")
+                .build();
+
+        return HuoShanRequest.builder()
+                .app(app)
+                .user(user)
+                .audio(audio)
+                .request(request)
+                .build();
+    }
+
+    private ResponseEntity<byte[]> processHuoShanResponse(Request httpRequest) {
+        HuoShanResponse huoshanResponse = HttpUtils.httpRequest(httpRequest, HuoShanResponse.class);
+        if (huoshanResponse == null || huoshanResponse.getCode()!= HuoShanResponseCodeEnum.OK.code || huoshanResponse.getData() == null) {
+            HttpStatus status = getHttpStatus(HuoShanAdaptor.HuoShanResponseCodeEnum.getByCode(huoshanResponse.getCode()));
+            throw new ChannelException.OpenAIException(status.value(), status.getReasonPhrase(), huoshanResponse.getMessage());
+        }
+        byte[] decodedData = BASE64_DECODER.decode(huoshanResponse.getData());
+        return ResponseEntity.ok(decodedData);
+    }
+
+    private HttpStatus getHttpStatus(HuoShanResponseCodeEnum responseCode) {
+        switch (responseCode) {
+            case INVALID_REQUEST:
+                return HttpStatus.BAD_REQUEST;
+            case CONCURRENT_LIMIT_EXCEEDED:
+                return HttpStatus.TOO_MANY_REQUESTS;
+            case BACKEND_SERVICE_BUSY:
+                return HttpStatus.SERVICE_UNAVAILABLE;
+            case SERVICE_INTERRUPTED:
+                return HttpStatus.SERVICE_UNAVAILABLE;
+            case TEXT_LENGTH_LIMIT_EXCEEDED:
+                return HttpStatus.PAYLOAD_TOO_LARGE;
+            case INVALID_TEXT:
+                return HttpStatus.BAD_REQUEST;
+            case PROCESSING_TIMEOUT:
+                return HttpStatus.SERVICE_UNAVAILABLE;
+            case PROCESSING_ERROR:
+                return HttpStatus.INTERNAL_SERVER_ERROR;
+            case AUDIO_ACQUISITION_TIMEOUT:
+                return HttpStatus.GATEWAY_TIMEOUT;
+            case BACKEND_LINK_ERROR:
+                return HttpStatus.BAD_GATEWAY;
+            case VOICE_STYLE_NOT_EXIST:
+                return HttpStatus.NOT_FOUND;
+            default:
+                return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return "火山协议";
+    }
+
+    @Override
+    public Class<?> getPropertyClass() {
+        return HuoShanProperty.class;
+    }
+    public enum HuoShanResponseCodeEnum {
+        OK(3000, "请求正确"),
+        INVALID_REQUEST(3001, "无效的请求"),
+        CONCURRENT_LIMIT_EXCEEDED(3003, "并发超限"),
+        BACKEND_SERVICE_BUSY(3005, "后端服务忙"),
+        SERVICE_INTERRUPTED(3006, "服务中断"),
+        TEXT_LENGTH_LIMIT_EXCEEDED(3010, "文本长度超限"),
+        INVALID_TEXT(3011, "无效文本"),
+        PROCESSING_TIMEOUT(3030, "处理超时"),
+        PROCESSING_ERROR(3031, "处理错误"),
+        AUDIO_ACQUISITION_TIMEOUT(3032, "等待获取音频超时"),
+        BACKEND_LINK_ERROR(3040, "后端链路连接错误"),
+        VOICE_STYLE_NOT_EXIST(3050, "音色不存在");
+
+        public final Integer code;
+        public final String message;
+
+        HuoShanResponseCodeEnum(Integer code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public static HuoShanResponseCodeEnum getByCode(Integer code) {
+            for (HuoShanResponseCodeEnum value : HuoShanResponseCodeEnum.values()) {
+                if (value.code.equals(code)) {
+                    return value;
+                }
+            }
+            return null;
+        }
+    }
+}
