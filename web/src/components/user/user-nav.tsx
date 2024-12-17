@@ -28,6 +28,11 @@ export function UserNav({ user }: UserNavProps) {
                         主页
                     </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem>
+                    <Link href="/apikey" className="w-full text-sm">
+                        API Key管理
+                    </Link>
+                </DropdownMenuItem>
                 {hasPermission(user, '/console/model/**') && (
                     <DropdownMenuItem>
                         <Link href="/meta/console" className="w-full text-sm">
