@@ -22,7 +22,7 @@ public class CompletionMetricsResolver implements MetricsResolver {
     @Override
     public Integer resolveUnavailableSeconds(EndpointProcessData processData) {
         OpenapiResponse response = processData.getResponse();
-        int seconds = 60;
+        int seconds = 10;
         if(canResolve(response, processData.getSupplier())) {
             String msg = response.getError().getMessage();
             Matcher timeMatcher = timePattern.matcher(msg);
