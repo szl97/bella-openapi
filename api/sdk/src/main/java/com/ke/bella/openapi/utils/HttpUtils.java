@@ -2,6 +2,7 @@ package com.ke.bella.openapi.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.completion.Callbacks;
 import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -52,26 +54,40 @@ public class HttpUtils {
     }
 
     public static <T> T httpRequest(Request request, Class<T> clazz) {
-        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, clazz));
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, clazz), null);
     }
 
     public static <T> T httpRequest(Request request, TypeReference<T> typeReference) {
-        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, typeReference));
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, typeReference), null);
     }
 
-    private static  <T> T doHttpRequest(Request request, Function<byte[], T> fun) {
+    public static <T> T httpRequest(Request request, Class<T> clazz, Callbacks.ChannelErrorCallback<T> errorCallback) {
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, clazz), errorCallback);
+    }
+
+    public static <T> T httpRequest(Request request, TypeReference<T> typeReference, Callbacks.ChannelErrorCallback<T> errorCallback) {
+        return doHttpRequest(request, bytes -> JacksonUtils.deserialize(bytes, typeReference), errorCallback);
+    }
+
+    private static  <T> T doHttpRequest(Request request, Function<byte[], T> responseConvert, Callbacks.ChannelErrorCallback<T> errorCallback) {
         T result = null;
         try {
             Response response = HttpUtils.httpRequest(request);
             if(response.body() != null) {
-                result = fun.apply(response.body().bytes());
+                result = responseConvert.apply(response.body().bytes());
             }
-            if(result == null && response.code() > 299) {
-                if(response.code() > 499 && response.code() < 600) {
-                    String message = "供应商返回：code: " +  response.code() + " message: " + response.message();
-                    throw ChannelException.fromResponse(503, message);
+            if(response.code() > 299) {
+                if(result == null) {
+                    if(response.code() > 499 && response.code() < 600) {
+                        String message = "供应商返回：code: " + response.code() + " message: " + response.message();
+                        throw ChannelException.fromResponse(503, message);
+                    }
+                    throw ChannelException.fromResponse(response.code(), response.message());
+                } else {
+                    if(errorCallback != null) {
+                        errorCallback.callback(result, response);
+                    }
                 }
-                throw ChannelException.fromResponse(response.code(), response.message());
             }
             return result;
         } catch (IOException e) {

@@ -154,6 +154,7 @@ public abstract class ChannelException extends RuntimeException {
             if(error == null) {
                 this.response = new OpenapiResponse.OpenapiError(type, message, httpCode);
             } else {
+                error.setHttpCode(httpCode);
                 this.response = error;
             }
         }

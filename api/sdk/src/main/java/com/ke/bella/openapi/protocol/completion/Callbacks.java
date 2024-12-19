@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol.completion;
 
 import com.ke.bella.openapi.common.exception.ChannelException;
+import okhttp3.Response;
 
 public interface Callbacks {
 
@@ -16,5 +17,8 @@ public interface Callbacks {
          void finish();
 
          void finish(ChannelException exception);
+     }
+     interface ChannelErrorCallback<T> {
+         void callback(T channelResponse, Response httpResponse);
      }
 }

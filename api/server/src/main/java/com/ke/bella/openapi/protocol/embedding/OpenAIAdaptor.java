@@ -38,7 +38,11 @@ public class OpenAIAdaptor implements EmbeddingAdaptor<OpenAIProperty> {
     }
 
     protected EmbeddingResponse doRequest(Request httpRequest) {
-        return HttpUtils.httpRequest(httpRequest, EmbeddingResponse.class);
+        return HttpUtils.httpRequest(httpRequest, EmbeddingResponse.class, ((embeddingResponse, response) -> {
+            if(embeddingResponse.getError() != null) {
+                embeddingResponse.getError().setHttpCode(response.code());
+            }
+        }));
     }
 
     @Override

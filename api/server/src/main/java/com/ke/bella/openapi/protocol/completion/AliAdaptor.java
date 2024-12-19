@@ -29,7 +29,7 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
     public CompletionResponse completion(CompletionRequest request, String url, AliProperty property) {
         AliCompletionRequest aliRequest = requestConvert(request);
         Request httpRequest = buildRequest(aliRequest, url, property);
-        AliCompletionResponse response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class);
+        AliCompletionResponse response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class, ((aliCompletionResponse, okhttpResponse) -> aliCompletionResponse.setHttpCode(okhttpResponse.code())));
         return responseConvert(response);
     }
 
@@ -89,9 +89,10 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
         }
         OpenapiResponse.OpenapiError openAIError = null;
         List<CompletionResponse.Choice> choices = null;
-        if(response.getOutput() == null) {
+        if(response.getHttpCode() > 299) {
             openAIError = OpenapiResponse.OpenapiError.builder()
                     .type(response.getCode())
+                    .httpCode(response.getHttpCode())
                     .message(response.getMessage())
                     .build();
         } else {

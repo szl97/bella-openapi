@@ -24,7 +24,11 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property) {
         Request httpRequest = buildRequest(request, url, property);
-        CompletionResponse response = HttpUtils.httpRequest(httpRequest, CompletionResponse.class);
+        CompletionResponse response = HttpUtils.httpRequest(httpRequest, CompletionResponse.class, (errorResponse, res) -> {
+            if(errorResponse.getError() != null) {
+                errorResponse.getError().setHttpCode(res.code());
+            }
+        });
         response.setCreated(DateTimeUtils.getCurrentSeconds());
         return response;
     }
