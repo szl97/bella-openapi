@@ -74,7 +74,13 @@ public class CompletionSseListener extends EventSourceListener {
         String msg;
         try {
             msg = response.body().string();
-            return new ChannelException.OpenAIException(response.code(), HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
+            StreamCompletionResponse streamCompletionResponse = sseConverter.convert(null, null, msg);
+            if(streamCompletionResponse != null && streamCompletionResponse.getError() != null) {
+                return new ChannelException.OpenAIException(response.code(), streamCompletionResponse.getError().getType(),
+                        streamCompletionResponse.getError().getMessage(), streamCompletionResponse.getError());
+            } else {
+                return new ChannelException.OpenAIException(response.code(), HttpStatus.valueOf(response.code()).getReasonPhrase(), msg);
+            }
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
             return ChannelException.fromResponse(response.code(), response.message());
