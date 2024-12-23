@@ -62,6 +62,8 @@ public class MetricsManager {
         metrics.add(DateTimeUtils.getCurrentSeconds());
         metrics.add("errors");
         metrics.add(httpCode < 500 ? 0 : 1);
+        metrics.add("request_too_many");
+        metrics.add(httpCode == 429 ? 1 : 0);
         metrics.add("completed");
         metrics.add(1);
         if(processData.getMetrics() != null) {
@@ -97,6 +99,7 @@ public class MetricsManager {
         List<Object> params  = new ArrayList<>();
         params.add("completed");
         params.add("errors");
+        params.add("request_too_many");
         params.addAll(metricsName);
 
         Object result = executor.execute(endpoint, ScriptType.metricsQuery, keys, params);

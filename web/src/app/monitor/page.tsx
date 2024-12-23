@@ -236,6 +236,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
     ttlt: transformData(currentData, 'ttlt'),
     ttft: transformData(currentData, 'ttft'),
     errors: transformData(currentData, 'errors'),
+    request_too_many: transformData(currentData, 'request_too_many'),
     output_token: transformData(currentData, 'output_token'),
     input_token: transformData(currentData, 'input_token'),
     status: transformData(currentData, 'status'),
@@ -361,6 +362,17 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
                   valueFormatter={(value: number) => Math.round(value).toString()}
                   aggregationType="sum"
                   intervalMinutes={intervalMinutes}
+                />
+              </Suspense>
+              <Suspense fallback={<div className="bg-white p-4 rounded-lg shadow-sm">Loading chart...</div>}>
+                <MetricsLineChart
+                    title="限流请求数（httpcode = 429）"
+                    data={metrics.request_too_many}
+                    channels={selectedChannels.length > 0 ? selectedChannels : channels}
+                    channelColors={channelColors}
+                    valueFormatter={(value: number) => Math.round(value).toString()}
+                    aggregationType="sum"
+                    intervalMinutes={intervalMinutes}
                 />
               </Suspense>
               <Suspense fallback={<div className="bg-white p-4 rounded-lg shadow-sm">Loading chart...</div>}>
