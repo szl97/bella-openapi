@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 public class AliCompletionResponse {
-    private Integer httpCode;
+    private Integer httpCode = 200;
     private String requestId;
     private AliCompletionOutput output;
     private AliUsage usage;

@@ -69,6 +69,9 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
                     .type(response.getCode())
                     .message(response.getMessage())
                     .build();
+            if(response.getHttpCode() != null && response.getHttpCode() > 299) {
+                openAIError.setHttpCode(response.getHttpCode());
+            }
         } else {
             choices = Lists.newArrayList(StreamCompletionResponse.Choice.builder()
                     .delta(response.getOutput().getChoices().get(0).getMessage())
@@ -89,7 +92,7 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
         }
         OpenapiResponse.OpenapiError openAIError = null;
         List<CompletionResponse.Choice> choices = null;
-        if(response.getHttpCode() > 299) {
+        if(response.getHttpCode() != null && response.getHttpCode() > 299) {
             openAIError = OpenapiResponse.OpenapiError.builder()
                     .type(response.getCode())
                     .httpCode(response.getHttpCode())
