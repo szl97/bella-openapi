@@ -44,6 +44,9 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             if(properties.getManagers().containsKey(op.getUserId())) {
                 String akCode = properties.getManagers().get(op.getUserId());
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
+                if(apikeyInfo == null) {
+                    throw new ChannelException.AuthorizationException("console apikey不存在");
+                }
                 op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
                 op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
                 EndpointContext.setApikey(apikeyInfo);

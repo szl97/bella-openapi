@@ -140,6 +140,7 @@ public class ApikeyService {
         db.setOwnerName(apikey.getOwnerName());
         db.setRoleCode(op.getRoleCode());
         db.setMonthQuota(op.getMonthQuota());
+        db.setSafetyLevel(op.getSafetyLevel());
         db.setName(op.getName());
         db.setRemark(op.getRemark());
         db = apikeyRepo.insert(db);
@@ -219,16 +220,6 @@ public class ApikeyService {
         apikeyRepo.updateStatus(op.getCode(), status);
     }
 
-    public ApikeyInfo verify(String ak) {
-        String sha = EncryptUtils.sha256(ak);
-        ApikeyInfo info = queryBySha(sha, true);
-        String display = EncryptUtils.desensitize(ak);
-        if(info == null) {
-            throw new ChannelException.AuthorizationException("api key不存在，请求的非法ak为：" + display);
-        }
-        return info;
-    }
-
     public ApikeyInfo verifyAuthHeader(String auth) {
         String ak;
         if(auth.startsWith("Bearer ")) {
@@ -242,6 +233,15 @@ public class ApikeyService {
             String display = EncryptUtils.desensitizeByLength(auth);
             String displayAk = EncryptUtils.desensitize(ak);
             throw new ChannelException.AuthorizationException("api key不存在，请求的header为：" + display + ", apikey为：" + displayAk);
+        }
+        if(StringUtils.isNotEmpty(info.getParentCode())) {
+            ApikeyInfo parent = queryByCode(info.getParentCode(), true);
+            if(parent == null) {
+                String display = EncryptUtils.desensitizeByLength(auth);
+                String displayAk = EncryptUtils.desensitize(ak);
+                throw new ChannelException.AuthorizationException("api key不存在，请求的header为：" + display + ", apikey为：" + displayAk);
+            }
+            info.setParentInfo(parent);
         }
         return info;
     }
@@ -265,8 +265,8 @@ public class ApikeyService {
 
     public ApikeyInfo queryByCode(String code, boolean onlyActive) {
         ApikeyInfo apikeyInfo = apikeyRepo.queryByCode(code);
-        if(apikeyInfo == null || (onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
-            throw new ChannelException.AuthorizationException("api key不存在");
+        if(onlyActive && apikeyInfo.getStatus().equals(INACTIVE)) {
+            return null;
         }
         return apikeyInfo;
     }

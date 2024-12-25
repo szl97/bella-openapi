@@ -45,6 +45,7 @@ public class EndpointContext {
     public static void setApikey(ApikeyInfo ak) {
         BellaContext.setApikey(ak);
         getProcessData().setAkCode(ak.getCode());
+        getProcessData().setParentAkCode(ak.getParentCode());
         getProcessData().setAccountType(ak.getOwnerType());
         getProcessData().setAccountCode(ak.getOwnerCode());
     }

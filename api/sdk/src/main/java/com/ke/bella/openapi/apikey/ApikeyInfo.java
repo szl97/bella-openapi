@@ -40,6 +40,7 @@ public class ApikeyInfo implements Serializable {
     private String status;
     private String remark;
     private Long userId;
+    private ApikeyInfo parentInfo;
 
     public RolePath getRolePath() {
         if(rolePath != null) {

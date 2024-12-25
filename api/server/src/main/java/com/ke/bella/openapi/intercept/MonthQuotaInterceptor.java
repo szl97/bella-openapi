@@ -25,11 +25,24 @@ public class MonthQuotaInterceptor extends HandlerInterceptorAdapter {
             return true;
         }
         ApikeyInfo apikey = EndpointContext.getApikey();
-        BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
-        double costVal = cost.doubleValue() / 100.0;
-        if(apikey.getMonthQuota().doubleValue() <= costVal) {
-            String msg = "已达每月额度上限, limit:" + apikey.getMonthQuota() + ", cost:" + costVal;
-            throw new ChannelException.RateLimitException(msg);
+        // 非子ak 或 已指定额度的子ak
+        if(apikey.getParentInfo() == null || apikey.getMonthQuota().doubleValue() > 0) {
+            BigDecimal cost = apikeyService.loadCost(apikey.getCode(), DateTimeUtils.getCurrentMonth());
+            double costVal = cost.doubleValue() / 100.0;
+            if(apikey.getMonthQuota().doubleValue() <= costVal) {
+                String msg = "已达每月额度上限, limit:" + apikey.getMonthQuota() + ", cost:" + costVal;
+                throw new ChannelException.RateLimitException(msg);
+            }
+        }
+        // 父ak的总额度不能超出
+        if(apikey.getParentInfo() != null) {
+            BigDecimal quota = apikey.getParentInfo().getMonthQuota();
+            BigDecimal cost = apikeyService.loadCost(apikey.getParentCode(), DateTimeUtils.getCurrentMonth());
+            double costVal = cost.doubleValue() / 100.0;
+            if(quota.doubleValue() <= costVal) {
+                String msg = "主ak的总额度已达上限, limit:" + quota + ", cost:" + costVal;
+                throw new ChannelException.RateLimitException(msg);
+            }
         }
         return true;
     }

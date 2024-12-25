@@ -17,6 +17,7 @@ public class EndpointProcessData {
     private String accountType;
     private String accountCode;
     private String akCode;
+    private String parentAkCode;
     private String endpoint;
     private String model;
     private String channelCode;

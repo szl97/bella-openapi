@@ -30,11 +30,9 @@ public class ApikeyController {
     public String createApikey(@RequestBody ApikeyCreateOp op) {
         ApikeyInfo cur = EndpointContext.getApikey();
         Assert.isTrue(StringUtils.isEmpty(cur.getParentCode()), "当前AK无创建子AK权限");
-        Assert.isTrue(op.getMonthQuota() == null || op.getMonthQuota().doubleValue() > 0, "配额应大于0");
+        Assert.notNull(op.getMonthQuota(), "配额应不可为null");
         Assert.notNull(op.getSafetyLevel(), "安全等级不可为空");
-        Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode())
-                        || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
-
+        Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode()) || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
         op.setParentCode(cur.getCode());
         return as.createByParentCode(op);
     }

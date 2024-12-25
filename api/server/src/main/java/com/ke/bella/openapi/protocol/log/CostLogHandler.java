@@ -5,6 +5,7 @@ import com.ke.bella.openapi.protocol.cost.CostCalculator;
 import com.ke.bella.openapi.protocol.cost.CostCounter;
 import com.lmax.disruptor.EventHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 
@@ -29,6 +30,9 @@ public class CostLogHandler implements EventHandler<LogEvent> {
         BigDecimal cost = CostCalculator.calculate(log.getEndpoint(), log.getPriceInfo(), log.getUsage());
         if(cost != null && BigDecimal.ZERO.compareTo(cost) < 0) {
             costCounter.delta(log.getAkCode(), cost);
+            if(StringUtils.isNotEmpty(log.getParentAkCode())) {
+                costCounter.delta(log.getParentAkCode(), cost);
+            }
         }
     }
 }
