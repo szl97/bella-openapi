@@ -7,13 +7,8 @@ import {DateTimeRangePicker} from "@/components/ui/date-time-range-picker";
 import {ModelSelect} from "@/components/ui/model-select";
 import {format, subDays, subMinutes} from 'date-fns';
 import {Sidebar} from '@/components/meta/sidebar';
-import {getAllCategoryTrees, listModels, listConsoleModels} from '@/lib/api/meta';
-import {hasPermission} from "@/lib/api/userInfo";
-import {useUser} from "@/lib/context/user-context";
+import {getAllCategoryTrees, listModels} from '@/lib/api/meta';
 import {CategoryTree, Model, MonitorData} from "@/lib/types/openapi";
-import {Input} from "@/components/ui/input";
-import {ScrollArea} from "@/components/ui/scroll-area";
-import {Search} from "lucide-react";
 
 // 预定义的颜色数组
 const colors = [
@@ -88,13 +83,12 @@ const getUniqueChannels = (data: MonitorData[]) => {
 };
 
 function MonitorPageContent({ params }: { params: { model: string } }) {
-  const { userInfo } = useUser();
   const [selectedEndpoint, setSelectedEndpoint] = useState<string>('/v1/chat/completions');
   const [models, setModels] = useState<Model[]>([]);
   const [filteredModels, setFilteredModels] = useState<Model[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModel, setSelectedModel] = useState<string>(params.model);
-  const [showModelList, setShowModelList] = useState(false);
+  const [selectedDisplayModel, setSelectedDisplayModel] = useState<string>(params.model);
   const [categoryTrees, setCategoryTrees] = useState<CategoryTree[]>([]);
   const [startDate, setStartDate] = useState(subMinutes(new Date(), 30));
   const [endDate, setEndDate] = useState(new Date());
@@ -117,23 +111,20 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   useEffect(() => {
     async function fetchModels() {
       try {
-        const models = hasPermission(userInfo, '/console/model/**')
-          ? await listConsoleModels(selectedEndpoint, '', '', 'active', '')
-          : await listModels(selectedEndpoint);
+        const models = await listModels(selectedEndpoint);
         setModels(models || []);
         const validModel = models?.find(m => m.modelName === selectedModel) || models?.[0];
         if (validModel) {
           setSelectedModel(validModel.terminalModel ? validModel.terminalModel : validModel.modelName);
+          setSelectedDisplayModel(validModel.modelName);
         }
       } catch (error) {
         console.error('Error fetching models:', error);
         setModels([]);
       }
     }
-    if (userInfo) {
-      fetchModels();
-    }
-  }, [selectedEndpoint, userInfo]);
+    fetchModels();
+  }, [selectedEndpoint]);
 
   useEffect(() => {
     const filtered = models.filter((model) =>
@@ -258,10 +249,11 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">模型:</label>
                   <ModelSelect
-                    value={selectedModel}
+                    value={selectedDisplayModel}
                     onChange={(value) => {
                       const model = models.find(m => m.modelName === value);
                       setSelectedModel(model?.terminalModel || model?.modelName || value);
+                      setSelectedDisplayModel(model?.modelName || value);
                     }}
                     models={models.map(m => m.modelName || '')}
                     className="w-full"
