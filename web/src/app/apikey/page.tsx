@@ -24,25 +24,26 @@ const ApikeyPage: React.FC = () => {
 
     const refresh = async () => {
         setIsLoading(true)
-        try {
-            const res = await getApikeyInfos(page, searchTerm || null)
-            setData(res?.data || null)
-            if (res) {
-                setTotalPages(Math.ceil(res.total / 10))
-            } else {
-                setTotalPages(1)
+        if (userInfo) {
+            try {
+                const res = await getApikeyInfos(page, userInfo?.userId || null, searchTerm || null)
+                setData(res?.data || null)
+                if (res) {
+                    setTotalPages(Math.ceil(res.total / 10))
+                } else {
+                    setTotalPages(1)
+                }
+            } catch (error) {
+                console.error('Failed to fetch API keys:', error)
+                setData(null)
+            } finally {
+                setIsLoading(false)
             }
-        } catch (error) {
-            console.error('Failed to fetch API keys:', error)
-            setData(null)
-        } finally {
-            setIsLoading(false)
         }
     }
-
     useEffect(() => {
         refresh()
-    }, [page])
+    }, [page, userInfo])
 
     const handlePageChange = (newPage: number) => {
         setPage(newPage)

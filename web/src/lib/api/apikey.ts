@@ -1,10 +1,10 @@
 import { ApikeyInfo, Page} from "@/lib/types/openapi";
 import { openapi } from '@/lib/api/openapi';
 
-export async function getApikeyInfos(page: number, search: string | null): Promise<Page<ApikeyInfo> | null> {
+export async function getApikeyInfos(page: number, ownerCode: number | null, search: string | null): Promise<Page<ApikeyInfo> | null> {
     try {
         const response = await openapi.get<Page<ApikeyInfo>>(`/console/apikey/page`, {
-            params: { status: 'active', searchParam: search, page }
+            params: { status: 'active', ownerType:'person', ownerCode: ownerCode, searchParam: search, page }
         });
         return response.data;
     } catch (error) {
@@ -20,7 +20,7 @@ export async function applyApikey(ownerCode: string, ownerName: string): Promise
 }
 
 export async function deleteApikey(code: string): Promise<boolean> {
-    const response = await openapi.post<boolean>(`/console/apikey/inactive`, { code });
+    const response = await openapi.post<boolean>(`/console/apikey/inactivate`, { code });
     return response.data ?? false;
 }
 
