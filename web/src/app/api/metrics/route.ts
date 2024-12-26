@@ -5,7 +5,7 @@ import {callWorkflow} from '@/lib/api/workflow';
 const WORKFLOW_API_URL = workflow_url;
 const API_KEY = workflow_apikey;
 const TENANT_ID = "04633c4f-8638-43a3-a02e-af23c29f821f";
-const WORKFLOW_ID = "WKFL-58db0d85-401e-44f2-b82d-d9fa5b65f7df";
+const WORKFLOW_ID = "WKFL-0e8d61e3-c616-44b4-99fc-e14284cc9b4c";
 
 export async function GET(request: NextRequest) {
   if (!API_KEY) {
