@@ -28,6 +28,14 @@ local function get_channel_metrics(channel_id)
 
     local result = {}
 
+    local unavailable = redis.call("GET", mark_key)
+    if unavailable then
+        result.status = 0
+    else
+        result.status = 1
+    end
+
+
     for _, metric_name in ipairs(metric_names) do
         local value = redis.call("HGET", total_key, metric_name)
         if value then
