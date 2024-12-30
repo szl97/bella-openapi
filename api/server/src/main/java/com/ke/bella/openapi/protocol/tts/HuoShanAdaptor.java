@@ -67,8 +67,8 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
     private ResponseEntity<byte[]> processHuoShanResponse(Request httpRequest) {
         HuoShanResponse huoshanResponse = HttpUtils.httpRequest(httpRequest, HuoShanResponse.class);
         if (huoshanResponse == null || huoshanResponse.getCode()!= HuoShanResponseCodeEnum.OK.code || huoshanResponse.getData() == null) {
-            HttpStatus status = getHttpStatus(HuoShanAdaptor.HuoShanResponseCodeEnum.getByCode(huoshanResponse.getCode()));
-            throw new ChannelException.OpenAIException(status.value(), status.getReasonPhrase(), huoshanResponse.getMessage());
+            HttpStatus status = getHttpStatus(HuoShanAdaptor.HuoShanResponseCodeEnum.getByCode(huoshanResponse == null ? HuoShanResponseCodeEnum.OTHER_ERROR.code : huoshanResponse.getCode()));
+            throw new ChannelException.OpenAIException(status.value(), status.getReasonPhrase(), huoshanResponse == null ? HuoShanResponseCodeEnum.OTHER_ERROR.message : huoshanResponse.getMessage());
         }
         byte[] decodedData = BASE64_DECODER.decode(huoshanResponse.getData());
         return ResponseEntity.ok(decodedData);
@@ -124,7 +124,8 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
         PROCESSING_ERROR(3031, "处理错误"),
         AUDIO_ACQUISITION_TIMEOUT(3032, "等待获取音频超时"),
         BACKEND_LINK_ERROR(3040, "后端链路连接错误"),
-        VOICE_STYLE_NOT_EXIST(3050, "音色不存在");
+        VOICE_STYLE_NOT_EXIST(3050, "音色不存在"),
+        OTHER_ERROR(3060, "未知错误");
 
         public final Integer code;
         public final String message;
@@ -140,7 +141,7 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
                     return value;
                 }
             }
-            return null;
+            return OTHER_ERROR;
         }
     }
 }
