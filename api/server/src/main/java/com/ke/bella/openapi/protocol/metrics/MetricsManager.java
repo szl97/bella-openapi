@@ -42,7 +42,7 @@ public class MetricsManager {
         MetricsResolver resolver = resolvers.stream().filter(t -> MatchUtils.matchUrl(t.support(), endpoint))
                 .findAny()
                 .orElse(null);
-        int unavailableSeconds = resolver == null ? 60 : resolver.resolveUnavailableSeconds(processData);
+        int unavailableSeconds = resolver == null ? 0 : resolver.resolveUnavailableSeconds(processData);
         Collection<String> metricsName;
         if(resolver != null) {
             metricsName = resolver.metricsName();

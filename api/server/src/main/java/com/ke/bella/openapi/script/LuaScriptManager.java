@@ -5,6 +5,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -41,20 +42,24 @@ public class LuaScriptManager {
         cacheManager.getOrCreateCache(config);
     }
 
-    private String doLoad(String fileName) throws IOException {
+    private String doLoad(String fileName, String defaultName) throws IOException {
         Resource resource = resourceLoader.getResource(luaDir + fileName);
-        InputStream inputStream = resource.getInputStream();
-        String scriptContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        return redissonClient.getScript().scriptLoad(scriptContent);
+        if(!resource.exists() && StringUtils.isNotEmpty(defaultName)) {
+            resource = resourceLoader.getResource(luaDir + defaultName);
+        }
+        try(InputStream inputStream = resource.getInputStream()) {
+            String scriptContent = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            return redissonClient.getScript().scriptLoad(scriptContent);
+        }
     }
 
     @Cached(name = luaScriptsKey, key = "#scriptName")
-    public String getScriptSha(String scriptName) throws IOException {
-        return doLoad(scriptName + ".lua");
+    public String getScriptSha(String scriptName, String defaultName) throws IOException {
+        return doLoad(scriptName + ".lua", defaultName + ".lua");
     }
 
-    public String reloadScript(String scriptName) throws IOException {
-        String sha = doLoad(scriptName + ".lua");
+    public String reloadScript(String scriptName, String defaultName) throws IOException {
+        String sha = doLoad(scriptName + ".lua", defaultName + ".lua");
         cacheManager.getCache(luaScriptsKey).put(scriptName, sha);
         return sha;
     }

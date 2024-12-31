@@ -18,7 +18,8 @@ public class LuaScriptExecutor {
 
     public Object execute(String fileName, ScriptType scriptType, List<Object> keys, List<Object> args) throws IOException {
         String scriptName = scriptType.getScriptName(fileName);
-        String sha = luaScriptManager.getScriptSha(scriptName);
+        String defaultName = scriptType.getScriptName("/default");
+        String sha = luaScriptManager.getScriptSha(scriptName, defaultName);
         if(StringUtils.isBlank(sha)) {
             return null;
         }

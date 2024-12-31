@@ -41,7 +41,7 @@ local function get_channel_metrics(channel_id)
             result[metric_name] = tonumber(value) or 0
         end
     end
-    
+
     return result
 end
 

@@ -29,7 +29,7 @@ public class ScriptConsoleController {
     @PostMapping("/lua/reload")
     public String reloadLuaScript(@RequestBody ScriptInfo script) throws IOException {
         Assert.isTrue(StringUtils.isNotBlank(script.getScriptName()), "scriptName cannot be empty");
-        return luaScriptManager.reloadScript(script.getScriptName());
+        return luaScriptManager.reloadScript(script.getScriptName(), script.getDefaultName());
     }
 
     @GetMapping("/check/model/map")
