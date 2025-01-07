@@ -1,28 +1,30 @@
 package com.ke.bella.openapi.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.completion.Callbacks;
-import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
-import okhttp3.Callback;
-import okhttp3.ConnectionPool;
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.internal.Util;
-import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSources;
-
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
+
+import okhttp3.Callback;
+import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSources;
 
 /**
  * Author: Stan Sai Date: 2024/8/14 12:09 description:
@@ -92,6 +94,38 @@ public class HttpUtils {
             return result;
         } catch (IOException e) {
             throw ChannelException.fromException(e);
+        }
+    }
+
+    public static byte[] doHttpRequest(Request request) {
+        Response response = null;
+        ResponseBody body = null;
+        try {
+            response = HttpUtils.httpRequest(request);
+            body = response.body();
+
+            byte[] bodyBytes = null;
+            if(body != null) {
+                bodyBytes = body.bytes();
+            }
+
+            if(!response.isSuccessful()) {
+                throw new IllegalStateException(String.format("failed to do http request, code: %s, message: %s ",
+                        response.code(),
+                        Optional.ofNullable(bodyBytes).map(String::new).orElse(null)));
+            } else {
+                return bodyBytes;
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+            if(body != null) {
+                body.close();
+            }
         }
     }
 
