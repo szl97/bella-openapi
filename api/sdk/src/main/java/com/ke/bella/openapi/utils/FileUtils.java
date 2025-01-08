@@ -1,13 +1,18 @@
 package com.ke.bella.openapi.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import okhttp3.MediaType;
 
 public class FileUtils {
 
     private static final Map<String, String> MIME_TO_EXTENSION = new HashMap<>();
+    private static final Map<String, String> EXTENSION_TO_MIME = new HashMap<>();
     static {
         // 初始化MIME类型到文件扩展名的映射
         MIME_TO_EXTENSION.put("text/html", "html");
@@ -52,6 +57,40 @@ public class FileUtils {
         MIME_TO_EXTENSION.put("message/rfc822", "eml");
         MIME_TO_EXTENSION.put("application/vnd.ms-outlook", "msg");
         // 可以根据需要添加更多的MIME类型
+
+        EXTENSION_TO_MIME.put("html", "text/html");
+        EXTENSION_TO_MIME.put("css", "text/css");
+        EXTENSION_TO_MIME.put("js", "text/javascript");
+        EXTENSION_TO_MIME.put("jpg", "image/jpg");
+        EXTENSION_TO_MIME.put("jpeg", "image/jpeg");
+        EXTENSION_TO_MIME.put("png", "image/png");
+        EXTENSION_TO_MIME.put("gif", "image/gif");
+        EXTENSION_TO_MIME.put("webp", "image/webp");
+        EXTENSION_TO_MIME.put("svg", "image/svg+xml");
+        EXTENSION_TO_MIME.put("pdf", "application/pdf");
+        EXTENSION_TO_MIME.put("zip", "application/zip");
+        EXTENSION_TO_MIME.put("mp3", "audio/mpeg");
+        EXTENSION_TO_MIME.put("m4a", "audio/mp4");
+        EXTENSION_TO_MIME.put("wav", "audio/wav");
+        EXTENSION_TO_MIME.put("webm", "audio/webm");
+        EXTENSION_TO_MIME.put("amr", "audio/amr");
+        EXTENSION_TO_MIME.put("mp4", "video/mp4");
+        EXTENSION_TO_MIME.put("mov", "video/quicktime");
+        EXTENSION_TO_MIME.put("mpeg", "video/mpeg");
+
+        EXTENSION_TO_MIME.put("doc", "application/msword");
+        EXTENSION_TO_MIME.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        EXTENSION_TO_MIME.put("xls", "application/vnd.ms-excel");
+        EXTENSION_TO_MIME.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        EXTENSION_TO_MIME.put("ppt", "application/vnd.ms-powerpoint");
+        EXTENSION_TO_MIME.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+        EXTENSION_TO_MIME.put("txt", "text/plain");
+        EXTENSION_TO_MIME.put("md", "text/markdown");
+        EXTENSION_TO_MIME.put("csv", "text/csv");
+        EXTENSION_TO_MIME.put("xml", "application/xml");
+        EXTENSION_TO_MIME.put("epub", "application/epub+zip");
+        EXTENSION_TO_MIME.put("eml", "message/rfc822");
+        EXTENSION_TO_MIME.put("msg", "application/vnd.ms-outlook");
     }
 
     public static MediaType getMediaType(String contentType) {
@@ -95,8 +134,36 @@ public class FileUtils {
         return mediaType.subtype();
     }
 
-    private static String extraPureMediaType(MediaType mediaType) {
+    public static String extraPureMediaType(MediaType mediaType) {
         return mediaType.type() + "/" + mediaType.subtype();
+    }
+
+    public static MediaType extraMediaType(String filename) {
+        String extension = getFileExtension(filename);
+        String mimeType = Optional.ofNullable(EXTENSION_TO_MIME.get(extension))
+                .orElseThrow(() -> new IllegalArgumentException("extra media type failed, unsupported file extension: " + extension));
+        return MediaType.parse(mimeType);
+    }
+
+    public static String getFileExtension(String filename) {
+        if(filename == null || filename.lastIndexOf(".") == -1) {
+            return null;
+        }
+        return filename.substring(filename.lastIndexOf(".") + 1);
+    }
+
+    public static byte[] readAllBytes(InputStream inputStream) {
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            int nRead;
+            byte[] data = new byte[2048];
+            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
+            }
+            buffer.flush();
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Error reading from InputStream", e);
+        }
     }
 
 }

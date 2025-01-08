@@ -129,6 +129,48 @@ public class HttpUtils {
         }
     }
 
+    /**
+     * 当且仅当http code为2xx时进行反序列化
+     *
+     * @param request
+     * @param reference
+     *
+     * @return
+     *
+     * @param <T>
+     */
+    public static <T> T doHttpRequest(Request request, TypeReference<T> reference) {
+        Response response = null;
+        ResponseBody body = null;
+        try {
+            response = HttpUtils.httpRequest(request);
+            body = response.body();
+
+            String bodyStr = null;
+            if(body != null) {
+                bodyStr = body.string();
+            }
+
+            if(!response.isSuccessful()) {
+                throw new IllegalStateException(String.format("failed to do http request, code: %s, message: %s ",
+                        response.code(),
+                        Optional.ofNullable(bodyStr).map(String::new).orElse(null)));
+            } else {
+                return JacksonUtils.deserialize(bodyStr, reference);
+            }
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if(response != null) {
+                response.close();
+            }
+            if(body != null) {
+                body.close();
+            }
+        }
+    }
+
     public static void streamRequest(Request request, CompletionSseListener listener) {
         CompletableFuture<?> future = new CompletableFuture<>();
         listener.setConnectionInitFuture(future);

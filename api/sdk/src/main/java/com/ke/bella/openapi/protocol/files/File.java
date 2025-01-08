@@ -20,6 +20,7 @@ public class File {
     @JsonProperty("created_at")
     private Long createdAt;
     private String filename;
+    private String extension;
     /**
      * assistants
      * assistants_output
