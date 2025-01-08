@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.ke.bella.openapi.client.OpenapiClient;
+import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
 
 @SpringJUnitConfig(TestConfiguration.class)
@@ -44,5 +45,13 @@ public class OpenapiClientTest {
     public void testRetrieveFileContent() {
         byte[] bytes = openapiClient.retrieveFileContent("c647706c-0d96-4649-b889-f37ac9324d25", "file-2412291635520022000203-2052459596");
         Assertions.assertNotNull(bytes);
+    }
+
+    @Test
+    public void testGetFileWithMetadata() {
+        File file = openapiClient.getFile("c647706c-0d96-4649-b889-f37ac9324d25", "file-2501081157090026000017-2075695711");
+        Assertions.assertNotNull(file);
+        Assertions.assertNotNull(file.getMimeType());
+        Assertions.assertNotNull(file.getType());
     }
 }

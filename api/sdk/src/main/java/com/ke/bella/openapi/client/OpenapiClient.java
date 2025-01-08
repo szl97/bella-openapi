@@ -12,6 +12,7 @@ import com.google.common.net.HttpHeaders;
 import com.ke.bella.openapi.BellaResponse;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
 import com.ke.bella.openapi.utils.HttpUtils;
 
@@ -95,5 +96,15 @@ public class OpenapiClient {
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .build();
         return HttpUtils.doHttpRequest(request);
+    }
+
+    public File getFile(String apiKey, String fileId) {
+        String url = openapiHost + "/v1/files/" + fileId;
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .build();
+        return HttpUtils.httpRequest(request, new TypeReference<File>() {
+        });
     }
 }
