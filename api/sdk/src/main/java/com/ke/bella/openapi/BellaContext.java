@@ -27,7 +27,7 @@ public class BellaContext {
         return headersThreadLocal.get();
     }
 
-    public static String getHeader(String key)  {
+    public static String getHeader(String key) {
         return getHeaders().get(key);
     }
 
@@ -81,6 +81,7 @@ public class BellaContext {
                 .email(oper.getEmail())
                 .tenantId(oper.getTenantId())
                 .spaceCode(oper.getSpaceCode())
+                .optionalInfo(oper.getOptionalInfo())
                 .build();
     }
 
