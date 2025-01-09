@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import {es_url, es_apikey} from "../config";
+import {NextResponse} from 'next/server';
+import {es_apikey, es_url} from "../config";
 
 const API_KEY = es_apikey;
 const API_URL = es_url;
@@ -27,7 +27,8 @@ export async function POST(request: Request) {
           "data_info_msg_requestId",
           "data_info_msg_bellaTraceId",
           "data_info_msg_requestTime",
-          "data_info_msg_user"
+          "data_info_msg_user",
+          "data_info_msg_metrics"
         ],
         index: "index-14812-15368",
         queryString: body.query,

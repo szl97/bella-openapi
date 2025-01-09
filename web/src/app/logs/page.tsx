@@ -108,11 +108,6 @@ const LogsPage = () => {
     setFilteredModels(filtered)
   }, [modelSearchQuery, models])
 
-  const handleTimeRangeChange = (start: Date, end: Date) => {
-    setStartDate(start)
-    setEndDate(end)
-  }
-
   const handleSearch = async () => {
     if (!akCode.trim() && !requestId.trim() && !bellaTraceId.trim()) {
       setIsAkCodeError(true)
@@ -589,14 +584,23 @@ const LogsPage = () => {
                               )}
                             </div>
                           )}
+
+                          {log.data_info_msg_metrics && (
+                              <div className="mb-4">
+                                <span className="font-medium text-gray-700">请求指标：</span>
+                                <div className="mt-1 text-gray-900 break-all">
+                                  {log.data_info_msg_metrics}
+                                </div>
+                              </div>
+                          )}
                         </div>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <div className="mt-8 text-center p-8 bg-white rounded-lg shadow-sm">
-                    <p className="text-gray-600">没有日志，请确认查询条件</p>
-                  </div>
+                    <div className="mt-8 text-center p-8 bg-white rounded-lg shadow-sm">
+                      <p className="text-gray-600">没有日志，请确认查询条件</p>
+                    </div>
                 )}
               </div>
             </div>
