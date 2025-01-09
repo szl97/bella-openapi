@@ -71,7 +71,17 @@ public class BellaContext {
     }
 
     public static void setOperator(Operator operator) {
-        operatorLocal.set(operator);
+        operatorLocal.set(getPureOper(operator));
+    }
+
+    private static Operator getPureOper(Operator oper) {
+        return Operator.builder()
+                .userId(oper.getUserId())
+                .userName(oper.getUserName())
+                .email(oper.getEmail())
+                .tenantId(oper.getTenantId())
+                .spaceCode(oper.getSpaceCode())
+                .build();
     }
 
     public static Map<String, Object> snapshot() {
