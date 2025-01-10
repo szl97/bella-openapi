@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import okhttp3.MediaType;
+import org.apache.commons.lang3.StringUtils;
 
 public class FileUtils {
 
@@ -79,6 +80,7 @@ public class FileUtils {
         EXTENSION_TO_MIME.put("mpeg", "video/mpeg");
 
         EXTENSION_TO_MIME.put("doc", "application/msword");
+		EXTENSION_TO_MIME.put("json", "application/json");
         EXTENSION_TO_MIME.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         EXTENSION_TO_MIME.put("xls", "application/vnd.ms-excel");
         EXTENSION_TO_MIME.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -140,8 +142,10 @@ public class FileUtils {
 
     public static MediaType extraMediaType(String filename) {
         String extension = getFileExtension(filename);
-        String mimeType = Optional.ofNullable(EXTENSION_TO_MIME.get(extension))
-                .orElseThrow(() -> new IllegalArgumentException("extra media type failed, unsupported file extension: " + extension));
+        String mimeType = EXTENSION_TO_MIME.get(extension);
+        if(StringUtils.isEmpty(mimeType)) {
+            return null;
+        }
         return MediaType.parse(mimeType);
     }
 

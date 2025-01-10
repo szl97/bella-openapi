@@ -15,6 +15,7 @@ import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.ke.bella.openapi.client.OpenapiClient;
 import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
+import com.ke.bella.openapi.utils.FileUtils;
 
 @SpringJUnitConfig(TestConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = { "spring.profiles.active=ut" })
@@ -89,6 +90,29 @@ public class OpenapiClientTest {
             File deleting = openapiClient.deleteFile(API_KEY, vision.getId());
             Assertions.assertNotNull(deleting);
             Assertions.assertThrows(IllegalStateException.class, () -> openapiClient.getFile(API_KEY, vision.getId()));
+        } finally {
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testUploadFileWithUnknownMimeType() throws FileNotFoundException {
+        String filename = "test_upload_unknown_mime_type.jsonl";
+        java.io.File file = new java.io.File("src/test/resources/" + filename);
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(file);
+            byte[] bytes = FileUtils.readAllBytes(inputStream);
+
+            Assertions.assertDoesNotThrow(() -> openapiClient.uploadFile(API_KEY, "vision", bytes, filename));
+            File vision = openapiClient.uploadFile(API_KEY, "vision", bytes, filename);
+            Assertions.assertNotNull(vision);
+
         } finally {
             if(inputStream != null) {
                 try {
