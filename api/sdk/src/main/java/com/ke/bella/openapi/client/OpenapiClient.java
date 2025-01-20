@@ -1,7 +1,9 @@
 package com.ke.bella.openapi.client;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +23,7 @@ import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
 import com.ke.bella.openapi.utils.FileUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -135,6 +138,20 @@ public class OpenapiClient {
         });
     }
 
+    public String getPreviewUrl(String apiKey, String fileId) {
+        String url = openapiHost + "/v1/files/" + fileId + "/preview_url";
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .build();
+        FileUrl fileUrl = HttpUtils.doHttpRequest(request, new TypeReference<FileUrl>() {
+        });
+        if(fileUrl == null || StringUtils.isBlank(fileUrl.getUrl())) {
+            throw new IllegalStateException("failed to get preview url");
+        }
+        return fileUrl.getUrl();
+    }
+
     public File uploadFile(String apiKey, String purpose, InputStream fileInputStream, String filename) {
         return uploadFile(apiKey, purpose, FileUtils.readAllBytes(fileInputStream), filename);
     }
@@ -166,6 +183,31 @@ public class OpenapiClient {
 
     public List<File> listFiles(String apiKey, String purpose, Integer limit, String after, Order order) {
         return listFiles(apiKey, purpose, limit, after, order, false, null);
+    }
+
+    public List<File> listFiles(String apiKey, List<String> fileIds) {
+        return listFiles(apiKey, fileIds, false, null);
+    }
+
+    public List<File> listFiles(String apiKey, List<String> fileIds, boolean getUrl, Long expires) {
+        String url = openapiHost + "/v1/files/list";
+        Map<String, Object> body = new HashMap<>();
+        if(getUrl) {
+            body.put("get_url", getUrl);
+            body.put("expires", expires);
+        }
+        body.put("file_ids", fileIds);
+
+        RequestBody requestBody = RequestBody.create(JacksonUtils.serialize(body), MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .build();
+
+        return HttpUtils.doHttpRequest(request, new TypeReference<List<File>>() {
+        });
     }
 
     public List<File> listFiles(String apiKey, String purpose, Integer limit, String after, Order order, boolean getUrl, Long expires) {

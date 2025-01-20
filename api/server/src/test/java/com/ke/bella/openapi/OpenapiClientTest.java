@@ -122,4 +122,30 @@ public class OpenapiClientTest {
             }
         }
     }
+
+    @Test
+    public void testListFilesByFileIds() {
+        String firstId = "file-2501081157090026000017-2075695711";
+        String secondId = "file-2501101804270027000104-2075695711";
+        List<File> files = openapiClient.listFiles(API_KEY, Lists.newArrayList(firstId, secondId));
+        Assertions.assertNotNull(files);
+        Assertions.assertEquals(2, files.size());
+        Assertions.assertEquals(files.get(0).getId(), firstId);
+        Assertions.assertEquals(files.get(1).getId(), secondId);
+    }
+
+    @Test
+    public void testGetPreviewUrl() {
+        String fileId = "file-2412291635520022000203-2052459596";
+        String url = openapiClient.getPreviewUrl(API_KEY, fileId);
+        Assertions.assertNotNull(url);
+        Assertions.assertTrue(url.startsWith("http"));
+    }
+
+    @Test
+    public void testGetPreviewUrlWithInvalidFileId() {
+        String fileId = "file-2501101754410023000092-2075695711";
+        String url = openapiClient.getPreviewUrl(API_KEY, fileId);
+        Assertions.assertNotNull(url);
+    }
 }
