@@ -41,6 +41,12 @@ public class ResponseHelper {
             } else {
                 target.setContent(target.getContent() + content);
             }
+        } else if(StringUtils.isNotEmpty(message.getReasoning_content())) {
+            if(target.getReasoning_content() == null) {
+                target.setReasoning_content(message.getReasoning_content());
+            } else {
+                target.setReasoning_content(target.getReasoning_content() + message.getReasoning_content());
+            }
         } else if(CollectionUtils.isNotEmpty(toolCallList)) {
             if(target.getTool_calls() == null) {
                 target.setTool_calls(new ArrayList<>());
@@ -73,6 +79,27 @@ public class ResponseHelper {
             }
         }
         return target;
+    }
+
+    public static StreamCompletionResponse rebuildThinkResp(StreamCompletionResponse thinkResp, Integer stage) {
+        StreamCompletionResponse response = new StreamCompletionResponse();
+        response.setCreated(thinkResp.getCreated());
+        response.setChoices(new ArrayList<>());
+        response.setUsage(thinkResp.getUsage());
+        response.setId(thinkResp.getId());
+        response.setModel(thinkResp.getModel());
+        Message thinkMessage = thinkResp.getChoices().get(0).getDelta();
+        Message message = new Message();
+        message.setName(thinkMessage.getName());
+        message.setContent(thinkMessage.getReasoning_content());
+        message.setReasoning_content(thinkMessage.getReasoning_content());
+        if(stage == 0) {
+            message.setContent("```sh\n" + message.getContent());
+        } else if(stage == -1) {
+            message.setContent("\n```\n" + thinkMessage.getContent());
+        }
+        response.getChoices().add(new StreamCompletionResponse.Choice("", 0, message));
+        return response;
     }
 
     public static Message.ToolCall copyToolCall(Message.ToolCall toolCall) {

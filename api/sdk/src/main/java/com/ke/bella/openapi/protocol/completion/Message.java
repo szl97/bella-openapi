@@ -12,10 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -36,6 +33,10 @@ public class Message {
      */
     @Nullable
     private Object content;
+
+    @JsonInclude(Include.NON_NULL)
+    @Nullable
+    private String reasoning_content;
     /**
      * name is required if role is function, and it should be the name of the function whose response is in the content;
      */

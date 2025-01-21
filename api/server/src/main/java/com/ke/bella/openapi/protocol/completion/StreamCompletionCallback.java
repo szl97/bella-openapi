@@ -49,6 +49,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
          private boolean dirtyChoice;
          private Long firstPackageTime;
          private Object requestRiskData;
+         private Integer thinkStage = 0; //推理阶段 0: 未开始;  1: 进行中;  -1:结束
 
          @Override
          public void callback(StreamCompletionResponse msg) {
@@ -56,7 +57,20 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
                  msg.setRequestRiskData(requestRiskData);
                  requestRiskData = null;
              }
-             SseHelper.sendEvent(sse, msg);
+             if (CollectionUtils.isNotEmpty(msg.getChoices()) && msg.getChoices().get(0).getDelta() != null
+                     && msg.getChoices().get(0).getDelta().getReasoning_content() != null) {
+                 StreamCompletionResponse rebuildMsg = ResponseHelper.rebuildThinkResp(msg, thinkStage);
+                 SseHelper.sendEvent(sse, rebuildMsg);
+                 thinkStage = 1;
+             } else if (thinkStage == 1 && (CollectionUtils.isNotEmpty(msg.getChoices()) && msg.getChoices().get(0).getDelta() != null
+                     && msg.getChoices().get(0).getDelta().getContent() != null)) {
+                 thinkStage = -1;
+                 safetyCheckIndex = 0;
+                 StreamCompletionResponse rebuildMsg = ResponseHelper.rebuildThinkResp(msg, thinkStage);
+                 SseHelper.sendEvent(sse, rebuildMsg);
+             } else {
+                 SseHelper.sendEvent(sse, msg);
+             }
              updateBuffer(msg);
              safetyCheck(false);
          }
@@ -112,7 +126,8 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
              if(choice.getIndex() != 0) {
                  return false;
              }
-             return choice.getDelta().getContent() != null && StringUtils.isNotBlank(choice.getDelta().getContent().toString());
+             return (choice.getDelta().getContent() != null && StringUtils.isNotBlank(choice.getDelta().getContent().toString()))
+             || StringUtils.isNotBlank(choice.getDelta().getReasoning_content());
          }
 
          private void log() {
@@ -131,7 +146,8 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
              }
              CompletionResponse.Choice choice = choiceBuffer.get(0);
              if(!done) {
-                 String content = choice.getMessage().getContent().toString();
+                 String content = choice.getMessage().getContent() == null ?
+                         choice.getMessage().getReasoning_content() : choice.getMessage().getContent().toString();
                  String delta = content.substring(safetyCheckIndex);
                  if(!PunctuationUtils.endsWithPunctuation(delta)) {
                      return;
