@@ -67,7 +67,7 @@ public class ChatController {
         EndpointContext.setEncodingType(property.getEncodingType());
         if(request.isStream()) {
             SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, EndpointContext.getProcessData().getRequestId());
-            adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService));
+            adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService, property));
             return sse;
         }
         CompletionResponse response = adaptor.completion(request, url, property);

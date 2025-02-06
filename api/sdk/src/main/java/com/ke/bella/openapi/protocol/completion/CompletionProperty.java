@@ -10,6 +10,7 @@ import java.util.Map;
 @Data
 public class CompletionProperty implements IProtocolProperty {
     String encodingType = StringUtils.EMPTY;
+    boolean mergeReasoningContent = false;
 
     @Override
     public Map<String, String> description() {
