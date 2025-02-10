@@ -1,7 +1,9 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import com.ke.bella.openapi.utils.SseHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,30 @@ import java.util.List;
 import static com.ke.bella.openapi.protocol.completion.StreamCompletionResponse.CHAT_COMPLETION_CHUNK_OBJECT;
 
 public class ResponseHelper {
+    public static final String START_THINK = "<think>";
+    public static final String END_THINK = "</think>";
+
+    public static void splitReasoningFromContent(CompletionResponse rsp, OpenAIProperty property) {
+        if(!property.splitReasoningFromContent) {
+            return;
+        }
+        if(CollectionUtils.isEmpty(rsp.getChoices()) || rsp.getChoices().get(0).getMessage() == null
+                || ObjectUtils.isEmpty(rsp.getChoices().get(0).getMessage().getContent())) {
+            return;
+        }
+        String content = rsp.getChoices().get(0).getMessage().getContent().toString();
+        if(!content.startsWith(START_THINK)) {
+            return;
+        }
+        String[] parts = content.split(END_THINK);
+        if(parts.length != 2) {
+            return;
+        }
+        String reasonContent = parts[0].replace(START_THINK, "");
+        content = parts[1];
+        rsp.getChoices().get(0).getMessage().setReasoning_content(reasonContent);
+        rsp.getChoices().get(0).getMessage().setContent(content);
+    }
 
     public static CompletionResponse overwrite(CompletionResponse response, StreamCompletionResponse streamCompletionResponse) {
         response.setError(streamCompletionResponse.getError());

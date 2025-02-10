@@ -11,6 +11,7 @@ import java.util.Map;
 public class CompletionProperty implements IProtocolProperty {
     String encodingType = StringUtils.EMPTY;
     boolean mergeReasoningContent = false;
+    boolean splitReasoningFromContent = false;
 
     @Override
     public Map<String, String> description() {

@@ -53,12 +53,22 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
          private Object requestRiskData;
          private Integer thinkStage = 0; // 推理阶段 0: 未开始; 1: 进行中; -1:结束
          private final CompletionProperty property;
+         private Integer splitFlg = 0;// 拆解标志 0: 不需要; 1: 拆解中; -1:拆解结束
 
          @Override
          public void callback(StreamCompletionResponse msg) {
              if(requestRiskData != null) {
                  msg.setRequestRiskData(requestRiskData);
                  requestRiskData = null;
+             }
+             if(property.splitReasoningFromContent) {
+                 splitFlg = getSplitFlg(msg, splitFlg);
+                 if(splitFlg == 1 && msgContentIsNotEmpty(msg)) {
+                     handleStartThink(msg);
+                 } else if(splitFlg == -1) {
+                     handleEndThink(msg);
+                     splitFlg = 0;
+                 }
              }
              if(property.mergeReasoningContent) {
                  if(CollectionUtils.isNotEmpty(msg.getChoices()) && msg.getChoices().get(0).getDelta() != null
@@ -81,6 +91,55 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
              }
              updateBuffer(msg);
              safetyCheck(false);
+         }
+
+         private void handleStartThink(StreamCompletionResponse msg) {
+             String deltaContent = msg.getChoices().get(0).getDelta().getContent().toString();
+             if(deltaContent.startsWith(ResponseHelper.START_THINK)) {
+                 String[] parts = deltaContent.split(ResponseHelper.START_THINK);
+                 if(parts.length == 2) {
+                     msg.getChoices().get(0).getDelta().setContent(parts[0]);
+                     msg.getChoices().get(0).getDelta().setReasoning_content(parts[1]);
+                 } else if(parts.length == 1) {
+                     msg.getChoices().get(0).getDelta().setContent(parts[0]);
+                 } else {
+                     msg.getChoices().get(0).getDelta().setContent(StringUtils.EMPTY);
+                 }
+                 return;
+             }
+             msg.getChoices().get(0).getDelta().setContent(StringUtils.EMPTY);
+             msg.getChoices().get(0).getDelta().setReasoning_content(deltaContent);
+         }
+
+         private void handleEndThink(StreamCompletionResponse msg) {
+             String[] parts = msg.getChoices().get(0).getDelta().getContent().toString().split(ResponseHelper.END_THINK);
+             if(parts.length == 2) {
+                 msg.getChoices().get(0).getDelta().setReasoning_content(parts[0]);
+                 msg.getChoices().get(0).getDelta().setContent(parts[1]);
+             } else if(parts.length == 1) {
+                 msg.getChoices().get(0).getDelta().setReasoning_content(parts[0]);
+             } else {
+                 msg.getChoices().get(0).getDelta().setContent(StringUtils.EMPTY);
+             }
+         }
+
+         private Integer getSplitFlg(StreamCompletionResponse msg, Integer currentSplitFlg) {
+             if(!msgContentIsNotEmpty(msg)) {
+                 return currentSplitFlg;
+             }
+             String content = msg.getChoices().get(0).getDelta().getContent().toString();
+             if(content.contains(ResponseHelper.START_THINK)) {
+                 return 1;
+             } else if(content.contains(ResponseHelper.END_THINK)) {
+                 return -1;
+             }
+             return currentSplitFlg;
+         }
+
+         private boolean msgContentIsNotEmpty(StreamCompletionResponse msg) {
+             return CollectionUtils.isNotEmpty(msg.getChoices()) && msg.getChoices().get(0).getDelta() != null
+                     && msg.getChoices().get(0).getDelta().getContent() != null && !Objects.equals(
+                             msg.getChoices().get(0).getDelta().getContent(), "");
          }
 
          @Override

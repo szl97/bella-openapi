@@ -29,6 +29,7 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
                 errorResponse.getError().setHttpCode(res.code());
             }
         });
+        ResponseHelper.splitReasoningFromContent(response, property);
         response.setCreated(DateTimeUtils.getCurrentSeconds());
         return response;
     }
