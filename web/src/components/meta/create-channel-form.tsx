@@ -230,7 +230,7 @@ export function CreateChannelForm({entityType, entityCode} : Props) {
                             <Label htmlFor="channelInfo">渠道信息</Label>
                             {channelInfoSchema.params.map((schema) => (
                                 <div key={schema.code}>
-                                    <Label>{schema.name}</Label>
+                                    {schema.valueType != 'map' && <Label>{schema.name}</Label>}
                                     {renderField(schema, channelInfoValue[schema.code], (_, value) => handleChannelInfoChange(schema.code, value))}
                                 </div>
                             ))}

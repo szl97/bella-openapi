@@ -7,6 +7,7 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +52,9 @@ public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
                 .post(RequestBody.create(JacksonUtils.serialize(request), MediaType.parse("application/json")));
+        if(MapUtils.isNotEmpty(property.getExtraHeaders())) {
+            property.getExtraHeaders().forEach(builder::addHeader);
+        }
         return builder.build();
     }
 

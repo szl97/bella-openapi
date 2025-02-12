@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.SortedMap;
 
 @Data
 @NoArgsConstructor
@@ -22,6 +23,11 @@ public class OpenAIProperty extends CompletionProperty {
 
     @Override
     public Map<String, String> description() {
-        return ImmutableSortedMap.of("auth", "鉴权配置", "deployName", "部署名称", "apiVersion", "API版本", "supportStreamOptions", "是否支持StreamOptions参数");
+        Map<String, String> map = super.description();
+        map.put("auth", "鉴权配置");
+        map.put("deployName", "部署名称");
+        map.put("apiVersion", "API版本");
+        map.put("supportStreamOptions", "是否支持StreamOptions参数");
+        return map;
     }
 }

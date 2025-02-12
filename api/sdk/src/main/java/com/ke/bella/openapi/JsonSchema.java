@@ -5,8 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -27,7 +29,7 @@ public class JsonSchema implements Serializable {
             } else {
                 desc = new HashMap<>();
             }
-            Set<TypeSchema> schemas = Arrays.stream(type.getDeclaredFields())
+            Set<TypeSchema> schemas = getAllFields(type).stream()
                     .map(field -> TypeSchema.toSchema(field, desc))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
@@ -35,5 +37,15 @@ public class JsonSchema implements Serializable {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Set<Field> getAllFields(Class<?> type) {
+        Set<Field> fields = new HashSet<>();
+        Class<?> currentClass = type;
+        while (currentClass != null && currentClass != Object.class) {
+            fields.addAll(Arrays.asList(currentClass.getDeclaredFields()));
+            currentClass = currentClass.getSuperclass();
+        }
+        return fields;
     }
 }
