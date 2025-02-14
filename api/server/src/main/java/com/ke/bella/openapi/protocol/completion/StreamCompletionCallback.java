@@ -215,6 +215,9 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
              if(!done) {
                  String content = choice.getMessage().getContent() == null ?
                          choice.getMessage().getReasoning_content() : choice.getMessage().getContent().toString();
+                 if(safetyCheckIndex > content.length()) {
+                      safetyCheckIndex = 0;
+                 }
                  String delta = content.substring(safetyCheckIndex);
                  if(!PunctuationUtils.endsWithPunctuation(delta)) {
                      return;
