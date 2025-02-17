@@ -18,6 +18,7 @@ namedArgument : IDENTIFIER EQUALS value;
 value : STRING                                                    # StringValue
       | NUMBER                                                   # NumberValue
       | BOOLEAN                                                  # BooleanValue
+      | '[' (value (COMMA value)*)? ']'                          # ArrayValue
       | NULL                                                     # NullValue
       | LBRACE (dictPair (COMMA dictPair)*)? RBRACE            # DictValue
       ;

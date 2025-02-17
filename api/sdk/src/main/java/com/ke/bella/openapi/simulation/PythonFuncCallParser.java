@@ -2,7 +2,6 @@ package com.ke.bella.openapi.simulation;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -10,8 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.LockSupport;
-
-import com.ke.bella.openapi.utils.JacksonUtils;
 
 public class PythonFuncCallParser {
     private final Reader reader;
@@ -156,6 +153,10 @@ public class PythonFuncCallParser {
         }
         if(Character.isDigit(currentChar) || currentChar == '-') {
             return parseNumber();
+        }
+        if(currentChar == '[') {
+            advance();
+            return parseArray();
         }
         if(currentChar == '{') {
             advance();
@@ -354,6 +355,16 @@ public class PythonFuncCallParser {
         }
 
         return Integer.parseInt(buffer.toString());
+    }
+
+    private ArrayList<Object> parseArray() throws IOException {
+        ArrayList<Object> list = new ArrayList<>();
+        do {
+            skipWhitespace();
+            list.add(parseValue());
+        } while (tryConsume(','));
+        expect(']');
+        return list;
     }
 
     private boolean tryParseBlockStart() throws IOException {
