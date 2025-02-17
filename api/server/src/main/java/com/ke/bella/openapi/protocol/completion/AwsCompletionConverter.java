@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.alibaba.nacos.api.naming.pojo.healthcheck.impl.Http;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.utils.DateTimeUtils;

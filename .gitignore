@@ -66,3 +66,5 @@ web/yarn-error.log*
 # vercel
 .vercel
 
+
+api/config-cache/bella-openapi/config-cache/bella-openapi\+default\+application.properties

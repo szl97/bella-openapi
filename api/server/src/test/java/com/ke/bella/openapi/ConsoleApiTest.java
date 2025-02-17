@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = { "spring.profiles.active=ut"})
 @AutoConfigureMockMvc
 @Transactional
+@Rollback
 public class ConsoleApiTest {
 
     private static final List<String> paths = ImmutableList.of("metadata.txt", "apikey.txt");
@@ -178,12 +180,12 @@ public class ConsoleApiTest {
     }
 
     @Data
-     static class RequestDef {
-         String method;
-         String url;
-         Map<String, Object> headers;
-         String request;
-         String res;
+    static class RequestDef {
+        String method;
+        String url;
+        Map<String, Object> headers;
+        String request;
+        String res;
     }
 
     private List<String> readResourceLines(String path) {

@@ -1,11 +1,11 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.concurrent.DefaultThreadFactory;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

@@ -1,10 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ke.bella.openapi</groupId>
         <artifactId>bella-openapi</artifactId>
-        <version>1.3.2-SNAPSHOT</version>
+        <version>2.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>server</artifactId>
     <name>server</name>
@@ -22,28 +22,8 @@
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.lianjia.hawk</groupId>
-            <artifactId>hawk-spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lianjia.infrastructure</groupId>
-            <artifactId>spring-boot-starter-config-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lianjia.infrastructure</groupId>
-            <artifactId>spring-boot-starter-discovery</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lianjia.infrastructure</groupId>
-            <artifactId>spring-boot-starter-datasource</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lianjia.infrastructure</groupId>
-            <artifactId>spring-boot-starter-graceful-reload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lianjia.infrastructure</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -51,7 +31,33 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -379,4 +385,3 @@
         </plugins>
     </build>
 </project>
-

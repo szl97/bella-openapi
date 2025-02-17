@@ -1,5 +1,7 @@
 package com.ke.bella.openapi;
 
+import com.google.common.collect.Lists;
+import com.ke.bella.openapi.client.OpenapiClient;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,8 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
-import com.ke.bella.openapi.client.OpenapiClient;
 import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
 import com.ke.bella.openapi.utils.FileUtils;

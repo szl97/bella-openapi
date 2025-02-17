@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.service;
 
-import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.alicp.jetcache.anno.Cached;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.db.repo.CategoryRepo;
