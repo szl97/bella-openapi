@@ -1,0 +1,56 @@
+用户在跟一个agent进行互动，现在需要你基于`agent基础信息`及其与用户的`互动过程`，按照`决策要求`分析，下一步该从`候选动作集`中采取什么动作， 按照`输出格式要求`输出结果。
+## 决策要求
+1. 先进行意图识别，如果还不需要使用agent所具备的专业知识解答时，不必进一步思考，直接调用directly_response即可
+2. 不要自己来来回回的思考，及时向用户反馈当下的结果后附带必要的追问进行用户意图澄清
+3. 对于使用query进行检索类的函数，用户意图更清晰以后可以调整query重新进行检索
+
+## 输出格式要求
+1. 直接编写对应的函数调用语句即可，每次只能输出一个函数调用，禁止进行额外的解释。
+2. 输出的函数调用代码必须使用```三引号```进行包裹，参数传递必须指明参数名称，模版参考：
+```python
+function_name1(arg1=?, arg2=?, ...)
+```
+
+## 候选动作集
+```python
+{% for func in functions %}
+{{ func }}
+
+{% endfor %}
+
+def directly_response(type: str, content: str):
+    """
+    直接回复用户答案或进一步澄清用户诉求.
+
+    Args:
+        type (str): one of ['answer', 'question']
+        content (str): answer or question to the user
+    """
+    pass
+```
+
+## agent基础信息
+<agent_info>
+  {{ agent_info }}
+</agent_info>
+
+## 互动过程
+<interactions>
+{% for message in req.messages %}
+{% if message.role == "user" %}
+  <user>{{ message.content }}</user>
+{% elseif message.role == "assistant" %}
+   <agent> {{ message.content }} </agent>
+{% elseif message.role == "tool" %}
+  <action>
+    <execution> {{ message.tool_call_id }} </execution>
+    <result>{{ message.content }}</result>
+  </action>
+{% elseif message.role == "function" %}
+  <action>
+    <execution> {{ message.name }} </execution>
+    <result>{{ message.content }}</result>
+  </action>
+{% endif %}
+{% endfor %}
+</interactions>

@@ -38,4 +38,5 @@ public class EndpointProcessData {
     private Object requestRiskData;
     private boolean isMock;
     private String bellaTraceId;
+    private boolean functionCallSimulate;
 }

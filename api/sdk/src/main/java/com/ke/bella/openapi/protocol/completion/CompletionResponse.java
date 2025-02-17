@@ -1,15 +1,18 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
+import com.ke.bella.openapi.protocol.completion.Message.ToolCall;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Collection;
-import java.util.List;
 
 @Data
 @JsonInclude(Include.NON_NULL)
@@ -45,8 +48,36 @@ public class CompletionResponse extends OpenapiResponse {
 
     private TokenUsage usage;
 
+    public String message() {
+        if(CollectionUtils.isNotEmpty(choices)
+                && choices.get(0).getMessage() != null
+                && choices.get(0).getMessage().getContent() != null) {
+            return choices.get(0).getMessage().getContent().toString();
+        } else {
+            return "";
+        }
+    }
+
+    public String reasoning() {
+        if(CollectionUtils.isNotEmpty(choices) && choices.get(0).getMessage() != null) {
+            return choices.get(0).getMessage().getReasoning_content();
+        } else {
+            return "";
+        }
+    }
+
+    public String finishReason() {
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).getFinish_reason();
+        } else {
+            return null;
+        }
+    }
+
     @Data
     @JsonInclude(Include.NON_NULL)
+    @SuperBuilder
+    @NoArgsConstructor
     public static class Choice {
 
         /**
@@ -59,6 +90,27 @@ public class CompletionResponse extends OpenapiResponse {
         private String finish_reason;
         private int index;
         private Message message;
+    }
+
+    public static Choice toolcallChoice(List<ToolCall> calls) {
+        Choice c = Choice.builder()
+                .message(Message.builder()
+                        .role("tool")
+                        .tool_calls(calls)
+                        .build())
+                .build();
+        return c;
+    }
+
+    public static Choice assistantMessageChoice(String reasoning, String content) {
+        Choice c = Choice.builder()
+                .message(Message.builder()
+                        .role("assistant")
+                        .reasoning_content(reasoning)
+                        .content(content)
+                        .build())
+                .build();
+        return c;
     }
 
     @Data

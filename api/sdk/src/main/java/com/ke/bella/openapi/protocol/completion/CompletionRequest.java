@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.ke.bella.openapi.protocol.UserRequest;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 @Data
+@SuperBuilder
+@NoArgsConstructor
 public class CompletionRequest implements UserRequest, Serializable {
     private static final long serialVersionUID = 1L;
     /**

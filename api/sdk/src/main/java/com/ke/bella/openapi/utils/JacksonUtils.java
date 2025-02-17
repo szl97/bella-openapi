@@ -184,7 +184,7 @@ public class JacksonUtils {
 
         // 设置日期格式
         ObjectMapper objectMapper = new ObjectMapper();
-
+        objectMapper.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 序列化日期格式
