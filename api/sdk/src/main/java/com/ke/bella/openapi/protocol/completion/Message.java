@@ -93,7 +93,7 @@ public class Message {
 
         public static ToolCall fromFunctionName(String name) {
             return ToolCall.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(name)
                     .type("function")
                     .function(FunctionCall.builder().name(name).arguments("").build())
                     .build();
