@@ -43,7 +43,7 @@ public class ToolCallSimulator<T extends CompletionProperty> implements Completi
                     // 解析为function call，替换第一个choice
                     Choice choice = SimulationHepler.parse(resp.reasoning(), resp.content());
                     choice.setFinish_reason(resp.finishReason());
-                    resp.getChoices().add(0, choice);
+                    resp.getChoices().set(0, choice);
                 } catch (Exception e) {
                     LOGGER.info(resp.content(), e);
                 }
