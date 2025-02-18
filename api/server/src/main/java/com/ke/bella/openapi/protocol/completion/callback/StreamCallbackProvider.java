@@ -13,7 +13,7 @@ public class StreamCallbackProvider {
     public static Callbacks.StreamCompletionCallback provide(SseEmitter sse, EndpointProcessData processData, ApikeyInfo apikeyInfo,
             EndpointLogger logger, ISafetyCheckService<SafetyCheckRequest.Chat> safetyService, CompletionProperty property) {
         Callbacks.StreamCompletionCallbackNode root = new SplitReasoningCallback(property);
-        root.addLast(new ToolCallSimulatorCallback(property));
+        root.addLast(new ToolCallSimulatorCallback(processData));
         root.addLast(new MergeReasoningCallback(property));
         root.addLast(new StreamCompletionCallback(sse, processData, apikeyInfo, logger, safetyService));
         return root;
