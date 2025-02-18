@@ -1,9 +1,7 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.utils.SseHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +13,11 @@ public class ResponseHelper {
     public static final String END_THINK = "</think>";
 
     public static void splitReasoningFromContent(CompletionResponse rsp, OpenAIProperty property) {
-        if(!property.splitReasoningFromContent) {
+        if(!property.isSplitReasoningFromContent()) {
             return;
         }
-        if(CollectionUtils.isEmpty(rsp.getChoices()) || rsp.getChoices().get(0).getMessage() == null
-                || ObjectUtils.isEmpty(rsp.getChoices().get(0).getMessage().getContent())) {
-            return;
-        }
-        String content = rsp.getChoices().get(0).getMessage().getContent().toString();
-        if(!content.startsWith(START_THINK)) {
+        String content = rsp.content();
+        if(StringUtils.isEmpty(content) || !content.startsWith(START_THINK)) {
             return;
         }
         String[] parts = content.split(END_THINK);
@@ -32,8 +26,8 @@ public class ResponseHelper {
         }
         String reasonContent = parts[0].replace(START_THINK, "");
         content = parts[1];
-        rsp.getChoices().get(0).getMessage().setReasoning_content(reasonContent);
-        rsp.getChoices().get(0).getMessage().setContent(content);
+        rsp.setReasoning(reasonContent);
+        rsp.setContent(content);
     }
 
     public static CompletionResponse overwrite(CompletionResponse response, StreamCompletionResponse streamCompletionResponse) {
@@ -60,20 +54,20 @@ public class ResponseHelper {
         }
         Object contentObj = message.getContent();
         List<Message.ToolCall> toolCallList = message.getTool_calls();
-        if(contentObj != null) {
+        if(StringUtils.isNotEmpty(message.getReasoning_content())) {
+            if(target.getReasoning_content() == null) {
+                target.setReasoning_content(message.getReasoning_content());
+            } else {
+                target.setReasoning_content(target.getReasoning_content() + message.getReasoning_content());
+            }
+        } else if(contentObj != null) {
             String content = contentObj.toString();
             if(target.getContent() == null) {
                 target.setContent(content);
             } else {
                 target.setContent(target.getContent() + content);
             }
-        } else if(StringUtils.isNotEmpty(message.getReasoning_content())) {
-            if(target.getReasoning_content() == null) {
-                target.setReasoning_content(message.getReasoning_content());
-            } else {
-                target.setReasoning_content(target.getReasoning_content() + message.getReasoning_content());
-            }
-        } else if(CollectionUtils.isNotEmpty(toolCallList)) {
+        }  else if(CollectionUtils.isNotEmpty(toolCallList)) {
             if(target.getTool_calls() == null) {
                 target.setTool_calls(new ArrayList<>());
             }
@@ -105,27 +99,6 @@ public class ResponseHelper {
             }
         }
         return target;
-    }
-
-    public static StreamCompletionResponse rebuildThinkResp(StreamCompletionResponse thinkResp, Integer stage) {
-        StreamCompletionResponse response = new StreamCompletionResponse();
-        response.setCreated(thinkResp.getCreated());
-        response.setChoices(new ArrayList<>());
-        response.setUsage(thinkResp.getUsage());
-        response.setId(thinkResp.getId());
-        response.setModel(thinkResp.getModel());
-        Message thinkMessage = thinkResp.getChoices().get(0).getDelta();
-        Message message = new Message();
-        message.setName(thinkMessage.getName());
-        message.setContent(thinkMessage.getReasoning_content());
-        message.setReasoning_content(thinkMessage.getReasoning_content());
-        if(stage == 0) {
-            message.setContent("```sh\n" + message.getContent());
-        } else if(stage == -1) {
-            message.setContent("\n```\n" + thinkMessage.getContent());
-        }
-        response.getChoices().add(new StreamCompletionResponse.Choice("", 0, message));
-        return response;
     }
 
     public static Message.ToolCall copyToolCall(Message.ToolCall toolCall) {

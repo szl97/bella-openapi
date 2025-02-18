@@ -5,7 +5,7 @@ public class PunctuationUtils {
         if (input == null || input.isEmpty()) {
             return false;
         }
-        String regex = ".*[，；。,.?？！!]$";
+        String regex = "[\\s\\S]*[，；。,.?？！!]\\s*$";
         return input.matches(regex);
     }
 }

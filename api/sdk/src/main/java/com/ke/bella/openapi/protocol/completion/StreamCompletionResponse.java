@@ -1,19 +1,19 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.Message.ToolCall;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.util.Assert;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @SuperBuilder
@@ -40,23 +40,41 @@ public class StreamCompletionResponse extends OpenapiResponse {
 
     private List<Choice> choices;
 
-    public String reasoning() {
-        if(CollectionUtils.isNotEmpty(choices)
-                && choices.get(0).getDelta() != null
-                && choices.get(0).getDelta().getReasoning_content() != null) {
-            return choices.get(0).getDelta().getReasoning_content();
-        }
-        return "";
-    }
+    @JsonIgnore
+    private StreamCompletionResponse standardFormat;
 
     public String content() {
-        if(CollectionUtils.isNotEmpty(choices)
-                && choices.get(0).getDelta() != null
-                && choices.get(0).getDelta().getContent() != null) {
-            return choices.get(0).getDelta().getContent().toString();
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).content();
         } else {
             return "";
         }
+    }
+
+    public String reasoning() {
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).reasoning();
+        } else {
+            return "";
+        }
+    }
+
+    public List<ToolCall> toolCalls() {
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).getDelta().getTool_calls();
+        } else {
+            return null;
+        }
+    }
+
+    public void setContent(String content) {
+        Assert.notEmpty(choices, "choices must not be null");
+        choices.get(0).setContent(content);
+    }
+
+    public void setReasoning(String reasoning) {
+        Assert.notNull(choices, "choices must not be null");
+        choices.get(0).setReasoning(reasoning);
     }
 
     public String finishReason() {
@@ -90,6 +108,32 @@ public class StreamCompletionResponse extends OpenapiResponse {
         private String finish_reason;
         private int index;
         private Message delta;
+
+        public String content() {
+            if(delta != null && delta.getContent() != null) {
+                return delta.getContent().toString();
+            } else {
+                return "";
+            }
+        }
+
+        public String reasoning() {
+            if(delta != null) {
+                return delta.getReasoning_content();
+            } else {
+                return "";
+            }
+        }
+
+        public void setContent(String content) {
+            Assert.notNull(delta, "delta must not be null");
+            delta.setContent(content);
+        }
+
+        public void setReasoning(String reasoning) {
+            Assert.notNull(delta, "delta must not be null");
+            delta.setReasoning_content(reasoning);
+        }
     }
 
     public static List<Choice> toolcallChoice(ToolCall fc) {

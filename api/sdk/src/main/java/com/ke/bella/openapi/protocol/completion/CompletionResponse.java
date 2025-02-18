@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.util.Assert;
 
 @Data
 @JsonInclude(Include.NON_NULL)
@@ -48,19 +49,17 @@ public class CompletionResponse extends OpenapiResponse {
 
     private TokenUsage usage;
 
-    public String message() {
-        if(CollectionUtils.isNotEmpty(choices)
-                && choices.get(0).getMessage() != null
-                && choices.get(0).getMessage().getContent() != null) {
-            return choices.get(0).getMessage().getContent().toString();
+    public String content() {
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).content();
         } else {
             return "";
         }
     }
 
     public String reasoning() {
-        if(CollectionUtils.isNotEmpty(choices) && choices.get(0).getMessage() != null) {
-            return choices.get(0).getMessage().getReasoning_content();
+        if(CollectionUtils.isNotEmpty(choices)) {
+            return choices.get(0).reasoning();
         } else {
             return "";
         }
@@ -72,6 +71,16 @@ public class CompletionResponse extends OpenapiResponse {
         } else {
             return null;
         }
+    }
+
+    public void setContent(String content) {
+        Assert.notEmpty(choices, "choices must not be null");
+        choices.get(0).setContent(content);
+    }
+
+    public void setReasoning(String reasoning) {
+        Assert.notNull(choices, "choices must not be null");
+        choices.get(0).setReasoning(reasoning);
     }
 
     @Data
@@ -90,6 +99,32 @@ public class CompletionResponse extends OpenapiResponse {
         private String finish_reason;
         private int index;
         private Message message;
+
+        public String content() {
+            if(message != null && message.getContent() != null) {
+                return message.getContent().toString();
+            } else {
+                return "";
+            }
+        }
+
+        public String reasoning() {
+            if(message != null) {
+                return message.getReasoning_content();
+            } else {
+                return "";
+            }
+        }
+
+        public void setContent(String content) {
+            Assert.notNull(message, "message must not be null");
+            message.setContent(content);
+        }
+
+        public void setReasoning(String reasoning) {
+            Assert.notNull(message, "message must not be null");
+            message.setReasoning_content(reasoning);
+        }
     }
 
     public static Choice toolcallChoice(List<ToolCall> calls) {

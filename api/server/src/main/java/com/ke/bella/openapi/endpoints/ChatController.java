@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.endpoints;
 
+import com.ke.bella.openapi.protocol.completion.callback.StreamCallbackProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +17,7 @@ import com.ke.bella.openapi.protocol.completion.CompletionAdaptor;
 import com.ke.bella.openapi.protocol.completion.CompletionProperty;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
-import com.ke.bella.openapi.protocol.completion.StreamCompletionCallback;
+import com.ke.bella.openapi.protocol.completion.callback.StreamCompletionCallback;
 import com.ke.bella.openapi.protocol.completion.ToolCallSimulator;
 import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
@@ -74,7 +75,7 @@ public class ChatController {
         EndpointContext.setEncodingType(property.getEncodingType());
         if(request.isStream()) {
             SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, EndpointContext.getProcessData().getRequestId());
-            adaptor.streamCompletion(request, url, property, new StreamCompletionCallback(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService, property));
+            adaptor.streamCompletion(request, url, property, StreamCallbackProvider.provide(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService, property));
             return sse;
         }
 

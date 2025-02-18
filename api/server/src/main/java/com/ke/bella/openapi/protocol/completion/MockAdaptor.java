@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.protocol.completion.callback.StreamCompletionCallback;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import io.netty.util.concurrent.DefaultThreadFactory;
