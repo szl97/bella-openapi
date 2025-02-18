@@ -1,7 +1,5 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.ke.bella.openapi.EndpointContext;
@@ -12,8 +10,10 @@ import com.ke.bella.openapi.protocol.completion.CompletionResponse.Choice;
 import com.ke.bella.openapi.simulation.FunctionCallContentBuffer;
 import com.ke.bella.openapi.simulation.FunctionCallListener;
 import com.ke.bella.openapi.simulation.SimulationHepler;
-import com.ke.bella.openapi.utils.JacksonUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ToolCallSimulator<T extends CompletionProperty> implements CompletionAdaptor<T> {
 
     CompletionAdaptor<T> delegator;
@@ -46,8 +46,8 @@ public class ToolCallSimulator<T extends CompletionProperty> implements Completi
                     Choice choice = SimulationHepler.parse(resp.reasoning(), resp.message());
                     choice.setFinish_reason(resp.finishReason());
                     resp.getChoices().add(0, choice);
-                } catch (IOException e) {
-                    // no-op
+                } catch (Exception e) {
+                    LOGGER.info(resp.message(), e);
                 }
                 return resp;
             }

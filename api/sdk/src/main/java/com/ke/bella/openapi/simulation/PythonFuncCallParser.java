@@ -361,7 +361,11 @@ public class PythonFuncCallParser {
         ArrayList<Object> list = new ArrayList<>();
         do {
             skipWhitespace();
-            list.add(parseValue());
+            if(currentChar != ']') {
+                list.add(parseValue());
+            } else {
+                break;
+            }
         } while (tryConsume(','));
         expect(']');
         return list;
@@ -401,7 +405,7 @@ public class PythonFuncCallParser {
 
     private boolean tryParseDirectlyResponse() throws IOException {
         buffer.setLength(0);
-        while (Character.isLetterOrDigit(currentChar) || currentChar == '_') {
+        while (Character.isLetterOrDigit(currentChar) || currentChar == '_' || currentChar == '-') {
             buffer.append((char) currentChar);
             advance();
         }
