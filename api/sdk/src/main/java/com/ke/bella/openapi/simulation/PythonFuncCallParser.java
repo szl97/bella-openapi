@@ -186,10 +186,14 @@ public class PythonFuncCallParser {
         do {
             Map<String, Object> ref = currentDict;
             skipWhitespace();
-            String key = parseString();
-            expect(':');
-            Object value = parseValue();
-            ref.put(key, value);
+            if(currentChar == '}') {
+                break;
+            } else {
+                String key = parseString();
+                expect(':');
+                Object value = parseValue();
+                ref.put(key, value);
+            }
         } while (tryConsume(','));
 
         expect('}');

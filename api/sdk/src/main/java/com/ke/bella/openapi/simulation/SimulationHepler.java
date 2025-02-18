@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.remoting.rmi.CodebaseAwareObjectInputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -228,5 +229,10 @@ public class SimulationHepler {
             this.declaration = declaration;
             this.description = description;
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        String code = "```python\nadd_itinerary_v2(matters=\"业务会议\", location=\"公司会议室\", happenTime=\"2023-10-0610:00\", endTime=\"2023-10-0612:00\", date=\"2023-10-06\", time=\"10:00\", userInfo={})\n```";
+        parse("", code);
     }
 }
