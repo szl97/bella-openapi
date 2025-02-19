@@ -17,6 +17,8 @@ public class KeQueueService {
     String putTaskUrl;
     @Value("${queue.get.task.result.url:null}")
     String getTaskResultUrl;
+    @Value("${bella.file.url:null}")
+    String fileUrl;
 
     public QueueTaskPutResp putTask(Object task, String endpoint, String model, String auth) {
         String url = putTaskUrl;
@@ -29,7 +31,11 @@ public class KeQueueService {
                 .model(model)
                 .build();
 
-        Request request = buildRequest(req, url, auth);
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", auth)
+                .post(RequestBody.create(JacksonUtils.serialize(req), MediaType.parse("application/json")))
+                .build();
         return HttpUtils.httpRequest(request, QueueTaskPutResp.class);
     }
 
@@ -44,7 +50,10 @@ public class KeQueueService {
             QueueTaskGetResultReq req = QueueTaskGetResultReq.builder()
                     .taskId(taskId)
                     .build();
-            Request request = buildRequest(req, url, auth);
+            Request request = new Request.Builder().url(url)
+                    .addHeader("Authorization", auth)
+                    .post(RequestBody.create(JacksonUtils.serialize(req), MediaType.parse("application/json")))
+                    .build();
             // todo queue batch get
             TaskGetDetailResp taskGetDetailResp = HttpUtils.httpRequest(request, TaskGetDetailResp.class);
             DetailData data = taskGetDetailResp.getData();
@@ -55,22 +64,19 @@ public class KeQueueService {
             String outputFileId = data.getOutputFileId();
             if (outputData != null) {
                 result.add(outputData);
-            } else if (outputFileId != null) {
-                // TODO: 处理文件
-                result.add(outputFileId);
+            } else if (outputFileId != null && !outputFileId.isEmpty()) {
+                Request requestFile = new Request.Builder()
+                        .url(fileUrl + "/" + outputFileId + "/content")
+                        .addHeader("Authorization", auth)
+                        .get()
+                        .build();
+                outputData = HttpUtils.httpRequest(requestFile, Object.class);
+                result.add(outputData);
             }
         }
 
         return QueueTaskGetResultResp.builder()
                 .data(result)
                 .build();
-    }
-
-    private Request buildRequest(Object request, String url, String auth) {
-        Request.Builder builder = new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", auth)
-                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(request)));
-        return builder.build();
     }
 }

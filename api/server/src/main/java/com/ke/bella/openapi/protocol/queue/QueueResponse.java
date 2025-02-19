@@ -51,9 +51,9 @@ public class QueueResponse {
         private Object inputData;
         private String status;
         private String ak;
-        @JsonProperty("input_fileid")
+        @JsonProperty("input_file_id")
         private String inputFileId;
-        @JsonProperty("output_fileid")
+        @JsonProperty("output_file_id")
         private String outputFileId;
         @JsonProperty("output_data")
         private Object outputData;

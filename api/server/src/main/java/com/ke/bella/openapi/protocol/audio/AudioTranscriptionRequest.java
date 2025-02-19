@@ -145,6 +145,7 @@ public class AudioTranscriptionRequest {
     @Data
     public static class AudioTranscriptionResultReq {
         @NotEmpty
+        @JsonProperty("task_id")
         private List<String> taskId;
     }
 }
