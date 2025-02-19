@@ -34,7 +34,7 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
     public CompletionResponse completion(CompletionRequest request, String url, AwsProperty property) {
         request.setModel(property.deployName);
         ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request);
-        BedrockRuntimeClient client = AwsClientManager.client(property.region, property.auth.getApiKey(), property.auth.getSecret());
+        BedrockRuntimeClient client = AwsClientManager.client(property.region, url, property.auth.getApiKey(), property.auth.getSecret());
         try {
             ConverseResponse response = client.converse(awsRequest);
             return AwsCompletionConverter.convert2OpenAIResponse(response);
@@ -48,7 +48,7 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
             StreamCompletionCallback callback) {
         request.setModel(property.deployName);
         ConverseStreamRequest awsRequest = AwsCompletionConverter.convert2AwsStreamRequest(request);
-        BedrockRuntimeAsyncClient client = AwsClientManager.asyncClient(property.region, property.auth.getApiKey(), property.auth.getSecret());
+        BedrockRuntimeAsyncClient client = AwsClientManager.asyncClient(property.region, url, property.auth.getApiKey(), property.auth.getSecret());
         AwsSseCompletionCallBack awsCallBack = new AwsSseCompletionCallBack(callback);
         client.converseStream(awsRequest, ConverseStreamResponseHandler.builder()
                 .subscriber(awsCallBack)

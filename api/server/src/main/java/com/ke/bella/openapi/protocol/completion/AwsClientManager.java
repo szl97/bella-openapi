@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,20 +24,22 @@ public class AwsClientManager {
 
     private static final Map<String, AwsAuthorizationProvider> authCache = new ConcurrentHashMap<>();
 
-    public static BedrockRuntimeClient client(String region, String accessKeyId, String secretKey) {
+    public static BedrockRuntimeClient client(String region, String endpoint, String accessKeyId, String secretKey) {
         return httpCache.computeIfAbsent(region, k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(accessKeyId, k -> BedrockRuntimeClient.builder()
-                    .credentialsProvider(provide(accessKeyId, secretKey))
-                    .region(Region.of(region))
-                    .build());
+                        .endpointOverride(URI.create(endpoint))
+                        .credentialsProvider(provide(accessKeyId, secretKey))
+                        .region(Region.of(region))
+                        .build());
     }
 
-    public static BedrockRuntimeAsyncClient asyncClient(String region, String accessKeyId, String secretKey) {
+    public static BedrockRuntimeAsyncClient asyncClient(String region, String endpoint, String accessKeyId, String secretKey) {
         return asyncCache.computeIfAbsent(region, k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(accessKeyId, k -> BedrockRuntimeAsyncClient.builder()
-                    .credentialsProvider(provide(accessKeyId, secretKey))
-                    .region(Region.of(region))
-                    .build());
+                        .endpointOverride(URI.create(endpoint))
+                        .credentialsProvider(provide(accessKeyId, secretKey))
+                        .region(Region.of(region))
+                        .build());
     }
 
     private static AwsAuthorizationProvider provide(String accessKeyId, String secretKey) {
