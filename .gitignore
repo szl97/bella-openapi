@@ -68,3 +68,7 @@ web/yarn-error.log*
 
 
 api/config-cache/bella-openapi/config-cache/bella-openapi\+default\+application.properties
+
+api/mysql/data/
+
+api/redis/data/
