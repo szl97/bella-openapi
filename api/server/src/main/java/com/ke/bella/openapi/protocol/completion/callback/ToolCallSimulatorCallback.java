@@ -11,6 +11,9 @@ import com.ke.bella.openapi.simulation.FunctionCallContentBuffer;
 import com.ke.bella.openapi.simulation.FunctionCallListener;
 import com.ke.bella.openapi.simulation.SimulationHepler;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbackNode {
     private final FunctionCallContentBuffer buffer;
     private final EndpointProcessData endpointProcessData;
@@ -42,8 +45,9 @@ public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbac
                         }
                     });
                 } catch (Throwable e) {
-                    next.finish(ChannelException.fromException(e));
-                    e.printStackTrace();
+                    next.done();
+                    next.finish();
+                    LOGGER.warn("faild to parse function call, buffer: {}", buffer.toString(), e);
                 }
             });
         } finally {

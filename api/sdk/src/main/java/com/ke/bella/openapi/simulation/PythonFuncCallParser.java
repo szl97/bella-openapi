@@ -274,8 +274,7 @@ public class PythonFuncCallParser {
                     buffer.append((char) currentChar);
                     break;
                 default:
-                    // 处理其他转义或抛出异常
-                    throw new RuntimeException("Invalid escape character: " + (char) currentChar);
+                    buffer.append((char) currentChar);
                 }
                 advance();
             } else {
@@ -307,18 +306,27 @@ public class PythonFuncCallParser {
                 advance(); // 跳过反斜杠
                 switch (currentChar) {
                 case 'n':
+                    buffer.append('\n');
+                    break;
                 case 't':
+                    buffer.append('\t');
+                    break;
                 case 'r':
+                    buffer.append('\r');
+                    break;
                 case 'b':
+                    buffer.append('\b');
+                    break;
                 case 'f':
+                    buffer.append('\f');
+                    break;
                 case '\'':
                 case '"':
                 case '\\':
-                    buffer.append('\\').append((char) currentChar);
+                    buffer.append((char) currentChar);
                     break;
                 default:
-                    // 处理其他转义或抛出异常
-                    throw new RuntimeException("Invalid escape character: " + (char) currentChar);
+                    buffer.append((char) currentChar);
                 }
                 advanceUnBlock();
             } else {

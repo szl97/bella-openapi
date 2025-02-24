@@ -12,14 +12,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.remoting.rmi.CodebaseAwareObjectInputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
+import com.ke.bella.openapi.protocol.completion.CompletionResponse.Choice;
 import com.ke.bella.openapi.protocol.completion.Message;
 import com.ke.bella.openapi.protocol.completion.Message.Function;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.Renders;
 
 public class SimulationHepler {
@@ -232,7 +233,12 @@ public class SimulationHepler {
     }
 
     public static void main(String[] args) throws IOException {
-        String code = "```python\nadd_itinerary_v2(matters=\"业务会议\", location=\"公司会议室\", happenTime=\"2023-10-0610:00\", endTime=\"2023-10-0612:00\", date=\"2023-10-06\", time=\"10:00\", userInfo={})\n```";
-        parse("", code);
+        String code = "```python\ndirectly_response(type=\"公司会议室\", content=\"业务\\\u1233会议\")\n```";
+        Choice c = parse("", code);
+        if(c.getMessage().getTool_calls() != null) {
+            System.out.println(c.getMessage().getTool_calls().get(0).getFunction().getArguments());
+        } else {
+            System.out.println(c.getMessage().getContent());
+        }
     }
 }

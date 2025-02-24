@@ -1,13 +1,9 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse.Choice;
 import com.ke.bella.openapi.simulation.SimulationHepler;
-
-import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 

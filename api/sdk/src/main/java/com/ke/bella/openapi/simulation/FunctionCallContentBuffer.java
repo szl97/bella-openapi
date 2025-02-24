@@ -66,4 +66,9 @@ public class FunctionCallContentBuffer extends Reader {
         writingCompleted = true;
         notifyAll();
     }
+
+    @Override
+    public String toString() {
+        return sb.toString();
+    }
 }
