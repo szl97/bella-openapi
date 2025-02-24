@@ -233,7 +233,7 @@ public class SimulationHepler {
     }
 
     public static void main(String[] args) throws IOException {
-        String code = "```python\ndirectly_response(type=\"公司会议室\", content=\"业务\\\u1233会议\")\n```";
+        String code = "```python\ndirectly_response(type=\"公司会议室\", content=\"业务\\\u1233会议\"\n)\n```";
         Choice c = parse("", code);
         if(c.getMessage().getTool_calls() != null) {
             System.out.println(c.getMessage().getTool_calls().get(0).getFunction().getArguments());

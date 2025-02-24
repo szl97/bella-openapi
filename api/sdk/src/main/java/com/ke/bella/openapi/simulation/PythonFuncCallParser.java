@@ -107,6 +107,7 @@ public class PythonFuncCallParser {
         parseRespTypeArg();
         expect(',');
         parseContentArg();
+        skipWhitespace();
         expect(')');
     }
 
@@ -119,6 +120,7 @@ public class PythonFuncCallParser {
             stateStack.push(ParseState.IN_ARGUMENTS);
             parseArguments();
         }
+        skipWhitespace();
         expect(')');
         listner.onFunctionCallExit();
     }
