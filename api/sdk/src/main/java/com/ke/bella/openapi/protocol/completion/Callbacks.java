@@ -1,8 +1,10 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.common.exception.ChannelException;
-import okhttp3.Response;
 import org.springframework.util.Assert;
+
+import com.ke.bella.openapi.common.exception.ChannelException;
+
+import okhttp3.Response;
 
 public interface Callbacks {
 
@@ -12,6 +14,8 @@ public interface Callbacks {
     }
 
     interface StreamCompletionCallback extends Callbacks {
+        void onOpen();
+
         void callback(StreamCompletionResponse msg);
 
         void done();
@@ -34,6 +38,11 @@ public interface Callbacks {
 
         public StreamCompletionCallbackNode() {
 
+        }
+
+        @Override
+        public void onOpen() {
+            next.onOpen();
         }
 
         @Override

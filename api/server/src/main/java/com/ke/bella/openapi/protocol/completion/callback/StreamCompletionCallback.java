@@ -1,5 +1,13 @@
 package com.ke.bella.openapi.protocol.completion.callback;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
@@ -15,15 +23,9 @@ import com.ke.bella.openapi.safety.SafetyCheckRequest;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.PunctuationUtils;
 import com.ke.bella.openapi.utils.SseHelper;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 public class StreamCompletionCallback implements Callbacks.StreamCompletionCallback {
@@ -39,7 +41,8 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
     private Long firstPackageTime;
     private Object requestRiskData;
     private Integer safetyCheckIndex;
-    private Integer thinkStage = 0; // 0: 推理未开始; 1: 推理开始; 2: 推理进行中；3: 推理完成；-1:推理已结束
+    private Integer thinkStage = 0; // 0: 推理未开始; 1: 推理开始; 2: 推理进行中；3:推理完成；-1:推理已结束
+
     public StreamCompletionCallback(SseEmitter sse, EndpointProcessData processData, ApikeyInfo apikeyInfo,
             EndpointLogger logger, ISafetyCheckService<SafetyCheckRequest.Chat> safetyService) {
         this.sse = sse;
@@ -52,6 +55,11 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
         responseBuffer.setCreated(DateTimeUtils.getCurrentSeconds());
         this.choiceBuffer = new HashMap<>();
         this.requestRiskData = processData.getRequestRiskData();
+    }
+
+    @Override
+    public void onOpen() {
+
     }
 
     @Override

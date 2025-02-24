@@ -29,6 +29,7 @@ public class CompletionSseListener extends EventSourceListener {
 
     @Override
     public void onOpen(EventSource eventSource, Response response) {
+        callback.onOpen();
         this.connectionInitFuture.complete(null);
     }
 
