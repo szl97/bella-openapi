@@ -110,7 +110,7 @@ public class SimulationHepler {
             String description = func.getDescription() != null ? func.getDescription() : "";
 
             // Parameter processing
-            Function.FunctionParameter functionParam = func.getParameters();
+            Function.FunctionParameter functionParam = func.getParameters() == null ? new Function.FunctionParameter() : func.getParameters();
             List<String> requiredParams = functionParam.getRequired() != null ? functionParam.getRequired() : new ArrayList<>();
 
             // Convert properties Object to JsonNode for easier processing
