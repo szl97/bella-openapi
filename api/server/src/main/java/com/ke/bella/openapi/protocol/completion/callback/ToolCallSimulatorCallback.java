@@ -82,7 +82,6 @@ public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbac
     @Override
     public void finish() {
         buffer.finish();
-
     }
 
     @Override

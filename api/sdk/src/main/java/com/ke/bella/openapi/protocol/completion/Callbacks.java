@@ -14,6 +14,7 @@ public interface Callbacks {
     }
 
     interface StreamCompletionCallback extends Callbacks {
+
         void onOpen();
 
         void callback(StreamCompletionResponse msg);

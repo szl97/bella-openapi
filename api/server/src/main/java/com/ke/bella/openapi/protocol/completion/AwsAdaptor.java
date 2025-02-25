@@ -57,18 +57,30 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
                 .build());
     }
 
-    @AllArgsConstructor
-    static class AwsSseCompletionCallBack implements ConverseStreamResponseHandler.Visitor, Consumer<Throwable>, Runnable {
-        private Callbacks.StreamCompletionCallback callback;
 
+    static class AwsSseCompletionCallBack implements ConverseStreamResponseHandler.Visitor, Consumer<Throwable>, Runnable {
+        public AwsSseCompletionCallBack(StreamCompletionCallback callback) {
+            this.callback = callback;
+        }
+
+        private final Callbacks.StreamCompletionCallback callback;
+        private volatile boolean isFirst = true;
         @Override
         public void visitContentBlockStart(ContentBlockStartEvent event) {
+            if(isFirst) {
+                callback.onOpen();
+                isFirst = false;
+            }
             StreamCompletionResponse response = AwsCompletionConverter.convert2OpenAIStreamResponse(event.start(), event.contentBlockIndex());
             callback.callback(response);
         }
 
         @Override
         public void visitContentBlockDelta(ContentBlockDeltaEvent event) {
+            if(isFirst) {
+                callback.onOpen();
+                isFirst = false;
+            }
             StreamCompletionResponse response = AwsCompletionConverter.convert2OpenAIStreamResponse(event.delta(), event.contentBlockIndex());
             callback.callback(response);
         }
