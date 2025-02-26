@@ -130,7 +130,7 @@ public class CompletionResponse extends OpenapiResponse {
     public static Choice toolcallChoice(List<ToolCall> calls) {
         Choice c = Choice.builder()
                 .message(Message.builder()
-                        .role("tool")
+                        .role("assistant")
                         .tool_calls(calls)
                         .build())
                 .build();
