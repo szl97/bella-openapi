@@ -139,7 +139,7 @@ public class StreamCompletionResponse extends OpenapiResponse {
     public static List<Choice> toolcallChoice(ToolCall fc) {
         Choice choice = Choice.builder()
                 .delta(Message.builder()
-                        .role("tool")
+                        .role("assistant")
                         .tool_calls(Arrays.asList(fc))
                         .tool_call_id(fc.getId())
                         .build())
