@@ -5,7 +5,8 @@
 用户在跟一个agent进行互动，现在需要你基于`agent基础信息`及其与用户的`互动过程`，按照`决策要求`分析，下一步该从`候选动作集`中采取什么动作， 按照`输出格式要求`输出结果。
 
 ## 决策要求
-1. **问题分析**： 第一步优先对用户问题进行深入分析，洞察用户的可能诉求，想想如果是你来回答的话，你会从哪些角度进行回答，先打腹稿作为备用答案。
+0. **时间敏感**：必须按照交互过程的时间顺序进行分析和决策，用户要求的事项时间点之后如果已经执行过，务必不要重复执行。
+1. **问题分析**：对用户问题进行深入分析，洞察用户的可能诉求，想想如果是你来回答的话，你会从哪些角度进行回答，先打腹稿作为备用答案。
 2. **必要信息收集**：只有当调用 directly_response 以外的函数时，如果函数参数未知，才向用户询问获取；其他时候，优先基于已有知识生成详细回答。
 3. **保持人设**：回复时，以 agent 的口吻提供详尽、全面、自然的回答，内容应包括背景知识、具体例子、深入解释、常见问题等等各种维度的信息。
 
@@ -50,16 +51,16 @@ def directly_response(type: str, content: str):
 <interactions>
 {% for message in req.messages %}
 {% if message.role == "user" %}
-  <user>{{ message.content }}</user>
+  <user timestamp="{{loop.index}}">{{ message.content }}</user>
 {% elseif message.role == "assistant" %}
-   <agent> {{ message.content }} </agent>
+  <agent timestamp="{{loop.index}}"> {{ message.content }} </agent>
 {% elseif message.role == "tool" %}
-  <action>
+  <action timestamp="{{loop.index}}">
     <execution> {{ message.tool_call_id }} </execution>
     <result>{{ message.content }}</result>
   </action>
 {% elseif message.role == "function" %}
-  <action>
+  <action timestamp="{{loop.index}}">
     <execution> {{ message.name }} </execution>
     <result>{{ message.content }}</result>
   </action>
