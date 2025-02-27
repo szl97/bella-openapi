@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.google.common.collect.ImmutableSortedMap;
 import com.ke.bella.openapi.protocol.IModelFeatures;
 import lombok.Data;
 
@@ -16,7 +15,6 @@ public class CompletionModelFeatures implements IModelFeatures {
     private boolean vision;
     private boolean json_format;
     private boolean json_schema;
-    private boolean agent_thought;
     private boolean reason_content;
 
     @Override
@@ -29,7 +27,6 @@ public class CompletionModelFeatures implements IModelFeatures {
         desc.put("vision", "是否支持视觉");
         desc.put("json_format", "是否支持JSON格式的输出");
         desc.put("json_schema", "是否支持JSON Schema的输出");
-        desc.put("agent_thought", "是否支持Agent thought的输出");
         desc.put("reason_content", "是否支持思考过程的输出");
         return desc;
     }

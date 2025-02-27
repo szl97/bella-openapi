@@ -6,6 +6,7 @@ import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.ImageUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import software.amazon.awssdk.core.SdkBytes;
@@ -22,6 +23,8 @@ import software.amazon.awssdk.services.bedrockruntime.model.ImageBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.ImageSource;
 import software.amazon.awssdk.services.bedrockruntime.model.InferenceConfiguration;
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
+import software.amazon.awssdk.services.bedrockruntime.model.ReasoningContentBlock;
+import software.amazon.awssdk.services.bedrockruntime.model.ReasoningTextBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.SystemContentBlock;
 import software.amazon.awssdk.services.bedrockruntime.model.TokenUsage;
 import software.amazon.awssdk.services.bedrockruntime.model.ToolConfiguration;
@@ -43,6 +46,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AwsCompletionConverter {
+
     /**
      * system message是单独的
      * 只有两个role， user和assistant
@@ -55,36 +59,55 @@ public class AwsCompletionConverter {
      *
      * @return
      */
-    public static ConverseRequest convert2AwsRequest(CompletionRequest openAIRequest) {
+    public static ConverseRequest convert2AwsRequest(CompletionRequest openAIRequest, AwsProperty property) {
         Pair<List<SystemContentBlock>, List<Message>> pair = generateMsg(openAIRequest.getMessages());
         try {
-            return ConverseRequest
+            rewriteMaxTokens(openAIRequest, property);
+            ConverseRequest.Builder builder = ConverseRequest
                     .builder()
                     .modelId(openAIRequest.getModel())
                     .system(pair.getLeft().isEmpty() ? null : pair.getLeft())
                     .messages(pair.getRight())
                     .inferenceConfig(convert2AwsReqConfig(openAIRequest))
                     .toolConfig(CollectionUtils.isEmpty(openAIRequest.getTools()) ? null :
-                            convert2AwsTool(openAIRequest.getTools())).build();
+                            convert2AwsTool(openAIRequest.getTools()));
+            if(MapUtils.isNotEmpty(property.additionalParams)) {
+                builder.additionalModelRequestFields(convertObjectToDocument(property.additionalParams));
+            }
+            return builder.build();
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid arguments");
         }
     }
 
-    public static ConverseStreamRequest convert2AwsStreamRequest(CompletionRequest openAIRequest) {
+    public static ConverseStreamRequest convert2AwsStreamRequest(CompletionRequest openAIRequest, AwsProperty property) {
         try {
+            rewriteMaxTokens(openAIRequest, property);
             Pair<List<SystemContentBlock>, List<software.amazon.awssdk.services.bedrockruntime.model.Message>> pair = generateMsg(
                     openAIRequest.getMessages());
-            return ConverseStreamRequest
+            ConverseStreamRequest.Builder builder = ConverseStreamRequest
                     .builder()
                     .modelId(openAIRequest.getModel())
                     .system(pair.getLeft().isEmpty() ? null : pair.getLeft())
                     .messages(pair.getRight())
                     .inferenceConfig(convert2AwsReqConfig(openAIRequest))
-                    .toolConfig(CollectionUtils.isEmpty(openAIRequest.getTools()) ? null : convert2AwsTool(openAIRequest.getTools()))
-                    .build();
+                    .toolConfig(CollectionUtils.isEmpty(openAIRequest.getTools()) ? null : convert2AwsTool(openAIRequest.getTools()));
+            if(MapUtils.isNotEmpty(property.additionalParams)) {
+                builder.additionalModelRequestFields(convertObjectToDocument(property.additionalParams));
+            }
+            return builder.build();
         } catch (Exception e) {
             throw new IllegalArgumentException("invalid arguments");
+        }
+    }
+
+    private static void rewriteMaxTokens(CompletionRequest openAIRequest, AwsProperty property) {
+        if(property.supportThink) {
+            int maxTokens = property.defaultMaxTokens;
+            if(openAIRequest.getMax_tokens() != null) {
+                maxTokens = Integer.min(openAIRequest.getMax_tokens() + property.budgetTokens, maxTokens);
+            }
+            openAIRequest.setMax_tokens(maxTokens);
         }
     }
 
@@ -103,6 +126,7 @@ public class AwsCompletionConverter {
         com.ke.bella.openapi.protocol.completion.Message openAiMsg = new com.ke.bella.openapi.protocol.completion.Message();
         openAiMsg.setRole("assistant");
         openAiMsg.setContent(convert2OpenAIContent(message.content()));
+        openAiMsg.setReasoning_content(convert2OpenAIReasoningContent(message.content()));
         openAiMsg.setTool_calls(convert2OpenAIToolCall(message.content()));
         CompletionResponse.Choice choice = new CompletionResponse.Choice();
         choice.setMessage(openAiMsg);
@@ -154,6 +178,8 @@ public class AwsCompletionConverter {
             fc.setArguments(toolUseBlock.input());
             toolCall.setFunction(fc);
             openAiMsg.setTool_calls(Lists.newArrayList(toolCall));
+        } else if(response.reasoningContent() != null) {
+            openAiMsg.setReasoning_content(response.reasoningContent().text());
         }
         StreamCompletionResponse.Choice choice = new StreamCompletionResponse.Choice();
         choice.setDelta(openAiMsg);
@@ -175,6 +201,15 @@ public class AwsCompletionConverter {
 
     private static Object convert2OpenAIContent(List<ContentBlock> contentBlocks) {
         return contentBlocks.stream().map(ContentBlock::text).filter(Objects::nonNull).findAny().orElse("");
+    }
+
+    private static String convert2OpenAIReasoningContent(List<ContentBlock> contentBlocks) {
+        return contentBlocks.stream().map(ContentBlock::reasoningContent).filter(Objects::nonNull)
+                .map(ReasoningContentBlock::reasoningText)
+                .filter(Objects::nonNull)
+                .map(ReasoningTextBlock::text)
+                .filter(Objects::nonNull)
+                .findAny().orElse(null);
     }
 
     private static List<com.ke.bella.openapi.protocol.completion.Message.ToolCall> convert2OpenAIToolCall(List<ContentBlock> contentBlocks) {

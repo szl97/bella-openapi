@@ -3,6 +3,8 @@ package com.ke.bella.openapi.protocol.completion;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
@@ -20,6 +22,8 @@ import java.util.function.Consumer;
 @Component("AwsCompletion")
 public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
 
+    private static final Logger log = LoggerFactory.getLogger(AwsAdaptor.class);
+
     @Override
     public String getDescription() {
         return "亚马逊协议";
@@ -33,7 +37,7 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, AwsProperty property) {
         request.setModel(property.deployName);
-        ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request);
+        ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request, property);
         BedrockRuntimeClient client = AwsClientManager.client(property.region, url, property.auth.getApiKey(), property.auth.getSecret());
         try {
             ConverseResponse response = client.converse(awsRequest);
@@ -47,14 +51,18 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
     public void streamCompletion(CompletionRequest request, String url, AwsProperty property,
             StreamCompletionCallback callback) {
         request.setModel(property.deployName);
-        ConverseStreamRequest awsRequest = AwsCompletionConverter.convert2AwsStreamRequest(request);
+        ConverseStreamRequest awsRequest = AwsCompletionConverter.convert2AwsStreamRequest(request, property);
         BedrockRuntimeAsyncClient client = AwsClientManager.asyncClient(property.region, url, property.auth.getApiKey(), property.auth.getSecret());
         AwsSseCompletionCallBack awsCallBack = new AwsSseCompletionCallBack(callback);
-        client.converseStream(awsRequest, ConverseStreamResponseHandler.builder()
-                .subscriber(awsCallBack)
-                .onError(awsCallBack)
-                .onComplete(awsCallBack)
-                .build());
+        try {
+            client.converseStream(awsRequest, ConverseStreamResponseHandler.builder()
+                    .subscriber(awsCallBack)
+                    .onError(awsCallBack)
+                    .onComplete(awsCallBack)
+                    .build());
+        } catch (Exception bedrockException) {
+            log.info("sse异常,{}", bedrockException.getMessage());
+        }
     }
 
 

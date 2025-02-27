@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbackNode {
     private final FunctionCallContentBuffer buffer;
     private final EndpointProcessData endpointProcessData;
+    private boolean isOpen;
 
     public ToolCallSimulatorCallback(EndpointProcessData endpointProcessData) {
         this.endpointProcessData = endpointProcessData;
@@ -50,6 +51,7 @@ public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbac
                     LOGGER.warn("faild to parse function call, buffer: {}", buffer.toString(), e);
                 }
             });
+            isOpen = true;
         } finally {
             next.onOpen();
         }
@@ -86,6 +88,10 @@ public class ToolCallSimulatorCallback extends Callbacks.StreamCompletionCallbac
 
     @Override
     public void finish(ChannelException exception) {
-        buffer.finish();
+        if(isOpen) {
+            buffer.finish();
+        } else {
+            next.finish(exception);
+        }
     }
 }
