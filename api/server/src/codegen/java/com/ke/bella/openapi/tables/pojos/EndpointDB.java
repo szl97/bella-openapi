@@ -31,6 +31,7 @@ public class EndpointDB implements Operator, Serializable {
     private String        muName;
     private LocalDateTime ctime;
     private LocalDateTime mtime;
+    private String        documentUrl;
 
     public EndpointDB() {}
 
@@ -48,6 +49,7 @@ public class EndpointDB implements Operator, Serializable {
         this.muName = value.muName;
         this.ctime = value.ctime;
         this.mtime = value.mtime;
+        this.documentUrl = value.documentUrl;
     }
 
     public EndpointDB(
@@ -63,7 +65,8 @@ public class EndpointDB implements Operator, Serializable {
         Long          muid,
         String        muName,
         LocalDateTime ctime,
-        LocalDateTime mtime
+        LocalDateTime mtime,
+        String        documentUrl
     ) {
         this.id = id;
         this.endpoint = endpoint;
@@ -78,6 +81,7 @@ public class EndpointDB implements Operator, Serializable {
         this.muName = muName;
         this.ctime = ctime;
         this.mtime = mtime;
+        this.documentUrl = documentUrl;
     }
 
     /**
@@ -262,6 +266,20 @@ public class EndpointDB implements Operator, Serializable {
         this.mtime = mtime;
     }
 
+    /**
+     * Getter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public String getDocumentUrl() {
+        return this.documentUrl;
+    }
+
+    /**
+     * Setter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("EndpointDB (");
@@ -279,6 +297,7 @@ public class EndpointDB implements Operator, Serializable {
         sb.append(", ").append(muName);
         sb.append(", ").append(ctime);
         sb.append(", ").append(mtime);
+        sb.append(", ").append(documentUrl);
 
         sb.append(")");
         return sb.toString();

@@ -60,7 +60,8 @@ public class MetadataValidator {
             }
             Assert.isTrue(StringUtils.isNotBlank(op.getEndpointName())
                     || StringUtils.isNotBlank(op.getMaintainerCode())
-                    || StringUtils.isNotBlank(op.getMaintainerName()), "可修改字段全部为空，无法修改");
+                    || StringUtils.isNotBlank(op.getMaintainerName())
+                    || StringUtils.isNotBlank(op.getDocumentUrl()), "可修改字段全部为空，无法修改");
         }
         if(StringUtils.isNotEmpty(op.getEndpointName())) {
             Assert.isTrue(isTextStart(op.getEndpointName()), "能力点名称不可以数字/特殊字符/空格开头");
@@ -71,6 +72,10 @@ public class MetadataValidator {
         }
         if(StringUtils.isNotEmpty(op.getMaintainerName())) {
             Assert.isTrue(isAllText(op.getMaintainerName()), "姓名不可以包含数字/特殊字符/空格开头");
+        }
+        if(StringUtils.isNotEmpty(op.getDocumentUrl())) {
+            Assert.isTrue(isValidURL(op.getDocumentUrl()), "文档地址必须是有效的URL");
+            Assert.isTrue(op.getDocumentUrl().length() <= 255, "文档地址长度不能超过255");
         }
     }
 

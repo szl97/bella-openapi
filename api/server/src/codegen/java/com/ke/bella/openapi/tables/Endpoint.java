@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row13;
+import org.jooq.Row14;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -116,6 +116,11 @@ public class Endpoint extends TableImpl<EndpointRecord> {
      */
     public final TableField<EndpointRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
 
+    /**
+     * The column <code>endpoint.document_url</code>. 文档地址
+     */
+    public final TableField<EndpointRecord, String> DOCUMENT_URL = createField(DSL.name("document_url"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "文档地址");
+
     private Endpoint(Name alias, Table<EndpointRecord> aliased) {
         this(alias, aliased, null);
     }
@@ -201,11 +206,11 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row13 type methods
+    // Row14 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 }

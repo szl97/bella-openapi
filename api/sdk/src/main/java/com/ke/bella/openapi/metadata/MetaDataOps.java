@@ -22,6 +22,7 @@ public class MetaDataOps {
         private String endpointName;
         private String maintainerCode;
         private String maintainerName;
+        private String documentUrl;
     }
 
     @EqualsAndHashCode(callSuper = true)

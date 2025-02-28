@@ -75,6 +75,7 @@ export interface Endpoint {
     muName: string;
     ctime: string;
     mtime: string;
+    documentUrl?: string;
 }
 
 export interface CategoryTree {

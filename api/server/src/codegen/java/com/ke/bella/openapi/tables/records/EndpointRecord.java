@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record13;
-import org.jooq.Row13;
+import org.jooq.Record14;
+import org.jooq.Row14;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 能力点
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implements Operator, Record13<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
+public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implements Operator, Record14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -206,6 +206,20 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
         return (LocalDateTime) get(12);
     }
 
+    /**
+     * Setter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public void setDocumentUrl(String value) {
+        set(13, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public String getDocumentUrl() {
+        return (String) get(13);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -216,17 +230,17 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     // -------------------------------------------------------------------------
-    // Record13 type implementation
+    // Record14 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row13<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row13) super.fieldsRow();
+    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> fieldsRow() {
+        return (Row14) super.fieldsRow();
     }
 
     @Override
-    public Row13<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> valuesRow() {
-        return (Row13) super.valuesRow();
+    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> valuesRow() {
+        return (Row14) super.valuesRow();
     }
 
     @Override
@@ -295,6 +309,11 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     @Override
+    public Field<String> field14() {
+        return Endpoint.ENDPOINT.DOCUMENT_URL;
+    }
+
+    @Override
     public Long component1() {
         return getId();
     }
@@ -360,6 +379,11 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     @Override
+    public String component14() {
+        return getDocumentUrl();
+    }
+
+    @Override
     public Long value1() {
         return getId();
     }
@@ -422,6 +446,11 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     @Override
     public LocalDateTime value13() {
         return getMtime();
+    }
+
+    @Override
+    public String value14() {
+        return getDocumentUrl();
     }
 
     @Override
@@ -503,7 +532,13 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     @Override
-    public EndpointRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13) {
+    public EndpointRecord value14(String value) {
+        setDocumentUrl(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13, String value14) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -517,6 +552,7 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
         value11(value11);
         value12(value12);
         value13(value13);
+        value14(value14);
         return this;
     }
 
@@ -534,7 +570,7 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     /**
      * Create a detached, initialised EndpointRecord
      */
-    public EndpointRecord(Long id, String endpoint, String endpointCode, String endpointName, String maintainerCode, String maintainerName, String status, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
+    public EndpointRecord(Long id, String endpoint, String endpointCode, String endpointName, String maintainerCode, String maintainerName, String status, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime, String documentUrl) {
         super(Endpoint.ENDPOINT);
 
         setId(id);
@@ -550,5 +586,6 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
         setMuName(muName);
         setCtime(ctime);
         setMtime(mtime);
+        setDocumentUrl(documentUrl);
     }
 }
