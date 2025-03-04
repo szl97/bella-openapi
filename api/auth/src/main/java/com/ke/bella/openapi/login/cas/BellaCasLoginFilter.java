@@ -2,6 +2,7 @@ package com.ke.bella.openapi.login.cas;
 
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.login.config.BellaLoginConfiguration;
 import com.ke.bella.openapi.login.session.SessionManager;
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,25 +18,23 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-public class BellaAuthenticationFilter implements Filter {
+public class BellaCasLoginFilter implements Filter {
     private final String loginUrl;
     private final String clientHost;
     private final String serviceUri;
     private final boolean clientSupport;
     private final String authorizationHeader;
     private final String clientIndex;
-    private final String logoutUri;
     private final SessionManager sessionManager;
 
-    public BellaAuthenticationFilter(String loginUrl, String clientHost, String serviceUri, boolean clientSupport,
-            String authorizationHeader, String clientIndex, String logoutUri, SessionManager sessionManager) {
+    public BellaCasLoginFilter(String loginUrl, String clientHost, String serviceUri, boolean clientSupport,
+            String authorizationHeader, String clientIndex, SessionManager sessionManager) {
         this.loginUrl = loginUrl;
         this.clientHost = clientHost;
         this.serviceUri = serviceUri;
         this.clientSupport = clientSupport;
         this.authorizationHeader = authorizationHeader;
         this.clientIndex = clientIndex;
-        this.logoutUri = logoutUri;
         this.sessionManager = sessionManager;
     }
 
@@ -44,10 +43,6 @@ public class BellaAuthenticationFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         if(httpRequest.getRequestURI().equals(serviceUri)) {
             //不处理cas服务的登出请求
-            return;
-        }
-        if(httpRequest.getRequestURI().equals(logoutUri)) {
-            sessionManager.destroySession(httpRequest);
             return;
         }
         if(StringUtils.isNotBlank(authorizationHeader)) {
@@ -63,7 +58,7 @@ public class BellaAuthenticationFilter implements Filter {
             StringBuilder loginBuilder = new StringBuilder(loginUrl);
             loginBuilder.append("?service=");
             StringBuilder serviceBuilder = new StringBuilder(clientHost).append(serviceUri).append("?")
-                    .append(BellaCasClient.redirectParameter).append("=");
+                    .append(BellaLoginConfiguration.redirectParameter).append("=");
             if(!clientSupport) {
                 serviceBuilder.append(clientIndex);
             }

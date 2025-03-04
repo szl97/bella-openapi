@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BellaCasClient {
-    public static final String redirectParameter = "redirect";
     private static final int CAS_STEP_ONE = Ordered.HIGHEST_PRECEDENCE + 51;
     private static final int CAS_STEP_TWO = CAS_STEP_ONE + 1;
     private static final int CAS_STEP_THREE = CAS_STEP_TWO + 1;
@@ -25,8 +24,8 @@ public class BellaCasClient {
 
     public FilterRegistrationBean<BellaValidatorFilter> casValidationFilter() {
         FilterRegistrationBean<BellaValidatorFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        BellaValidatorFilter targetCasValidationFilter = new BellaValidatorFilter(casProperties.getIdAttribute(),
-                casProperties.getNameAttribute(), casProperties.getEmailAttribute(), casProperties.getOptionalAttributes(), sessionManager);
+        BellaValidatorFilter targetCasValidationFilter = new BellaValidatorFilter(casProperties.isUseCasUserId(), casProperties.getIdAttribute(),
+                casProperties.getNameAttribute(), casProperties.getEmailAttribute(), casProperties.getSource(), casProperties.getOptionalAttributes(), sessionManager);
         filterRegistrationBean.setFilter(targetCasValidationFilter);
         filterRegistrationBean.setOrder(CAS_STEP_ONE);
         Map<String, String> initParams = new HashMap<>();
@@ -48,11 +47,11 @@ public class BellaCasClient {
         return filterRegistrationBean;
     }
 
-    public FilterRegistrationBean<BellaAuthenticationFilter> casAuthenticationFilter() {
-        FilterRegistrationBean<BellaAuthenticationFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        BellaAuthenticationFilter filter = new BellaAuthenticationFilter(casProperties.getServerLoginUrl(), casProperties.getClientHost(),
+    public FilterRegistrationBean<BellaCasLoginFilter> casAuthenticationFilter() {
+        FilterRegistrationBean<BellaCasLoginFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        BellaCasLoginFilter filter = new BellaCasLoginFilter(casProperties.getServerLoginUrl(), casProperties.getClientHost(),
                 casProperties.getClientUri(), casProperties.isClientSupport(), casProperties.getAuthorizationHeader(),
-                casProperties.getClientIndexUrl(), casProperties.getLogoutUri(), sessionManager);
+                casProperties.getClientIndexUrl(), sessionManager);
         filterRegistrationBean.setOrder(CAS_STEP_THREE);
         filterRegistrationBean.setFilter(filter);
         filterRegistrationBean.setUrlPatterns(casProperties.getValidationUrlPatterns());

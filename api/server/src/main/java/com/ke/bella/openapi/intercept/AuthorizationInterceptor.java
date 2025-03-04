@@ -1,12 +1,12 @@
 package com.ke.bella.openapi.intercept;
 
 import com.google.common.collect.Lists;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
-import com.ke.bella.openapi.configuration.OpenApiProperties;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.configuration.OpenApiProperties;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +39,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         String url = request.getRequestURI();
         Operator op = BellaContext.getOperatorIgnoreNull();
         if(op != null) {
-            List<String> roles = Lists.newArrayList(properties.getLoginRoles());
-            List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
-            if(properties.getManagers().containsKey(op.getUserId())) {
-                String akCode = properties.getManagers().get(op.getUserId());
+            if(StringUtils.isNotBlank(op.getManagerAk())) {
+                String akCode = op.getManagerAk();
                 ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
                 if(apikeyInfo == null) {
                     throw new ChannelException.AuthorizationException("console apikey不存在");
@@ -52,6 +50,8 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
                 EndpointContext.setApikey(apikeyInfo);
                 hasPermission = apikeyInfo.hasPermission(url);
             } else {
+                List<String> roles = Lists.newArrayList(properties.getLoginRoles());
+                List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
                 op.getOptionalInfo().put("roles", roles);
                 op.getOptionalInfo().put("excludes", excludes);
                 hasPermission = roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))

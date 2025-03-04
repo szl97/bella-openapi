@@ -19,7 +19,6 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row19;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -75,6 +74,26 @@ public class Channel extends TableImpl<ChannelRecord> {
      * The column <code>channel.status</code>. 状态状态(active/inactive)
      */
     public final TableField<ChannelRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("active", SQLDataType.VARCHAR)), this, "状态状态(active/inactive)");
+
+    /**
+     * The column <code>channel.owner_type</code>. 所有者类型（组织/个人）
+     */
+    public final TableField<ChannelRecord, String> OWNER_TYPE = createField(DSL.name("owner_type"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "所有者类型（组织/个人）");
+
+    /**
+     * The column <code>channel.owner_code</code>. 所有者系统号
+     */
+    public final TableField<ChannelRecord, String> OWNER_CODE = createField(DSL.name("owner_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "所有者系统号");
+
+    /**
+     * The column <code>channel.owner_name</code>. 所有者名称
+     */
+    public final TableField<ChannelRecord, String> OWNER_NAME = createField(DSL.name("owner_name"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "所有者名称");
+
+    /**
+     * The column <code>channel.visibility</code>. 是否公开(private/public)
+     */
+    public final TableField<ChannelRecord, String> VISIBILITY = createField(DSL.name("visibility"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("public", SQLDataType.VARCHAR)), this, "是否公开(private/public)");
 
     /**
      * The column <code>channel.trial_enabled</code>. 是否支持试用
@@ -228,14 +247,5 @@ public class Channel extends TableImpl<ChannelRecord> {
     @Override
     public Channel rename(Name name) {
         return new Channel(name, null);
-    }
-
-    // -------------------------------------------------------------------------
-    // Row19 type methods
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row19<Long, String, String, String, String, Byte, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
-        return (Row19) super.fieldsRow();
     }
 }

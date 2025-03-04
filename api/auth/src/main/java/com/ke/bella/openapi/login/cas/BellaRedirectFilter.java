@@ -8,7 +8,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.ke.bella.openapi.login.cas.BellaCasClient.redirectParameter;
+import static com.ke.bella.openapi.login.config.BellaLoginConfiguration.redirectParameter;
 
 public class BellaRedirectFilter implements Filter {
     @Override

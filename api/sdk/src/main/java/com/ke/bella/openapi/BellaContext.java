@@ -81,7 +81,8 @@ public class BellaContext {
                 .email(oper.getEmail())
                 .tenantId(oper.getTenantId())
                 .spaceCode(oper.getSpaceCode())
-                .optionalInfo(oper.getOptionalInfo())
+                .managerAk(oper.getManagerAk())
+                .optionalInfo(oper.getOptionalInfo() == null ? new HashMap<>() : oper.getOptionalInfo())
                 .build();
     }
 

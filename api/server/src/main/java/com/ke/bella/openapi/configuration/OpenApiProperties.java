@@ -15,5 +15,4 @@ import java.util.Map;
 public class OpenApiProperties {
     private List<String> loginRoles = new ArrayList<>();
     private List<String> loginExcludes = new ArrayList<>();
-    private Map<Long, String> managers = new HashMap<>();
 }

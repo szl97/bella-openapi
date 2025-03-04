@@ -17,6 +17,7 @@ import com.ke.bella.openapi.tables.ModelEndpointRel;
 import com.ke.bella.openapi.tables.Space;
 import com.ke.bella.openapi.tables.SpaceMember;
 import com.ke.bella.openapi.tables.SpaceRole;
+import com.ke.bella.openapi.tables.User;
 
 import java.util.Arrays;
 import java.util.List;
@@ -105,6 +106,11 @@ public class DefaultSchema extends SchemaImpl {
     public final SpaceRole SPACE_ROLE = SpaceRole.SPACE_ROLE;
 
     /**
+     * 用户表
+     */
+    public final User USER = User.USER;
+
+    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -132,6 +138,7 @@ public class DefaultSchema extends SchemaImpl {
             ModelEndpointRel.MODEL_ENDPOINT_REL,
             Space.SPACE,
             SpaceMember.SPACE_MEMBER,
-            SpaceRole.SPACE_ROLE);
+            SpaceRole.SPACE_ROLE,
+            User.USER);
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -22,9 +21,12 @@ public class Operator implements Serializable {
     protected String email;
     protected String tenantId;
     protected String spaceCode;
+    protected String source;
+    protected String sourceId;
+    protected String managerAk;
     protected Map<String, Object> optionalInfo = new HashMap<>();
 
     public String getSpaceCode() {
-        return StringUtils.isEmpty(spaceCode) ? String.valueOf(userId) : spaceCode;
+        return StringUtils.isEmpty(spaceCode) ? (userId > 0 ? String.valueOf(userId) : source + "_" + sourceId) : spaceCode;
     }
 }

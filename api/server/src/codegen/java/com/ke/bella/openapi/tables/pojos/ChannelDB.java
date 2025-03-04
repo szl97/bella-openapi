@@ -23,6 +23,10 @@ public class ChannelDB implements Operator, Serializable {
     private String        entityCode;
     private String        channelCode;
     private String        status;
+    private String        ownerType;
+    private String        ownerCode;
+    private String        ownerName;
+    private String        visibility;
     private Byte          trialEnabled;
     private String        dataDestination;
     private String        priority;
@@ -46,6 +50,10 @@ public class ChannelDB implements Operator, Serializable {
         this.entityCode = value.entityCode;
         this.channelCode = value.channelCode;
         this.status = value.status;
+        this.ownerType = value.ownerType;
+        this.ownerCode = value.ownerCode;
+        this.ownerName = value.ownerName;
+        this.visibility = value.visibility;
         this.trialEnabled = value.trialEnabled;
         this.dataDestination = value.dataDestination;
         this.priority = value.priority;
@@ -68,6 +76,10 @@ public class ChannelDB implements Operator, Serializable {
         String        entityCode,
         String        channelCode,
         String        status,
+        String        ownerType,
+        String        ownerCode,
+        String        ownerName,
+        String        visibility,
         Byte          trialEnabled,
         String        dataDestination,
         String        priority,
@@ -88,6 +100,10 @@ public class ChannelDB implements Operator, Serializable {
         this.entityCode = entityCode;
         this.channelCode = channelCode;
         this.status = status;
+        this.ownerType = ownerType;
+        this.ownerCode = ownerCode;
+        this.ownerName = ownerName;
+        this.visibility = visibility;
         this.trialEnabled = trialEnabled;
         this.dataDestination = dataDestination;
         this.priority = priority;
@@ -172,6 +188,62 @@ public class ChannelDB implements Operator, Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Getter for <code>channel.owner_type</code>. 所有者类型（组织/个人）
+     */
+    public String getOwnerType() {
+        return this.ownerType;
+    }
+
+    /**
+     * Setter for <code>channel.owner_type</code>. 所有者类型（组织/个人）
+     */
+    public void setOwnerType(String ownerType) {
+        this.ownerType = ownerType;
+    }
+
+    /**
+     * Getter for <code>channel.owner_code</code>. 所有者系统号
+     */
+    public String getOwnerCode() {
+        return this.ownerCode;
+    }
+
+    /**
+     * Setter for <code>channel.owner_code</code>. 所有者系统号
+     */
+    public void setOwnerCode(String ownerCode) {
+        this.ownerCode = ownerCode;
+    }
+
+    /**
+     * Getter for <code>channel.owner_name</code>. 所有者名称
+     */
+    public String getOwnerName() {
+        return this.ownerName;
+    }
+
+    /**
+     * Setter for <code>channel.owner_name</code>. 所有者名称
+     */
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    /**
+     * Getter for <code>channel.visibility</code>. 是否公开(private/public)
+     */
+    public String getVisibility() {
+        return this.visibility;
+    }
+
+    /**
+     * Setter for <code>channel.visibility</code>. 是否公开(private/public)
+     */
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
     /**
@@ -379,6 +451,10 @@ public class ChannelDB implements Operator, Serializable {
         sb.append(", ").append(entityCode);
         sb.append(", ").append(channelCode);
         sb.append(", ").append(status);
+        sb.append(", ").append(ownerType);
+        sb.append(", ").append(ownerCode);
+        sb.append(", ").append(ownerName);
+        sb.append(", ").append(visibility);
         sb.append(", ").append(trialEnabled);
         sb.append(", ").append(dataDestination);
         sb.append(", ").append(priority);

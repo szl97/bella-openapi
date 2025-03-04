@@ -1,16 +1,30 @@
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel} from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from 'next/link';
 import {hasPermission} from "@/lib/api/userInfo";
 import React from "react"
 import {UserInfo} from "@/lib/types/openapi";
-
+import { useRouter } from 'next/navigation'
+import { openapi } from '@/lib/api/openapi'
 
 interface UserNavProps {
     user: UserInfo
 }
 
 export function UserNav({ user }: UserNavProps) {
+    const router = useRouter()
+
+    const handleLogout = async () => {
+        try {
+            await openapi.post('/logout')
+            router.push('/login')
+        } catch (error) {
+            console.error('Logout failed:', error)
+            // 即使失败也跳转到登录页
+            router.push('/login')
+        }
+    }
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -49,6 +63,9 @@ export function UserNav({ user }: UserNavProps) {
                     <Link href="/logs" className="w-full text-sm">
                         日志查询
                     </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                    登出
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

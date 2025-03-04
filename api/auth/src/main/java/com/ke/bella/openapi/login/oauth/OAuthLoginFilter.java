@@ -1,0 +1,162 @@
+package com.ke.bella.openapi.login.oauth;
+
+import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.BellaResponse;
+import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.login.session.SessionManager;
+import com.ke.bella.openapi.utils.JacksonUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static com.ke.bella.openapi.login.config.BellaLoginConfiguration.redirectParameter;
+
+public class OAuthLoginFilter implements Filter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthLoginFilter.class);
+    private static final String STATE_ATTRIBUTE = "oauth_state";
+    private static final String REDIRECT_HEADER = "X-Redirect-Login";
+
+    private final Map<String, OAuthService> oauthServices;
+    private final SessionManager sessionManager;
+    private final OAuthProperties properties;
+
+    public OAuthLoginFilter(List<OAuthService> services, SessionManager sessionManager, OAuthProperties properties) {
+        this.oauthServices = new HashMap<>();
+        for (OAuthService service : services) {
+            this.oauthServices.put(service.getProviderType(), service);
+        }
+        this.sessionManager = sessionManager;
+        this.properties = properties;
+        Assert.notNull(properties.getLoginPageUrl(), "登录页面url不可为空");
+        Assert.notNull(properties.getClientIndex(), "主页url不可为空");
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) 
+            throws IOException, ServletException {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        // Check if already authenticated
+        Operator operator = sessionManager.getSession(httpRequest);
+        if (operator != null) {
+            try {
+                BellaContext.setOperator(operator);
+                chain.doFilter(request, response);
+            } finally {
+                BellaContext.clearAll();
+                sessionManager.renew(httpRequest);
+            }
+            return;
+        }
+
+        // Check authorization header if configured
+        if (StringUtils.isNotBlank(properties.getAuthorizationHeader())) {
+            String auth = httpRequest.getHeader(properties.getAuthorizationHeader());
+            if (StringUtils.isNotBlank(auth)) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
+
+        String requestUri = httpRequest.getRequestURI();
+        
+        // Handle OAuth callback
+        if (requestUri.startsWith("/oauth/callback/")) {
+            String provider = requestUri.substring("/oauth/callback/".length());
+            handleCallback(provider, httpRequest, httpResponse);
+            return;
+        }
+
+        // Handle OAuth config request
+        if (requestUri.equals("/oauth/config")) {
+            handleOAuthConfig(httpRequest, httpResponse);
+            return;
+        }
+
+        // Build login URL with provider auth URLs
+        httpResponse.setHeader(REDIRECT_HEADER, properties.getLoginPageUrl() + "?" + redirectParameter + "=");
+        httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    private void handleOAuthConfig(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String redirect = request.getParameter("redirect");
+        // 将 redirect 参数编码到 state 中
+        String state = UUID.randomUUID() + (StringUtils.isNotBlank(redirect) ? ":" + redirect : "");
+        sessionManager.saveTicket(state);
+
+
+        List<Map<String, Object>> providers = new ArrayList<>();
+        for (String type : oauthServices.keySet()) {
+            OAuthService service = oauthServices.get(type);
+            String authUrl = service.getAuthorizationUrl(state);
+            
+            Map<String, Object> provider = new HashMap<>();
+            provider.put("type", service.getProviderType());
+            provider.put("authUrl", authUrl);
+            providers.add(provider);
+        }
+
+        BellaResponse<List<Map<String, Object>>> bellaResponse = new BellaResponse();
+        bellaResponse.setCode(200);
+        bellaResponse.setData(providers);
+        response.setContentType("application/json");
+        response.getWriter().write(JacksonUtils.serialize(bellaResponse));
+    }
+
+    private void handleCallback(String provider, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        OAuthService service = oauthServices.get(provider);
+        if (service == null) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid provider");
+            return;
+        }
+
+        String error = request.getParameter("error");
+        if (StringUtils.isNotBlank(error)) {
+            LOGGER.error("{} OAuth error: {}", provider, error);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
+            return;
+        }
+
+        String code = request.getParameter("code");
+        String state = request.getParameter("state");
+
+
+        if (!sessionManager.isValidTicket(state)) {
+            LOGGER.error("OAuth validation failed - code: {}, state: {}", code, state);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid state");
+            return;
+        }
+
+        // 从 state 中解析出 redirect 参数
+        String redirect = null;
+        if (state.contains(":")) {
+            redirect = state.substring(state.indexOf(":") + 1);
+        }
+
+        Operator operator = service.handleCallback(code, state);
+        if (operator == null) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Failed to get user info");
+            return;
+        }
+        sessionManager.create(operator, request, response);
+        sessionManager.removeTicket(state);
+        response.sendRedirect(StringUtils.isNotBlank(redirect) ? redirect : properties.getClientIndex());
+    }
+}

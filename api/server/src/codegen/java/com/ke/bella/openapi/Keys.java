@@ -17,6 +17,7 @@ import com.ke.bella.openapi.tables.ModelEndpointRel;
 import com.ke.bella.openapi.tables.Space;
 import com.ke.bella.openapi.tables.SpaceMember;
 import com.ke.bella.openapi.tables.SpaceRole;
+import com.ke.bella.openapi.tables.User;
 import com.ke.bella.openapi.tables.records.ApikeyMonthCostRecord;
 import com.ke.bella.openapi.tables.records.ApikeyRecord;
 import com.ke.bella.openapi.tables.records.ApikeyRoleRecord;
@@ -30,6 +31,7 @@ import com.ke.bella.openapi.tables.records.ModelRecord;
 import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
 import com.ke.bella.openapi.tables.records.SpaceRecord;
 import com.ke.bella.openapi.tables.records.SpaceRoleRecord;
+import com.ke.bella.openapi.tables.records.UserRecord;
 
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
@@ -76,4 +78,6 @@ public class Keys {
     public static final UniqueKey<SpaceMemberRecord> KEY_SPACE_MEMBER_PRIMARY = Internal.createUniqueKey(SpaceMember.SPACE_MEMBER, DSL.name("KEY_space_member_PRIMARY"), new TableField[] { SpaceMember.SPACE_MEMBER.ID }, true);
     public static final UniqueKey<SpaceRoleRecord> KEY_SPACE_ROLE_PRIMARY = Internal.createUniqueKey(SpaceRole.SPACE_ROLE, DSL.name("KEY_space_role_PRIMARY"), new TableField[] { SpaceRole.SPACE_ROLE.ID }, true);
     public static final UniqueKey<SpaceRoleRecord> KEY_SPACE_ROLE_UNIQ_IDX_SPACE_ROLE_CODE = Internal.createUniqueKey(SpaceRole.SPACE_ROLE, DSL.name("KEY_space_role_uniq_idx_space_role_code"), new TableField[] { SpaceRole.SPACE_ROLE.SPACE_CODE, SpaceRole.SPACE_ROLE.ROLE_CODE }, true);
+    public static final UniqueKey<UserRecord> KEY_USER_PRIMARY = Internal.createUniqueKey(User.USER, DSL.name("KEY_user_PRIMARY"), new TableField[] { User.USER.ID }, true);
+    public static final UniqueKey<UserRecord> KEY_USER_UK_SOURCE_SOURCE_ID = Internal.createUniqueKey(User.USER, DSL.name("KEY_user_uk_source_source_id"), new TableField[] { User.USER.SOURCE, User.USER.SOURCE_ID }, true);
 }

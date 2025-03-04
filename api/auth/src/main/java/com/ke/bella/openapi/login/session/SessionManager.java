@@ -1,9 +1,12 @@
 package com.ke.bella.openapi.login.session;
 
 import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.login.user.IUserRepo;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import javax.servlet.http.Cookie;
@@ -17,17 +20,26 @@ public class SessionManager {
 
     private final SessionProperty sessionProperty;
     private final RedisTemplate<String, Operator> redisTemplate;
-    private String sessionPrefix = "bella-openapi-session:";
+    private final StringRedisTemplate stringRedisTemplate;
+    @Setter
+    private IUserRepo userRepo;
+    private String sessionPrefix = "bella-openapi-session-user:";
+    private String ticketPrefix = "bella-openapi-oauth-ticket:";
 
-    public SessionManager(SessionProperty sessionProperty, RedisTemplate<String, Operator> redisTemplate) {
+    public SessionManager(SessionProperty sessionProperty, RedisTemplate<String, Operator> redisTemplate, StringRedisTemplate stringRedisTemplate) {
         this.sessionProperty = sessionProperty;
         this.redisTemplate = redisTemplate;
+        this.stringRedisTemplate = stringRedisTemplate;
         if(sessionProperty.getSessionPrefix() != null) {
             sessionPrefix = sessionProperty.getSessionPrefix();
         }
     }
 
     public String create(Operator sessionInfo, HttpServletRequest request, HttpServletResponse response) {
+        // 如果配置了用户持久化，则进行持久化
+        if (userRepo != null) {
+            userRepo.persist(sessionInfo);
+        }
         String id = UUID.randomUUID().toString();
         ValueOperations<String, Operator> ops = redisTemplate.opsForValue();
         ops.set(sessionPrefix + id, sessionInfo, sessionProperty.getMaxInactiveInterval(), TimeUnit.MINUTES);
@@ -43,10 +55,14 @@ public class SessionManager {
         return loadById(id);
     }
 
-    public void destroySession(HttpServletRequest request) {
-        String id = findSessionId(request);
-        if(id != null) {
-            deleteById(id);
+    public void destroySession(HttpServletRequest request, HttpServletResponse response) {
+        String sessionId = findSessionId(request);
+        if(sessionId != null) {
+            deleteById(sessionId);
+            Cookie cookie = new Cookie(sessionProperty.getCookieName(), null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
         }
     }
 
@@ -105,5 +121,21 @@ public class SessionManager {
             cookie.setHttpOnly(true);
             response.addCookie(cookie);
         }
+    }
+
+    private String getTicketKey(String ticket) {
+        return ticketPrefix + ticket;
+    }
+
+    public void saveTicket(String ticket) {
+        stringRedisTemplate.opsForValue().set(getTicketKey(ticket), ticket, 10, TimeUnit.MINUTES);
+    }
+
+    public boolean isValidTicket(String ticket) {
+        return stringRedisTemplate.hasKey(getTicketKey(ticket));
+    }
+
+    public void removeTicket(String ticket) {
+        stringRedisTemplate.delete(getTicketKey(ticket));
     }
 }

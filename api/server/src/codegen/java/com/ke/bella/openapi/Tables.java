@@ -17,6 +17,7 @@ import com.ke.bella.openapi.tables.ModelEndpointRel;
 import com.ke.bella.openapi.tables.Space;
 import com.ke.bella.openapi.tables.SpaceMember;
 import com.ke.bella.openapi.tables.SpaceRole;
+import com.ke.bella.openapi.tables.User;
 
 
 /**
@@ -89,4 +90,9 @@ public class Tables {
      * 空间角色
      */
     public static final SpaceRole SPACE_ROLE = SpaceRole.SPACE_ROLE;
+
+    /**
+     * 用户表
+     */
+    public static final User USER = User.USER;
 }

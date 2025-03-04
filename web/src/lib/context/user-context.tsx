@@ -18,6 +18,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [error, setError] = useState<Error | null>(null);
 
     useEffect(() => {
+        // Skip userInfo fetch on login page
+        if (window.location.pathname === '/login') {
+            setIsLoading(false);
+            return;
+        }
+
         const fetchUserInfo = async () => {
             try {
                 const info = await getUserInfo();

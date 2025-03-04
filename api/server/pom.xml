@@ -65,11 +65,6 @@
             <version>1.8.0</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.cronutils</groupId>
             <artifactId>cron-utils</artifactId>
             <version>9.2.1</version>
@@ -250,6 +245,11 @@
             <artifactId>spring-data-redis</artifactId>
             <version>2.2.0.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -303,6 +303,19 @@
                             <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
                             <matchers>
                                 <tables>
+                                    <table>
+                                        <daoClass>
+                                            <transform>PASCAL</transform>
+                                            <expression>$0_D_B_Dao</expression>
+                                        </daoClass>
+                                        <pojoClass>
+                                            <transform>PASCAL</transform>
+                                            <expression>$0_D_B</expression>
+                                        </pojoClass>
+                                        <pojoImplements>com.ke.bella.openapi.db.repo.Timed</pojoImplements>
+                                        <recordImplements>com.ke.bella.openapi.db.repo.Timed</recordImplements>
+                                        <expression>user</expression>
+                                    </table>
                                     <table>
                                         <daoClass>
                                             <transform>PASCAL</transform>
