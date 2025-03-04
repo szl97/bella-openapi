@@ -71,6 +71,9 @@ public class Condition {
         private String priority;
         private String dataDestination;
         private String status;
+        private String visibility;
+        private String ownerType;
+        private String ownerCode;
     }
 
     @NoArgsConstructor

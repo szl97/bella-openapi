@@ -171,7 +171,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
             safetyCheckIndex = content.length();
         }
         responseBuffer.setChoices(Collections.singletonList(choice));
-        Object result = safetyService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(responseBuffer, processData, apikeyInfo));
+        Object result = safetyService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(responseBuffer, processData, apikeyInfo), processData.isMock());
         if(result != null) {
             StreamCompletionResponse response = new StreamCompletionResponse();
             response.setSensitives(result);

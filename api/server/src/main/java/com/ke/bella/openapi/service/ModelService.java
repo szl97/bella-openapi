@@ -301,7 +301,9 @@ public class ModelService {
         Model model = modelRepo.queryByUniqueKey(modelName, Model.class);
         Assert.notNull(model, "实体不存在");
         List<Channel> channels = channelService
-                .listByCondition(Condition.ChannelCondition.builder().entityType("model").entityCode(modelName).build(), Channel.class);
+                .listByCondition(Condition.ChannelCondition.builder().entityType("model").entityCode(modelName)
+                        .visibility(PUBLIC)
+                        .build(), Channel.class);
         ModelDetails modelDetails = new ModelDetails();
         modelDetails.setChannels(channels);
         modelDetails.setModel(model);
@@ -367,16 +369,16 @@ public class ModelService {
                 .collect(Collectors.toList());
     }
 
-    public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition) {
-        apikeyService.fillPermissionCode(condition);
+    public List<ModelDB> listByConditionWithPermission(Condition.ModelCondition condition, boolean apikeyFirst) {
+        apikeyService.fillPermissionCode(condition, apikeyFirst);
         if(!fillModelNames(condition)) {
             return Lists.newArrayList();
         }
         return listByCondition(condition);
     }
 
-    public Page<ModelDB> pageByConditionWithPermission(Condition.ModelCondition condition) {
-        apikeyService.fillPermissionCode(condition);
+    public Page<ModelDB> pageByConditionWithPermission(Condition.ModelCondition condition, boolean apikeyFirst) {
+        apikeyService.fillPermissionCode(condition, apikeyFirst);
         if(!fillModelNames(condition)) {
             return new Page<>();
         }

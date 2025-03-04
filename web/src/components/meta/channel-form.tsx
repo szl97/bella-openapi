@@ -82,9 +82,9 @@ export function ChannelForm({ channel, onUpdate, onToggleStatus }: ChannelFormPr
                     multiline
                 />
                 <EditableField
-                            label='优先级'
-                            value={channel.priority}
-                            onUpdate={(value) => onUpdate(channel.channelCode, 'priority', value)}
+                    label='优先级'
+                    value={channel.priority}
+                    onUpdate={(value) => onUpdate(channel.channelCode, 'priority', value)}
                 />
                 <ConfirmDialog
                     isOpen={isStatusDialogOpen}

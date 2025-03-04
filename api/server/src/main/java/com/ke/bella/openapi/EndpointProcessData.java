@@ -21,6 +21,7 @@ public class EndpointProcessData {
     private String endpoint;
     private String model;
     private String channelCode;
+    private boolean isPrivate;
     private String user;
     //时间单位都为s
     private long requestTime;

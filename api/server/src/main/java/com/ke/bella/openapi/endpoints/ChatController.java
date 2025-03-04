@@ -51,28 +51,27 @@ public class ChatController {
         String model = request.getModel();
         EndpointContext.setEndpointData(endpoint, model, request);
         boolean isMock = EndpointContext.getProcessData().isMock();
-        ChannelDB channel = router.route(endpoint, model, isMock);
+        ChannelDB channel = router.route(endpoint, model, EndpointContext.getProcessData());
         EndpointContext.setEndpointData(channel);
-        limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
-        Object requestRiskData = null;
-        if(!isMock) {
-            requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,
-                    EndpointContext.getProcessData(), EndpointContext.getApikey()));
-            EndpointContext.getProcessData().setRequestRiskData(requestRiskData);
+        if(!EndpointContext.getProcessData().isPrivate()) {
+            limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
         }
-
+        Object requestRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(request,
+                    EndpointContext.getProcessData(), EndpointContext.getApikey()), isMock);
+        EndpointContext.getProcessData().setRequestRiskData(requestRiskData);
         EndpointProcessData processData = EndpointContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
         String channelInfo = channel.getChannelInfo();
         CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, CompletionAdaptor.class);
         CompletionProperty property = (CompletionProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
-        
+
         if(property.isFunctionCallSimulate()) {
             adaptor = new ToolCallSimulator<>(adaptor);
         }
-        
+
         EndpointContext.setEncodingType(property.getEncodingType());
+
         if(request.isStream()) {
             SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, EndpointContext.getProcessData().getRequestId());
             adaptor.streamCompletion(request, url, property, StreamCallbackProvider.provide(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService, property));
@@ -80,12 +79,9 @@ public class ChatController {
         }
 
         CompletionResponse response = adaptor.completion(request, url, property);
-        Object responseRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(response,
-                EndpointContext.getProcessData(), EndpointContext.getApikey()));
-        if(!isMock) {
-            response.setSensitives(responseRiskData);
-            response.setRequestRiskData(requestRiskData);
-        }
+        Object responseRiskData = safetyCheckService.safetyCheck(SafetyCheckRequest.Chat.convertFrom(response, EndpointContext.getProcessData(), EndpointContext.getApikey()), isMock);
+        response.setSensitives(responseRiskData);
+        response.setRequestRiskData(requestRiskData);
         return response;
     }
 }

@@ -47,11 +47,12 @@ public class AudioController {
         String ttsEndpoint = EndpointContext.getRequest().getRequestURI();
         String ttsModel = request.getModel();
         EndpointContext.setEndpointData(ttsEndpoint, ttsModel, request);
-        boolean isMock = EndpointContext.getProcessData().isMock();
-        ChannelDB ttsChannel = router.route(ttsEndpoint, ttsModel, isMock);
-        EndpointContext.setEndpointData(ttsChannel);
-        limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), ttsModel);
         EndpointProcessData processData = EndpointContext.getProcessData();
+        ChannelDB ttsChannel = router.route(ttsEndpoint, ttsModel, processData);
+        EndpointContext.setEndpointData(ttsChannel);
+        if(!EndpointContext.getProcessData().isPrivate()) {
+            limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), ttsModel);
+        }
         String ttsProtocol = processData.getProtocol();
         String ttsUrl = processData.getForwardUrl();
         String ttsChannelInfo = ttsChannel.getChannelInfo();

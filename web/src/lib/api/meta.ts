@@ -106,6 +106,12 @@ export async function updateChannelStatus(channelCode: string, active: boolean) 
     return response.data;
 }
 
+export async function updatePrivateChannelStatus(channelCode: string, active: boolean) {
+    const url = active ? '/v1/meta/channel/private/activate' : '/v1/meta/channel/private/inactivate';
+    const response = await openapi.post<Boolean>(url, { channelCode });
+    return response.data;
+}
+
 export async function createModel(model: Model) : Promise<Boolean> {
     const response = await openapi.post<Boolean>('/console/model', model);
     return response.data;
@@ -116,8 +122,22 @@ export async function createChannel(channel: Channel) : Promise<Boolean> {
     return response.data;
 }
 
+export async function createPrivateChannel(channel: Channel): Promise<Boolean> {
+    const response = await openapi.post<Boolean>('/v1/meta/channel/private', channel);
+    return response.data;
+}
+
+export async function updatePrivateChannel(channelCode: string, update: Partial<Channel>): Promise<Boolean> {
+    const requestBody = {
+        channelCode,
+        ...update
+    };
+    const response = await openapi.put<Boolean>('/v1/meta/channel/private', requestBody);
+    return response.data;
+}
+
 export async function getModelPropertySchema(endpoints: string[]) : Promise<JsonSchema> {
-    const response = await openapi.get<JsonSchema>('/console/schema/modelProperty', {
+    const response = await openapi.get<JsonSchema>('/v1/meta/schema/modelProperty', {
         params: { endpoints : endpoints.join(',') },
     });
     return response.data;
@@ -125,7 +145,7 @@ export async function getModelPropertySchema(endpoints: string[]) : Promise<Json
 
 
 export async function getModelFeatureSchema(endpoints: string[]) : Promise<JsonSchema> {
-    const response = await openapi.get<JsonSchema>('/console/schema/modelFeature', {
+    const response = await openapi.get<JsonSchema>('/v1/meta/schema/modelFeature', {
         params: { endpoints : endpoints.join(',') },
     });
     return response.data;
@@ -133,7 +153,7 @@ export async function getModelFeatureSchema(endpoints: string[]) : Promise<JsonS
 
 
 export async function listProtocols(entityType: string, entityCode: string) : Promise<Record<string, string>> {
-    const response = await openapi.get<Record<string, string>>('/console/protocol/list', {
+    const response = await openapi.get<Record<string, string>>('/v1/meta/protocol/list', {
         params: { entityType, entityCode},
     });
     return response.data;
@@ -141,14 +161,14 @@ export async function listProtocols(entityType: string, entityCode: string) : Pr
 
 
 export async function getPriceInfoSchema(entityType: string, entityCode: string) : Promise<JsonSchema> {
-    const response = await openapi.get<JsonSchema>('/console/schema/priceInfo', {
+    const response = await openapi.get<JsonSchema>('/v1/meta/schema/priceInfo', {
         params: { entityType, entityCode},
     });
     return response.data;
 }
 
 export async function getChannelInfoSchema(entityType: string, entityCode: string, protocol: string) : Promise<JsonSchema> {
-    const response = await openapi.get<JsonSchema>('/console/schema/channelInfo', {
+    const response = await openapi.get<JsonSchema>('/v1/meta/schema/channelInfo', {
         params: { entityType, entityCode, protocol},
     });
     return response.data;
@@ -157,6 +177,17 @@ export async function getChannelInfoSchema(entityType: string, entityCode: strin
 export async function listModels(endpoint?: string): Promise<Model[]> {
     const response = await openapi.get<Model[]>('/v1/meta/model/list/for-selection', {
         params: { endpoint, status: 'active'},
+    });
+    return response.data;
+}
+
+export async function listPrivateChannels(entityType: string, entityCode: string): Promise<Channel[]> {
+    const response = await openapi.get<Channel[]>('/v1/meta/channel/list', {
+        params: {
+            entityType,
+            entityCode,
+            visibility: 'private',
+        },
     });
     return response.data;
 }

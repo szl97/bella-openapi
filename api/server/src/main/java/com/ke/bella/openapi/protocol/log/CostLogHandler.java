@@ -19,6 +19,9 @@ public class CostLogHandler implements EventHandler<LogEvent> {
     @Override
     public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
         EndpointProcessData log = event.getData();
+        if(log.isPrivate()) {
+            return;
+        }
         if(log.getPriceInfo() == null) {
             LOGGER.warn("price Info is null, channelCode:{}, requestId:{}", log.getChannelCode(), log.getRequestId());
             return;

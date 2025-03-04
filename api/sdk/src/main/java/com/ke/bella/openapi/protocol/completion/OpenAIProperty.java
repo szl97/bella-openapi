@@ -26,7 +26,7 @@ public class OpenAIProperty extends CompletionProperty {
         Map<String, String> map = super.description();
         map.put("auth", "鉴权配置");
         map.put("deployName", "部署名称");
-        map.put("apiVersion", "API版本");
+        map.put("apiVersion", "API版本(url中需要拼接时填写)");
         map.put("supportStreamOptions", "是否支持StreamOptions参数");
         return map;
     }

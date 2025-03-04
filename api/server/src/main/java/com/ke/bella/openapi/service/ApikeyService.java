@@ -67,6 +67,9 @@ public class ApikeyService {
     @Value("${apikey.basic.roleCode:low}")
     private String basicRoleCode;
 
+    @Value("${apikey.basic.safetyLevel:40}")
+    private byte basicSafetyLevel;
+
     @Value("#{'${apikey.basic.childRoleCodes:low,high}'.split (',')}")
     private List<String> childRoleCodes;
     @Value("${cache.use:true}")
@@ -108,7 +111,7 @@ public class ApikeyService {
         db.setOwnerCode(op.getOwnerCode());
         db.setOwnerName(op.getOwnerName());
         db.setRoleCode(StringUtils.isEmpty(op.getRoleCode()) ? basicRoleCode : op.getRoleCode());
-        db.setSafetyLevel(EntityConstants.LOWEST_SAFETY_LEVEL);
+        db.setSafetyLevel(basicSafetyLevel);
         db.setMonthQuota(op.getMonthQuota() == null ? BigDecimal.valueOf(basicMonthQuota) : op.getMonthQuota());
         db.setName(op.getName());
         db.setRemark(op.getRemark());
@@ -320,15 +323,15 @@ public class ApikeyService {
     }
 
     public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
-        fillPermissionCode(condition);
+        fillPermissionCode(condition, false);
         return apikeyRepo.pageAccessKeys(condition);
     }
 
-    public void fillPermissionCode(PermissionCondition condition) {
+    public void fillPermissionCode(PermissionCondition condition, boolean apikeyFirst) {
         ApikeyInfo apikeyInfo = EndpointContext.getApikeyIgnoreNull();
-        if(apikeyInfo == null) {
-            Operator op = BellaContext.getOperator();
-            if (CollectionUtils.isNotEmpty(condition.getOrgCodes())) {
+        Operator op = BellaContext.getOperatorIgnoreNull();
+        if(apikeyInfo == null || (!apikeyFirst && op != null)) {
+            if (op == null || CollectionUtils.isNotEmpty(condition.getOrgCodes())) {
                 throw new ChannelException.AuthorizationException("没有操作权限");
             }
             if (StringUtils.isNotEmpty(condition.getPersonalCode())) {

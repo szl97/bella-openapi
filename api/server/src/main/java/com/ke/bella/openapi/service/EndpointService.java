@@ -161,7 +161,7 @@ public class EndpointService {
                 }
             });
         }
-        return modelService.listByConditionWithPermission(modelCondition)
+        return modelService.listByConditionWithPermission(modelCondition, false)
                 .stream().map(db -> {
                     Model model = new Model();
                     model.setModelName(db.getModelName());

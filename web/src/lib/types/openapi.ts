@@ -119,6 +119,10 @@ export interface Channel {
     url: string;
     channelInfo: string;
     priceInfo: string;
+    ownerType?: string;
+    ownerCode?: string;
+    ownerName?: string;
+    visibility?: string;
 }
 
 export interface ModelDetails {

@@ -1,9 +1,11 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Edit } from "lucide-react";
+import { ExternalLink, Settings } from "lucide-react";
 import Link from "next/link";
 import { Model } from "@/lib/types/openapi";
 import { Badge } from "@/components/ui/badge";
+import {useUser} from "@/lib/context/user-context";
+import {hasPermission} from "@/lib/api/userInfo";
 
 interface ModelCardProps {
     model: Model;
@@ -13,6 +15,7 @@ interface ModelCardProps {
 export function ModelCard({ model, update }: ModelCardProps) {
     const properties = JSON.parse(model.properties) as Record<string, any>;
     const features = JSON.parse(model.features) as Record<string, boolean>;
+    const { userInfo } = useUser()
 
     const renderProperty = (label: string, value: any) => {
         if (value !== undefined && value !== null) {
@@ -39,7 +42,19 @@ export function ModelCard({ model, update }: ModelCardProps) {
                                     size="sm"
                                     className="text-gray-600 hover:text-gray-800 hover:bg-white/50"
                                 >
-                                    <Edit size={16} />
+                                    <Settings size={16} />
+                                </Button>
+                            </Link>
+                        )}
+                        {!update && hasPermission(userInfo, '/v1/meta/channel/private/**') && (
+                            <Link href={`/meta/private-channel?entityType=model&entityCode=${model.modelName}`} passHref>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-600 hover:text-gray-800 hover:bg-white/50"
+                                >
+                                    <Settings size={16} className="mr-1" />
+                                    私有渠道
                                 </Button>
                             </Link>
                         )}

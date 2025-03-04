@@ -7,7 +7,6 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import com.ke.bella.openapi.db.repo.ChannelRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.metadata.Channel;
 import com.ke.bella.openapi.metadata.Condition;
 import com.ke.bella.openapi.metadata.MetaDataOps;
 import com.ke.bella.openapi.metadata.PriceDetails;
@@ -43,6 +42,7 @@ import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
 import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
 import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.common.EntityConstants.MODEL;
+import static com.ke.bella.openapi.common.EntityConstants.PUBLIC;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 11:35 description:
@@ -67,6 +67,7 @@ public class ChannelService {
                 .cacheNullValue(true)
                 .cacheType(CacheType.BOTH)
                 .syncLocal(true)
+                .localExpire(Duration.ofSeconds(30))
                 .penetrationProtect(true)
                 .penetrationProtectTimeout(Duration.ofSeconds(10))
                 .build();
@@ -89,6 +90,11 @@ public class ChannelService {
         }
         endpoints.forEach(endpoint -> Assert.isTrue(CostCalculator.validate(endpoint, op.getPriceInfo()), "priceInfo invalid"));
         endpoints.forEach(endpoint -> Assert.isTrue(adaptorManager.support(endpoint, op.getProtocol()), "不支持的协议"));
+
+        if (StringUtils.isEmpty(op.getVisibility())) {
+            op.setVisibility(PUBLIC);
+        }
+        
         //todo: 根据协议检查channelInfo
         ChannelDB channelDB = channelRepo.insert(op);
         updateCache(channelDB.getEntityType(), channelDB.getEntityCode());

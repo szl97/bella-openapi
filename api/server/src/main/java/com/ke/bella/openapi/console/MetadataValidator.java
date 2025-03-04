@@ -24,6 +24,8 @@ import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
 import static com.ke.bella.openapi.common.EntityConstants.MODEL;
 import static com.ke.bella.openapi.common.EntityConstants.ModelJsonKey;
 import static com.ke.bella.openapi.common.EntityConstants.OWNER_TYPES;
+import static com.ke.bella.openapi.common.EntityConstants.PRIVATE;
+import static com.ke.bella.openapi.common.EntityConstants.PUBLIC;
 import static com.ke.bella.openapi.common.EntityConstants.SystemBasicCategory;
 import static com.ke.bella.openapi.common.EntityConstants.SystemBasicEndpoint;
 import static com.ke.bella.openapi.utils.MatchUtils.isAllText;
@@ -158,6 +160,22 @@ public class MetadataValidator {
         Assert.hasText(op.getProtocol(), "请求协议不可为空字符串");
         Assert.hasText(op.getSupplier(), "供应商不可为空字符串");
         Assert.isTrue(StringUtils.isEmpty(op.getUrl()) || isValidURL(op.getUrl()), "url必须以http://或https://开头");
+        
+        // Validate visibility if provided
+        if (StringUtils.isNotEmpty(op.getVisibility())) {
+            Assert.isTrue(PRIVATE.equals(op.getVisibility()) || 
+                          PUBLIC.equals(op.getVisibility()),
+                    "通道的可见性只能是：" + PRIVATE + "或" + PUBLIC);
+                    
+            // If it's a private channel, validate owner information
+            if (PRIVATE.equals(op.getVisibility())) {
+                Assert.hasText(op.getOwnerType(), "私有通道的所有者类型不可为空");
+                Assert.hasText(op.getOwnerCode(), "私有通道的所有者编码不可为空");
+                Assert.isTrue(OWNER_TYPES.contains(op.getOwnerType()),
+                        "所有者类型只能是：" + String.join("或", OWNER_TYPES));
+            }
+        }
+        
         checkJsonInfo(op.getChannelInfo());
         checkJsonInfo(op.getPriceInfo());
     }

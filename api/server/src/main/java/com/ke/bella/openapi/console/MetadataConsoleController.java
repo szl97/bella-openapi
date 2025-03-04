@@ -211,31 +211,6 @@ public class MetadataConsoleController {
         return modelService.getModelDetails(modelName);
     }
 
-    @GetMapping("/schema/modelProperty")
-    public JsonSchema getModelPropertySchema(@RequestParam Set<String> endpoints) {
-        return endpointService.getModelPropertySchema(endpoints);
-    }
-
-    @GetMapping("/schema/modelFeature")
-    public JsonSchema getModelFeatureSchema(@RequestParam Set<String> endpoints) {
-        return endpointService.getModelFeatureSchema(endpoints);
-    }
-
-    @GetMapping("/schema/priceInfo")
-    public JsonSchema getPriceInfoSchema(@RequestParam String entityType, @RequestParam String entityCode) {
-        return endpointService.getPriceInfoSchema(entityType, entityCode);
-    }
-
-    @GetMapping("/schema/channelInfo")
-    public JsonSchema getChannelInfoSchema(@RequestParam String entityType, @RequestParam String entityCode, @RequestParam String protocol) {
-        return endpointService.getChannelInfo(entityType, entityCode, protocol);
-    }
-
-    @GetMapping("/protocol/list")
-    public Map<String, String> listProtocols(@RequestParam String entityType, @RequestParam String entityCode) {
-        return endpointService.listProtocols(entityType, entityCode);
-    }
-
     @GetMapping("/model/list")
     public List<ModelDB> listModels(Condition.ModelCondition condition) {
         return modelService.listByCondition(condition);

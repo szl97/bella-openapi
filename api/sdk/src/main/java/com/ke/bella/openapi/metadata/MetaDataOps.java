@@ -131,6 +131,10 @@ public class MetaDataOps {
         private String channelInfo;
         private String priceInfo;
         private Byte trialEnabled = 0;
+        private String ownerType;
+        private String ownerCode;
+        private String ownerName;
+        private String visibility;
     }
 
     @EqualsAndHashCode(callSuper = true)

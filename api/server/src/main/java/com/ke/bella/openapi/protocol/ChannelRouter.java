@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.EndpointContext;
+import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.limiter.LimiterManager;
@@ -38,8 +39,8 @@ public class ChannelRouter {
     @Value("${bella.openapi.free.concurrent:1}")
     private Integer freeConcurrent;
 
-    public ChannelDB route(String endpoint, String model, boolean isMock) {
-        if(isMock) {
+    public ChannelDB route(String endpoint, String model, EndpointProcessData processData) {
+        if(processData.isMock()) {
             return mockChannel();
         }
         List<ChannelDB> channels;
@@ -53,7 +54,7 @@ public class ChannelRouter {
             channels = channelService.listActives(EntityConstants.ENDPOINT, endpoint);
         }
         Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
-        channels = filter(channels, entityCode);
+        channels = filter(channels, entityCode, processData.getAccountType(), processData.getAccountCode());
         channels = pickMaxPriority(channels);
         return random(channels);
     }
@@ -65,9 +66,11 @@ public class ChannelRouter {
      *
      * @return
      */
-    private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode) {
+    private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode, String accountType, String accountCode) {
         Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
-        List<ChannelDB> filtered = channels.stream().filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
+        List<ChannelDB> filtered = channels.stream()
+                .filter(channel -> EntityConstants.PUBLIC.equals(channel.getVisibility()) || (channel.getOwnerType().equals(accountType) && channel.getOwnerCode().equals(accountCode)))
+                .filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(filtered)) {
             if(LOWEST_SAFETY_LEVEL.equals(safetyLevel)) {
@@ -95,7 +98,7 @@ public class ChannelRouter {
     }
 
     private boolean isTestUsed(ChannelDB channel) {
-        return 1 == channel.getTrialEnabled();
+        return 1 == channel.getTrialEnabled() && channel.getVisibility().equals(EntityConstants.PUBLIC);
     }
 
     private boolean freeAkOverload(String akCode, String entityCode) {
@@ -119,35 +122,42 @@ public class ChannelRouter {
 
     private List<ChannelDB> pickMaxPriority(List<ChannelDB> channels) {
         List<ChannelDB> highest = new ArrayList<>();
-        String max = EntityConstants.LOW;
+        String curVisibility = EntityConstants.PUBLIC;
+        String curPriority = EntityConstants.LOW;
         for (ChannelDB channel : channels) {
             String priority = channel.getPriority();
-            int compare = compare(priority, max);
+            String visibility = channel.getVisibility();
+            int compare = compare(priority, curPriority, visibility, curVisibility);
             if(compare < 0) {
                 continue;
             }
             if(compare > 0) {
                 highest.clear();
-                max = priority;
+                curPriority = priority;
+                curVisibility = visibility;
             }
             highest.add(channel);
         }
         return highest;
     }
 
-    private int compare(String priority, String target) {
-        if(priority.equals(target)) {
-            return 0;
-        }
-        if(priority.equals(EntityConstants.LOW)) {
-            return -1;
-        }
-        if(priority.equals(EntityConstants.NORMAL)) {
-            if(target.equals(EntityConstants.HIGH)) {
+    private int compare(String priority, String curPriority, String visibility, String curVisibility) {
+        if(visibility.equals(curVisibility)) {
+            if(priority.equals(curPriority)) {
+                return 0;
+            }
+            if(priority.equals(EntityConstants.LOW)) {
                 return -1;
             }
+            if(priority.equals(EntityConstants.NORMAL)) {
+                if(curPriority.equals(EntityConstants.HIGH)) {
+                    return -1;
+                }
+            }
+            return 1;
+        } else {
+            return visibility.equals(EntityConstants.PRIVATE) ? 1 : -1;
         }
-        return 1;
     }
 
     private ChannelDB random(List<ChannelDB> list) {
