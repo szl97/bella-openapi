@@ -34,7 +34,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
     private final EndpointProcessData processData;
     private final ApikeyInfo apikeyInfo;
     private final EndpointLogger logger;
-    private final ISafetyCheckService<SafetyCheckRequest.Chat> safetyService;
+    private final ISafetyCheckService.IChatSafetyCheckService safetyService;
     private final CompletionResponse responseBuffer;
     private final Map<Integer, CompletionResponse.Choice> choiceBuffer;
     private boolean dirtyChoice;
@@ -44,7 +44,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
     private Integer thinkStage = 0; // 0: 推理未开始; 1: 推理开始; 2: 推理进行中；3:推理完成；-1:推理已结束
 
     public StreamCompletionCallback(SseEmitter sse, EndpointProcessData processData, ApikeyInfo apikeyInfo,
-            EndpointLogger logger, ISafetyCheckService<SafetyCheckRequest.Chat> safetyService) {
+            EndpointLogger logger, ISafetyCheckService.IChatSafetyCheckService safetyService) {
         this.sse = sse;
         this.processData = processData;
         this.apikeyInfo = apikeyInfo;

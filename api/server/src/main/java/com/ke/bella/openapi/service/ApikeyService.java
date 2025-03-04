@@ -7,20 +7,19 @@ import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Sets;
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.PermissionCondition;
 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.apikey.ApikeyOps;
-import com.ke.bella.openapi.common.EntityConstants;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.db.repo.ApikeyCostRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRepo;
 import com.ke.bella.openapi.db.repo.ApikeyRoleRepo;
 import com.ke.bella.openapi.db.repo.Page;
-import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.safety.SafetyAuditService;
+import com.ke.bella.openapi.safety.ISafetyAuditService;
 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
 import com.ke.bella.openapi.tables.pojos.ApikeyRoleDB;
@@ -79,7 +78,7 @@ public class ApikeyService {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
-    private SafetyAuditService safetyAuditService;
+    private ISafetyAuditService safetyAuditService;
     private static final String apikeyCacheKey = "apikey:sha:";
 
     @PostConstruct

@@ -36,6 +36,7 @@ public class EntityConstants {
     public static final List<String> AUTHORIZER_TYPES = ImmutableList.of(ORG, PERSON);
 
     public static final Byte LOWEST_SAFETY_LEVEL = 10;
+    public static final Byte HIGHEST_SAFETY_LEVEL = 40;
 
     @AllArgsConstructor
     @Getter
