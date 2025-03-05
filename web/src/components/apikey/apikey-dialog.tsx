@@ -257,14 +257,16 @@ export const QuotaDialog: React.FC<{
     onClose: () => void
 }> = ({code, origin, refresh, isOpen, onClose}) => {
     const handleApplyQuota = () => {
-        window.open(apikey_quota_apply_url, '_blank')
+        if(apikey_quota_apply_url) {
+            window.open(apikey_quota_apply_url, '_blank')
+        }
         onClose()
     }
 
     return (
         <ActionDialog
-            label="申请修改额度"
-            description={"点击确认按钮跳转到额度申请页面。Ak Code:" + code}
+            label="充值额度"
+            description={apikey_quota_apply_url ? "点击确认按钮跳转到额度申请页面。Ak Code:" + code : "充值功能暂未开放"}
             onConfirm={handleApplyQuota}
             icon={<SquarePen className="h-4 w-4"/>}
             isIcon={true}

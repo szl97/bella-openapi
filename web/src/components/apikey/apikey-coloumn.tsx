@@ -10,6 +10,7 @@ import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
 import {Copy} from 'lucide-react'
 import {useToast} from "@/hooks/use-toast";
+import {safety_apply_url} from "@/config";
 
 interface EditableCellProps {
     content: ReactNode;
@@ -159,6 +160,7 @@ export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
             }
 
             return (
+                safety_apply_url ?
                 <EditableCell
                     content={<Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
                 </Badge>}
@@ -172,7 +174,8 @@ export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
                     )}
                     positionCalc="60%"
                     rowId={row.id}
-                />
+                /> : <Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
+                    </Badge>
             );
         },
     },
