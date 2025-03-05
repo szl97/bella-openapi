@@ -69,7 +69,7 @@ public class ChannelRouter {
     private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode, String accountType, String accountCode) {
         Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
         List<ChannelDB> filtered = channels.stream()
-                .filter(channel -> EntityConstants.PUBLIC.equals(channel.getVisibility()) || (channel.getOwnerType().equals(accountType) && channel.getOwnerCode().equals(accountCode)))
+                .filter(channel -> EntityConstants.PUBLIC.equals(channel.getVisibility()) || (accountType.equals(channel.getOwnerType()) && accountCode.equals(channel.getOwnerCode())))
                 .filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(filtered)) {
