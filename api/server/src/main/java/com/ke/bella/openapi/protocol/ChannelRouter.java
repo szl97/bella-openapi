@@ -99,7 +99,7 @@ public class ChannelRouter {
     }
 
     private boolean isTestUsed(ChannelDB channel) {
-        return 1 == channel.getTrialEnabled() && !channel.getVisibility().equals(EntityConstants.PRIVATE);
+        return 1 == channel.getTrialEnabled() && !EntityConstants.PRIVATE.equals(channel.getVisibility());
     }
 
     private boolean freeAkOverload(String akCode, String entityCode) {

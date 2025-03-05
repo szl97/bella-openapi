@@ -70,7 +70,7 @@ public class EndpointContext {
 
     public static void setEndpointData(ChannelDB channel) {
         EndpointContext.getProcessData().setChannelCode(channel.getChannelCode());
-        EndpointContext.getProcessData().setPrivate(channel.getVisibility().equals(EntityConstants.PRIVATE));
+        EndpointContext.getProcessData().setPrivate(EntityConstants.PRIVATE.equals(channel.getVisibility()));
         EndpointContext.getProcessData().setForwardUrl(channel.getUrl());
         EndpointContext.getProcessData().setProtocol(channel.getProtocol());
         EndpointContext.getProcessData().setPriceInfo(channel.getPriceInfo());
