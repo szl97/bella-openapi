@@ -10,6 +10,7 @@ import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.ModelService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -69,7 +70,7 @@ public class ChannelRouter {
     private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode, String accountType, String accountCode) {
         Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
         List<ChannelDB> filtered = channels.stream()
-                .filter(channel -> EntityConstants.PUBLIC.equals(channel.getVisibility()) || (accountType.equals(channel.getOwnerType()) && accountCode.equals(channel.getOwnerCode())))
+                .filter(channel -> !EntityConstants.PRIVATE.equals(channel.getVisibility()) || (accountType.equals(channel.getOwnerType()) && accountCode.equals(channel.getOwnerCode())))
                 .filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(filtered)) {
@@ -98,7 +99,7 @@ public class ChannelRouter {
     }
 
     private boolean isTestUsed(ChannelDB channel) {
-        return 1 == channel.getTrialEnabled() && channel.getVisibility().equals(EntityConstants.PUBLIC);
+        return 1 == channel.getTrialEnabled() && !channel.getVisibility().equals(EntityConstants.PRIVATE);
     }
 
     private boolean freeAkOverload(String akCode, String entityCode) {
@@ -126,7 +127,7 @@ public class ChannelRouter {
         String curPriority = EntityConstants.LOW;
         for (ChannelDB channel : channels) {
             String priority = channel.getPriority();
-            String visibility = channel.getVisibility();
+            String visibility = StringUtils.isNotBlank(channel.getVisibility()) ? channel.getVisibility() : EntityConstants.PUBLIC;
             int compare = compare(priority, curPriority, visibility, curVisibility);
             if(compare < 0) {
                 continue;
