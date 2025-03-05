@@ -23,13 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static com.ke.bella.openapi.login.config.BellaLoginConfiguration.redirectParameter;
 
 public class OAuthLoginFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuthLoginFilter.class);
-    private static final String STATE_ATTRIBUTE = "oauth_state";
     private static final String REDIRECT_HEADER = "X-Redirect-Login";
 
     private final Map<String, OAuthService> oauthServices;

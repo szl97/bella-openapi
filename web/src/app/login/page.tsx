@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { LucideIcon, Mail as MailIcon, Github, Twitter, Facebook } from "lucide-react"
 import { ClientHeader } from "@/components/user/client-header"
 import { openapi } from '@/lib/api/openapi'
+import {UserInfo} from "@/lib/types/openapi";
 
 // 定义 provider 类型
 interface Provider {
@@ -30,9 +31,10 @@ function LoginContent() {
 
   useEffect(() => {
     // 检查是否已登录
-    openapi.get('/userInfo')
+    openapi.get<UserInfo>('/userInfo')
       .then(response => {
-        if (response.data?.code === 200) {
+        console.log(response)
+        if (response.data?.userId) {
           // 已登录，根据 redirect 参数决定跳转
           router.push(redirect || '/')
         } else {

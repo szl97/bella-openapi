@@ -1,7 +1,7 @@
 package com.ke.bella.openapi.login.config;
 
 import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.login.LogoutFilter;
+import com.ke.bella.openapi.login.LoginFilter;
 import com.ke.bella.openapi.login.cas.BellaCasClient;
 import com.ke.bella.openapi.login.cas.BellaCasLoginFilter;
 import com.ke.bella.openapi.login.cas.BellaRedirectFilter;
@@ -139,10 +139,11 @@ public class BellaLoginConfiguration {
     }
 
     @Bean
-    public FilterRegistrationBean<LogoutFilter> logoutFilter(SessionManager sessionManager) {
-        FilterRegistrationBean<LogoutFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new LogoutFilter(sessionManager));
+    public FilterRegistrationBean<LoginFilter> loginFilter(SessionManager sessionManager) {
+        FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new LoginFilter(sessionManager));
         registration.addUrlPatterns("/logout");
+        registration.addUrlPatterns("/userInfo");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
         return registration;
     }
