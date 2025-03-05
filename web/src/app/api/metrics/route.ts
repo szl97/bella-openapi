@@ -1,20 +1,28 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {workflow_apikey, workflow_url} from "@/app/api/config";
+import {
+  workflow_apikey,
+  workflow_url,
+  tenant_id,
+  metrics_workflow_id,
+  isMetricsConfigComplete
+} from "@/app/api/config";
 import {callWorkflow} from '@/lib/api/workflow';
 
 const WORKFLOW_API_URL = workflow_url;
 const API_KEY = workflow_apikey;
-const TENANT_ID = "04633c4f-8638-43a3-a02e-af23c29f821f";
-const WORKFLOW_ID = "WKFL-0e8d61e3-c616-44b4-99fc-e14284cc9b4c";
+const TENANT_ID = tenant_id;
+const WORKFLOW_ID = metrics_workflow_id;
 
 export async function GET(request: NextRequest) {
-  if (!API_KEY) {
-    console.error('WORKFLOW_API_KEY is not set in environment variables');
+  // 检查配置是否完整
+  if (!isMetricsConfigComplete()) {
+    console.error('监控功能配置不完整，请检查环境变量');
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: '功能暂未开放' },
+      { status: 503 }
     );
   }
+
   try {
     const searchParams = new URL(request.url).searchParams;
     const model = searchParams.get('model');
@@ -37,10 +45,10 @@ export async function GET(request: NextRequest) {
     };
 
     const workflowResponse = await callWorkflow(
-      WORKFLOW_API_URL,
-      API_KEY,
-      TENANT_ID,
-      WORKFLOW_ID,
+      WORKFLOW_API_URL || '',
+      API_KEY || '',
+      TENANT_ID || '',
+      WORKFLOW_ID || '',
       inputs
     );
 

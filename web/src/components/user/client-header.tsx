@@ -10,14 +10,14 @@ interface Props {
 }
 
 const EmptyHeader: React.FC<Props> = ({ title }) => (
-    <div className="flex items-center justify-between p-4 bg-background border-b">
-        <h1 className="text-2xl font-bold">{title}</h1>
-    </div>
+    <header className="flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-300">{title}</h1>
+    </header>
 )
 
 const SessionHeader: React.FC<Props & { userInfo: any }> = ({ title, userInfo }) => (
-    <header className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{title || "Bella Openapi"}</h1>
+    <header className="flex justify-between items-center p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-300">{title || "Bella Openapi"}</h1>
         <UserNav user={userInfo} />
     </header>
 )

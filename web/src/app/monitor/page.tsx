@@ -36,6 +36,10 @@ const colors = [
 
 // 动态生成颜色映射
 const getChannelColors = (channels: string[]) => {
+  if (!Array.isArray(channels) || channels.length === 0) {
+    return {};
+  }
+  
   const colorMap: { [key: string]: string } = {};
   // 对 channels 进行排序，确保相同的 channel 总是获得相同的颜色
   const sortedChannels = [...channels].sort();
@@ -47,6 +51,11 @@ const getChannelColors = (channels: string[]) => {
 
 // 转换数据格式
 const transformData = (data: MonitorData[], metricType: keyof MonitorData['metrics']): { time: string; channels: { [key: string]: { value: number; status: number; rawData?: number[] } } }[] => {
+  // 确保 data 是数组
+  if (!Array.isArray(data) || data.length === 0) {
+    return [];
+  }
+  
   // 按时间分组
   const timeGroups = data.reduce((acc, item) => {
     // 确保时间格式为 YYYYMMDDHHMM
@@ -79,6 +88,9 @@ const transformData = (data: MonitorData[], metricType: keyof MonitorData['metri
 
 // 获取所有唯一的渠道
 const getUniqueChannels = (data: MonitorData[]) => {
+  if (!Array.isArray(data) || data.length === 0) {
+    return [];
+  }
   return Array.from(new Set(data.map(item => item.channel_code))).sort();
 };
 
@@ -99,6 +111,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   const [intervalMinutes, setIntervalMinutes] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isServiceUnavailable, setIsServiceUnavailable] = useState(false);
 
   useEffect(() => {
     async function fetchCategoryTrees() {
@@ -139,6 +152,7 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
     async function fetchData() {
       setIsLoading(true);
       setError(null);
+      setIsServiceUnavailable(false);
       try {
         const response = await fetch('/api/metrics?' + new URLSearchParams({
           model: selectedModel,
@@ -147,6 +161,18 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
           end: format(endDate, "yyyyMMddHHmm")
         }));
         const data = await response.json();
+        
+        if (!response.ok) {
+          if (data.error === '功能暂未开放') {
+            setIsServiceUnavailable(true);
+            setError(data.error);
+            setCurrentData([]);
+            return;
+          } else {
+            throw new Error('Failed to fetch metrics data');
+          }
+        }
+        
         setCurrentData(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch metrics data');
@@ -159,10 +185,10 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   }, [selectedModel, selectedEndpoint, startDate, endDate]);
 
   useEffect(() => {
-    const uniqueChannels = getUniqueChannels(currentData);
+    const uniqueChannels = getUniqueChannels(currentData || []);
     setChannels(uniqueChannels);
     setSelectedChannels([]); // 默认不选择任何渠道
-    setChannelColors(getChannelColors(uniqueChannels));
+    setChannelColors(getChannelColors(uniqueChannels || []));
   }, [currentData]);
 
   const handleDateRangeChange = (newStartDate: Date, newEndDate: Date) => {
@@ -223,18 +249,18 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
   };
 
   const metrics: any = {
-    completed: transformData(currentData, 'completed'),
-    ttlt: transformData(currentData, 'ttlt'),
-    ttft: transformData(currentData, 'ttft'),
-    errors: transformData(currentData, 'errors'),
-    request_too_many: transformData(currentData, 'request_too_many'),
-    output_token: transformData(currentData, 'output_token'),
-    input_token: transformData(currentData, 'input_token'),
-    status: transformData(currentData, 'status'),
+    completed: transformData(currentData || [], 'completed'),
+    ttlt: transformData(currentData || [], 'ttlt'),
+    ttft: transformData(currentData || [], 'ttft'),
+    errors: transformData(currentData || [], 'errors'),
+    request_too_many: transformData(currentData || [], 'request_too_many'),
+    output_token: transformData(currentData || [], 'output_token'),
+    input_token: transformData(currentData || [], 'input_token'),
+    status: transformData(currentData || [], 'status'),
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white dark:bg-white">
       <ClientHeader title="能力点监控" />
       <div className="flex">
         <Sidebar
@@ -244,6 +270,37 @@ function MonitorPageContent({ params }: { params: { model: string } }) {
         />
         <main className="flex-1">
           <div className="p-6">
+            {isServiceUnavailable ? (
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      {error}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : error ? (
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700">
+                      {error}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
             <div className="bg-white p-6 rounded-lg shadow-sm space-y-4">
               <div className="flex flex-col space-y-4">
                 <div className="space-y-2">

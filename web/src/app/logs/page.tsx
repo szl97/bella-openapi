@@ -37,6 +37,8 @@ const LogsPage = () => {
   const [logs, setLogs] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [isAkCodeError, setIsAkCodeError] = useState(false)
+  const [isError, setIsError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [totalLogs, setTotalLogs] = useState(0)
@@ -114,6 +116,8 @@ const LogsPage = () => {
       return
     }
     setIsAkCodeError(false)
+    setIsError(false)
+    setErrorMessage('')
 
     setLoading(true)
     try {
@@ -155,13 +159,26 @@ const LogsPage = () => {
       })
 
       const data = await response.json()
-      console.log('Response data:', data)
+      
+      if (!response.ok) {
+        if (data.error === '功能暂未开放') {
+          setIsError(true)
+          setErrorMessage(data.error)
+          setLogs([])
+          setTotalLogs(0)
+          return
+        } else {
+          throw new Error('Failed to fetch logs')
+        }
+      }
       const logs = data.data || []
       setLogs(logs)
       setTotalLogs(logs.length)
       setCurrentPage(1) // 重置到第一页
     } catch (error) {
       console.error('Failed to fetch logs:', error)
+      setIsError(true)
+      setErrorMessage('获取日志失败，请检查配置或稍后重试')
       setLogs([])
       setTotalLogs(0)
     } finally {
@@ -191,21 +208,37 @@ const LogsPage = () => {
   }
 
   const getDisplayedLines = (text: string, expanded: boolean) => {
+    // 检查是否有换行符
     const lines = text.split('\n')
-    if (!expanded && lines.length > 3) {
+    const hasNewlines = lines.length > 1
+    
+    // 检查内容长度
+    const isLongContent = text.length > 100
+    
+    // 如果已展开或者内容既没有多行也不长，直接返回全部内容
+    if (expanded || (!hasNewlines && !isLongContent)) {
       return {
-        text: lines.slice(0, 3).join('\n'),
-        hasMore: true
+        text,
+        hasMore: false
       }
     }
+    
+    // 否则返回截断的内容
+    let truncatedText = ''
+    if (hasNewlines) {
+      truncatedText = lines.slice(0, 3).join('\n')
+    } else {
+      truncatedText = text.substring(0, 100) // 只显示前100个字符
+    }
+    
     return {
-      text,
-      hasMore: false
+      text: truncatedText,
+      hasMore: true
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white dark:bg-white">
       <ClientHeader title="日志查询" />
       <div className="flex">
         <LogsSidebar />
@@ -450,6 +483,13 @@ const LogsPage = () => {
                     </div>
                   </div>
                 )}
+                {isError && (
+                  <div className="mt-4 p-4 border rounded-md bg-blue-50 border-blue-200">
+                    <p className="text-sm text-blue-600 font-medium">
+                      {errorMessage || '获取日志失败，请检查配置或稍后重试'}
+                    </p>
+                  </div>
+                )}
                 {logs.length > 0 ? (
                   <>
                     <div className="bg-white p-4 rounded-lg shadow-sm mb-4 flex justify-between items-center">
@@ -558,7 +598,7 @@ const LogsPage = () => {
                             <pre className="mt-1 p-2 bg-gray-50 border rounded text-sm overflow-x-auto text-gray-900">
                               {getDisplayedLines(log.data_info_msg_request, expandedRequests[index]).text}
                             </pre>
-                            {log.data_info_msg_request.split('\n').length > 3 && (
+                            {(log.data_info_msg_request.split('\n').length > 3 || log.data_info_msg_request.length > 200) && (
                               <button
                                 onClick={() => toggleRequest(index)}
                                 className="mt-1 text-sm text-blue-600 hover:text-blue-800"
@@ -574,7 +614,7 @@ const LogsPage = () => {
                               <pre className="mt-1 p-2 bg-gray-50 border rounded text-sm overflow-x-auto text-gray-900">
                                 {getDisplayedLines(log.data_info_msg_response, expandedResponses[index]).text}
                               </pre>
-                              {log.data_info_msg_response.split('\n').length > 3 && (
+                              {(log.data_info_msg_response.split('\n').length > 3 || log.data_info_msg_response.length > 200) && (
                                 <button
                                   onClick={() => toggleResponse(index)}
                                   className="mt-1 text-sm text-blue-600 hover:text-blue-800"

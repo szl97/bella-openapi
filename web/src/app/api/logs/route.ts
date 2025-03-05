@@ -1,14 +1,21 @@
 import {NextResponse} from 'next/server';
-import {es_apikey, es_url} from "../config";
+import {es_apikey, es_url, isEsConfigComplete} from "../config";
 
 const API_KEY = es_apikey;
 const API_URL = es_url;
 
 export async function POST(request: Request) {
+  if(!isEsConfigComplete()) {
+    console.error('日志功能配置不完整，请检查环境变量');
+    return NextResponse.json(
+      { error: '功能暂未开放' },
+      { status: 503 }
+    );
+  }
   try {
     const body = await request.json();
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(API_URL || '', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

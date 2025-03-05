@@ -18,6 +18,7 @@ interface ServiceConfig {
   fields: string[];
 }
 
+
 export default function TraceLogsPage() {
   const [startDate, setStartDate] = useState<Date>(() => {
     const date = new Date()
@@ -29,11 +30,13 @@ export default function TraceLogsPage() {
   const [akCode, setAkCode] = useState('')
   const [searchType, setSearchType] = useState<'bellaTraceId' | 'akCode'>('bellaTraceId')
   const [services, setServices] = useState<ServiceConfig[]>([]);
-  const [logs, setLogs] = useState<{ [serviceId: string]: any[] }>({});
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('');
+  const [logs, setLogs] = useState<{ [serviceId: string]: any[] }>({})
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('')
   const [currentPages, setCurrentPages] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(false)
   const [isError, setIsError] = useState(false)
+  const [errorType, setErrorType] = useState<'validation' | 'api'>('validation')
+  const [errorMessage, setErrorMessage] = useState('')
   const [showAkCodeDialog, setShowAkCodeDialog] = useState(false)
   const [expandedLogs, setExpandedLogs] = useState<{ [key: string]: boolean }>({});
   const PAGE_SIZE = 10;
@@ -42,14 +45,25 @@ export default function TraceLogsPage() {
     async function fetchServices() {
       try {
         const response = await fetch('/api/logs/trace/service');
-        if (!response.ok) {
-          throw new Error('Failed to fetch services');
-        }
         const data = await response.json();
+        
+        if (!response.ok) {
+          if (data.error === '功能暂未开放') {
+            setIsError(true);
+            setErrorType('api');
+            setErrorMessage(data.error);
+          } else {
+            throw new Error('Failed to fetch services');
+          }
+          return;
+        }
+        
         setServices(data || []);
       } catch (error) {
         console.error('Error fetching services:', error);
         setIsError(true);
+        setErrorType('api');
+        setErrorMessage('获取日志失败，请检查配置或稍后重试');
       }
     }
     fetchServices();
@@ -72,11 +86,16 @@ export default function TraceLogsPage() {
 
   const handleSearch = async () => {
     if (!bellaTraceId && !akCode) {
+      setIsError(true);
+      setErrorType('validation');
+      setErrorMessage(`请输入${searchType === 'bellaTraceId' ? 'BellaTraceID' : 'AKCode'}`);
       return;
     }
 
     setLoading(true);
     setIsError(false);
+    setErrorType('validation');
+    setErrorMessage('');
     try {
       const searchParams = new URLSearchParams({
         start: startDate.getTime().toString(),
@@ -91,40 +110,61 @@ export default function TraceLogsPage() {
 
       // 按顺序查询每个服务
       const results: { [serviceId: string]: any[] } = {};
+      let isServiceUnavailable = false;
+      let serviceUnavailableMessage = '';
+
       for (const service of services) {
         const serviceParams = new URLSearchParams(searchParams);
         serviceParams.append('serviceId', service.serviceId);
 
         const response = await fetch(`/api/logs/trace?${serviceParams.toString()}`);
+        const data = await response.json();
+
         if (!response.ok) {
-          throw new Error('Failed to fetch logs');
+          if (data.error === '功能暂未开放') {
+            isServiceUnavailable = true;
+            serviceUnavailableMessage = data.error;
+            break;
+          } else {
+            throw new Error('Failed to fetch logs');
+          }
         }
 
-        const data = await response.json();
         if (Array.isArray(data)) {
           results[service.serviceId] = data;
         }
       }
 
-      setLogs(results);
+      if (isServiceUnavailable) {
+        setIsError(true);
+        setErrorType('api');
+        setErrorMessage(serviceUnavailableMessage);
+        setLogs({});
+      } else {
+        setLogs(results);
 
-      // 自动选择第一个有日志的服务
-      const serviceWithLogs = Object.entries(results).find(([_, logs]) => logs && logs.length > 0);
-      if (serviceWithLogs) {
-        setSelectedServiceId(serviceWithLogs[0]);
+        // 自动选择第一个有日志的服务
+        const serviceWithLogs = Object.entries(results).find(([_, logs]) => logs && logs.length > 0);
+        if (serviceWithLogs) {
+          setSelectedServiceId(serviceWithLogs[0]);
+        }
       }
     } catch (error) {
       console.error('Error fetching logs:', error);
       setIsError(true);
+      setErrorType('api');
+      setErrorMessage('获取日志失败，请检查配置或稍后重试');
+      // 清空日志数据
+      setLogs({});
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleLogExpansion = (content: string) => {
+  const toggleLogExpansion = (contentKey: string) => {
     setExpandedLogs(prev => ({
       ...prev,
-      [content]: !prev[content]
+      [contentKey]: !prev[contentKey]
     }));
   };
 
@@ -143,48 +183,49 @@ export default function TraceLogsPage() {
   };
 
   const renderLogContent = (content: any) => {
+    // 处理字符串类型
     if (typeof content === 'string') {
-      const lines = content.split('\n');
-      if (lines.length <= 3) {
-        return <span className="break-all">{content}</span>;
+      // 检查内容长度
+      const isLongContent = content.length > 100
+
+      // 如果内容不长，直接显示全部
+      if (!isLongContent) {
+        return <div className="whitespace-pre-wrap break-all">{content}</div>
       }
+
+      // 对于长内容，创建一个唯一的键
+      const contentKey = `str_${content.substring(0, 100)}`
+
+      // 根据展开状态决定显示内容
+      let displayedContent = content
+      if (!expandedLogs[contentKey]) {
+        displayedContent = content.substring(0, 100) + '...'
+      }
+
       return (
         <div>
-          {expandedLogs[content] ? (
-            <div>
-              <span className="break-all">{content}</span>
-              <button
-                onClick={() => toggleLogExpansion(content)}
-                className="ml-2 text-blue-600 hover:text-blue-800 text-sm"
-              >
-                收起
-              </button>
-            </div>
-          ) : (
-            <div>
-              <span className="break-all">
-                {lines.slice(0, 3).join('\n')}
-                {lines.length > 3 && '...'}
-              </span>
-              <button
-                onClick={() => toggleLogExpansion(content)}
-                className="ml-2 text-blue-600 hover:text-blue-800 text-sm"
-              >
-                展开
-              </button>
-            </div>
-          )}
+          <div className="whitespace-pre-wrap break-all">{displayedContent}</div>
+          <button
+            onClick={() => toggleLogExpansion(contentKey)}
+            className="mt-1 text-gray-500 hover:text-gray-700 text-sm"
+          >
+            {expandedLogs[contentKey] ? '收起' : '展开'}
+          </button>
         </div>
-      );
+      )
     }
+
+    // 处理对象类型
     if (typeof content === 'object' && content !== null) {
       return <pre className="whitespace-pre-wrap">{JSON.stringify(content, null, 2)}</pre>;
     }
+
+    // 处理其他类型
     return content?.toString() || '';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white dark:bg-white">
       <ClientHeader title="Bella 链路查询" />
       <div className="flex">
         <LogsSidebar />
@@ -202,6 +243,8 @@ export default function TraceLogsPage() {
                         setBellaTraceId('')
                         setAkCode('')
                         setIsError(false)
+                        setErrorType('validation')
+                        setErrorMessage('')
                       }}
                     >
                       <SelectTrigger className="w-[180px]">
@@ -215,7 +258,7 @@ export default function TraceLogsPage() {
                     {searchType === 'akCode' && (
                       <button
                         onClick={() => setShowAkCodeDialog(true)}
-                        className="text-sm text-blue-600 hover:text-blue-800"
+                        className="text-sm text-gray-600 hover:text-gray-800"
                       >
                         获取 AK Code
                       </button>
@@ -229,6 +272,8 @@ export default function TraceLogsPage() {
                       onChange={(e) => {
                         setBellaTraceId(e.target.value)
                         setIsError(false)
+                        setErrorType('validation')
+                        setErrorMessage('')
                       }}
                       className={`w-full p-2 border rounded bg-white text-gray-900 ${
                         isError ? 'border-red-500' : 'border-gray-300'
@@ -242,6 +287,8 @@ export default function TraceLogsPage() {
                       onChange={(e) => {
                         setAkCode(e.target.value)
                         setIsError(false)
+                        setErrorType('validation')
+                        setErrorMessage('')
                       }}
                       className={`w-full p-2 border rounded bg-white text-gray-900 ${
                         isError ? 'border-red-500' : 'border-gray-300'
@@ -250,10 +297,20 @@ export default function TraceLogsPage() {
                     />
                   )}
 
-                  {isError && (
-                    <p className="text-sm text-red-500">
-                      请输入{searchType === 'bellaTraceId' ? 'BellaTraceID' : 'AKCode'}
-                    </p>
+                  {isError && errorType === 'api' && (
+                    <div className="mt-4 p-4 border rounded-md bg-blue-50 border-blue-200">
+                      <p className="text-sm text-blue-600 font-medium">
+                        {errorMessage || '获取日志失败，请检查配置或稍后重试'}
+                      </p>
+                    </div>
+                  )}
+
+                  {isError && errorType === 'validation' && (
+                    <div className="mt-4 p-4 border rounded-md bg-red-50 border-red-200">
+                      <p className="text-sm text-red-600 font-medium">
+                        {errorMessage}
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -268,7 +325,7 @@ export default function TraceLogsPage() {
                 <button
                   onClick={handleSearch}
                   disabled={loading}
-                  className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-400"
+                  className="w-full bg-black text-white px-4 py-2 rounded hover:bg-gray-800 disabled:bg-gray-400"
                 >
                   {loading ? '查询中...' : '查询'}
                 </button>
@@ -286,7 +343,7 @@ export default function TraceLogsPage() {
                           onClick={() => setSelectedServiceId(service.serviceId)}
                           className={`px-3 py-1 rounded ${
                             selectedServiceId === service.serviceId
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-black text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -295,7 +352,7 @@ export default function TraceLogsPage() {
                             {logs[service.serviceId].length}
                           </span>
                         </button>
-                    ))}
+                      ))}
                   </div>
 
                   {selectedServiceId && logs[selectedServiceId] && (

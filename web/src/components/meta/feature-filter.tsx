@@ -39,8 +39,8 @@ export function FeatureFilter({ features, onSelect, selectedFeatures }: FeatureF
                             px-3 py-1 rounded-full text-sm font-medium
                             transition-all duration-200 ease-in-out
                             ${isSelected(feature.code)
-                            ? 'bg-gray-700 text-white border-2 border-gray-500'
-                            : 'bg-gray-200 text-gray-700 border-2 border-transparent hover:bg-gray-300'}
+                            ? 'bg-blue-400 text-white border-2 border-blue-200 dark:bg-blue-500 dark:border-blue-300'
+                            : 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'}
                         `}
                     >
                         {feature.name}

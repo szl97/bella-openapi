@@ -1,29 +1,37 @@
-import {NextResponse} from 'next/server';
-import {workflow_apikey, workflow_url} from "@/app/api/config";
+import {NextResponse} from "next/server";
+import {
+  workflow_apikey,
+  workflow_url,
+  tenant_id,
+  service_workflow_id,
+  isServiceConfigComplete
+} from "@/app/api/config";
 import {callWorkflow} from '@/lib/api/workflow';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 const WORKFLOW_API_URL = workflow_url;
 const API_KEY = workflow_apikey;
-const TENANT_ID = "04633c4f-8638-43a3-a02e-af23c29f821f";
-const WORKFLOW_ID = "WKFL-58db0d85-401e-44f2-b82d-d9fa5b65f7df";
+const TENANT_ID = tenant_id;
+const WORKFLOW_ID = service_workflow_id;
 
 export async function GET() {
-    if (!API_KEY) {
-        console.error('WORKFLOW_API_KEY is not set in environment variables');
+    // 检查配置是否完整
+    if (!isServiceConfigComplete()) {
+        console.error('服务列表功能配置不完整，请检查环境变量');
         return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
+            { error: '功能暂未开放' },
+            { status: 503 }
         );
     }
+
     try {
         const inputs = {};
         const workflowResponse = await callWorkflow(
-            WORKFLOW_API_URL,
-            API_KEY,
-            TENANT_ID,
-            WORKFLOW_ID,
+            WORKFLOW_API_URL || '',
+            API_KEY || '',
+            TENANT_ID || '',
+            WORKFLOW_ID || '',
             inputs
         );
         return NextResponse.json(workflowResponse.data.outputs.result || []);

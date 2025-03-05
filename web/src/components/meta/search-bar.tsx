@@ -22,9 +22,9 @@ export function SearchBar({ onSearch }: SearchBarProps) {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="flex-grow bg-gray-100 border-gray-300 focus:border-gray-500 focus:ring-2 focus:ring-gray-200"
+                className="flex-grow bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:border-gray-400 focus:ring-1 focus:ring-gray-100 dark:focus:ring-gray-700"
             />
-            <Button onClick={handleSearch} className="bg-gray-700 hover:bg-gray-800 text-white">
+            <Button onClick={handleSearch} className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white">
                 <Search className="mr-2 h-4 w-4" /> 搜索
             </Button>
         </div>

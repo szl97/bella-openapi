@@ -28,14 +28,14 @@ export function UserNav({ user }: UserNavProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Avatar className="h-10 w-10 cursor-pointer border-2 border-gray-500 shadow-lg">
+                <Avatar className="h-10 w-10 cursor-pointer border-2 border-gray-300 dark:border-gray-600 shadow-sm">
                     <AvatarImage src={user.image} alt={user.userName} />
-                    <AvatarFallback className="bg-gray-700 text-white text-lg font-bold">{user.userName.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="bg-black text-white text-lg font-bold">{user.userName.charAt(0)}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
-                <div className="flex items-center justify-center p-2">
-                    <span className="text-sm font-medium">{user.userName}</span>
+                <div className="flex items-center justify-center p-2 bg-gray-100 dark:bg-gray-800">
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-100">{user.userName}</span>
                 </div>
                 <DropdownMenuItem>
                     <Link href="/" className="w-full text-sm">
@@ -64,7 +64,7 @@ export function UserNav({ user }: UserNavProps) {
                         日志查询
                     </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
+                <DropdownMenuItem onClick={handleLogout} className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900 dark:hover:text-red-300">
                     登出
                 </DropdownMenuItem>
             </DropdownMenuContent>
