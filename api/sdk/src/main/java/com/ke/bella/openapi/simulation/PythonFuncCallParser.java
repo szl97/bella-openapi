@@ -96,7 +96,7 @@ public class PythonFuncCallParser {
             return;
         }
 
-        listner.onFunctionName(buffer.toString());
+        listner.onFunctionName(buffer.toString(), funcCalls.size());
         parseNormalCall();
         funcCalls.add(currentCall);
         stateStack.pop();

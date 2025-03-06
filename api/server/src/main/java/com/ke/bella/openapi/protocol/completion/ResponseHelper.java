@@ -72,8 +72,8 @@ public class ResponseHelper {
                 target.setTool_calls(new ArrayList<>());
             }
             for (Message.ToolCall streamToolCall : toolCallList) {
-                //拼接对应id的function
-                String toolId = streamToolCall.getId();
+                //拼接对应index的function
+                int toolIndex = streamToolCall.getIndex();
                 String name = streamToolCall.getFunction().getName();
                 String arguments = streamToolCall.getFunction().getArguments();
                 if(StringUtils.isBlank(name) && StringUtils.isEmpty(arguments)) {
@@ -81,7 +81,7 @@ public class ResponseHelper {
                 }
                 boolean add = true;
                 for (Message.ToolCall toolCall : target.getTool_calls()) {
-                    if(toolCall.getId().equals(toolId)) {
+                    if(toolCall.getIndex() == toolIndex) {
                         add = false;
                         if(StringUtils.isNotBlank(name) && StringUtils.isBlank(toolCall.getFunction().getName())) {
                             toolCall.getFunction().setName(name);

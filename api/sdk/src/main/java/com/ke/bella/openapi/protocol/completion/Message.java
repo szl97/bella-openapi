@@ -91,9 +91,10 @@ public class Message {
             return StringUtils.isBlank(id) ? UUID.randomUUID().toString() : id;
         }
 
-        public static ToolCall fromFunctionName(String name) {
+        public static ToolCall fromFunctionName(String name, int index) {
             return ToolCall.builder()
                     .id(UUID.randomUUID().toString())
+                    .index(index)
                     .type("function")
                     .function(FunctionCall.builder().name(name).arguments("").build())
                     .build();

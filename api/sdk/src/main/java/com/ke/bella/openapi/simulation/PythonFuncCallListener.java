@@ -23,8 +23,8 @@ public class PythonFuncCallListener {
         this.callback = callback;
     }
 
-    public void onFunctionName(String name) {
-        currentToolCall = ToolCall.fromFunctionName(name);
+    public void onFunctionName(String name, int index) {
+        currentToolCall = ToolCall.fromFunctionName(name, index);
         if(callback != null) {
             callback.onMessage(StreamCompletionResponse.builder()
                     .choices(StreamCompletionResponse.toolcallChoice(currentToolCall))
