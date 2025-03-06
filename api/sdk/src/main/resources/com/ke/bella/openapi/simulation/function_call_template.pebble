@@ -56,7 +56,7 @@ def directly_response(type: str, content: str):
   <agent timestamp="{{loop.index}}"> {{ message.content }} </agent>
 {% elseif message.role == "tool" %}
   <action timestamp="{{loop.index}}">
-    <execution> {{ message.tool_call_id }} </execution>
+    <execution>{{ toolMap[message.tool_call_id] }}</execution>
     <result>{{ message.content }}</result>
   </action>
 {% elseif message.role == "function" %}

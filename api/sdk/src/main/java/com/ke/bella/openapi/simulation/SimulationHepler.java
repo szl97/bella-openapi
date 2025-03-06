@@ -58,9 +58,17 @@ public class SimulationHepler {
         }
 
         StringBuilder agentInfo = new StringBuilder();
+        Map<String, String> toolMap = new HashMap<>();
         for (Message msg : req.getMessages()) {
             if(msg.getRole().equals("system")) {
                 agentInfo.append(msg.getContent()).append("\n");
+            }
+            if(msg.getRole().equals("assistant")) {
+                if(CollectionUtils.isNotEmpty(msg.getTool_calls())) {
+                    for(Message.ToolCall call : msg.getTool_calls()) {
+                        toolMap.put(call.getId(), call.getFunction().getName());
+                    }
+                }
             }
         }
 
@@ -82,6 +90,7 @@ public class SimulationHepler {
         env.put("req", req);
         env.put("functions", functions);
         env.put("agent_info", agentInfo.toString());
+        env.put("toolMap", toolMap);
         String prompt = Renders.render("com/ke/bella/openapi/simulation/function_call_template.pebble", env);
         Message msg = Message.builder()
                 .role("user")
