@@ -267,7 +267,7 @@ public class ApikeyService {
 
     public ApikeyInfo queryByCode(String code, boolean onlyActive) {
         ApikeyInfo apikeyInfo = apikeyRepo.queryByCode(code);
-        if(onlyActive && apikeyInfo.getStatus().equals(INACTIVE)) {
+        if(apikeyInfo == null ||(onlyActive && apikeyInfo.getStatus().equals(INACTIVE))) {
             return null;
         }
         return apikeyInfo;

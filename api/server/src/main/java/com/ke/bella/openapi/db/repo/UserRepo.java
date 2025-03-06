@@ -1,8 +1,8 @@
 package com.ke.bella.openapi.db.repo;
 
 import com.ke.bella.openapi.Operator;
-
 import com.ke.bella.openapi.login.user.IUserRepo;
+import com.ke.bella.openapi.tables.pojos.UserDB;
 import com.ke.bella.openapi.tables.records.UserRecord;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import org.jooq.DSLContext;
@@ -55,17 +55,27 @@ public class UserRepo implements IUserRepo {
         return operator;
     }
 
-    public void addManagerBySourceAndSourceId(String source, String sourceId, String managerAk) {
+    public UserDB addManagerById(Long id, String managerAk) {
+        dsl.update(USER)
+                .set(USER.MANAGER_AK, managerAk)
+                .where(USER.ID.eq(id))
+                .execute();
+        return dsl.selectFrom(USER).where(USER.ID.eq(id)).fetchOneInto(UserDB.class);
+    }
+
+    public UserDB addManagerBySourceAndSourceId(String source, String sourceId, String managerAk) {
         dsl.update(USER)
                 .set(USER.MANAGER_AK, managerAk)
                 .where(USER.SOURCE_ID.eq(sourceId).and(USER.SOURCE.eq(source)))
                 .execute();
+        return dsl.selectFrom(USER).where(USER.SOURCE_ID.eq(sourceId).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
     }
 
-    public void addManagerBySourceAndEmail(String source, String email, String managerAk) {
+    public UserDB addManagerBySourceAndEmail(String source, String email, String managerAk) {
         dsl.update(USER)
                 .set(USER.MANAGER_AK, managerAk)
                 .where(USER.EMAIL.eq(email).and(USER.SOURCE.eq(source)))
                 .execute();
+        return dsl.selectFrom(USER).where(USER.EMAIL.eq(email).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
     }
 }

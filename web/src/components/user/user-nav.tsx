@@ -34,8 +34,17 @@ export function UserNav({ user }: UserNavProps) {
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
-                <div className="flex items-center justify-center p-2 bg-gray-100 dark:bg-gray-800">
-                    <span className="text-sm font-medium text-gray-800 dark:text-gray-100">{user.userName}</span>
+                <div className="flex flex-col items-center justify-center p-2 bg-gray-100 dark:bg-gray-800">
+                    <div className="flex flex-col items-center">
+                        <span className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                            {user.userName}
+                        </span>
+                        <div className="flex items-center space-x-1 mt-0.5">
+                            <span className="text-[10px] px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-gray-600 dark:text-gray-300">
+                                ID: {user.userId}
+                            </span>
+                        </div>
+                    </div>
                 </div>
                 <DropdownMenuItem>
                     <Link href="/" className="w-full text-sm">

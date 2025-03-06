@@ -1,9 +1,13 @@
 package com.ke.bella.openapi.endpoints;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.annotations.BellaAPI;
-import com.ke.bella.openapi.BellaContext;
+import com.ke.bella.openapi.apikey.ApikeyInfo;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.db.repo.UserRepo;
+import com.ke.bella.openapi.service.ApikeyService;
+import com.ke.bella.openapi.tables.pojos.UserDB;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserInfoController {
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private ApikeyService apikeyService;
 
     @GetMapping
     public Operator whoami() {
@@ -28,15 +34,25 @@ public class UserInfoController {
     }
 
     @PostMapping("/manager")
-    public Boolean addManager(@RequestBody Operator op) {
+    public UserDB addManager(@RequestBody Operator op) {
         Assert.hasText(op.getManagerAk(), "managerAk is required");
-        Assert.hasText(op.getSource(), "source is required");
-        Assert.isTrue(StringUtils.hasText(op.getEmail()) || StringUtils.hasText(op.getSourceId()), "sourceId or email is required");
-        if(StringUtils.hasText(op.getSourceId())) {
-            userRepo.addManagerBySourceAndSourceId(op.getSource(), op.getSourceId(), op.getManagerAk());
-        } else {
-            userRepo.addManagerBySourceAndEmail(op.getSource(), op.getEmail(), op.getManagerAk());
+        Assert.isTrue((op.getUserId() != null && op.getUserId() > 0) ||(StringUtils.hasText(op.getSource()) && (StringUtils.hasText(op.getEmail()) || StringUtils.hasText(op.getSourceId()))),
+                "invalid params");
+        ApikeyInfo apikeyInfo = apikeyService.queryByCode(op.getManagerAk(), true);
+        if(apikeyInfo == null) {
+            throw new BizParamCheckException("apikey不存在");
         }
-        return true;
+        UserDB user;
+        if(op.getUserId() != null && op.getUserId() > 0) {
+            user = userRepo.addManagerById(op.getUserId(), op.getManagerAk());
+        } else if(StringUtils.hasText(op.getSourceId())) {
+            user = userRepo.addManagerBySourceAndSourceId(op.getSource(), op.getSourceId(), op.getManagerAk());
+        } else {
+            user = userRepo.addManagerBySourceAndEmail(op.getSource(), op.getEmail(), op.getManagerAk());
+        }
+        if(user == null) {
+            throw new BizParamCheckException("用户不存在");
+        }
+        return user;
     }
 }

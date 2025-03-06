@@ -20,10 +20,10 @@ public enum MetadataFeatures {
     PROTECTED("protected", "内部已备案", ImmutableSet.of("*")),
     LARGE_INPUT_CONTEXT("long_input_context", "超长上下文", ImmutableSet.of("/v1/chat/completions")),
     LARGE_OUTPUT_CONTEXT("long_output_context", "超长输出", ImmutableSet.of("/v1/chat/completions")),
+    REASON_CONTENT("reason_content", "深度思索", ImmutableSet.of("/v1/chat/completions")),
     STREAM("stream", "流式", ImmutableSet.of("/v1/chat/completions")),
     FUNCTION_CALL("function_call", "工具调用", ImmutableSet.of("/v1/chat/completions")),
     STREAM_FUNCTION_CALL("stream_function_call", "流式工具调用", ImmutableSet.of("/v1/chat/completions")),
-    PARALLEL_TOOL_CALLS("parallel_tool_calls", "并行工具调用", ImmutableSet.of("/v1/chat/completions")),
     VISION("vision", "视觉", ImmutableSet.of("/v1/chat/completions")),
     JSON_FORMAT("json_format", "json格式", ImmutableSet.of("/v1/chat/completions"))
     ;

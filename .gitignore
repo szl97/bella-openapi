@@ -73,3 +73,6 @@ api/config-cache/bella-openapi/config-cache/bella-openapi\+default\+application.
 api/mysql/data/
 
 api/redis/data/
+
+system-apikey.txt
+

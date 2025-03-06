@@ -68,8 +68,8 @@ export function EditableField({ label, value, onUpdate, multiline, options }: Ed
         <div className="space-y-1 bg-white bg-opacity-50 p-3 rounded-lg">
             <div className="flex justify-between items-center">
                 <Label className="text-sm font-medium text-gray-700">{label}</Label>
-                <Button onClick={() => setIsEditing(true)} variant="default"
-                        className="text-blue-600 hover:text-blue-800">
+                <Button onClick={() => setIsEditing(true)} variant="ghost"
+                        className="bg-white text-gragy-600 hover:text-blue-800">
                     编辑
                 </Button>
             </div>

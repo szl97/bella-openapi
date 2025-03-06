@@ -4,15 +4,14 @@
 
 - [项目结构](#项目结构)
 - [使用 Docker Compose 启动项目](#使用-docker-compose-启动项目)
-  - [前提条件](#前提条件)
+- [前提条件](#前提条件)
 - [启动服务](#启动服务)
-  - [使用脚本启动](#使用脚本启动)
-  - [快速构建（跳过依赖安装）](#快速构建跳过依赖安装)
-  - [使用 Docker Compose 命令](#使用-docker-compose-命令)
 - [环境变量配置](#环境变量配置)
 - [停止服务](#停止服务)
 - [查看日志](#查看日志)
 - [重启服务](#重启服务)
+- [生成系统API Key](#生成系统api-key)
+- [授权管理员](#授权管理员)
 - [常见问题与解决方案](#常见问题与解决方案)
 
 ## 项目结构
@@ -31,8 +30,6 @@
 
 ## 启动服务
 
-### 使用脚本启动
-
 ```bash
 ./start.sh [选项]
 ```
@@ -41,40 +38,20 @@
 - `-b, --build`: 重新构建服务
 - `-r, --rebuild`: 强制重新构建服务（不使用缓存）
 - `-e, --env ENV`: 指定环境（dev, test, prod）
-- `--skip-install`: 跳过依赖安装（加快构建速度）
 - `-h, --help`: 显示帮助信息
+- `--skip-auth`: 跳过授权步骤
 
 示例:
 ```bash
 ./start.sh                       # 启动服务，不重新构建
-./start.sh -b                    # 启动服务并重新构建
+./start.sh -b                    # 启动服务并重新构建（会使用缓存，增量修改编译较快）
 ./start.sh -r                    # 启动服务并强制重新构建（不使用缓存）
 ./start.sh -e test               # 以测试环境启动服务
 ./start.sh -b -e prod            # 重新构建并以生产环境启动服务
 ./start.sh --skip-install        # 跳过依赖安装，加快构建速度
+./start.sh --skip-auth           # 启动服务但跳过授权步骤
 ```
 
-### 快速构建（跳过依赖安装）
-
-快速构建脚本会自动优化构建过程，提高开发效率：
-
-1. 如果本地已有 node_modules 目录，将直接使用它
-2. 如果本地没有 node_modules 目录，脚本会自动安装依赖
-3. 使用 Docker 卷挂载技术，避免在容器内重复安装依赖
-
-```bash
-./fast-build.sh [选项]
-```
-
-选项:
-- `-e, --env ENV`: 指定环境（dev, test, prod），默认为 dev
-
-示例:
-```bash
-./fast-build.sh                  # 快速构建开发环境
-./fast-build.sh -e test          # 快速构建测试环境
-./fast-build.sh -e prod          # 快速构建生产环境
-```
 
 ### 使用 Docker Compose 命令
 
@@ -180,11 +157,130 @@ docker-compose up -d --build api
 docker-compose up -d --build web
 ```
 
+## 生成系统API Key
+
+系统初始化时需要生成一个系统级别的API Key，用于管理和访问所有API资源。我们提供了一个脚本来自动生成系统API Key并将其写入数据库。
+./start.sh 启动服务时会自动生成。如需手动生成，请使用 ./generate-system-apikey.sh 脚本。
+
+### 使用方法
+
+#### 直接在Docker环境中执行
+./generate-system-apikey.sh
+
+#### 使用自定义数据库连接参数
+DB_USER=bella_user DB_PASS=123456 ./generate-system-apikey.sh
+
+### 脚本功能
+
+1. 检查数据库中是否已存在系统API Key
+2. 如果不存在，生成一个新的系统API Key并写入数据库
+3. 如果已存在，显示现有系统API Key的信息
+4. 将API Key信息保存到`system-apikey.txt`文件中
+
+### 重要说明
+
+- 系统API Key具有最高权限，请妥善保管
+- API Key只会在生成时显示一次，之后只能看到掩码版本
+- 如果丢失API Key，需要重新生成一个新的，如果是系统AK，需要将其设置为失效，并重新生成
+- 生成的API Key具有`all`角色，可以访问所有端点
+- 脚本需要在Docker环境中运行，会自动连接到MySQL容器
+
+### 示例输出
+
+```
+正在生成系统API key...
+检查数据库中是否已存在系统API key...
+在数据库中插入新的系统API key...
+成功生成并插入系统API key到数据库。
+API Key Code: ak-026e84f5-8a1c-4243-a800-d44581f0f1b7
+API Key: 9be9d54d-d4ae-4510-8819-a62a4e69e57b
+API Key SHA-256: d58ed6447aa8da22d6fa3064d242f8f8dd74a6df4a1663084f4003b2d559b9ea
+API Key Display: 9b****e57b
+API key详细信息已保存到 system-apikey.txt
+重要: 请妥善保管此信息，API key只会显示一次！
+完成。
+
+```
+
+### 授权管理员
+
+系统初始化后，需要授权管理员用户。管理员用户可以管理API Key、用户权限等系统资源。
+
+#### 授权流程
+
+1. 首先启动服务并生成系统API Key
+   ```bash
+   ./start.sh
+   ```
+   如果新生成系统ak时会自动进入管理员授权流程，如果不想在启动时进行管理员授权（仍会检查系统ak是否需要生成），可以使用`--skip-auth`参数：
+   ```bash
+   ./start.sh --skip-auth
+   ```
+   
+   注意：如果系统中已存在API Key，脚本会自动跳过管理员授权步骤。只有在首次生成新的API Key时才会询问是否需要授权管理员。
+
+2. 启动脚本会询问您是否需要授权管理员
+   - 如果选择"是"，脚本会引导您完成整个授权流程
+   - 如果选择"否"，您可以稍后手动运行授权脚本
+   - 如果使用了 `--skip-auth` 参数，则会跳过询问步骤
+
+3. 按照提示登录前端页面获取用户ID或邮箱
+   - 访问 http://localhost:3000
+   - 使用第三方账号登录（如Google、GitHub等）
+   - 点击右上角头像，查看个人信息获取用户ID或邮箱
+
+4. 授权脚本会自动启动，根据提示输入用户信息
+   - 可以选择使用用户ID或邮箱进行授权
+   - 按照脚本提示输入相关信息
+
+5. 如果您稍后需要授权管理员，可以随时运行：
+   ```bash
+   ./authorize-admin.sh
+   ```
+6. 授权后点击头像登出系统，重新登录即可拥有管理员权限
+
+#### 手动授权
+
+也可以使用curl命令手动授权：
+
+##### 使用用户ID授权
+```bash
+curl --location 'http://localhost:8080/console/userInfo/manager' \
+--header 'Authorization: Bearer YOUR_SYSTEM_API_KEY' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "managerAk": "YOUR_SYSTEM_API_KEY_CODE",
+    "userId": YOUR_USER_ID,
+    "userName": "YOUR_USER_NAME"
+}'
+```
+
+##### 使用邮箱授权
+```bash
+curl --location 'http://localhost:8080/console/userInfo/manager' \
+--header 'Authorization: Bearer YOUR_SYSTEM_API_KEY' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "managerAk": "YOUR_SYSTEM_API_KEY_CODE",
+    "source": "google",
+    "email": "YOUR_EMAIL@gmail.com",
+    "userId": 0,
+    "userName": "YOUR_USER_NAME"
+}'
+```
+
 ## 常见问题与解决方案
 
 ### 1. 前端使用development环境时运行启动脚本编译失败
 
 next.js在dev环境做了预加载相关的优化，如果一定需要使用dev环境，推荐使用next.dev单独启动web服务
 
+### 2. 初始化并启动系统，清除原有数据（开发、测试环境）
+
+1. 删除数据库：`docker exec -it bella-openapi-mysql mysql -uroot -p123456 -e "drop database bella_openapi;"` (如非默用户名和密码，请替换为您的用户名和密码)
+2. 停止服务：`./stop.sh`
+3. 删除mysql数据缓存：`rm -rf ./api/mysql`
+4. 删除redis数据缓存：`rm -rf ./api/redis`
+5. 重新构建并启动：`./start.sh -b`
 ---
-*最后更新: 2025-03-05*
+*最后更新: 2025-03-06*
