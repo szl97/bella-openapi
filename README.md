@@ -52,14 +52,6 @@
 ./start.sh --skip-auth           # 启动服务但跳过授权步骤
 ```
 
-
-### 使用 Docker Compose 命令
-
-```bash
-docker-compose up -d             # 启动服务
-docker-compose up -d --build     # 启动服务并重新构建
-```
-
 ## 环境变量配置
 
 ### 环境变量优先级
