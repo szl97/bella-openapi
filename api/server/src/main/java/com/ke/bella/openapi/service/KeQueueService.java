@@ -13,11 +13,11 @@ import java.util.List;
 
 @Component
 public class KeQueueService {
-    @Value("${queue.put.task.url:null}")
+    @Value("${queue.put.task.url:#{null}")
     String putTaskUrl;
-    @Value("${queue.get.task.result.url:null}")
+    @Value("${queue.get.task.result.url:#{null}")
     String getTaskResultUrl;
-    @Value("${bella.file.url:null}")
+    @Value("${bella.file.url:#{null}")
     String fileUrl;
 
     public QueueTaskPutResp putTask(Object task, String endpoint, String model, String auth) {

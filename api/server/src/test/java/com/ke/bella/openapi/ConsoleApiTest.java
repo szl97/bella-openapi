@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -51,6 +52,9 @@ public class ConsoleApiTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Value("${test.apikey:#{null}}")
+    private String testApikey;
+
     private String currentFile = null;
 
     @Test
@@ -66,7 +70,8 @@ public class ConsoleApiTest {
                     def.setMethod(strs[0]);
                     def.setUrl(strs[1]);
                 } else if (i % 5 == 1) {
-                    def.setHeaders(JacksonUtils.toMap(formatRequest(lines.get(i), answers)));
+                    String line = lines.get(i).replace("{testApikey}", testApikey);
+                    def.setHeaders(JacksonUtils.toMap(formatRequest(line, answers)));
                 } else if(i % 5 == 2) {
                     def.setRequest(formatRequest(lines.get(i), answers));
                 } else if(i % 5 == 3) {

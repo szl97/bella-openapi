@@ -8,6 +8,8 @@ public interface CompletionAdaptor<T extends CompletionProperty> extends IProtoc
 
     void streamCompletion(CompletionRequest request, String url, T property, Callbacks.StreamCompletionCallback callback);
 
+
+
     @Override
     default String endpoint() {
         return "/v1/chat/completions";

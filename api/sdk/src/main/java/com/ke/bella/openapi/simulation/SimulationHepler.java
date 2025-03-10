@@ -20,7 +20,6 @@ import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse.Choice;
 import com.ke.bella.openapi.protocol.completion.Message;
 import com.ke.bella.openapi.protocol.completion.Message.Function;
-import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.Renders;
 
 public class SimulationHepler {
@@ -31,7 +30,7 @@ public class SimulationHepler {
         parser.parse();
 
         return sfc.getToolcalls().isEmpty() ? CompletionResponse.assistantMessageChoice(reasoning, sfc.getBuffer().toString())
-                : CompletionResponse.toolcallChoice(sfc.getToolcalls());
+                : CompletionResponse.toolcallChoice(reasoning, sfc.getToolcalls());
     }
 
     public static void parse(Reader cs, FunctionCallListener callback) throws IOException {

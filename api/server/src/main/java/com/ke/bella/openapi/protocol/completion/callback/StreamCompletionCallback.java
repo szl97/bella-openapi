@@ -100,6 +100,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
     }
 
     private void updateBuffer(StreamCompletionResponse streamResponse) {
+        ResponseHelper.overwrite(responseBuffer, streamResponse);
         if(CollectionUtils.isEmpty(streamResponse.getChoices()) || streamResponse.getChoices().get(0).getDelta() == null) {
             return;
         }
@@ -110,7 +111,6 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
         if(firstPackageTime == null) {
             firstPackageTime = streamResponse.getCreated();
         }
-        ResponseHelper.overwrite(responseBuffer, streamResponse);
         StreamCompletionResponse.Choice choice = streamResponse.getChoices().get(0);
         Integer choiceIndex = choice.getIndex();
         if(!choiceBuffer.containsKey(choiceIndex)) {

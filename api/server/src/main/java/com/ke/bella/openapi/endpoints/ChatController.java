@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.endpoints;
 
+import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Map;
 
 @EndpointAPI
 @RestController
@@ -62,7 +65,9 @@ public class ChatController {
         String channelInfo = channel.getChannelInfo();
         CompletionAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, CompletionAdaptor.class);
         CompletionProperty property = (CompletionProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
-
+        if(isMock) {
+            fillMockProperty(property);
+        }
         if(property.isFunctionCallSimulate()) {
             adaptor = new ToolCallSimulator<>(adaptor);
         }
@@ -80,5 +85,15 @@ public class ChatController {
         response.setSensitives(responseRiskData);
         response.setRequestRiskData(requestRiskData);
         return response;
+    }
+
+    private void fillMockProperty(CompletionProperty property) {
+        Map<String, String> requestInfo = BellaContext.getHeaders();
+        String functionCallSimulate = requestInfo.get("X-BELLA-FUNCTION-SIMULATE");
+        String mergeReasoningContent = requestInfo.get("X-BELLA-MERGE-REASONING");
+        String splitReasoningFromContent = requestInfo.get("X-BELLA-SPLIT-REASONING");
+        property.setFunctionCallSimulate("true".equals(functionCallSimulate) || property.isFunctionCallSimulate());
+        property.setMergeReasoningContent("true".equals(mergeReasoningContent) || property.isMergeReasoningContent());
+        property.setSplitReasoningFromContent("true".equals(splitReasoningFromContent) || property.isSplitReasoningFromContent());
     }
 }

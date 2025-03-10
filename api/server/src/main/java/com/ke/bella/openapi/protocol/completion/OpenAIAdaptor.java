@@ -1,26 +1,22 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
-import com.ke.bella.openapi.utils.DateTimeUtils;
-import com.ke.bella.openapi.utils.HttpUtils;
-import com.ke.bella.openapi.utils.JacksonUtils;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
+import com.ke.bella.openapi.utils.DateTimeUtils;
+import com.ke.bella.openapi.utils.HttpUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
+
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
 @Component("OpenAICompletion")
 public class OpenAIAdaptor implements CompletionAdaptor<OpenAIProperty> {
 
-    private final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = (id, event, str) -> {
-        StreamCompletionResponse response = JacksonUtils.deserialize(str, StreamCompletionResponse.class);
-        if(response != null) {
-            response.setCreated(DateTimeUtils.getCurrentSeconds());
-        }
-        return response;
-    };
+    public final Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter = new Callbacks.DefaultSseConverter();
 
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property) {

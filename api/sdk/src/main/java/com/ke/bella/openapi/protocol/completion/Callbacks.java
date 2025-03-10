@@ -1,5 +1,7 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import com.ke.bella.openapi.utils.DateTimeUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import org.springframework.util.Assert;
 
 import com.ke.bella.openapi.common.exception.ChannelException;
@@ -11,6 +13,18 @@ public interface Callbacks {
     @FunctionalInterface
     interface SseEventConverter<T> {
         T convert(String id, String event, String msg);
+    }
+
+    class DefaultSseConverter implements SseEventConverter<StreamCompletionResponse> {
+
+        @Override
+        public StreamCompletionResponse convert(String id, String event, String msg) {
+            StreamCompletionResponse response = JacksonUtils.deserialize(msg, StreamCompletionResponse.class);
+            if(response != null) {
+                response.setCreated(DateTimeUtils.getCurrentSeconds());
+            }
+            return response;
+        }
     }
 
     interface StreamCompletionCallback extends Callbacks {

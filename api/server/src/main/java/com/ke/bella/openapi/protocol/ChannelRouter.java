@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.EntityConstants;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
@@ -41,9 +42,7 @@ public class ChannelRouter {
     private Integer freeConcurrent;
 
     public ChannelDB route(String endpoint, String model, EndpointProcessData processData) {
-        if(processData.isMock()) {
-            return mockChannel();
-        }
+        boolean isMock = processData.isMock();
         List<ChannelDB> channels;
         String entityCode;
         if(model != null) {
@@ -54,10 +53,19 @@ public class ChannelRouter {
             entityCode = endpoint;
             channels = channelService.listActives(EntityConstants.ENDPOINT, endpoint);
         }
-        Assert.isTrue(CollectionUtils.isNotEmpty(channels), "没有可用渠道");
-        channels = filter(channels, entityCode, processData.getAccountType(), processData.getAccountCode());
+        if(CollectionUtils.isEmpty(channels)) {
+            if(isMock) {
+                return mockChannel(null);
+            } else {
+                throw new BizParamCheckException("没有可用渠道");
+            }
+        }
+        if(!isMock) {
+            channels = filter(channels, entityCode, processData.getAccountType(), processData.getAccountCode());
+        }
         channels = pickMaxPriority(channels);
-        return random(channels);
+        ChannelDB channel = random(channels);
+        return isMock ? mockChannel(channel) : channel;
     }
 
     /**
@@ -169,15 +177,15 @@ public class ChannelRouter {
         return list.get(rand);
     }
 
-    private ChannelDB mockChannel() {
+    private ChannelDB mockChannel(ChannelDB origin) {
         ChannelDB channel = new ChannelDB();
         channel.setChannelCode("ch-mock");
         channel.setProtocol("MockAdaptor");
         channel.setEntityType(EntityConstants.ENDPOINT);
         channel.setEntityCode("mock");
         channel.setPriceInfo("{}");
-        channel.setChannelInfo("{}");
-        channel.setSupplier("AIT");
+        channel.setChannelInfo(origin != null ? origin.getChannelInfo() : "{}");
+        channel.setSupplier("system");
         channel.setUrl("");
         return channel;
     }

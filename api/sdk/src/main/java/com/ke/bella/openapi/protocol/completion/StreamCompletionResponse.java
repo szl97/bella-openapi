@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol.completion;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.collect.Lists;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.Message.ToolCall;
 import lombok.AllArgsConstructor;
@@ -77,6 +78,16 @@ public class StreamCompletionResponse extends OpenapiResponse {
         choices.get(0).setReasoning(reasoning);
     }
 
+    public void setToolCall(ToolCall toolCall) {
+        Assert.notNull(choices, "choices must not be null");
+        choices.get(0).setTooCall(toolCall);
+    }
+
+    public void setFinishReason(String finishReason) {
+        Assert.notNull(choices, "choices must not be null");
+        choices.get(0).setFinish_reason(finishReason);
+    }
+
     public String finishReason() {
         if(CollectionUtils.isNotEmpty(choices)
                 && choices.get(0).getFinish_reason() != null) {
@@ -133,6 +144,11 @@ public class StreamCompletionResponse extends OpenapiResponse {
         public void setReasoning(String reasoning) {
             Assert.notNull(delta, "delta must not be null");
             delta.setReasoning_content(reasoning);
+        }
+
+        public void setTooCall(ToolCall toolCall) {
+            Assert.notNull(delta, "delta must not be null");
+            delta.setTool_calls(Lists.newArrayList(toolCall));
         }
     }
 
