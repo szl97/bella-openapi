@@ -1,19 +1,21 @@
 package com.ke.bella.openapi.protocol.tts;
 
+import static org.springframework.http.MediaType.TEXT_EVENT_STREAM;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ke.bella.openapi.EndpointProcessData;
-import com.ke.bella.openapi.protocol.OpenapiResponse;
-import com.ke.bella.openapi.protocol.log.EndpointLogger;
-import com.ke.bella.openapi.utils.DateTimeUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.log.EndpointLogger;
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
 import lombok.Data;
@@ -21,9 +23,7 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okio.ByteString;
 
-import static org.springframework.http.MediaType.TEXT_EVENT_STREAM;
-
-public class HuoshanStreamTtsCallback implements Callbacks.WebSocketStreamTtsCallback {
+public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback {
     private static final int PROTOCOL_VERSION = 0b0001;
     private static final int DEFAULT_HEADER_SIZE = 0b0001;
 

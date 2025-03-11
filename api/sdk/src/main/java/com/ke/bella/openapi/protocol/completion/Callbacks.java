@@ -46,7 +46,10 @@ public interface Callbacks {
         }
     }
 
-    interface WebSocketStreamTtsCallback extends Callbacks {
+    interface StreamTtsCallback extends Callbacks {
+    }
+
+    interface WebSocketTtsCallback extends StreamTtsCallback {
        void onOpen(WebSocket webSocket, Response response);
        void onMessage(WebSocket webSocket, ByteString bytes);
        void onMessage(WebSocket webSocket, String text);

@@ -1,25 +1,26 @@
 package com.ke.bella.openapi.protocol.tts;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 
-import com.ke.bella.openapi.EndpointContext;
-import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.OpenapiResponse;
-import com.ke.bella.openapi.protocol.log.EndpointLogger;
-import com.ke.bella.openapi.utils.HttpUtils;
-import com.ke.bella.openapi.utils.JacksonUtils;
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.UUID;
+import com.ke.bella.openapi.EndpointContext;
+import com.ke.bella.openapi.EndpointProcessData;
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.log.EndpointLogger;
+import com.ke.bella.openapi.utils.HttpUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
-import static org.springframework.data.redis.connection.ReactiveStreamCommands.AddStreamRecord.body;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 @Slf4j
 @Component("HuoShanTts")
@@ -37,8 +38,7 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
     }
 
     @Override
-    public void streamTts(TtsRequest request, String url, HuoShanProperty property, SseEmitter sse, EndpointLogger logger) {
-        HuoshanStreamTtsCallback callback = new HuoshanStreamTtsCallback(request, sse, EndpointContext.getProcessData(), logger);
+    public void streamTts(TtsRequest request, String url, HuoShanProperty property, Callbacks.StreamTtsCallback callback) {
         Request webSocketRequest = new Request.Builder()
                 .url(property.websocketUrl)
                 .header("X-Api-App-Key", property.appId)
@@ -46,7 +46,12 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
                 .header("X-Api-Resource-Id", property.resourceId)
                 .header("X-Api-Connect-Id", UUID.randomUUID().toString())
                 .build();
-        HttpUtils.websocketRequest(webSocketRequest, new WebSocketTtsListener(callback));
+        HttpUtils.websocketRequest(webSocketRequest, new WebSocketTtsListener((Callbacks.WebSocketTtsCallback) callback));
+    }
+
+    @Override
+    public Callbacks.StreamTtsCallback buildCallback(TtsRequest request, SseEmitter sse, EndpointProcessData processData, EndpointLogger logger) {
+        return new HuoshanStreamTtsCallback(request, sse, EndpointContext.getProcessData(), logger);
     }
 
     private HuoShanRequest convertTtsRequestToHuoShanRequest(TtsRequest ttsRequest, HuoShanProperty property) {

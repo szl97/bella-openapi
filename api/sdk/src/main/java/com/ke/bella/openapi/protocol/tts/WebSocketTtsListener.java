@@ -8,9 +8,9 @@ import okhttp3.WebSocket;
 import okio.ByteString;
 
 public class WebSocketTtsListener extends BellaWebSocketListener {
-    private final Callbacks.WebSocketStreamTtsCallback callback;
+    private final Callbacks.WebSocketTtsCallback callback;
 
-    public WebSocketTtsListener(Callbacks.WebSocketStreamTtsCallback callback) {
+    public WebSocketTtsListener(Callbacks.WebSocketTtsCallback callback) {
         this.callback = callback;
     }
 
