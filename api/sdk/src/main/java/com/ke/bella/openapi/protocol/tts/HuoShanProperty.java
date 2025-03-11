@@ -12,4 +12,6 @@ public class HuoShanProperty extends TtsProperty {
     String deployName;
     String appId;
     String cluster;
+    String resourceId;
+    String websocketUrl;
 }

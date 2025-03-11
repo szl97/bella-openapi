@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol.completion;
 
 import com.google.common.collect.ImmutableSet;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.BellaEventSourceListener;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
@@ -14,9 +15,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
-public class CompletionSseListener extends EventSourceListener {
-    @Setter
-    private CompletableFuture<?> connectionInitFuture;
+public class CompletionSseListener extends BellaEventSourceListener {
     private Callbacks.StreamCompletionCallback callback;
     private Callbacks.SseEventConverter<StreamCompletionResponse> sseConverter;
     private final Set<String> DONE_FLAGS = ImmutableSet.of("[DONE]");
@@ -30,7 +29,7 @@ public class CompletionSseListener extends EventSourceListener {
     @Override
     public void onOpen(EventSource eventSource, Response response) {
         callback.onOpen();
-        this.connectionInitFuture.complete(null);
+        super.onOpen(eventSource, response);
     }
 
     @Override

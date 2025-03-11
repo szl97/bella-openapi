@@ -12,6 +12,8 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.BellaEventSourceListener;
+import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.completion.Callbacks;
 import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
 
@@ -22,6 +24,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.WebSocketListener;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
@@ -42,6 +45,7 @@ public class HttpUtils {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectionPool(connectionPool)
                 .dispatcher(dispatcher)
+                .pingInterval(50, TimeUnit.SECONDS)
                 .connectTimeout(2, TimeUnit.MINUTES)
                 .readTimeout(5, TimeUnit.MINUTES);
         return builder.build();
@@ -171,12 +175,29 @@ public class HttpUtils {
         }
     }
 
-    public static void streamRequest(Request request, CompletionSseListener listener) {
+    public static void streamRequest(Request request, BellaEventSourceListener listener) {
         CompletableFuture<?> future = new CompletableFuture<>();
         listener.setConnectionInitFuture(future);
         factory.newEventSource(request, listener);
         try {
              future.get();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+            Thread.currentThread().interrupt();
+        }  catch (ExecutionException e) {
+            if(e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void websocketRequest(Request request, BellaWebSocketListener listener) {
+        CompletableFuture<?> future = new CompletableFuture<>();
+        listener.setConnectionInitFuture(future);
+        client.newWebSocket(request, listener);
+        try {
+            future.get();
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
             Thread.currentThread().interrupt();

@@ -40,4 +40,5 @@ public class EndpointProcessData {
     private boolean isMock;
     private String bellaTraceId;
     private boolean functionCallSimulate;
+    private String channelRequestId;
 }

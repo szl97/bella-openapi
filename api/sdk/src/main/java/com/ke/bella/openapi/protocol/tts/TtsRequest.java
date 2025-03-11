@@ -17,4 +17,5 @@ public class TtsRequest implements UserRequest, Serializable{
     @JsonProperty("response_format")
     String responseFormat;
     Double speed;
+    boolean stream;
 }

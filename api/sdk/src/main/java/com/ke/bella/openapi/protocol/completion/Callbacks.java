@@ -1,10 +1,12 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.utils.DateTimeUtils;
-import com.ke.bella.openapi.utils.JacksonUtils;
+import okhttp3.WebSocket;
+import okio.ByteString;
 import org.springframework.util.Assert;
 
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.utils.DateTimeUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
 import okhttp3.Response;
 
@@ -42,6 +44,15 @@ public interface Callbacks {
         default boolean support() {
             return true;
         }
+    }
+
+    interface WebSocketStreamTtsCallback extends Callbacks {
+       void onOpen(WebSocket webSocket, Response response);
+       void onMessage(WebSocket webSocket, ByteString bytes);
+       void onMessage(WebSocket webSocket, String text);
+       void onClosing(WebSocket webSocket, int code, String reason);
+       void onClosed(WebSocket webSocket, int code, String reason);
+       void onFailure(WebSocket webSocket, Throwable t, Response response);
     }
 
     interface ChannelErrorCallback<T> {

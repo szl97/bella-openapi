@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ke.bella.openapi.common.exception.ChannelException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

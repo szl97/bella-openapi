@@ -19,10 +19,12 @@ public class TtsLogHandler implements EndpointLogHandler {
     public void process(EndpointProcessData processData) {
         TtsRequest request = (TtsRequest) processData.getRequest();
         long startTime = processData.getRequestTime();
-        int ttlt = (int) (DateTimeUtils.getCurrentSeconds() - startTime);
-        Map<String, Object> map = new HashMap<>();
-        map.put("ttlt", ttlt);
-        processData.setMetrics(map);
+        if(processData.getMetrics() == null) {
+            int ttlt = (int) (DateTimeUtils.getCurrentSeconds() - startTime);
+            Map<String, Object> map = new HashMap<>();
+            map.put("ttlt", ttlt);
+            processData.setMetrics(map);
+        }
         processData.setUsage(request.getInput().length());
     }
 

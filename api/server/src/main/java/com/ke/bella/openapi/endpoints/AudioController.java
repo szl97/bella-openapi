@@ -4,6 +4,7 @@ import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
+import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.protocol.tts.TtsAdaptor;
 import com.ke.bella.openapi.protocol.tts.TtsProperty;
 import com.ke.bella.openapi.protocol.tts.TtsRequest;
@@ -13,6 +14,7 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.protocol.audio.AudioTranscriptionRequest.*;
 import com.ke.bella.openapi.protocol.audio.AudioTranscriptionResponse.*;
 import com.ke.bella.openapi.service.KeQueueService;
+import com.ke.bella.openapi.utils.SseHelper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.ke.bella.openapi.annotations.EndpointAPI;
-
-
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -41,9 +42,11 @@ public class AudioController {
     private AdaptorManager adaptorManager;
     @Autowired
     private LimiterManager limiterManager;
+    @Autowired
+    private EndpointLogger logger;
     @PostMapping("/speech")
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public ResponseEntity<byte[]> speech(@RequestBody TtsRequest request) {
+    public Object speech(@RequestBody TtsRequest request) {
         String ttsEndpoint = EndpointContext.getRequest().getRequestURI();
         String ttsModel = request.getModel();
         EndpointContext.setEndpointData(ttsEndpoint, ttsModel, request);
@@ -60,6 +63,11 @@ public class AudioController {
         TtsAdaptor ttsAdaptor = adaptorManager.getProtocolAdaptor(ttsEndpoint, ttsProtocol, TtsAdaptor.class);
         TtsProperty ttsProperty = (TtsProperty) JacksonUtils.deserialize(ttsChannelInfo, ttsAdaptor.getPropertyClass());
         EndpointContext.setEncodingType(ttsProperty.getEncodingType());
+        if(request.isStream()) {
+            SseEmitter sse = SseHelper.createSse(1000L * 60 * 10, EndpointContext.getProcessData().getRequestId());
+            ttsAdaptor.streamTts(request, ttsUrl, ttsProperty, sse, logger);
+            return sse;
+        }
         return ttsAdaptor.tts(request, ttsUrl, ttsProperty);
     }
     @Resource
