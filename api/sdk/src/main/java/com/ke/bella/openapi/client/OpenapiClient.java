@@ -21,6 +21,8 @@ import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.OpenapiListResponse;
 import com.ke.bella.openapi.protocol.files.File;
 import com.ke.bella.openapi.protocol.files.FileUrl;
+import com.ke.bella.openapi.protocol.route.RouteRequest;
+import com.ke.bella.openapi.protocol.route.RouteResult;
 import com.ke.bella.openapi.utils.FileUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
@@ -255,4 +257,19 @@ public class OpenapiClient {
         });
     }
 
+    public RouteResult route(String endpoint, String model, String userApikey, String consoleApikey) {
+        String url = openapiHost + "/v1/route";
+        RouteRequest routeRequest = RouteRequest.builder().apikey(userApikey).endpoint(endpoint).model(model).build();
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + consoleApikey)
+                .post(RequestBody.create(JacksonUtils.serialize(routeRequest), MediaType.parse("application/json")))
+                .build();
+        BellaResponse<RouteResult> bellaResp = HttpUtils.httpRequest(request, new TypeReference<BellaResponse<RouteResult>>() {
+        });
+        if(bellaResp.getCode() != 200) {
+            throw ChannelException.fromResponse(bellaResp.getCode(), bellaResp.getMessage());
+        }
+        return bellaResp.getData();
+    }
 }

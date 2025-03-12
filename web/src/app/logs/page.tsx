@@ -124,7 +124,7 @@ const LogsPage = () => {
       let queryParts = []
 
       if (httpCode) {
-        queryParts.push(`data_info_msg_response: (\"\\\"httpCode\\\"\\:${httpCode}\" AND \"\\\"error\\\"\\:\\{\\\"code\\\"\\:\")`)
+        queryParts.push(`data_info_msg_response: (\"\\\"httpCode\\\"\\:${httpCode}\")`)
       }
 
       if (requestId) {
@@ -159,7 +159,7 @@ const LogsPage = () => {
       })
 
       const data = await response.json()
-      
+
       if (!response.ok) {
         if (data.error === '功能暂未开放') {
           setIsError(true)
@@ -211,10 +211,10 @@ const LogsPage = () => {
     // 检查是否有换行符
     const lines = text.split('\n')
     const hasNewlines = lines.length > 1
-    
+
     // 检查内容长度
     const isLongContent = text.length > 100
-    
+
     // 如果已展开或者内容既没有多行也不长，直接返回全部内容
     if (expanded || (!hasNewlines && !isLongContent)) {
       return {
@@ -222,7 +222,7 @@ const LogsPage = () => {
         hasMore: false
       }
     }
-    
+
     // 否则返回截断的内容
     let truncatedText = ''
     if (hasNewlines) {
@@ -230,7 +230,7 @@ const LogsPage = () => {
     } else {
       truncatedText = text.substring(0, 100) // 只显示前100个字符
     }
-    
+
     return {
       text: truncatedText,
       hasMore: true

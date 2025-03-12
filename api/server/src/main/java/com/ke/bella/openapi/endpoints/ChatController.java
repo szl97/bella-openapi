@@ -51,7 +51,7 @@ public class ChatController {
         String model = request.getModel();
         EndpointContext.setEndpointData(endpoint, model, request);
         boolean isMock = EndpointContext.getProcessData().isMock();
-        ChannelDB channel = router.route(endpoint, model, EndpointContext.getProcessData());
+        ChannelDB channel = router.route(endpoint, model, EndpointContext.getApikey(), isMock);
         EndpointContext.setEndpointData(channel);
         if(!EndpointContext.getProcessData().isPrivate()) {
             limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);

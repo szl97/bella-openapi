@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
+import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.EntityConstants;
 import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.common.exception.ChannelException;
@@ -41,8 +42,10 @@ public class ChannelRouter {
     @Value("${bella.openapi.free.concurrent:1}")
     private Integer freeConcurrent;
 
-    public ChannelDB route(String endpoint, String model, EndpointProcessData processData) {
-        boolean isMock = processData.isMock();
+    public ChannelDB route(String endpoint, String model, ApikeyInfo apikeyInfo, boolean isMock) {
+        if(StringUtils.isBlank(endpoint) && StringUtils.isBlank(model)) {
+            throw new BizParamCheckException("没有可用渠道");
+        }
         List<ChannelDB> channels;
         String entityCode;
         if(model != null) {
@@ -61,7 +64,7 @@ public class ChannelRouter {
             }
         }
         if(!isMock) {
-            channels = filter(channels, entityCode, processData.getAccountType(), processData.getAccountCode());
+            channels = filter(channels, entityCode, apikeyInfo);
         }
         channels = pickMaxPriority(channels);
         ChannelDB channel = random(channels);
@@ -75,10 +78,13 @@ public class ChannelRouter {
      *
      * @return
      */
-    private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode, String accountType, String accountCode) {
-        Byte safetyLevel = EndpointContext.getApikey().getSafetyLevel();
+    private List<ChannelDB> filter(List<ChannelDB> channels, String entityCode, ApikeyInfo apikeyInfo) {
+        Byte safetyLevel = apikeyInfo.getSafetyLevel();
+        String accountType = apikeyInfo.getOwnerType();
+        String accountCode = apikeyInfo.getOwnerCode();
         List<ChannelDB> filtered = channels.stream()
-                .filter(channel -> !EntityConstants.PRIVATE.equals(channel.getVisibility()) || (accountType.equals(channel.getOwnerType()) && accountCode.equals(channel.getOwnerCode())))
+                .filter(channel -> !EntityConstants.PRIVATE.equals(channel.getVisibility()) ||
+                        (accountType.equals(channel.getOwnerType()) && accountCode.equals(channel.getOwnerCode())))
                 .filter(channel -> getSafetyLevelLimit(channel.getDataDestination()) <= safetyLevel)
                 .collect(Collectors.toList());
         if(CollectionUtils.isEmpty(filtered)) {

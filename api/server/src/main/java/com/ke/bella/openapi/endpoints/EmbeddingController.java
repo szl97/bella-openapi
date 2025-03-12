@@ -36,12 +36,12 @@ public class EmbeddingController {
         String endpoint = EndpointContext.getRequest().getRequestURI();
         String model = request.getModel();
         EndpointContext.setEndpointData(endpoint, model, request);
-        ChannelDB channel = router.route(endpoint, model, EndpointContext.getProcessData());
+        EndpointProcessData processData = EndpointContext.getProcessData();
+        ChannelDB channel = router.route(endpoint, model, EndpointContext.getApikey(), processData.isMock());
         EndpointContext.setEndpointData(channel);
         if(!EndpointContext.getProcessData().isPrivate()) {
             limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
         }
-        EndpointProcessData processData = EndpointContext.getProcessData();
         String protocol = processData.getProtocol();
         String url = processData.getForwardUrl();
         String channelInfo = channel.getChannelInfo();

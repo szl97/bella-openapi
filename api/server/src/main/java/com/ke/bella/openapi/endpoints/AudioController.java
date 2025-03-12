@@ -54,7 +54,7 @@ public class AudioController {
         String ttsModel = request.getModel();
         EndpointContext.setEndpointData(ttsEndpoint, ttsModel, request);
         EndpointProcessData processData = EndpointContext.getProcessData();
-        ChannelDB ttsChannel = router.route(ttsEndpoint, ttsModel, processData);
+        ChannelDB ttsChannel = router.route(ttsEndpoint, ttsModel, EndpointContext.getApikey(), processData.isMock());
         EndpointContext.setEndpointData(ttsChannel);
         if(!EndpointContext.getProcessData().isPrivate()) {
             limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), ttsModel);
