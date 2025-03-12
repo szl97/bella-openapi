@@ -15,6 +15,6 @@ public class RouteResult {
     private String entityCode;
     private String protocol;
     private String url;
-    private String channelInfo;
+    private Object channelInfo;
     private String priceInfo;
 }

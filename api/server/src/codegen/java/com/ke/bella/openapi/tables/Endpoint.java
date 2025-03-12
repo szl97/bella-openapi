@@ -19,7 +19,7 @@ import org.jooq.Identity;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row14;
+import org.jooq.Row15;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -72,6 +72,11 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     public final TableField<EndpointRecord, String> ENDPOINT_NAME = createField(DSL.name("endpoint_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "能力点名称");
 
     /**
+     * The column <code>endpoint.document_url</code>. 文档地址
+     */
+    public final TableField<EndpointRecord, String> DOCUMENT_URL = createField(DSL.name("document_url"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "文档地址");
+
+    /**
      * The column <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public final TableField<EndpointRecord, String> MAINTAINER_CODE = createField(DSL.name("maintainer_code"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "维护人ucid");
@@ -85,6 +90,11 @@ public class Endpoint extends TableImpl<EndpointRecord> {
      * The column <code>endpoint.status</code>. 状态(active/inactive)
      */
     public final TableField<EndpointRecord, String> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("active", SQLDataType.VARCHAR)), this, "状态(active/inactive)");
+
+    /**
+     * The column <code>endpoint.cost_script</code>. 计费脚本
+     */
+    public final TableField<EndpointRecord, String> COST_SCRIPT = createField(DSL.name("cost_script"), SQLDataType.VARCHAR(1024).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "计费脚本");
 
     /**
      * The column <code>endpoint.cuid</code>. 创建人id
@@ -115,11 +125,6 @@ public class Endpoint extends TableImpl<EndpointRecord> {
      * The column <code>endpoint.mtime</code>.
      */
     public final TableField<EndpointRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
-
-    /**
-     * The column <code>endpoint.document_url</code>. 文档地址
-     */
-    public final TableField<EndpointRecord, String> DOCUMENT_URL = createField(DSL.name("document_url"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "文档地址");
 
     private Endpoint(Name alias, Table<EndpointRecord> aliased) {
         this(alias, aliased, null);
@@ -206,11 +211,11 @@ public class Endpoint extends TableImpl<EndpointRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row14 type methods
+    // Row15 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Long, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 }

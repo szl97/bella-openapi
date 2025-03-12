@@ -1,41 +1,73 @@
 package com.ke.bella.openapi.protocol.log;
 
+import com.google.common.collect.Maps;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.cost.CostCalculator;
 import com.ke.bella.openapi.protocol.cost.CostCounter;
+import com.ke.bella.openapi.utils.GroovyExecutor;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import com.lmax.disruptor.EventHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Slf4j
 public class CostLogHandler implements EventHandler<LogEvent> {
-    public CostLogHandler(CostCounter costCounter) {
+    public CostLogHandler(CostCounter costCounter, CostScripFetcher costScripFetcher) {
         this.costCounter = costCounter;
+        this.costScripFetcher = costScripFetcher;
     }
 
     private final CostCounter costCounter;
+    private final CostScripFetcher costScripFetcher;
     @Override
     public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
         EndpointProcessData log = event.getData();
         if(log.isPrivate()) {
             return;
         }
-        if(log.getPriceInfo() == null) {
-            LOGGER.warn("price Info is null, channelCode:{}, requestId:{}", log.getChannelCode(), log.getRequestId());
-            return;
+        BigDecimal cost = BigDecimal.ZERO;
+        if(log.isInnerLog()) {
+            if(log.getPriceInfo() == null) {
+                LOGGER.warn("price Info is null, channelCode:{}, requestId:{}", log.getChannelCode(), log.getRequestId());
+                return;
+            }
+            if(log.getUsage() == null) {
+                LOGGER.warn("usage is null, endpoint:{}, requestId:{}", log.getEndpoint(), log.getRequestId());
+                return;
+            }
+            cost = CostCalculator.calculate(log.getEndpoint(), log.getPriceInfo(), log.getUsage());
+        } else {
+            String script = costScripFetcher.fetchCosetScript(log.getEndpoint());
+            if(script != null) {
+                try {
+                    Map<String, Object> params = new HashMap<>();
+                    Map<String, Object> price = JacksonUtils.toMap(log.getPriceInfo());
+                    params.put("price", price == null ? Maps.newHashMap() : price);
+                    params.put("usage", log.getUsage() == null ? Maps.newHashMap() : log.getUsage());
+                    cost = BigDecimal.valueOf(Double.parseDouble(GroovyExecutor.executeScript(script, params).toString()));
+                } catch (Exception e) {
+                    LOGGER.warn("cost scrip run failed, endpoint: " + log.getEndpoint() + "; " + e.getMessage(), e);
+                }
+            }
         }
-        if(log.getUsage() == null) {
-            LOGGER.warn("usage is null, endpoint:{}, requestId:{}", log.getEndpoint(), log.getRequestId());
-            return;
-        }
-        BigDecimal cost = CostCalculator.calculate(log.getEndpoint(), log.getPriceInfo(), log.getUsage());
-        if(cost != null && BigDecimal.ZERO.compareTo(cost) < 0) {
+        boolean valid = cost != null && BigDecimal.ZERO.compareTo(cost) < 0;
+        log.setCost(valid ? cost : BigDecimal.ZERO);
+        if(valid) {
             costCounter.delta(log.getAkCode(), cost);
             if(StringUtils.isNotEmpty(log.getParentAkCode())) {
                 costCounter.delta(log.getParentAkCode(), cost);
             }
         }
     }
+
+    @FunctionalInterface
+    public interface CostScripFetcher {
+        String fetchCosetScript(String endpoint);
+    }
+
 }

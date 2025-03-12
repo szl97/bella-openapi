@@ -1,11 +1,13 @@
 package com.ke.bella.openapi;
 
+import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Data
@@ -13,6 +15,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndpointProcessData {
+    private String apikey;
     private String requestId;
     private String accountType;
     private String accountCode;
@@ -41,4 +44,13 @@ public class EndpointProcessData {
     private String bellaTraceId;
     private boolean functionCallSimulate;
     private String channelRequestId;
+    private BigDecimal cost;
+    private boolean innerLog;
+
+    public void setApikeyInfo(ApikeyInfo ak) {
+        this.setAkCode(ak.getCode());
+        this.setParentAkCode(ak.getParentCode());
+        this.setAccountType(ak.getOwnerType());
+        this.setAccountCode(ak.getOwnerCode());
+    }
 }

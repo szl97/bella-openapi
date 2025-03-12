@@ -16,6 +16,7 @@ public class EndpointContext {
     public static EndpointProcessData getProcessData() {
         if(endpointRequestInfo.get() == null) {
             EndpointProcessData endpointProcessData = EndpointProcessData.builder().build();
+            endpointProcessData.setInnerLog(true);
             endpointProcessData.setBellaTraceId(BellaContext.getTraceId());
             endpointProcessData.setRequestId(BellaContext.getRequestId());
             endpointProcessData.setMock(BellaContext.isMock());
@@ -45,10 +46,7 @@ public class EndpointContext {
 
     public static void setApikey(ApikeyInfo ak) {
         BellaContext.setApikey(ak);
-        getProcessData().setAkCode(ak.getCode());
-        getProcessData().setParentAkCode(ak.getParentCode());
-        getProcessData().setAccountType(ak.getOwnerType());
-        getProcessData().setAccountCode(ak.getOwnerCode());
+        EndpointContext.getProcessData().setApikeyInfo(ak);
     }
 
     public static void setEndpointData(String endpoint, String model, ChannelDB channel, Object request) {

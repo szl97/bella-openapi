@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -23,6 +24,9 @@ public class MetaDataOps {
         private String maintainerCode;
         private String maintainerName;
         private String documentUrl;
+        private String costScript;
+        private String testPriceInfo;
+        private Object testUsage;
     }
 
     @EqualsAndHashCode(callSuper = true)

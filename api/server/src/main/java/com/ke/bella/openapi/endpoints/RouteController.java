@@ -8,6 +8,7 @@ import com.ke.bella.openapi.protocol.route.RouteResult;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.EncryptUtils;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +43,7 @@ public class RouteController {
                 .entityCode(channelDB.getEntityCode())
                 .protocol(channelDB.getProtocol())
                 .url(channelDB.getUrl())
-                .channelInfo(channelDB.getChannelInfo())
+                .channelInfo(JacksonUtils.toMap(channelDB.getChannelInfo()))
                 .priceInfo(channelDB.getPriceInfo())
                 .build();
     }

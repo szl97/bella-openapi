@@ -17,7 +17,7 @@ public class LimiterLogHandler implements EventHandler<LogEvent> {
     @Override
     public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
         EndpointProcessData log = event.getData();
-        if(!log.isPrivate()) {
+        if(!log.isInnerLog() && !log.isPrivate()) {
             limiterManager.record(log);
         }
     }

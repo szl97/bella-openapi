@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Record14;
-import org.jooq.Row14;
+import org.jooq.Record15;
+import org.jooq.Row15;
 import org.jooq.impl.UpdatableRecordImpl;
 
 
@@ -20,7 +20,7 @@ import org.jooq.impl.UpdatableRecordImpl;
  * 能力点
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implements Operator, Record14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> {
+public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implements Operator, Record15<Long, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,143 +81,157 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     /**
-     * Setter for <code>endpoint.maintainer_code</code>. 维护人ucid
-     */
-    public void setMaintainerCode(String value) {
-        set(4, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.maintainer_code</code>. 维护人ucid
-     */
-    public String getMaintainerCode() {
-        return (String) get(4);
-    }
-
-    /**
-     * Setter for <code>endpoint.maintainer_name</code>. 维护人姓名
-     */
-    public void setMaintainerName(String value) {
-        set(5, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.maintainer_name</code>. 维护人姓名
-     */
-    public String getMaintainerName() {
-        return (String) get(5);
-    }
-
-    /**
-     * Setter for <code>endpoint.status</code>. 状态(active/inactive)
-     */
-    public void setStatus(String value) {
-        set(6, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.status</code>. 状态(active/inactive)
-     */
-    public String getStatus() {
-        return (String) get(6);
-    }
-
-    /**
-     * Setter for <code>endpoint.cuid</code>. 创建人id
-     */
-    public void setCuid(Long value) {
-        set(7, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.cuid</code>. 创建人id
-     */
-    public Long getCuid() {
-        return (Long) get(7);
-    }
-
-    /**
-     * Setter for <code>endpoint.cu_name</code>. 创建人姓名
-     */
-    public void setCuName(String value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.cu_name</code>. 创建人姓名
-     */
-    public String getCuName() {
-        return (String) get(8);
-    }
-
-    /**
-     * Setter for <code>endpoint.muid</code>. 编辑人id
-     */
-    public void setMuid(Long value) {
-        set(9, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.muid</code>. 编辑人id
-     */
-    public Long getMuid() {
-        return (Long) get(9);
-    }
-
-    /**
-     * Setter for <code>endpoint.mu_name</code>. 编辑人姓名
-     */
-    public void setMuName(String value) {
-        set(10, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.mu_name</code>. 编辑人姓名
-     */
-    public String getMuName() {
-        return (String) get(10);
-    }
-
-    /**
-     * Setter for <code>endpoint.ctime</code>.
-     */
-    public void setCtime(LocalDateTime value) {
-        set(11, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.ctime</code>.
-     */
-    public LocalDateTime getCtime() {
-        return (LocalDateTime) get(11);
-    }
-
-    /**
-     * Setter for <code>endpoint.mtime</code>.
-     */
-    public void setMtime(LocalDateTime value) {
-        set(12, value);
-    }
-
-    /**
-     * Getter for <code>endpoint.mtime</code>.
-     */
-    public LocalDateTime getMtime() {
-        return (LocalDateTime) get(12);
-    }
-
-    /**
      * Setter for <code>endpoint.document_url</code>. 文档地址
      */
     public void setDocumentUrl(String value) {
-        set(13, value);
+        set(4, value);
     }
 
     /**
      * Getter for <code>endpoint.document_url</code>. 文档地址
      */
     public String getDocumentUrl() {
-        return (String) get(13);
+        return (String) get(4);
+    }
+
+    /**
+     * Setter for <code>endpoint.maintainer_code</code>. 维护人ucid
+     */
+    public void setMaintainerCode(String value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.maintainer_code</code>. 维护人ucid
+     */
+    public String getMaintainerCode() {
+        return (String) get(5);
+    }
+
+    /**
+     * Setter for <code>endpoint.maintainer_name</code>. 维护人姓名
+     */
+    public void setMaintainerName(String value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.maintainer_name</code>. 维护人姓名
+     */
+    public String getMaintainerName() {
+        return (String) get(6);
+    }
+
+    /**
+     * Setter for <code>endpoint.status</code>. 状态(active/inactive)
+     */
+    public void setStatus(String value) {
+        set(7, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.status</code>. 状态(active/inactive)
+     */
+    public String getStatus() {
+        return (String) get(7);
+    }
+
+    /**
+     * Setter for <code>endpoint.cost_script</code>. 计费脚本
+     */
+    public void setCostScript(String value) {
+        set(8, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.cost_script</code>. 计费脚本
+     */
+    public String getCostScript() {
+        return (String) get(8);
+    }
+
+    /**
+     * Setter for <code>endpoint.cuid</code>. 创建人id
+     */
+    public void setCuid(Long value) {
+        set(9, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.cuid</code>. 创建人id
+     */
+    public Long getCuid() {
+        return (Long) get(9);
+    }
+
+    /**
+     * Setter for <code>endpoint.cu_name</code>. 创建人姓名
+     */
+    public void setCuName(String value) {
+        set(10, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.cu_name</code>. 创建人姓名
+     */
+    public String getCuName() {
+        return (String) get(10);
+    }
+
+    /**
+     * Setter for <code>endpoint.muid</code>. 编辑人id
+     */
+    public void setMuid(Long value) {
+        set(11, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.muid</code>. 编辑人id
+     */
+    public Long getMuid() {
+        return (Long) get(11);
+    }
+
+    /**
+     * Setter for <code>endpoint.mu_name</code>. 编辑人姓名
+     */
+    public void setMuName(String value) {
+        set(12, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.mu_name</code>. 编辑人姓名
+     */
+    public String getMuName() {
+        return (String) get(12);
+    }
+
+    /**
+     * Setter for <code>endpoint.ctime</code>.
+     */
+    public void setCtime(LocalDateTime value) {
+        set(13, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.ctime</code>.
+     */
+    public LocalDateTime getCtime() {
+        return (LocalDateTime) get(13);
+    }
+
+    /**
+     * Setter for <code>endpoint.mtime</code>.
+     */
+    public void setMtime(LocalDateTime value) {
+        set(14, value);
+    }
+
+    /**
+     * Getter for <code>endpoint.mtime</code>.
+     */
+    public LocalDateTime getMtime() {
+        return (LocalDateTime) get(14);
     }
 
     // -------------------------------------------------------------------------
@@ -230,17 +244,17 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     }
 
     // -------------------------------------------------------------------------
-    // Record14 type implementation
+    // Record15 type implementation
     // -------------------------------------------------------------------------
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> fieldsRow() {
-        return (Row14) super.fieldsRow();
+    public Row15<Long, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> fieldsRow() {
+        return (Row15) super.fieldsRow();
     }
 
     @Override
-    public Row14<Long, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime, String> valuesRow() {
-        return (Row14) super.valuesRow();
+    public Row15<Long, String, String, String, String, String, String, String, String, Long, String, Long, String, LocalDateTime, LocalDateTime> valuesRow() {
+        return (Row15) super.valuesRow();
     }
 
     @Override
@@ -265,52 +279,57 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
 
     @Override
     public Field<String> field5() {
-        return Endpoint.ENDPOINT.MAINTAINER_CODE;
+        return Endpoint.ENDPOINT.DOCUMENT_URL;
     }
 
     @Override
     public Field<String> field6() {
-        return Endpoint.ENDPOINT.MAINTAINER_NAME;
+        return Endpoint.ENDPOINT.MAINTAINER_CODE;
     }
 
     @Override
     public Field<String> field7() {
+        return Endpoint.ENDPOINT.MAINTAINER_NAME;
+    }
+
+    @Override
+    public Field<String> field8() {
         return Endpoint.ENDPOINT.STATUS;
     }
 
     @Override
-    public Field<Long> field8() {
-        return Endpoint.ENDPOINT.CUID;
-    }
-
-    @Override
     public Field<String> field9() {
-        return Endpoint.ENDPOINT.CU_NAME;
+        return Endpoint.ENDPOINT.COST_SCRIPT;
     }
 
     @Override
     public Field<Long> field10() {
-        return Endpoint.ENDPOINT.MUID;
+        return Endpoint.ENDPOINT.CUID;
     }
 
     @Override
     public Field<String> field11() {
+        return Endpoint.ENDPOINT.CU_NAME;
+    }
+
+    @Override
+    public Field<Long> field12() {
+        return Endpoint.ENDPOINT.MUID;
+    }
+
+    @Override
+    public Field<String> field13() {
         return Endpoint.ENDPOINT.MU_NAME;
     }
 
     @Override
-    public Field<LocalDateTime> field12() {
+    public Field<LocalDateTime> field14() {
         return Endpoint.ENDPOINT.CTIME;
     }
 
     @Override
-    public Field<LocalDateTime> field13() {
+    public Field<LocalDateTime> field15() {
         return Endpoint.ENDPOINT.MTIME;
-    }
-
-    @Override
-    public Field<String> field14() {
-        return Endpoint.ENDPOINT.DOCUMENT_URL;
     }
 
     @Override
@@ -335,52 +354,57 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
 
     @Override
     public String component5() {
-        return getMaintainerCode();
+        return getDocumentUrl();
     }
 
     @Override
     public String component6() {
-        return getMaintainerName();
+        return getMaintainerCode();
     }
 
     @Override
     public String component7() {
+        return getMaintainerName();
+    }
+
+    @Override
+    public String component8() {
         return getStatus();
     }
 
     @Override
-    public Long component8() {
-        return getCuid();
-    }
-
-    @Override
     public String component9() {
-        return getCuName();
+        return getCostScript();
     }
 
     @Override
     public Long component10() {
-        return getMuid();
+        return getCuid();
     }
 
     @Override
     public String component11() {
+        return getCuName();
+    }
+
+    @Override
+    public Long component12() {
+        return getMuid();
+    }
+
+    @Override
+    public String component13() {
         return getMuName();
     }
 
     @Override
-    public LocalDateTime component12() {
+    public LocalDateTime component14() {
         return getCtime();
     }
 
     @Override
-    public LocalDateTime component13() {
+    public LocalDateTime component15() {
         return getMtime();
-    }
-
-    @Override
-    public String component14() {
-        return getDocumentUrl();
     }
 
     @Override
@@ -405,52 +429,57 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
 
     @Override
     public String value5() {
-        return getMaintainerCode();
+        return getDocumentUrl();
     }
 
     @Override
     public String value6() {
-        return getMaintainerName();
+        return getMaintainerCode();
     }
 
     @Override
     public String value7() {
+        return getMaintainerName();
+    }
+
+    @Override
+    public String value8() {
         return getStatus();
     }
 
     @Override
-    public Long value8() {
-        return getCuid();
-    }
-
-    @Override
     public String value9() {
-        return getCuName();
+        return getCostScript();
     }
 
     @Override
     public Long value10() {
-        return getMuid();
+        return getCuid();
     }
 
     @Override
     public String value11() {
+        return getCuName();
+    }
+
+    @Override
+    public Long value12() {
+        return getMuid();
+    }
+
+    @Override
+    public String value13() {
         return getMuName();
     }
 
     @Override
-    public LocalDateTime value12() {
+    public LocalDateTime value14() {
         return getCtime();
     }
 
     @Override
-    public LocalDateTime value13() {
+    public LocalDateTime value15() {
         return getMtime();
-    }
-
-    @Override
-    public String value14() {
-        return getDocumentUrl();
     }
 
     @Override
@@ -479,66 +508,72 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
 
     @Override
     public EndpointRecord value5(String value) {
-        setMaintainerCode(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value6(String value) {
-        setMaintainerName(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value7(String value) {
-        setStatus(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value8(Long value) {
-        setCuid(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value9(String value) {
-        setCuName(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value10(Long value) {
-        setMuid(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value11(String value) {
-        setMuName(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value12(LocalDateTime value) {
-        setCtime(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value13(LocalDateTime value) {
-        setMtime(value);
-        return this;
-    }
-
-    @Override
-    public EndpointRecord value14(String value) {
         setDocumentUrl(value);
         return this;
     }
 
     @Override
-    public EndpointRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, Long value8, String value9, Long value10, String value11, LocalDateTime value12, LocalDateTime value13, String value14) {
+    public EndpointRecord value6(String value) {
+        setMaintainerCode(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value7(String value) {
+        setMaintainerName(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value8(String value) {
+        setStatus(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value9(String value) {
+        setCostScript(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value10(Long value) {
+        setCuid(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value11(String value) {
+        setCuName(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value12(Long value) {
+        setMuid(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value13(String value) {
+        setMuName(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value14(LocalDateTime value) {
+        setCtime(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord value15(LocalDateTime value) {
+        setMtime(value);
+        return this;
+    }
+
+    @Override
+    public EndpointRecord values(Long value1, String value2, String value3, String value4, String value5, String value6, String value7, String value8, String value9, Long value10, String value11, Long value12, String value13, LocalDateTime value14, LocalDateTime value15) {
         value1(value1);
         value2(value2);
         value3(value3);
@@ -553,6 +588,7 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
         value12(value12);
         value13(value13);
         value14(value14);
+        value15(value15);
         return this;
     }
 
@@ -570,22 +606,23 @@ public class EndpointRecord extends UpdatableRecordImpl<EndpointRecord> implemen
     /**
      * Create a detached, initialised EndpointRecord
      */
-    public EndpointRecord(Long id, String endpoint, String endpointCode, String endpointName, String maintainerCode, String maintainerName, String status, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime, String documentUrl) {
+    public EndpointRecord(Long id, String endpoint, String endpointCode, String endpointName, String documentUrl, String maintainerCode, String maintainerName, String status, String costScript, Long cuid, String cuName, Long muid, String muName, LocalDateTime ctime, LocalDateTime mtime) {
         super(Endpoint.ENDPOINT);
 
         setId(id);
         setEndpoint(endpoint);
         setEndpointCode(endpointCode);
         setEndpointName(endpointName);
+        setDocumentUrl(documentUrl);
         setMaintainerCode(maintainerCode);
         setMaintainerName(maintainerName);
         setStatus(status);
+        setCostScript(costScript);
         setCuid(cuid);
         setCuName(cuName);
         setMuid(muid);
         setMuName(muName);
         setCtime(ctime);
         setMtime(mtime);
-        setDocumentUrl(documentUrl);
     }
 }

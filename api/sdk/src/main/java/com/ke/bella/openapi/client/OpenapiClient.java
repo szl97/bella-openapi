@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,6 +16,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HttpHeaders;
 import com.ke.bella.openapi.BellaResponse;
+import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.Order;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.exception.ChannelException;
@@ -266,6 +268,25 @@ public class OpenapiClient {
                 .post(RequestBody.create(JacksonUtils.serialize(routeRequest), MediaType.parse("application/json")))
                 .build();
         BellaResponse<RouteResult> bellaResp = HttpUtils.httpRequest(request, new TypeReference<BellaResponse<RouteResult>>() {
+        });
+        if(bellaResp.getCode() != 200) {
+            throw ChannelException.fromResponse(bellaResp.getCode(), bellaResp.getMessage());
+        }
+        return bellaResp.getData();
+    }
+
+    public Boolean log(EndpointProcessData processData, String consoleApikey) {
+        Assert.hasText(processData.getEndpoint(), "endpoint can not be null");
+        Assert.hasText(processData.getApikey(), "apikey can not be null");
+        Assert.hasText(processData.getBellaTraceId(), "bella trace id can not be null");
+        processData.setInnerLog(false);
+        String url = openapiHost + "/v1/log";
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + consoleApikey)
+                .post(RequestBody.create(JacksonUtils.serialize(processData), MediaType.parse("application/json")))
+                .build();
+        BellaResponse<Boolean> bellaResp = HttpUtils.httpRequest(request, new TypeReference<BellaResponse<Boolean>>() {
         });
         if(bellaResp.getCode() != 200) {
             throw ChannelException.fromResponse(bellaResp.getCode(), bellaResp.getMessage());

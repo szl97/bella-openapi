@@ -12,6 +12,8 @@ import com.ke.bella.openapi.protocol.log.LogExceptionHandler;
 import com.ke.bella.openapi.protocol.log.LogRecordHandler;
 import com.ke.bella.openapi.protocol.log.MetricsLogHandler;
 import com.ke.bella.openapi.protocol.metrics.MetricsManager;
+import com.ke.bella.openapi.service.ApikeyService;
+import com.ke.bella.openapi.service.EndpointService;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -28,7 +30,6 @@ import java.util.List;
 public class BellaAutoConf {
     private final SleepingWaitStrategy sleepingWaitStrategy = new SleepingWaitStrategy();
     private Disruptor<LogEvent> logDisruptor;
-    @Autowired
     private CostCounter costCounter;
     @Autowired
     private MetricsManager metricsManager;
@@ -42,10 +43,27 @@ public class BellaAutoConf {
     }
 
     @Bean
-    public RingBuffer<LogEvent> logRingBuffer(List<LogRepo> logRepos) {
+    public CostCounter.CostRecorder costRecorder(@Autowired ApikeyService service) {
+        return service::recordCost;
+    }
+
+    @Bean
+    public CostLogHandler.CostScripFetcher costScripFetcher(@Autowired EndpointService service) {
+        return service::fetchCostScript;
+    }
+
+    @Bean
+    public CostCounter costCounter(CostCounter.CostRecorder costRecorder) {
+        costCounter = new CostCounter(costRecorder);
+        return costCounter;
+    }
+
+    @Bean
+    public RingBuffer<LogEvent> logRingBuffer(List<LogRepo> logRepos, CostCounter costCounter, CostLogHandler.CostScripFetcher costScripFetcher) {
         Disruptor<LogEvent> disruptor = new Disruptor<>(LogEvent::new, 1024,
                 DaemonThreadFactory.INSTANCE, ProducerType.MULTI, sleepingWaitStrategy);
-        disruptor.handleEventsWith(new LogRecordHandler(logRepos), new CostLogHandler(costCounter), new MetricsLogHandler(metricsManager), new LimiterLogHandler(limiterManager));
+        disruptor.handleEventsWith(new CostLogHandler(costCounter, costScripFetcher)).then(new LogRecordHandler(logRepos));
+        disruptor.handleEventsWith(new MetricsLogHandler(metricsManager), new LimiterLogHandler(limiterManager));
         disruptor.setDefaultExceptionHandler(new LogExceptionHandler());
         disruptor.start();
         logDisruptor = disruptor;
@@ -57,6 +75,8 @@ public class BellaAutoConf {
         if(logDisruptor != null) {
             logDisruptor.shutdown();
         }
-        costCounter.flush();
+        if(costCounter != null) {
+            costCounter.flush();
+        }
     }
 }

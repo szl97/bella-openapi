@@ -1,23 +1,22 @@
 package com.ke.bella.openapi.protocol.cost;
 
-import com.ke.bella.openapi.service.ApikeyService;
-import com.ke.bella.openapi.utils.DateTimeUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Component
+import org.springframework.scheduling.annotation.Scheduled;
+
+import com.ke.bella.openapi.utils.DateTimeUtils;
+
 public class CostCounter {
-    @Autowired
-    private ApikeyService apikeyService;
+    private final CostRecorder costRecorder;
     private final ConcurrentHashMap<String, AtomicReference<BigDecimal>> costCache = new ConcurrentHashMap<>();
+
+    public CostCounter(CostRecorder costRecorder) {
+        this.costRecorder = costRecorder;
+    }
+
     public void delta(String apikey, BigDecimal cost) {
         AtomicReference<BigDecimal> amount = costCache.computeIfAbsent(apikey, k -> new AtomicReference<>(BigDecimal.ZERO));
         amount.accumulateAndGet(cost, BigDecimal::add);
@@ -30,9 +29,13 @@ public class CostCounter {
             String month = DateTimeUtils.getCurrentMonth();
             current.forEach(apikey -> {
                         AtomicReference<BigDecimal> cost = costCache.remove(apikey);
-                        apikeyService.recordCost(apikey, month, cost.get());
+                        costRecorder.recordCost(apikey, month, cost.get());
                     }
             );
         }
+    }
+
+    public interface CostRecorder {
+        void recordCost(String apikey, String month, BigDecimal cost);
     }
 }

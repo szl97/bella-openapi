@@ -15,7 +15,6 @@ import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.BellaEventSourceListener;
 import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.completion.Callbacks;
-import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
 
 import okhttp3.Callback;
 import okhttp3.ConnectionPool;
@@ -24,7 +23,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import okhttp3.WebSocketListener;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;

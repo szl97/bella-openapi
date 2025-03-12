@@ -22,16 +22,17 @@ public class EndpointDB implements Operator, Serializable {
     private String        endpoint;
     private String        endpointCode;
     private String        endpointName;
+    private String        documentUrl;
     private String        maintainerCode;
     private String        maintainerName;
     private String        status;
+    private String        costScript;
     private Long          cuid;
     private String        cuName;
     private Long          muid;
     private String        muName;
     private LocalDateTime ctime;
     private LocalDateTime mtime;
-    private String        documentUrl;
 
     public EndpointDB() {}
 
@@ -40,16 +41,17 @@ public class EndpointDB implements Operator, Serializable {
         this.endpoint = value.endpoint;
         this.endpointCode = value.endpointCode;
         this.endpointName = value.endpointName;
+        this.documentUrl = value.documentUrl;
         this.maintainerCode = value.maintainerCode;
         this.maintainerName = value.maintainerName;
         this.status = value.status;
+        this.costScript = value.costScript;
         this.cuid = value.cuid;
         this.cuName = value.cuName;
         this.muid = value.muid;
         this.muName = value.muName;
         this.ctime = value.ctime;
         this.mtime = value.mtime;
-        this.documentUrl = value.documentUrl;
     }
 
     public EndpointDB(
@@ -57,31 +59,33 @@ public class EndpointDB implements Operator, Serializable {
         String        endpoint,
         String        endpointCode,
         String        endpointName,
+        String        documentUrl,
         String        maintainerCode,
         String        maintainerName,
         String        status,
+        String        costScript,
         Long          cuid,
         String        cuName,
         Long          muid,
         String        muName,
         LocalDateTime ctime,
-        LocalDateTime mtime,
-        String        documentUrl
+        LocalDateTime mtime
     ) {
         this.id = id;
         this.endpoint = endpoint;
         this.endpointCode = endpointCode;
         this.endpointName = endpointName;
+        this.documentUrl = documentUrl;
         this.maintainerCode = maintainerCode;
         this.maintainerName = maintainerName;
         this.status = status;
+        this.costScript = costScript;
         this.cuid = cuid;
         this.cuName = cuName;
         this.muid = muid;
         this.muName = muName;
         this.ctime = ctime;
         this.mtime = mtime;
-        this.documentUrl = documentUrl;
     }
 
     /**
@@ -141,6 +145,20 @@ public class EndpointDB implements Operator, Serializable {
     }
 
     /**
+     * Getter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public String getDocumentUrl() {
+        return this.documentUrl;
+    }
+
+    /**
+     * Setter for <code>endpoint.document_url</code>. 文档地址
+     */
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
+    /**
      * Getter for <code>endpoint.maintainer_code</code>. 维护人ucid
      */
     public String getMaintainerCode() {
@@ -180,6 +198,20 @@ public class EndpointDB implements Operator, Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * Getter for <code>endpoint.cost_script</code>. 计费脚本
+     */
+    public String getCostScript() {
+        return this.costScript;
+    }
+
+    /**
+     * Setter for <code>endpoint.cost_script</code>. 计费脚本
+     */
+    public void setCostScript(String costScript) {
+        this.costScript = costScript;
     }
 
     /**
@@ -266,20 +298,6 @@ public class EndpointDB implements Operator, Serializable {
         this.mtime = mtime;
     }
 
-    /**
-     * Getter for <code>endpoint.document_url</code>. 文档地址
-     */
-    public String getDocumentUrl() {
-        return this.documentUrl;
-    }
-
-    /**
-     * Setter for <code>endpoint.document_url</code>. 文档地址
-     */
-    public void setDocumentUrl(String documentUrl) {
-        this.documentUrl = documentUrl;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("EndpointDB (");
@@ -288,16 +306,17 @@ public class EndpointDB implements Operator, Serializable {
         sb.append(", ").append(endpoint);
         sb.append(", ").append(endpointCode);
         sb.append(", ").append(endpointName);
+        sb.append(", ").append(documentUrl);
         sb.append(", ").append(maintainerCode);
         sb.append(", ").append(maintainerName);
         sb.append(", ").append(status);
+        sb.append(", ").append(costScript);
         sb.append(", ").append(cuid);
         sb.append(", ").append(cuName);
         sb.append(", ").append(muid);
         sb.append(", ").append(muName);
         sb.append(", ").append(ctime);
         sb.append(", ").append(mtime);
-        sb.append(", ").append(documentUrl);
 
         sb.append(")");
         return sb.toString();

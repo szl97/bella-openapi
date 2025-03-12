@@ -1,11 +1,43 @@
 package com.ke.bella.openapi.service;
 
+import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
+import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.INNER;
+import static com.ke.bella.openapi.common.EntityConstants.MAINLAND;
+import static com.ke.bella.openapi.common.EntityConstants.OVERSEAS;
+import static com.ke.bella.openapi.common.EntityConstants.PROTECTED;
+
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+
+import com.ke.bella.openapi.utils.JacksonUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.template.QuickConfig;
 import com.google.common.collect.Lists;
 import com.ke.bella.openapi.EnumDto;
 import com.ke.bella.openapi.JsonSchema;
 import com.ke.bella.openapi.TypeSchema;
+import com.ke.bella.openapi.common.exception.BizParamCheckException;
 import com.ke.bella.openapi.db.repo.EndpointRepo;
 import com.ke.bella.openapi.db.repo.Page;
 import com.ke.bella.openapi.metadata.Condition;
@@ -20,32 +52,13 @@ import com.ke.bella.openapi.protocol.IModelProperties;
 import com.ke.bella.openapi.protocol.IPriceInfo;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
+import com.ke.bella.openapi.utils.GroovyExecutor;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
-import static com.ke.bella.openapi.common.EntityConstants.ENDPOINT;
-import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
-import static com.ke.bella.openapi.common.EntityConstants.INNER;
-import static com.ke.bella.openapi.common.EntityConstants.MAINLAND;
-import static com.ke.bella.openapi.common.EntityConstants.OVERSEAS;
-import static com.ke.bella.openapi.common.EntityConstants.PROTECTED;
+import org.springframework.util.Assert;
 
 /**
  * Author: Stan Sai Date: 2024/8/2 10:41 description:
@@ -60,17 +73,45 @@ public class EndpointService {
     private ChannelService channelService;
     @Autowired
     private AdaptorManager adaptorManager;
+    @Autowired
+    private CacheManager cacheManager;
+    @Value("${cost.script.limit.time:1000}")
+    private int costScriptLimitMs;
+    @Value("${cost.script.limit.memory:2000000}")
+    private int costScriptLimitBytes;
+
+    private static final String endpointCostScript = "endpoint:cost:script:";
+
+    @PostConstruct
+    public void postConstruct() {
+        QuickConfig quickConfig = QuickConfig.newBuilder(endpointCostScript)
+                .cacheNullValue(true)
+                .cacheType(CacheType.BOTH)
+                .syncLocal(true)
+                .localExpire(Duration.ofSeconds(30))
+                .penetrationProtect(true)
+                .penetrationProtectTimeout(Duration.ofSeconds(10))
+                .build();
+        cacheManager.getOrCreateCache(quickConfig);
+    }
 
     @Transactional
     public EndpointDB createEndpoint(MetaDataOps.EndpointOp op) {
         endpointRepo.checkExist(op.getEndpoint(), false);
-        return endpointRepo.insert(op);
+        checkCostScript(op);
+        EndpointDB db = endpointRepo.insert(op);
+        cacheManager.getCache(endpointCostScript).put(op.getEndpoint(), op.getCostScript());
+        return db;
     }
 
     @Transactional
     public void updateEndpoint(MetaDataOps.EndpointOp op) {
         endpointRepo.checkExist(op.getEndpoint(), true);
+        checkCostScript(op);
         endpointRepo.update(op, op.getEndpoint());
+        if(op.getCostScript() != null) {
+            cacheManager.getCache(endpointCostScript).put(op.getEndpoint(), op.getCostScript());
+        }
     }
 
     @Transactional
@@ -130,6 +171,30 @@ public class EndpointService {
             }
         }
         return endpoint;
+    }
+
+    @Cached(name = endpointCostScript, key = "#endpoint")
+    public String fetchCostScript(String endpoint) {
+        EndpointDB db = getActive(UniqueKeyQuery.builder().endpoint(endpoint).build());
+        return db == null ? null : db.getCostScript();
+    }
+
+
+    private void checkCostScript(MetaDataOps.EndpointOp op) {
+        if(op.getCostScript() == null) {
+            return;
+        }
+        Map<String, Object> params = new HashMap<>();
+        Map<String, Object> price = JacksonUtils.toMap(op.getTestPriceInfo());
+        params.put("price", price == null ? new HashMap<>() : price);
+        params.put("usage", op.getTestUsage() == null ? new HashMap<>() : op.getTestUsage());
+        Object result = GroovyExecutor.testScript(op.getCostScript(), params, costScriptLimitMs, costScriptLimitBytes);
+        try {
+            BigDecimal cost = BigDecimal.valueOf(Double.parseDouble(result.toString()));
+            Assert.isTrue(cost.doubleValue() > 0, "脚本返回结果不符合预期, result is " + result);
+        } catch (Exception e) {
+            throw new BizParamCheckException("脚本返回结果不符合预期, result is " + result.toString());
+        }
     }
 
     private List<Model> searchModels(Condition.EndpointDetailsCondition condition) {
