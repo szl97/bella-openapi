@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.TaskExecutor;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.protocol.completion.StreamCompletionResponse;
 import com.ke.bella.openapi.simulation.FunctionCallContentBuffer;
 import com.ke.bella.openapi.simulation.FunctionCallListener;

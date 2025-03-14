@@ -3,16 +3,14 @@ package com.ke.bella.openapi.protocol.completion;
 import com.google.common.collect.ImmutableSet;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.BellaEventSourceListener;
-import lombok.Setter;
+import com.ke.bella.openapi.protocol.Callbacks;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.sse.EventSource;
-import okhttp3.sse.EventSourceListener;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class CompletionSseListener extends BellaEventSourceListener {

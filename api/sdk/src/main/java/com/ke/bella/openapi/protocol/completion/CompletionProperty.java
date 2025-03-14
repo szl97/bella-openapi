@@ -15,6 +15,7 @@ public class CompletionProperty implements IProtocolProperty {
     boolean splitReasoningFromContent = false;
     boolean functionCallSimulate = false;
     Map<String, String> extraHeaders;
+    String queueName;
 
     @Override
     public Map<String, String> description() {
@@ -24,6 +25,7 @@ public class CompletionProperty implements IProtocolProperty {
         map.put("splitReasoningFromContent", "是否需要拆分推理内容");
         map.put("functionCallSimulate", "是否需要强制支持function call");
         map.put("extraHeaders", "额外的请求头");
+        map.put("queueName", "队列（配置后请求被bella-job-queue服务代理）");
         return map;
     }
 }

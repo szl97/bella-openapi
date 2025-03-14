@@ -245,6 +245,7 @@ public class ApikeyService {
             }
             info.setParentInfo(parent);
         }
+        info.setApikey(ak);
         return info;
     }
 

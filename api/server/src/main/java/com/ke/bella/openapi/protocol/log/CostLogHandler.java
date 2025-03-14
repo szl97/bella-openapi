@@ -1,5 +1,11 @@
 package com.ke.bella.openapi.protocol.log;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Maps;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.cost.CostCalculator;
@@ -7,13 +13,8 @@ import com.ke.bella.openapi.protocol.cost.CostCounter;
 import com.ke.bella.openapi.utils.GroovyExecutor;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.lmax.disruptor.EventHandler;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
-import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CostLogHandler implements EventHandler<LogEvent> {
@@ -27,9 +28,6 @@ public class CostLogHandler implements EventHandler<LogEvent> {
     @Override
     public void onEvent(LogEvent event, long sequence, boolean endOfBatch) throws Exception {
         EndpointProcessData log = event.getData();
-        if(log.isPrivate()) {
-            return;
-        }
         BigDecimal cost = BigDecimal.ZERO;
         if(log.isInnerLog()) {
             if(log.getPriceInfo() == null) {
@@ -57,6 +55,9 @@ public class CostLogHandler implements EventHandler<LogEvent> {
         }
         boolean valid = cost != null && BigDecimal.ZERO.compareTo(cost) < 0;
         log.setCost(valid ? cost : BigDecimal.ZERO);
+        if(log.isPrivate()) {
+            return;
+        }
         if(valid) {
             costCounter.delta(log.getAkCode(), cost);
             if(StringUtils.isNotEmpty(log.getParentAkCode())) {

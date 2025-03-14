@@ -46,8 +46,10 @@ public class EndpointProcessData {
     private String channelRequestId;
     private BigDecimal cost;
     private boolean innerLog;
+    private Integer maxWaitSec;
 
     public void setApikeyInfo(ApikeyInfo ak) {
+        this.setApikey(ak.getApikey());
         this.setAkCode(ak.getCode());
         this.setParentAkCode(ak.getParentCode());
         this.setAccountType(ak.getOwnerType());

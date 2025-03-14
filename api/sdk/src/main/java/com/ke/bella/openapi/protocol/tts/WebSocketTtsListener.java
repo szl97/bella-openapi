@@ -2,7 +2,7 @@ package com.ke.bella.openapi.protocol.tts;
 
 import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 
-import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okio.ByteString;

@@ -38,7 +38,6 @@ public class LogController {
             throw new BizParamCheckException("用户的Apikey不存在");
         }
         processData.setApikeyInfo(apikeyInfo);
-        processData.setApikey(null);
         processData.setInnerLog(false);
         logger.log(processData);
         return true;

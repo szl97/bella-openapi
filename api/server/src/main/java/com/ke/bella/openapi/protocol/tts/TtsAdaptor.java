@@ -2,12 +2,10 @@ package com.ke.bella.openapi.protocol.tts;
 
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
-import com.ke.bella.openapi.protocol.completion.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
 
 public interface TtsAdaptor <T extends TtsProperty> extends IProtocolAdaptor {
 

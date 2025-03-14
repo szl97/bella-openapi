@@ -1,11 +1,5 @@
 package com.ke.bella.openapi.intercept;
 
-import com.ke.bella.openapi.EndpointContext;
-import com.ke.bella.openapi.annotations.EndpointAPI;
-import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.OpenapiResponse;
-import com.ke.bella.openapi.protocol.log.EndpointLogger;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -18,7 +12,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import java.util.Arrays;
+import com.ke.bella.openapi.EndpointContext;
+import com.ke.bella.openapi.annotations.EndpointAPI;
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
+import com.ke.bella.openapi.protocol.log.EndpointLogger;
+
+import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice(annotations = EndpointAPI.class)
 @EndpointAPI

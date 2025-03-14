@@ -1,11 +1,15 @@
 package com.ke.bella.openapi;
 
-import com.ke.bella.openapi.apikey.ApikeyInfo;
-import com.ke.bella.openapi.common.EntityConstants;
-import com.ke.bella.openapi.tables.pojos.ChannelDB;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.Assert;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import com.ke.bella.openapi.apikey.ApikeyInfo;
+import com.ke.bella.openapi.common.EntityConstants;
+import com.ke.bella.openapi.tables.pojos.ChannelDB;
 
 public class EndpointContext {
     private static final ThreadLocal<EndpointProcessData> endpointRequestInfo = new ThreadLocal<>();
@@ -34,7 +38,6 @@ public class EndpointContext {
     public static void setRequest(ContentCachingRequestWrapper request) {
         requestCache.set(request);
     }
-
 
     public static ApikeyInfo getApikey() {
         return BellaContext.getApikey();
@@ -77,6 +80,13 @@ public class EndpointContext {
 
     public static void setEncodingType(String encodingType) {
         getProcessData().setEncodingType(encodingType);
+    }
+
+    public static void setHeaderInfo(Map<String, String> headers) {
+        String maxWait = headers.get("X-BELLA-MAX-WAIT");
+        if(StringUtils.isNumeric(maxWait)) {
+            EndpointContext.getProcessData().setMaxWaitSec(Integer.parseInt(maxWait));
+        }
     }
 
     public static void setEndpointData(String endpoint, ChannelDB channel, Object request) {

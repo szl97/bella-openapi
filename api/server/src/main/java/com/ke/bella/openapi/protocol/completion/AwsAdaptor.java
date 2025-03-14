@@ -1,11 +1,15 @@
 package com.ke.bella.openapi.protocol.completion;
 
-import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
-import lombok.AllArgsConstructor;
+import java.util.function.Consumer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks.StreamCompletionCallback;
+
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeAsyncClient;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.BedrockRuntimeException;
@@ -16,8 +20,6 @@ import software.amazon.awssdk.services.bedrockruntime.model.ConverseResponse;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamMetadataEvent;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.ConverseStreamResponseHandler;
-
-import java.util.function.Consumer;
 
 @Component("AwsCompletion")
 public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
@@ -37,7 +39,7 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, AwsProperty property) {
         request.setModel(property.deployName);
-        ConverseRequest awsRequest = AwsCompletionConverter.convert2AwsRequest(request, property);
+        ConverseRequest awsRequest =  AwsCompletionConverter.convert2AwsRequest(request, property);
         BedrockRuntimeClient client = AwsClientManager.client(property.region, url, property.auth.getApiKey(), property.auth.getSecret());
         try {
             ConverseResponse response = client.converse(awsRequest);
@@ -64,7 +66,6 @@ public class AwsAdaptor implements CompletionAdaptor<AwsProperty> {
             log.info("sse异常,{}", bedrockException.getMessage());
         }
     }
-
 
     static class AwsSseCompletionCallBack implements ConverseStreamResponseHandler.Visitor, Consumer<Throwable>, Runnable {
         public AwsSseCompletionCallBack(StreamCompletionCallback callback) {

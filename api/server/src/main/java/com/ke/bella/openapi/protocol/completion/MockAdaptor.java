@@ -29,6 +29,7 @@ import com.ke.bella.openapi.mock.ContentGenerator;
 import com.ke.bella.openapi.mock.FunctionCallGenerator;
 import com.ke.bella.openapi.mock.MockNetworkIO;
 import com.ke.bella.openapi.mock.MockSseWriter;
+import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
@@ -36,7 +37,7 @@ import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.Data;
 
 @Component("mock")
-public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
+public class MockAdaptor implements CompletionAdaptorDelegator<CompletionProperty> {
 
     ExecutorService executor = new ThreadPoolExecutor(500, 500,
             0L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000),
@@ -122,6 +123,16 @@ public class MockAdaptor implements CompletionAdaptor<CompletionProperty> {
         };
     }
 
+    @Override
+    public CompletionResponse completion(CompletionRequest request, String url, CompletionProperty property, Callbacks.HttpDelegator delegator) {
+        return completion(request, url, property);
+    }
+
+    @Override
+    public void streamCompletion(CompletionRequest request, String url, CompletionProperty property, Callbacks.StreamCompletionCallback callback,
+            Callbacks.StreamDelegator delegator) {
+        streamCompletion(request, url, property, callback);
+    }
 
     @Data
     public static class MockCompletionRequest {

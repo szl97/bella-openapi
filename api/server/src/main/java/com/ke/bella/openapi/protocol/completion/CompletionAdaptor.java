@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 
 public interface CompletionAdaptor<T extends CompletionProperty> extends IProtocolAdaptor {

@@ -26,6 +26,7 @@ public class EndpointLogger {
         logHandlers.forEach(handler -> handlerMap.put(handler.endpoint(), handler));
     }
     public void log(EndpointProcessData log) {
+        log.setApikey(null);
         if(log.isMock()) {
             return;
         }

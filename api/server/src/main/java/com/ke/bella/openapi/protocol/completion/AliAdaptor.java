@@ -1,20 +1,31 @@
 package com.ke.bella.openapi.protocol.completion;
 
+import java.util.List;
+
+import com.ke.bella.openapi.protocol.completion.AliCompletionRequest;
+import com.ke.bella.openapi.protocol.completion.AliCompletionResponse;
+import com.ke.bella.openapi.protocol.completion.AliProperty;
+import com.ke.bella.openapi.protocol.completion.CompletionAdaptor;
+import com.ke.bella.openapi.protocol.completion.CompletionRequest;
+import com.ke.bella.openapi.protocol.completion.CompletionResponse;
+import com.ke.bella.openapi.protocol.completion.CompletionSseListener;
+import com.ke.bella.openapi.protocol.completion.StreamCompletionResponse;
+import org.springframework.stereotype.Component;
+
 import com.google.common.collect.Lists;
+import com.ke.bella.openapi.protocol.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
-import com.ke.bella.openapi.protocol.completion.Callbacks.StreamCompletionCallback;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
+
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component("AliCompletion")
-public class AliAdaptor implements CompletionAdaptor<AliProperty> {
+public class AliAdaptor implements CompletionAdaptorDelegator<AliProperty> {
     @Override
     public String getDescription() {
         return "阿里协议";
@@ -25,23 +36,53 @@ public class AliAdaptor implements CompletionAdaptor<AliProperty> {
         return AliProperty.class;
     }
 
+    Callbacks.ChannelErrorCallback<AliCompletionResponse> errorCallback = (aliCompletionResponse, okhttpResponse) -> aliCompletionResponse.setHttpCode(okhttpResponse.code());
+
     @Override
-    public CompletionResponse completion(CompletionRequest request, String url, AliProperty property) {
-        AliCompletionRequest aliRequest = requestConvert(request);
-        Request httpRequest = buildRequest(aliRequest, url, property);
-        AliCompletionResponse response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class, ((aliCompletionResponse, okhttpResponse) -> aliCompletionResponse.setHttpCode(okhttpResponse.code())));
+    public CompletionResponse completion(CompletionRequest request, String url, AliProperty property, Callbacks.HttpDelegator delegator) {
+        AliCompletionRequest aliRequest = rewriteRequest(request, property);
+        AliCompletionResponse response;
+        if(delegator == null) {
+            Request httpRequest = buildRequest(aliRequest, url, property);
+            response = HttpUtils.httpRequest(httpRequest, AliCompletionResponse.class, errorCallback);
+        } else {
+            response = delegator.request(aliRequest, AliCompletionResponse.class, errorCallback);
+        }
         return responseConvert(response);
     }
 
     @Override
-    public void streamCompletion(CompletionRequest request, String url, AliProperty property, StreamCompletionCallback callback) {
-        AliCompletionRequest aliRequest = requestConvert(request);
-        Request httpRequest = buildRequest(aliRequest, url, property);
-        HttpUtils.streamRequest(httpRequest, new CompletionSseListener(callback, sseConverter));
+    public void streamCompletion(CompletionRequest request, String url, AliProperty property, StreamCompletionCallback callback,
+            Callbacks.StreamDelegator delegator) {
+        AliCompletionRequest aliRequest = rewriteRequest(request, property);
+        CompletionSseListener sseListener = new CompletionSseListener(callback, sseConverter);
+        if(delegator == null) {
+            Request httpRequest = buildRequest(aliRequest, url, property);
+            HttpUtils.streamRequest(httpRequest, sseListener);
+        } else {
+            delegator.request(aliRequest, sseListener);
+        }
     }
 
+    @Override
+    public CompletionResponse completion(CompletionRequest request, String url, AliProperty property) {
+        return completion(request, url, property, null);
+    }
+
+    @Override
+    public void streamCompletion(CompletionRequest request, String url, AliProperty property, StreamCompletionCallback callback) {
+         streamCompletion(request, url, property, callback,null);
+
+    }
+
+    public AliCompletionRequest rewriteRequest(CompletionRequest request, AliProperty property) {
+        AliCompletionRequest aliRequest = requestConvert(request);
+        aliRequest.setModel(property.getDeployName());
+        return aliRequest;
+    }
+
+
     private Request buildRequest(AliCompletionRequest request, String url, AliProperty property) {
-        request.setModel(property.getDeployName());
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
                 .post(RequestBody.create(JacksonUtils.serialize(request),

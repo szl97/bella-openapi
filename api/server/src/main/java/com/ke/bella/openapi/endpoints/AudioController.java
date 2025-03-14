@@ -7,7 +7,6 @@ import javax.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -26,13 +25,15 @@ import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.protocol.tts.TtsAdaptor;
 import com.ke.bella.openapi.protocol.tts.TtsProperty;
 import com.ke.bella.openapi.protocol.tts.TtsRequest;
-import com.ke.bella.openapi.service.KeQueueService;
+import com.ke.bella.openapi.service.JobQueueService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.SseHelper;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+
+
 @EndpointAPI
 @RestController
 @RequestMapping("/v1/audio")
@@ -74,23 +75,23 @@ public class AudioController {
         return ttsAdaptor.tts(request, ttsUrl, ttsProperty);
     }
     @Resource
-    private KeQueueService keQueueService;
+    private JobQueueService jobQueueService;
 
     @PostMapping("/transcriptions/file")
-    public AudioTranscriptionResp transcribeAudio(@RequestBody AudioTranscriptionReq audioTranscriptionReq,
-                                                  @RequestHeader(value = "Authorization") String authorization) {
+    public AudioTranscriptionResp transcribeAudio(@RequestBody AudioTranscriptionReq audioTranscriptionReq) {
         validateRequestParams(audioTranscriptionReq);
         String endpoint = EndpointContext.getRequest().getRequestURI();
-        String taskId = keQueueService.putTask(audioTranscriptionReq, endpoint, audioTranscriptionReq.getModel(), authorization).getTaskId();
+        String taskId = jobQueueService
+                .putTask(audioTranscriptionReq, endpoint, audioTranscriptionReq.getModel(), EndpointContext.getProcessData().getApikey())
+                .getTaskId();
         return AudioTranscriptionResp.builder()
                 .taskId(taskId)
                 .build();
     }
 
     @PostMapping("/transcriptions/file/result")
-    public AudioTranscriptionResultResp getTranscriptionResult(@RequestBody AudioTranscriptionResultReq audioTranscriptionResultReq,
-                                                               @RequestHeader(value = "Authorization") String authorization) {
-        List<Object> data = keQueueService.getTaskResult(audioTranscriptionResultReq.getTaskId(), authorization).getData();
+    public AudioTranscriptionResultResp getTranscriptionResult(@RequestBody AudioTranscriptionResultReq audioTranscriptionResultReq) {
+        List<Object> data = jobQueueService.getTaskResult(audioTranscriptionResultReq.getTaskId(), EndpointContext.getProcessData().getApikey()).getData();
         return AudioTranscriptionResultResp.builder()
                 .data(data)
                 .build();

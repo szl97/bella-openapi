@@ -1,5 +1,16 @@
 package com.ke.bella.openapi.endpoints;
 
+import java.util.Map;
+
+import com.ke.bella.openapi.protocol.completion.CompletionAdaptorDelegator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import com.ke.bella.openapi.BellaContext;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
@@ -10,24 +21,19 @@ import com.ke.bella.openapi.protocol.completion.CompletionAdaptor;
 import com.ke.bella.openapi.protocol.completion.CompletionProperty;
 import com.ke.bella.openapi.protocol.completion.CompletionRequest;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
+import com.ke.bella.openapi.protocol.completion.QueueAdaptor;
 import com.ke.bella.openapi.protocol.completion.ToolCallSimulator;
 import com.ke.bella.openapi.protocol.completion.callback.StreamCallbackProvider;
 import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.safety.ISafetyCheckService;
 import com.ke.bella.openapi.safety.SafetyCheckRequest;
+import com.ke.bella.openapi.service.JobQueueService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.SseHelper;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.Map;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @EndpointAPI
 @RestController
@@ -44,6 +50,8 @@ public class ChatController {
     private EndpointLogger logger;
     @Autowired
     private ISafetyCheckService.IChatSafetyCheckService safetyCheckService;
+    @Autowired
+    private JobQueueService jobQueueService;
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @PostMapping("/completions")
     public Object completion(@RequestBody CompletionRequest request) {
@@ -68,12 +76,9 @@ public class ChatController {
         if(isMock) {
             fillMockProperty(property);
         }
-        if(property.isFunctionCallSimulate()) {
-            adaptor = new ToolCallSimulator<>(adaptor);
-        }
+        adaptor = decorateAdaptor(adaptor, property, processData);
 
         EndpointContext.setEncodingType(property.getEncodingType());
-
         if(request.isStream()) {
             SseEmitter sse = SseHelper.createSse(1000L * 60 * 5, EndpointContext.getProcessData().getRequestId());
             adaptor.streamCompletion(request, url, property, StreamCallbackProvider.provide(sse, processData, EndpointContext.getApikey(), logger, safetyCheckService, property));
@@ -95,5 +100,19 @@ public class ChatController {
         property.setFunctionCallSimulate("true".equals(functionCallSimulate) || property.isFunctionCallSimulate());
         property.setMergeReasoningContent("true".equals(mergeReasoningContent) || property.isMergeReasoningContent());
         property.setSplitReasoningFromContent("true".equals(splitReasoningFromContent) || property.isSplitReasoningFromContent());
+    }
+
+    private CompletionAdaptor<?> decorateAdaptor(CompletionAdaptor<?> adaptor, CompletionProperty property, EndpointProcessData processData) {
+        if(StringUtils.isNotBlank(property.getQueueName())) {
+            if(adaptor instanceof CompletionAdaptorDelegator) {
+                adaptor = new QueueAdaptor<>((CompletionAdaptorDelegator<?>)adaptor, jobQueueService, jobQueueService, processData);
+            } else {
+                throw new IllegalStateException(adaptor.getClass().getSimpleName() + "不支持请求代理");
+            }
+        }
+        if(property.isFunctionCallSimulate()) {
+            adaptor = new ToolCallSimulator<>(adaptor, processData);
+        }
+        return adaptor;
     }
 }
