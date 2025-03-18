@@ -3,6 +3,7 @@ package com.ke.bella.openapi.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ke.bella.openapi.protocol.BellaStreamCallback;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +48,13 @@ public class JobQueueService implements Callbacks.RealTimeTaskCallback, Callback
     @Override
     public void putStreamTask(Object task, String endpoint, String queueName, String apikey, int timeout, BellaEventSourceListener listener) {
         Request request = getRequest(task, endpoint, queueName, apikey, timeout);
-        HttpUtils.streamRequest(request, listener);
+        HttpUtils.streamRequest(request, listener, timeout, timeout);
+    }
+
+    @Override
+    public void putStreamTask(Object task, String endpoint, String queueName, String apikey, int timeout, BellaStreamCallback listener) {
+        Request request = getRequest(task, endpoint, queueName, apikey, timeout);
+        HttpUtils.streamRequest(request, listener, timeout, timeout);
     }
 
     public QueueTaskPutResp putTask(Object task, String endpoint, String queueName, String apikey) {

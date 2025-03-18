@@ -13,10 +13,10 @@ import java.util.function.Function;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.BellaEventSourceListener;
+import com.ke.bella.openapi.protocol.BellaStreamCallback;
 import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.Callbacks;
 
-import okhttp3.Callback;
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -24,7 +24,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.Util;
-import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSources;
 
 /**
@@ -37,7 +36,6 @@ public class HttpUtils {
     private static final int defaultConnectionTimeout = 120;
     private static final int defaultReadTimeout = 300;
     private static final OkHttpClient.Builder clientBuilder = clientBuilder();
-    public static EventSource.Factory factory = EventSources.createFactory(defaultOkhttpClient());
     private static OkHttpClient defaultOkhttpClient() {
         OkHttpClient.Builder builder = clientBuilder()
                 .connectTimeout(defaultConnectionTimeout, TimeUnit.SECONDS)
@@ -63,8 +61,48 @@ public class HttpUtils {
         return httpRequest(request, defaultConnectionTimeout, defaultReadTimeout);
     }
 
-    public static void streamRequest(Request request, Callback callback) {
-        clientBuilder.build().newCall(request).enqueue(callback);
+    public static void streamRequest(Request request, BellaStreamCallback callback) {
+        streamRequest(request, callback, defaultConnectionTimeout, defaultReadTimeout);
+    }
+
+    public static void streamRequest(Request request, BellaEventSourceListener listener) {
+        streamRequest(request, listener, defaultConnectionTimeout, defaultReadTimeout);
+    }
+
+    public static void streamRequest(Request request, BellaStreamCallback callback, int connectionTimeout, int readTimeout) {
+        CompletableFuture<?> future = new CompletableFuture<>();
+        callback.setConnectionInitFuture(future);
+        clientBuilder.connectTimeout(connectionTimeout, TimeUnit.SECONDS)
+                .readTimeout(readTimeout, TimeUnit.SECONDS).build().newCall(request).enqueue(callback);
+        try {
+            future.get();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+            Thread.currentThread().interrupt();
+        }  catch (ExecutionException e) {
+            if(e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void streamRequest(Request request, BellaEventSourceListener listener, int connectionTimeout, int readTimeout) {
+        CompletableFuture<?> future = new CompletableFuture<>();
+        listener.setConnectionInitFuture(future);
+        EventSources.createFactory(clientBuilder.connectTimeout(connectionTimeout, TimeUnit.SECONDS)
+                .readTimeout(readTimeout, TimeUnit.SECONDS).build()).newEventSource(request, listener);
+        try {
+            future.get();
+        } catch (InterruptedException interruptedException) {
+            interruptedException.printStackTrace();
+            Thread.currentThread().interrupt();
+        }  catch (ExecutionException e) {
+            if(e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
+            }
+            throw new RuntimeException(e);
+        }
     }
 
     public static <T> T httpRequest(Request request, Class<T> clazz) {
@@ -196,23 +234,6 @@ public class HttpUtils {
             if(body != null) {
                 body.close();
             }
-        }
-    }
-
-    public static void streamRequest(Request request, BellaEventSourceListener listener) {
-        CompletableFuture<?> future = new CompletableFuture<>();
-        listener.setConnectionInitFuture(future);
-        factory.newEventSource(request, listener);
-        try {
-             future.get();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-            Thread.currentThread().interrupt();
-        }  catch (ExecutionException e) {
-            if(e.getCause() instanceof RuntimeException) {
-                throw (RuntimeException) e.getCause();
-            }
-            throw new RuntimeException(e);
         }
     }
 

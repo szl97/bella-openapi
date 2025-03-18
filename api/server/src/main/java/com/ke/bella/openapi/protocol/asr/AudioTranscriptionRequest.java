@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.protocol.audio;
+package com.ke.bella.openapi.protocol.asr;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

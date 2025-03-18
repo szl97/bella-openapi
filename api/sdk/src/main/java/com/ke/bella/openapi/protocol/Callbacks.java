@@ -61,10 +61,19 @@ public interface Callbacks {
     interface StreamTtsCallback extends Callbacks {
     }
 
+    interface HttpStreamTtsCallback extends StreamTtsCallback {
+        void onOpen();
+
+        void callback(byte[] msg);
+
+        void finish();
+
+        void finish(ChannelException exception);
+    }
+
     interface WebSocketTtsCallback extends StreamTtsCallback {
        void onOpen(WebSocket webSocket, Response response);
        void onMessage(WebSocket webSocket, ByteString bytes);
-       void onMessage(WebSocket webSocket, String text);
        void onClosing(WebSocket webSocket, int code, String reason);
        void onClosed(WebSocket webSocket, int code, String reason);
        void onFailure(WebSocket webSocket, Throwable t, Response response);
@@ -142,6 +151,7 @@ public interface Callbacks {
 
     interface StreamTaskCallback {
         void putStreamTask(Object task, String endpoint, String queueName, String apikey, int timeout, BellaEventSourceListener listener);
+        void putStreamTask(Object task, String endpoint, String queueName, String apikey, int timeout, BellaStreamCallback listener);
         int defaultTimeout();
     }
 

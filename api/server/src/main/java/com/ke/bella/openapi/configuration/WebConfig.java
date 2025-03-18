@@ -1,17 +1,18 @@
 package com.ke.bella.openapi.configuration;
 
-import com.ke.bella.openapi.common.EntityConstants;
-import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
-import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
-import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.ke.bella.openapi.common.EntityConstants;
+import com.ke.bella.openapi.intercept.AuthorizationInterceptor;
+import com.ke.bella.openapi.intercept.ConcurrentStartInterceptor;
+import com.ke.bella.openapi.intercept.MonthQuotaInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {

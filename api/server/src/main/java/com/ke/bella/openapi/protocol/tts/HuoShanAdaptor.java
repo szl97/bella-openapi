@@ -1,13 +1,12 @@
 package com.ke.bella.openapi.protocol.tts;
 
+import java.io.OutputStream;
 import java.util.Base64;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
@@ -22,13 +21,15 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
+import javax.servlet.AsyncContext;
+
 @Slf4j
 @Component("HuoShanTts")
 public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
     @Autowired
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
     @Override
-    public ResponseEntity<byte[]> tts(TtsRequest request, String url, HuoShanProperty property){
+    public byte[] tts(TtsRequest request, String url, HuoShanProperty property){
         HuoShanRequest huoShanRequest = convertTtsRequestToHuoShanRequest(request, property);
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
@@ -50,8 +51,9 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
     }
 
     @Override
-    public Callbacks.StreamTtsCallback buildCallback(TtsRequest request, SseEmitter sse, EndpointProcessData processData, EndpointLogger logger) {
-        return new HuoshanStreamTtsCallback(request, sse, EndpointContext.getProcessData(), logger);
+    public Callbacks.StreamTtsCallback buildCallback(TtsRequest request, OutputStream outputStream, AsyncContext context,
+            EndpointProcessData processData, EndpointLogger logger) {
+        return new HuoshanStreamTtsCallback(request, outputStream, context, EndpointContext.getProcessData(), logger);
     }
 
     private HuoShanRequest convertTtsRequestToHuoShanRequest(TtsRequest ttsRequest, HuoShanProperty property) {
@@ -85,14 +87,13 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
                 .build();
     }
 
-    private ResponseEntity<byte[]> processHuoShanResponse(Request httpRequest) {
+    private byte[] processHuoShanResponse(Request httpRequest) {
         HuoShanResponse huoshanResponse = HttpUtils.httpRequest(httpRequest, HuoShanResponse.class);
         if (huoshanResponse == null || huoshanResponse.getCode()!= HuoShanResponseCodeEnum.OK.code || huoshanResponse.getData() == null) {
             HttpStatus status = getHttpStatus(HuoShanAdaptor.HuoShanResponseCodeEnum.getByCode(huoshanResponse == null ? HuoShanResponseCodeEnum.OTHER_ERROR.code : huoshanResponse.getCode()));
             throw new ChannelException.OpenAIException(status.value(), status.getReasonPhrase(), huoshanResponse == null ? HuoShanResponseCodeEnum.OTHER_ERROR.message : huoshanResponse.getMessage());
         }
-        byte[] decodedData = BASE64_DECODER.decode(huoshanResponse.getData());
-        return ResponseEntity.ok(decodedData);
+        return BASE64_DECODER.decode(huoshanResponse.getData());
     }
 
     private HttpStatus getHttpStatus(HuoShanResponseCodeEnum responseCode) {

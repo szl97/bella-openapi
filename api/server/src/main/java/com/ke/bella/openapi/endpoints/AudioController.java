@@ -1,25 +1,30 @@
 package com.ke.bella.openapi.endpoints;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
-import javax.annotation.Resource;
+import javax.servlet.AsyncContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
-import com.ke.bella.openapi.protocol.audio.AudioTranscriptionRequest.AudioTranscriptionReq;
-import com.ke.bella.openapi.protocol.audio.AudioTranscriptionRequest.AudioTranscriptionResultReq;
-import com.ke.bella.openapi.protocol.audio.AudioTranscriptionResponse.AudioTranscriptionResp;
-import com.ke.bella.openapi.protocol.audio.AudioTranscriptionResponse.AudioTranscriptionResultResp;
+import com.ke.bella.openapi.protocol.asr.AudioTranscriptionRequest.AudioTranscriptionReq;
+import com.ke.bella.openapi.protocol.asr.AudioTranscriptionRequest.AudioTranscriptionResultReq;
+import com.ke.bella.openapi.protocol.asr.AudioTranscriptionResponse.AudioTranscriptionResp;
+import com.ke.bella.openapi.protocol.asr.AudioTranscriptionResponse.AudioTranscriptionResultResp;
 import com.ke.bella.openapi.protocol.limiter.LimiterManager;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.protocol.tts.TtsAdaptor;
@@ -28,11 +33,11 @@ import com.ke.bella.openapi.protocol.tts.TtsRequest;
 import com.ke.bella.openapi.service.JobQueueService;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.utils.JacksonUtils;
-import com.ke.bella.openapi.utils.SseHelper;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.ke.bella.openapi.common.AudioFormat.getContentType;
 
 @EndpointAPI
 @RestController
@@ -48,9 +53,13 @@ public class AudioController {
     private LimiterManager limiterManager;
     @Autowired
     private EndpointLogger logger;
+    @Autowired
+    private JobQueueService jobQueueService;
+
+
     @PostMapping("/speech")
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Object speech(@RequestBody TtsRequest request) {
+    public void speech(@RequestBody TtsRequest request, HttpServletRequest httpRequest, HttpServletResponse response) throws IOException {
         String ttsEndpoint = EndpointContext.getRequest().getRequestURI();
         String ttsModel = request.getModel();
         EndpointContext.setEndpointData(ttsEndpoint, ttsModel, request);
@@ -66,16 +75,29 @@ public class AudioController {
 
         TtsAdaptor ttsAdaptor = adaptorManager.getProtocolAdaptor(ttsEndpoint, ttsProtocol, TtsAdaptor.class);
         TtsProperty ttsProperty = (TtsProperty) JacksonUtils.deserialize(ttsChannelInfo, ttsAdaptor.getPropertyClass());
+        if(StringUtils.isBlank(request.getResponseFormat())) {
+            request.setResponseFormat(ttsProperty.getDefaultContentType());
+        }
         EndpointContext.setEncodingType(ttsProperty.getEncodingType());
         if(request.isStream()) {
-            SseEmitter sse = SseHelper.createSse(1000L * 60 * 10, EndpointContext.getProcessData().getRequestId());
-            ttsAdaptor.streamTts(request, ttsUrl, ttsProperty, ttsAdaptor.buildCallback(request, sse, processData, logger));
-            return sse;
+            AsyncContext asyncContext = httpRequest.startAsync();
+            asyncContext.setTimeout(1200000);
+            try {
+                response.setContentType(getContentType(request.getResponseFormat()));
+                OutputStream outputStream = response.getOutputStream();
+                ttsAdaptor.streamTts(request, ttsUrl, ttsProperty,
+                        ttsAdaptor.buildCallback(request, outputStream, asyncContext, processData, logger));
+                return;
+            } catch (Exception e) {
+                asyncContext.complete();
+                throw e;
+            }
         }
-        return ttsAdaptor.tts(request, ttsUrl, ttsProperty);
+        byte[] data = ttsAdaptor.tts(request, ttsUrl, ttsProperty);
+        response.setContentType(getContentType(request.getResponseFormat()));
+        response.getOutputStream().write(data);
     }
-    @Resource
-    private JobQueueService jobQueueService;
+
 
     @PostMapping("/transcriptions/file")
     public AudioTranscriptionResp transcribeAudio(@RequestBody AudioTranscriptionReq audioTranscriptionReq) {

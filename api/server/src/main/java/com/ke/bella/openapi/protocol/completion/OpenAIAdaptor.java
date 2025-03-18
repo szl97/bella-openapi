@@ -27,8 +27,7 @@ public class OpenAIAdaptor implements CompletionAdaptorDelegator<OpenAIProperty>
 
     @Override
     public CompletionResponse completion(CompletionRequest request, String url, OpenAIProperty property, Callbacks.HttpDelegator delegator) {
-        rewriteRequest(request, property);
-        CompletionResponse response = null;
+        CompletionResponse response;
         if(delegator == null) {
             Request httpRequest = buildRequest(request, url, property);
             response = HttpUtils.httpRequest(httpRequest, CompletionResponse.class, errorCallback);
@@ -43,7 +42,6 @@ public class OpenAIAdaptor implements CompletionAdaptorDelegator<OpenAIProperty>
     @Override
     public void streamCompletion(CompletionRequest request, String url, OpenAIProperty property, StreamCompletionCallback callback,
             Callbacks.StreamDelegator delegator) {
-        rewriteRequest(request, property);
         CompletionSseListener listener = new CompletionSseListener(callback, sseConverter);
         if(delegator == null) {
             Request httpRequest = buildRequest(request, url, property);
@@ -62,14 +60,11 @@ public class OpenAIAdaptor implements CompletionAdaptorDelegator<OpenAIProperty>
         streamCompletion(request, url, property, callback, null);
     }
 
-    private void rewriteRequest(CompletionRequest request, OpenAIProperty property) {
+    private Request buildRequest(CompletionRequest request, String url, OpenAIProperty property) {
         if(property.supportStreamOptions && request.isStream()) {
             request.setStream_options(new CompletionRequest.StreamOptions());
         }
         request.setModel(property.getDeployName());
-    }
-
-    private Request buildRequest(CompletionRequest request, String url, OpenAIProperty property) {
         if(StringUtils.isNotEmpty(property.getApiVersion())) {
             url += property.getApiVersion();
         }

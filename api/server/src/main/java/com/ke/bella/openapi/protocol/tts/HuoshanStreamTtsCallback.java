@@ -1,22 +1,21 @@
 package com.ke.bella.openapi.protocol.tts;
 
-import static org.springframework.http.MediaType.TEXT_EVENT_STREAM;
-
-import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import javax.servlet.AsyncContext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.Callbacks;
+import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import com.ke.bella.openapi.utils.StreamHelper;
 
 import lombok.Data;
 import okhttp3.Response;
@@ -84,16 +83,18 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
     final String sessionId = UUID.randomUUID().toString().replace("-", "");
 
     final TtsRequest request;
-    final SseEmitter sse;
+    final OutputStream stream;
+    final AsyncContext context;
     final EndpointProcessData processData;
     final EndpointLogger logger;
     boolean end = false;
     boolean first = true;
     long startTime = DateTimeUtils.getCurrentMills();
 
-    public HuoshanStreamTtsCallback(TtsRequest request, SseEmitter sse, EndpointProcessData processData, EndpointLogger logger) {
+    public HuoshanStreamTtsCallback(TtsRequest request, OutputStream stream, AsyncContext context, EndpointProcessData processData, EndpointLogger logger) {
         this.request = request;
-        this.sse = sse;
+        this.stream = stream;
+        this.context = context;
         this.processData = processData;
         this.logger = logger;
         processData.setMetrics(new HashMap<>());
@@ -134,15 +135,11 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
             }
             // 输出结果
             if (response.header.message_type == AUDIO_ONLY_RESPONSE) {
-                try {
-                    if(first) {
-                        processData.getMetrics().put("ttft", DateTimeUtils.getCurrentMills() - startTime);
-                        first = false;
-                    }
-                    sse.send(response.payload, TEXT_EVENT_STREAM);
-                } catch (IOException e) {
-                    onError(ChannelException.fromException(e));
+                if(first) {
+                    processData.getMetrics().put("ttft", DateTimeUtils.getCurrentMills() - startTime);
+                    first = false;
                 }
+                StreamHelper.send(stream, response.payload);
             }
             break;
         }
@@ -153,10 +150,6 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
         default:
             break;
         }
-    }
-
-    @Override
-    public void onMessage(WebSocket webSocket, String text) {
     }
 
     @Override
@@ -185,14 +178,14 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
     void complete() {
         if(!end) {
             processData.getMetrics().put("ttlt", DateTimeUtils.getCurrentMills() - startTime);
-            sse.complete();
+            StreamHelper.close(stream, context);
             log();
             end = true;
         }
     }
 
     void onError(ChannelException exception) {
-        sse.completeWithError(exception);
+        complete();
         processData.setResponse(OpenapiResponse.errorResponse(exception.convertToOpenapiError()));
         log();
     }
