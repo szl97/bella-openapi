@@ -1,7 +1,6 @@
 package com.ke.bella.openapi.protocol.tts;
 
-import java.io.OutputStream;
-
+import com.ke.bella.openapi.protocol.BellaStreamCallback;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +14,6 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import javax.servlet.AsyncContext;
-
 @Component("OpenAITts")
 public class OpenAIAdaptor implements TtsAdaptor<OpenAIProperty> {
     @Override
@@ -26,15 +23,15 @@ public class OpenAIAdaptor implements TtsAdaptor<OpenAIProperty> {
     }
 
     @Override
-    public void streamTts(TtsRequest request, String url, OpenAIProperty property, Callbacks.StreamTtsCallback callback) {
+    public void streamTts(TtsRequest request, String url, OpenAIProperty property, Callbacks.StreamCallback callback) {
         Request httpRequest = buildRequest(request, url, property);
-        HttpUtils.streamRequest(httpRequest, new TtsStreamListener((Callbacks.HttpStreamTtsCallback) callback));
+        HttpUtils.streamRequest(httpRequest, new BellaStreamCallback((Callbacks.HttpStreamTtsCallback) callback));
     }
 
     @Override
-    public Callbacks.StreamTtsCallback buildCallback(TtsRequest request, OutputStream outputStream, AsyncContext context,
+    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.ByteSender byteSender,
             EndpointProcessData processData, EndpointLogger logger) {
-        return new OpenAIStreamTtsCallback(outputStream, context, processData, logger);
+        return new OpenAIStreamTtsCallback(byteSender, processData, logger);
     }
 
     @Override

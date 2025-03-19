@@ -104,15 +104,6 @@ public class MetadataValidator {
                     || StringUtils.isNotBlank(op.getProperties())
                     || StringUtils.isNotBlank(op.getFeatures()), "可修改字段全部为空，无法修改");
         }
-        if(CollectionUtils.isNotEmpty(op.getEndpoints())) {
-            boolean hasBasicEndpoint = op.getEndpoints().stream().anyMatch(path ->
-                    Arrays.stream(SystemBasicEndpoint.values())
-                            .map(SystemBasicEndpoint::getEndpoint)
-                            .anyMatch(match -> matchPath(match, path)));
-            Assert.isTrue(hasBasicEndpoint, "模型必须有一个基本能力点，基本能力点如下：\r\n" +
-                    String.join(",", Arrays.stream(SystemBasicEndpoint.values())
-                            .map(SystemBasicEndpoint::getEndpoint).collect(Collectors.toList())));
-        }
         if(StringUtils.isNotEmpty(op.getOwnerType())) {
             Assert.isTrue(OWNER_TYPES.contains(op.getOwnerType()), "错误的所有者类型");
         }
@@ -159,7 +150,6 @@ public class MetadataValidator {
         Assert.isTrue(op.getTrialEnabled() == 1 || op.getTrialEnabled() == 0, "试用开关只能是0或1");
         Assert.hasText(op.getProtocol(), "请求协议不可为空字符串");
         Assert.hasText(op.getSupplier(), "供应商不可为空字符串");
-        Assert.isTrue(StringUtils.isEmpty(op.getUrl()) || isValidURL(op.getUrl()), "url必须以http://或https://开头");
         
         // Validate visibility if provided
         if (StringUtils.isNotEmpty(op.getVisibility())) {

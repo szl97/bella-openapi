@@ -65,6 +65,15 @@ public class JacksonUtils {
         return "";
     }
 
+    public static byte[] toByte(Object obj) {
+        try {
+            return MAPPER.writeValueAsBytes(obj);
+        } catch (JsonProcessingException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return new byte[0];
+    }
+
     public static <T> T deserialize(String jsonText, TypeReference<T> type) {
         try {
             return MAPPER.readValue(jsonText, type);

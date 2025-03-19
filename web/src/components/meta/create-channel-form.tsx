@@ -145,9 +145,9 @@ export function CreateChannelForm({
                 window.location.href = `/meta/private-channel?entityType=${entityType}&entityCode=${entityCode}`;
             } else {
                 if (entityType == 'model') {
-                    window.location.href = `/meta/console/model?modelName=${entityCode}}`;
+                    window.location.href = `/meta/console/model?modelName=${entityCode}`;
                 } else {
-                    window.location.href = `/meta/console/endpoint?endpoint=${entityCode}}`;
+                    window.location.href = `/meta/console/endpoint?endpoint=${entityCode}`;
                 }
             }
         } catch (error) {

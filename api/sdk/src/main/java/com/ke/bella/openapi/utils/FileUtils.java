@@ -31,6 +31,7 @@ public class FileUtils {
         MIME_TO_EXTENSION.put("audio/mp3", "mp3");
         MIME_TO_EXTENSION.put("audio/mp4", "m4a");
         MIME_TO_EXTENSION.put("audio/wav", "wav");
+        MIME_TO_EXTENSION.put("audio/wave", "wav");
         MIME_TO_EXTENSION.put("audio/webm", "webm");
         MIME_TO_EXTENSION.put("audio/amr", "amr");
         MIME_TO_EXTENSION.put("video/mp4", "mp4");

@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.protocol.cost;
 
+import com.ke.bella.openapi.protocol.asr.AsrFlashPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
@@ -45,6 +46,7 @@ public class CostCalculator  {
         COMPLETION("/v*/chat/completions", completion),
         EMBEDDING("/v*/embeddings", embedding),
         TTS("/v*/audio/speech", tts),
+        ASR_FLASH("/v*/audio/asr/flash", asr_flash),
         ;
         final String endpoint;
         final EndpointCostCalculator calculator;
@@ -93,6 +95,20 @@ public class CostCalculator  {
         public boolean checkPriceInfo(String priceInfo) {
             TtsPriceInfo price = JacksonUtils.deserialize(priceInfo, TtsPriceInfo.class);
             return price != null && price.getInput() != null;
+        }
+    };
+
+    static EndpointCostCalculator asr_flash = new EndpointCostCalculator() {
+        @Override
+        public BigDecimal calculate(String priceInfo, Object usage) {
+            AsrFlashPriceInfo price = JacksonUtils.deserialize(priceInfo, AsrFlashPriceInfo.class);
+            return price.getPrice();
+        }
+
+        @Override
+        public boolean checkPriceInfo(String priceInfo) {
+            AsrFlashPriceInfo price = JacksonUtils.deserialize(priceInfo, AsrFlashPriceInfo.class);
+            return price != null && price.getPrice() != null;
         }
     };
 

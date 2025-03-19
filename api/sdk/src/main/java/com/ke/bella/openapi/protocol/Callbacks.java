@@ -58,10 +58,22 @@ public interface Callbacks {
         }
     }
 
-    interface StreamTtsCallback extends Callbacks {
+    interface StreamCallback extends Callbacks {
     }
 
-    interface HttpStreamTtsCallback extends StreamTtsCallback {
+
+    interface ByteSender extends Callbacks {
+        void send(byte[] bytes);
+        void close();
+    }
+
+    interface TextSender extends Callbacks {
+        void send(String text);
+        void onError(Throwable e);
+        void close();
+    }
+
+    interface HttpStreamTtsCallback extends StreamCallback {
         void onOpen();
 
         void callback(byte[] msg);
@@ -71,13 +83,15 @@ public interface Callbacks {
         void finish(ChannelException exception);
     }
 
-    interface WebSocketTtsCallback extends StreamTtsCallback {
+    interface WebSocketCallback extends StreamCallback {
        void onOpen(WebSocket webSocket, Response response);
        void onMessage(WebSocket webSocket, ByteString bytes);
+       void onMessage(WebSocket webSocket, String text);
        void onClosing(WebSocket webSocket, int code, String reason);
        void onClosed(WebSocket webSocket, int code, String reason);
        void onFailure(WebSocket webSocket, Throwable t, Response response);
     }
+
 
     interface ChannelErrorCallback<T> {
         void callback(T channelResponse, Response httpResponse);

@@ -38,6 +38,9 @@ public abstract class ChannelException extends RuntimeException {
         if(e instanceof ChannelException) {
             return (ChannelException) e;
         }
+        if(e.getCause() instanceof ChannelException) {
+            return (ChannelException) e.getCause();
+        }
         return new ChannelException(e.getMessage(), e) {
             @Override
             public Integer getHttpCode() {

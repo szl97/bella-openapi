@@ -1,6 +1,10 @@
 package com.ke.bella.openapi.endpoints;
 
+import static com.ke.bella.openapi.common.AudioFormat.getContentType;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -8,11 +12,15 @@ import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.asr.AsrProperty;
+import com.ke.bella.openapi.protocol.asr.AsrRequest;
+import com.ke.bella.openapi.protocol.asr.flash.FlashAsrAdaptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +29,8 @@ import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
+import com.ke.bella.openapi.protocol.StreamByteSender;
+import com.ke.bella.openapi.protocol.asr.AsrFlashResponse;
 import com.ke.bella.openapi.protocol.asr.AudioTranscriptionRequest.AudioTranscriptionReq;
 import com.ke.bella.openapi.protocol.asr.AudioTranscriptionRequest.AudioTranscriptionResultReq;
 import com.ke.bella.openapi.protocol.asr.AudioTranscriptionResponse.AudioTranscriptionResp;
@@ -36,8 +46,6 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.ke.bella.openapi.common.AudioFormat.getContentType;
 
 @EndpointAPI
 @RestController
@@ -86,7 +94,7 @@ public class AudioController {
                 response.setContentType(getContentType(request.getResponseFormat()));
                 OutputStream outputStream = response.getOutputStream();
                 ttsAdaptor.streamTts(request, ttsUrl, ttsProperty,
-                        ttsAdaptor.buildCallback(request, outputStream, asyncContext, processData, logger));
+                        ttsAdaptor.buildCallback(request, new StreamByteSender(asyncContext, outputStream), processData, logger));
                 return;
             } catch (Exception e) {
                 asyncContext.complete();
@@ -131,6 +139,46 @@ public class AudioController {
         }
         if (audioTranscriptionReq.getUser() == null || audioTranscriptionReq.getUser().isEmpty()) {
             throw new IllegalArgumentException("User is required");
+        }
+    }
+
+    @PostMapping("/asr/flash")
+    public AsrFlashResponse flashAsr(@RequestHeader(value = "format", defaultValue = "wav") String format,
+            @RequestHeader(value = "sample_rate",defaultValue = "16000") int sampleRate,
+            @RequestHeader(value = "max_sentence_silence", defaultValue = "3000") int maxSentenceSilence,
+            @RequestHeader(value = "model") String model, InputStream inputStream) {
+        String endpoint = EndpointContext.getRequest().getRequestURI();
+        AsrRequest request = AsrRequest.builder()
+                .format(format)
+                .maxSentenceSilence(maxSentenceSilence)
+                .sampleRate(sampleRate)
+                .content(readInputStream(inputStream))
+                .build();
+        EndpointContext.setEndpointData(endpoint, model, request);
+        EndpointProcessData processData = EndpointContext.getProcessData();
+        ChannelDB channel = router.route(endpoint, model, EndpointContext.getApikey(), processData.isMock());
+        EndpointContext.setEndpointData(channel);
+        if(!EndpointContext.getProcessData().isPrivate()) {
+            limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
+        }
+        String protocol = processData.getProtocol();
+        String url = processData.getForwardUrl();
+        String channelInfo = channel.getChannelInfo();
+        FlashAsrAdaptor adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, FlashAsrAdaptor.class);
+        AsrProperty property = (AsrProperty) JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
+        return adaptor.asr(request, url, property, processData);
+    }
+
+    private byte[] readInputStream(InputStream inputStream) {
+        try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+            byte[] data = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, bytesRead);
+            }
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            throw ChannelException.fromException(e);
         }
     }
 

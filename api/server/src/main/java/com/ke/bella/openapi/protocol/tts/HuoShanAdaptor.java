@@ -1,6 +1,5 @@
 package com.ke.bella.openapi.protocol.tts;
 
-import java.io.OutputStream;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.exception.ChannelException;
+import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.utils.HttpUtils;
@@ -20,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-
-import javax.servlet.AsyncContext;
 
 @Slf4j
 @Component("HuoShanTts")
@@ -39,7 +37,7 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
     }
 
     @Override
-    public void streamTts(TtsRequest request, String url, HuoShanProperty property, Callbacks.StreamTtsCallback callback) {
+    public void streamTts(TtsRequest request, String url, HuoShanProperty property, Callbacks.StreamCallback callback) {
         Request webSocketRequest = new Request.Builder()
                 .url(property.websocketUrl)
                 .header("X-Api-App-Key", property.appId)
@@ -47,13 +45,13 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
                 .header("X-Api-Resource-Id", property.resourceId)
                 .header("X-Api-Connect-Id", UUID.randomUUID().toString())
                 .build();
-        HttpUtils.websocketRequest(webSocketRequest, new WebSocketTtsListener((Callbacks.WebSocketTtsCallback) callback));
+        HttpUtils.websocketRequest(webSocketRequest, new BellaWebSocketListener((Callbacks.WebSocketCallback) callback));
     }
 
     @Override
-    public Callbacks.StreamTtsCallback buildCallback(TtsRequest request, OutputStream outputStream, AsyncContext context,
+    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.ByteSender byteSender,
             EndpointProcessData processData, EndpointLogger logger) {
-        return new HuoshanStreamTtsCallback(request, outputStream, context, EndpointContext.getProcessData(), logger);
+        return new HuoshanStreamTtsCallback(request, byteSender, EndpointContext.getProcessData(), logger);
     }
 
     private HuoShanRequest convertTtsRequestToHuoShanRequest(TtsRequest ttsRequest, HuoShanProperty property) {

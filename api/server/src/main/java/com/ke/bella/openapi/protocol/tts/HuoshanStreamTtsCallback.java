@@ -1,11 +1,8 @@
 package com.ke.bella.openapi.protocol.tts;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.servlet.AsyncContext;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ke.bella.openapi.EndpointProcessData;
@@ -15,14 +12,13 @@ import com.ke.bella.openapi.protocol.OpenapiResponse;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
-import com.ke.bella.openapi.utils.StreamHelper;
 
 import lombok.Data;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okio.ByteString;
 
-public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback {
+public class HuoshanStreamTtsCallback implements Callbacks.WebSocketCallback {
     private static final int PROTOCOL_VERSION = 0b0001;
     private static final int DEFAULT_HEADER_SIZE = 0b0001;
 
@@ -83,18 +79,16 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
     final String sessionId = UUID.randomUUID().toString().replace("-", "");
 
     final TtsRequest request;
-    final OutputStream stream;
-    final AsyncContext context;
+    final ByteSender byteSender;
     final EndpointProcessData processData;
     final EndpointLogger logger;
     boolean end = false;
     boolean first = true;
     long startTime = DateTimeUtils.getCurrentMills();
 
-    public HuoshanStreamTtsCallback(TtsRequest request, OutputStream stream, AsyncContext context, EndpointProcessData processData, EndpointLogger logger) {
+    public HuoshanStreamTtsCallback(TtsRequest request, ByteSender byteSender, EndpointProcessData processData, EndpointLogger logger) {
         this.request = request;
-        this.stream = stream;
-        this.context = context;
+        this.byteSender = byteSender;
         this.processData = processData;
         this.logger = logger;
         processData.setMetrics(new HashMap<>());
@@ -116,7 +110,7 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
         case EVENT_SessionFailed: {
             String errorStr = response.optional.response_meta_json;
             Map<String, Object> map = JacksonUtils.toMap(errorStr);
-            ChannelException exception = ChannelException.fromResponse((Integer)map.get("status_code"), (String)map.get("message"));
+            ChannelException exception = ChannelException.fromResponse(convertCode((Integer)map.get("status_code")), (String)map.get("message"));
             onError(exception);
             break;
         }
@@ -139,7 +133,7 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
                     processData.getMetrics().put("ttft", DateTimeUtils.getCurrentMills() - startTime);
                     first = false;
                 }
-                StreamHelper.send(stream, response.payload);
+                byteSender.send(response.payload);
             }
             break;
         }
@@ -150,6 +144,11 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
         default:
             break;
         }
+    }
+
+    @Override
+    public void onMessage(WebSocket webSocket, String text) {
+
     }
 
     @Override
@@ -178,7 +177,7 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
     void complete() {
         if(!end) {
             processData.getMetrics().put("ttlt", DateTimeUtils.getCurrentMills() - startTime);
-            StreamHelper.close(stream, context);
+            byteSender.close();
             log();
             end = true;
         }
@@ -192,6 +191,13 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketTtsCallback 
 
     void log() {
         logger.log(processData);
+    }
+
+    int convertCode(int statusCode) {
+        if(statusCode < 55000000) {
+            return 400;
+        }
+        return 503;
     }
 
     int bytesToInt(byte[] src) {
