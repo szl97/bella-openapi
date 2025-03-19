@@ -10,6 +10,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.ke.bella.openapi.EndpointProcessData;
+import com.ke.bella.openapi.TaskExecutor;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.Callbacks;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
@@ -293,13 +294,14 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
     public void sendAudioDataInChunks(WebSocket webSocket, byte[] audioData, int chunkSize, int intervalMs) {
         if (audioData == null || audioData.length == 0) {
             LOGGER.warn("No audio data to send");
+            onError(ChannelException.fromResponse(400, "No audio data to send"));
             return;
         }
         
         // 设置运行标志
         isRunning = true;
         
-        new Thread(() -> {
+        TaskExecutor.submit(() -> {
             try {
                 int offset = 0;
                 while (offset < audioData.length && isRunning) {
@@ -323,7 +325,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
                 LOGGER.warn("Error sending audio chunks", e);
                 onError(ChannelException.fromException(e));
             }
-        }).start();
+        });
     }
 
     /**
