@@ -12,6 +12,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.ke.bella.openapi</groupId>
             <artifactId>sdk</artifactId>
             <version>${project.parent.version}</version>
