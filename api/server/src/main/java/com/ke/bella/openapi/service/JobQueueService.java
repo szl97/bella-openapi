@@ -25,11 +25,11 @@ import okhttp3.RequestBody;
 
 @Component
 public class JobQueueService implements Callbacks.RealTimeTaskCallback, Callbacks.StreamTaskCallback {
-    @Value("${queue.put.task.url:#{null}")
+    @Value("${queue.put.task.url:#{null}}")
     String putTaskUrl;
-    @Value("${queue.get.task.result.url:#{null}")
+    @Value("${queue.get.task.result.url:#{null}}")
     String getTaskResultUrl;
-    @Value("${bella.file.url:#{null}")
+    @Value("${bella.file.url:#{null}}")
     String fileUrl;
     @Value("${queue.default.timeout:300}")
     Integer defaultTimeout;

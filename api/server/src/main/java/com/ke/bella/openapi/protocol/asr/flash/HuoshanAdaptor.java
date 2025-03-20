@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol.asr.flash;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.ke.bella.openapi.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
@@ -72,7 +73,10 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
                     .taskId(processData.getChannelRequestId())
                     .flashResult(AsrFlashResponse.FlashResult.builder()
                             .duration(Integer.parseInt(processData.getMetrics().get("ttlt").toString()))
-                            .sentences(Lists.newArrayList(AsrFlashResponse.Sentence.builder().text(text).build()))
+                            .sentences(Lists.newArrayList(AsrFlashResponse.Sentence.builder()
+                                            .beginTime(processData.getRequestTime())
+                                            .endTime(DateTimeUtils.getCurrentSeconds())
+                                            .text(text).build()))
                             .build())
                     .user(processData.getUser())
                     .build();

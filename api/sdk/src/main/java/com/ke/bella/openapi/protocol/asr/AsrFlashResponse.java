@@ -37,8 +37,8 @@ public class AsrFlashResponse extends OpenapiResponse {
     public static class Sentence {
         private String text;
         @JsonProperty("begin_time")
-        private int beginTime;
+        private long beginTime;
         @JsonProperty("end_time")
-        private int endTime;
+        private long endTime;
     }
 }
