@@ -26,7 +26,7 @@
         </dependency>
         <dependency>
             <groupId>com.ke.bella.openapi</groupId>
-            <artifactId>auth</artifactId>
+            <artifactId>spi</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
