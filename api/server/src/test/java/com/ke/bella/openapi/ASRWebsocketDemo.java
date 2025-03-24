@@ -5,6 +5,7 @@ import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import okio.ByteString;
+import org.apache.log4j.Logger;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -23,9 +24,10 @@ import java.util.concurrent.TimeUnit;
  * 贝壳实时ASR WebSocket Demo
  */
 public class ASRWebsocketDemo {
+    private static final Logger logger = Logger.getLogger(ASRWebsocketDemo.class);
 
     // 替换为您的API Token
-    private static final String TOKEN = "Bearer *********";
+    private static final String TOKEN = "Bearer ********";
 
     // 替换为您的modelName
     private static final String MODEL = "huoshan-realtime-asr";
@@ -43,160 +45,165 @@ public class ASRWebsocketDemo {
     private static boolean isRunning = false;
 
     public static void main(String[] args) throws Exception {
-        // 解析音频元数据
-        AudioFormat format;
-        AudioInputStream audioInputStream;
-        try {
-            File audioFile = new File(AUDIO_FILE_PATH);
-            audioInputStream = AudioSystem.getAudioInputStream(audioFile);
-            format = audioInputStream.getFormat();
-        } catch (UnsupportedAudioFileException | IOException e) {
-            throw new RuntimeException("无法读取音频文件: " + e.getMessage(), e);
-        }
+        for(int i = 0; i < 10; i++) {
+            new Thread(() -> {
 
-        // 设置WebSocket请求
-        Request request = new Request.Builder()
-                .url(WEBSOCKET_URL)
-                .header("model", MODEL)
-                .header("Authorization", TOKEN)
-                .build();
-
-        // 配置OkHttp客户端
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(Level.HEADERS);
-        OkHttpClient client = new OkHttpClient.Builder()
-                .pingInterval(30, TimeUnit.SECONDS)
-                .addInterceptor(loggingInterceptor)
-                .readTimeout(60, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .build();
-
-        // 生成任务ID
-        String taskId = UUID.randomUUID().toString();
-
-        // 建立WebSocket连接
-        client.newWebSocket(request, new WebSocketListener() {
-            @Override
-            public void onOpen(WebSocket webSocket, Response response) {
-                System.out.println("WebSocket连接已建立");
-                
-                // 发送StartTranscription指令
-                String startTranscriptionJson = generateStartTranscriptionJson(taskId, format);
-                webSocket.send(startTranscriptionJson);
-                System.out.println("已发送StartTranscription指令: " + startTranscriptionJson);
-            }
-
-            @Override
-            public void onMessage(WebSocket webSocket, String text) {
-                System.out.println("收到文本消息: " + text);
-                
+                // 解析音频元数据
+                AudioFormat format;
+                AudioInputStream audioInputStream;
                 try {
-                    Map<String, Object> message = JacksonUtils.deserialize(text, Map.class);
-                    Map<String, Object> header = (Map<String, Object>) message.get("header");
-                    Map<String, Object> payload = (Map<String, Object>) message.get("payload");
-                    
-                    if (header != null && header.containsKey("name")) {
-                        String eventName = (String) header.get("name");
-                        
-                        switch (eventName) {
-                            case "TranscriptionStarted":
-                                System.out.println("转录已开始");
-                                isRunning = true;
-                                
-                                // 开始发送音频数据
-                                new Thread(() -> {
-                                    try {
-                                        sendAudioStream(webSocket, AUDIO_FILE_PATH);
-                                        
-                                        // 发送StopTranscription指令结束任务
-                                        String stopTranscriptionJson = generateStopTranscriptionJson(taskId);
-                                        webSocket.send(stopTranscriptionJson);
-                                        System.out.println("已发送StopTranscription指令: " + stopTranscriptionJson);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }).start();
-                                break;
+                    File audioFile = new File(AUDIO_FILE_PATH);
+                    audioInputStream = AudioSystem.getAudioInputStream(audioFile);
+                    format = audioInputStream.getFormat();
+                } catch (UnsupportedAudioFileException | IOException e) {
+                    throw new RuntimeException("无法读取音频文件: " + e.getMessage(), e);
+                }
 
-                            case "SentenceStart":
-                                System.out.println("开始识别新的一句话");
-                                break;
-                                
-                            case "TranscriptionResultChanged":
-                                if (payload != null && payload.containsKey("result")) {
-                                    String transcript = (String) payload.get("result");
-                                    System.out.println("部分识别结果: " + transcript);
+                // 设置WebSocket请求
+                Request request = new Request.Builder()
+                        .url(WEBSOCKET_URL)
+                        .header("model", MODEL)
+                        .header("Authorization", TOKEN)
+                        .build();
+
+                // 配置OkHttp客户端
+                HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+                loggingInterceptor.setLevel(Level.HEADERS);
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .pingInterval(30, TimeUnit.SECONDS)
+                        .addInterceptor(loggingInterceptor)
+                        .readTimeout(60, TimeUnit.SECONDS)
+                        .writeTimeout(60, TimeUnit.SECONDS)
+                        .build();
+
+                // 生成任务ID
+                String taskId = UUID.randomUUID().toString();
+
+                // 建立WebSocket连接
+                client.newWebSocket(request, new WebSocketListener() {
+                    @Override
+                    public void onOpen(WebSocket webSocket, Response response) {
+                        logger.info("WebSocket连接已建立");
+
+                        // 发送StartTranscription指令
+                        String startTranscriptionJson = generateStartTranscriptionJson(taskId, format);
+                        webSocket.send(startTranscriptionJson);
+                        logger.info("已发送StartTranscription指令: " + startTranscriptionJson);
+                    }
+
+                    @Override
+                    public void onMessage(WebSocket webSocket, String text) {
+                        logger.info("收到文本消息: " + text);
+
+                        try {
+                            Map<String, Object> message = JacksonUtils.deserialize(text, Map.class);
+                            Map<String, Object> header = (Map<String, Object>) message.get("header");
+                            Map<String, Object> payload = (Map<String, Object>) message.get("payload");
+
+                            if(header != null && header.containsKey("name")) {
+                                String eventName = (String) header.get("name");
+
+                                switch (eventName) {
+                                case "TranscriptionStarted":
+                                    logger.info("转录已开始");
+                                    isRunning = true;
+
+                                    // 开始发送音频数据
+                                    new Thread(() -> {
+                                        try {
+                                            sendAudioStream(webSocket, AUDIO_FILE_PATH);
+
+                                            // 发送StopTranscription指令结束任务
+                                            String stopTranscriptionJson = generateStopTranscriptionJson(taskId);
+                                            webSocket.send(stopTranscriptionJson);
+                                            logger.info("已发送StopTranscription指令: " + stopTranscriptionJson);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }).start();
+                                    break;
+
+                                case "SentenceStart":
+                                    logger.info("开始识别新的一句话");
+                                    break;
+
+                                case "TranscriptionResultChanged":
+                                    if(payload != null && payload.containsKey("result")) {
+                                        String transcript = (String) payload.get("result");
+                                        logger.info("部分识别结果: " + transcript);
+                                    }
+                                    break;
+
+                                case "SentenceEnd":
+                                    logger.info("一句话识别结束");
+                                    if(payload != null && payload.containsKey("result")) {
+                                        String transcript = (String) payload.get("result");
+                                        logger.info("最终识别结果: " + transcript);
+                                    }
+                                    break;
+
+                                case "TranscriptionCompleted":
+                                    logger.info("转录已完成");
+                                    isRunning = false;
+                                    webSocket.close(1000, "正常关闭");
+                                    latch.countDown();
+                                    break;
+
+                                case "TranscriptionFailed":
+                                    String errorMessage = header.containsKey("status_message") ?
+                                            (String) header.get("status_message") : "未知错误";
+                                    logger.info("转录失败: " + errorMessage);
+                                    isRunning = false;
+                                    webSocket.close(1000, "转录失败");
+                                    latch.countDown();
+                                    break;
                                 }
-                                break;
-                                
-                            case "SentenceEnd":
-                                System.out.println("一句话识别结束");
-                                if (payload != null && payload.containsKey("result")) {
-                                    String transcript = (String) payload.get("result");
-                                    System.out.println("最终识别结果: " + transcript);
-                                }
-                                break;
-                                
-                            case "TranscriptionCompleted":
-                                System.out.println("转录已完成");
-                                isRunning = false;
-                                webSocket.close(1000, "正常关闭");
-                                latch.countDown();
-                                break;
-                                
-                            case "TranscriptionFailed":
-                                String errorMessage = header.containsKey("status_message") ? 
-                                        (String) header.get("status_message") : "未知错误";
-                                System.out.println("转录失败: " + errorMessage);
-                                isRunning = false;
-                                webSocket.close(1000, "转录失败");
-                                latch.countDown();
-                                break;
+                            }
+                        } catch (Exception e) {
+                            logger.info("解析消息失败: " + e.getMessage());
+                            e.printStackTrace();
                         }
                     }
-                } catch (Exception e) {
-                    System.err.println("解析消息失败: " + e.getMessage());
-                    e.printStackTrace();
+
+                    @Override
+                    public void onMessage(WebSocket webSocket, ByteString bytes) {
+                        logger.info("收到二进制消息，长度: " + bytes.size());
+                    }
+
+                    @Override
+                    public void onClosing(WebSocket webSocket, int code, String reason) {
+                        logger.info("WebSocket正在关闭: " + code + ", " + reason);
+                        webSocket.close(1000, "客户端主动关闭");
+                    }
+
+                    @Override
+                    public void onClosed(WebSocket webSocket, int code, String reason) {
+                        logger.info("WebSocket已关闭: " + code + ", " + reason);
+                        latch.countDown();
+                    }
+
+                    @Override
+                    public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                        logger.error("WebSocket连接失败: " + t.getMessage());
+                        t.printStackTrace();
+                        if(response != null) {
+                            logger.error("响应: " + response);
+                        }
+                        latch.countDown();
+                    }
+                });
+
+                // 等待任务完成
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    logger.error("等待中断: " + e.getMessage());
                 }
-            }
 
-            @Override
-            public void onMessage(WebSocket webSocket, ByteString bytes) {
-                System.out.println("收到二进制消息，长度: " + bytes.size());
-            }
-
-            @Override
-            public void onClosing(WebSocket webSocket, int code, String reason) {
-                System.out.println("WebSocket正在关闭: " + code + ", " + reason);
-                webSocket.close(1000, "客户端主动关闭");
-            }
-
-            @Override
-            public void onClosed(WebSocket webSocket, int code, String reason) {
-                System.out.println("WebSocket已关闭: " + code + ", " + reason);
-                latch.countDown();
-            }
-
-            @Override
-            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                System.err.println("WebSocket连接失败: " + t.getMessage());
-                t.printStackTrace();
-                if (response != null) {
-                    System.err.println("响应: " + response);
-                }
-                latch.countDown();
-            }
-        });
-
-        // 等待任务完成
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            System.err.println("等待中断: " + e.getMessage());
+                // 关闭OkHttp客户端
+                client.dispatcher().executorService().shutdown();
+            }).start();
         }
-
-        // 关闭OkHttp客户端
-        client.dispatcher().executorService().shutdown();
     }
 
     /**
@@ -280,7 +287,7 @@ public class ASRWebsocketDemo {
             // 间隔100ms发送，模拟实时音频流
             Thread.sleep(100);
         }
-        
-        System.out.println("音频数据发送完成");
+
+        logger.info("音频数据发送完成");
     }
 }

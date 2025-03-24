@@ -385,14 +385,14 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
             }
 
             if(!isRunning) {
+                // 设置运行标志
+                isRunning = true;
                 //非流式请求直接发送文件，流式请求由客户端发送文件
                 if(!request.isAsync()) {
                     sendAudioDataInChunks(webSocket, request.getAudioData(), request.getChunkSize(), request.getIntervalMs());
                 } else {
                     startFlag.complete(null);
                 }
-                // 设置运行标志
-                isRunning = true;
             } else {
                 // 处理事件
                 if(response.getSequence() < 0) {
