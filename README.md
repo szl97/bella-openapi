@@ -144,7 +144,9 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 
 ## 配置管理
 
-**配置管理为对配置的详细介绍，如果想使用docker直接启动，请直接阅读： [启动和部署](#启动和部署)**
+**配置管理为对配置的详细介绍，如果想使用docker直接启动**
+**请直接阅读： [启动和部署](#启动和部署)**
+**如果需要提供用户登录功能，需要增加 [登录服务配置](#登录服务配置)，否则只能使用密钥(apikey)登录**
 
 ### 环境变量配置
 
@@ -353,6 +355,58 @@ bella:
         tokenUri: https://github.com/login/oauth/access_token
         userInfoUri: https://api.github.com/user
 ```
+
+##### GitHub OAuth配置攻略
+
+要配置GitHub OAuth登录，请按照以下步骤操作：
+
+1. **创建GitHub OAuth应用**：
+   - 登录到您的GitHub账户
+   - 访问 [GitHub Developer Settings](https://github.com/settings/developers)
+   - 点击 "OAuth Apps" 选项卡
+   - 点击 "New OAuth App" 按钮
+
+2. **填写应用信息**：
+   - **Application name**：填写您的应用名称，例如 "Bella OpenAPI"
+   - **Homepage URL**：填写您的应用主页URL，例如 `http://localhost:3000`
+   - **Application description**：（可选）填写应用描述
+   - **Authorization callback URL**：填写回调URL，必须与配置文件中的`redirect-uri`完全一致，例如 `http://localhost:8080/oauth/callback/github`
+   - 点击 "Register application" 按钮
+
+3. **获取Client ID和Client Secret**：
+   - 注册成功后，您将看到应用详情页面
+   - 记录下 "Client ID"
+   - 点击 "Generate a new client secret" 生成Client Secret
+   - 立即复制并保存Client Secret，因为它只会显示一次
+
+4. **更新配置文件**：
+   - 在应用的配置文件中填入获取的Client ID和Client Secret：
+   ```yaml
+   bella:
+     oauth:
+       providers:
+         github:
+           enabled: true
+           client-id: 您的GitHub Client ID  # 例如：89a6d5f8c7b3e2a1d0f9
+           client-secret: 您的GitHub Client Secret  # 例如：3e7d9c8b5a4f2e1d0c9b8a7f6e5d4c3b2a1f0e9d
+           redirect-uri: http://localhost:8080/oauth/callback/github
+           scope: read:user user:email
+           authUri: https://github.com/login/oauth/authorize
+           tokenUri: https://github.com/login/oauth/access_token
+           userInfoUri: https://api.github.com/user
+   ```
+
+5. **注意事项**：
+   - 确保`redirect-uri`与GitHub开发者设置中的回调URL完全匹配
+   - 在生产环境中，请使用HTTPS URL
+   - 如果您的应用部署在不同的域名或端口，请相应地更新配置
+   - GitHub OAuth默认包含用户的公开信息，如需访问邮箱，需要添加`user:email`权限
+
+6. **测试配置**：
+   - 启动应用后，访问登录页面
+   - 点击"使用GitHub账号登录"按钮
+   - 您将被重定向到GitHub授权页面
+   - 授权后，您将被重定向回应用，完成登录流程
 
 #### 前端配置
 

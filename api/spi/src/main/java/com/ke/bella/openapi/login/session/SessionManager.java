@@ -2,6 +2,7 @@ package com.ke.bella.openapi.login.session;
 
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.login.user.IUserRepo;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,10 @@ public class SessionManager {
     private String sessionPrefix = "bella-openapi-session-user:";
     private String ticketPrefix = "bella-openapi-oauth-ticket:";
 
+    public boolean userRepoInitialized() {
+        return userRepo != null;
+    }
+
     public SessionManager(SessionProperty sessionProperty, RedisTemplate<String, Operator> redisTemplate, StringRedisTemplate stringRedisTemplate) {
         this.sessionProperty = sessionProperty;
         this.redisTemplate = redisTemplate;
@@ -40,6 +45,18 @@ public class SessionManager {
         if (userRepo != null) {
             userRepo.persist(sessionInfo);
         }
+        return createSession(sessionInfo, request, response);
+    }
+
+    public String create(String secret, HttpServletRequest request, HttpServletResponse response) {
+        Operator operator = userRepo.checkSecret(secret);
+        if(operator == null) {
+            return null;
+        }
+        return createSession(operator, request, response);
+    }
+
+    private String createSession(Operator sessionInfo, HttpServletRequest request, HttpServletResponse response) {
         String id = UUID.randomUUID().toString();
         ValueOperations<String, Operator> ops = redisTemplate.opsForValue();
         ops.set(sessionPrefix + id, sessionInfo, sessionProperty.getMaxInactiveInterval(), TimeUnit.MINUTES);

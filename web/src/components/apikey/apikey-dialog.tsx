@@ -147,7 +147,7 @@ export const DeleteDialog: React.FC<{ code: string; refresh: () => void }> = ({c
     )
 }
 
-export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({code, refresh}) => {
+export const ResetDialog: React.FC<{ code: string; showApikey: (apikey : string) => void }> = ({code, showApikey}) => {
     const {toast} = useToast()
     const [isOpen, setIsOpen] = useState(false)
 
@@ -155,17 +155,7 @@ export const ResetDialog: React.FC<{ code: string; refresh: () => void }> = ({co
         try {
             const apikey = await resetApikey(code)
             if (apikey) {
-                refresh()
-                const handleCopy = () => {
-                    navigator.clipboard.writeText(apikey).catch(err => {
-                        console.error('复制失败:', err)
-                    })
-                }
-                toast({
-                    title: "API Key 已重置",
-                    description: `新的 API Key: ${apikey}`,
-                    action: <ToastAction altText="复制 API Key" onClick={handleCopy}>复制</ToastAction>,
-                })
+                showApikey(apikey)
             } else {
                 toast({title: "重置失败", description: "无法重置 API Key，请稍后重试。", variant: "destructive"})
             }

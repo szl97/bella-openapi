@@ -63,7 +63,7 @@ const RemarkCell = ({ value }: { value: string }) => {
     )
 }
 
-const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => {
+const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey : string) => void }) => {
     const { toast } = useToast();
     const copyToClipboard = () => {
         navigator.clipboard.writeText(code).then(() => {
@@ -89,7 +89,7 @@ const ActionCell = ({code, refresh}: { code: string, refresh: () => void }) => {
                 </TooltipProvider>
             </Button>
             <DeleteDialog code={code} refresh={refresh}/>
-            <ResetDialog code={code} refresh={refresh}/>
+            <ResetDialog code={code} showApikey={showApikey}/>
         </div>
     )
 }
@@ -109,7 +109,7 @@ function getSafetyLevel(level: number) : string {
     }
 }
 
-export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
+export const ApikeyColumns = (refresh: () => void, showApikey: (apikey : string) => void): ColumnDef<ApikeyInfo>[] => [
     {
         accessorKey: "akDisplay",
         header: "AK",
@@ -215,7 +215,7 @@ export const ApikeyColumns = (refresh: () => void): ColumnDef<ApikeyInfo>[] => [
         id: "actions",
         header: "",
         cell: ({row}) => (
-            <ActionCell code={row.original.code} refresh={refresh}/>
+            <ActionCell code={row.original.code} refresh={refresh} showApikey={showApikey}/>
         ),
     },
 ]

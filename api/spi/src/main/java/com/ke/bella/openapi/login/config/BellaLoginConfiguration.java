@@ -134,7 +134,7 @@ public class BellaLoginConfiguration {
         OAuthLoginFilter filter = new OAuthLoginFilter(services, sessionManager, properties);
         registration.setFilter(filter);
         registration.setUrlPatterns(properties.getValidationUrlPatterns());
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 20);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 51);
         return registration;
     }
 
@@ -142,9 +142,10 @@ public class BellaLoginConfiguration {
     public FilterRegistrationBean<LoginFilter> loginFilter(SessionManager sessionManager) {
         FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new LoginFilter(sessionManager));
+        registration.addUrlPatterns("/login");
         registration.addUrlPatterns("/logout");
         registration.addUrlPatterns("/userInfo");
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
         return registration;
     }
 }
