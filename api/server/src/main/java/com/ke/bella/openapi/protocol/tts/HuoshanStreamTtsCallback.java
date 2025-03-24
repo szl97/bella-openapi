@@ -170,6 +170,11 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketCallback {
     }
 
     @Override
+    public boolean started() {
+        return true;
+    }
+
+    @Override
     public void onClosed(WebSocket webSocket, int code, String reason) {
         complete();
     }

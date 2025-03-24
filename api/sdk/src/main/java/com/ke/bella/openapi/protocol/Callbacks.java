@@ -90,6 +90,7 @@ public interface Callbacks {
        void onClosing(WebSocket webSocket, int code, String reason);
        void onClosed(WebSocket webSocket, int code, String reason);
        void onFailure(WebSocket webSocket, Throwable t, Response response);
+       boolean started();
     }
 
 

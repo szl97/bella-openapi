@@ -2,6 +2,7 @@ package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.IDescription;
 import com.ke.bella.openapi.protocol.completion.CompletionModelFeatures;
+import com.ke.bella.openapi.protocol.tts.TTSModelFeatures;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ public interface IModelFeatures extends IDescription {
     @Getter
     enum EndpointModelFeatureType {
         COMPLETION("/v1/chat/completions", CompletionModelFeatures.class),
+        TTS("/v1/audio/speech", TTSModelFeatures.class)
         ;
 
         private final String endpoint;

@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.protocol.asr;
+package com.ke.bella.openapi.protocol.asr.flash;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class AsrFlashResponse extends OpenapiResponse {
+public class FlashAsrResponse extends OpenapiResponse {
     @JsonProperty("task_id")
     private String taskId;
     private String user;

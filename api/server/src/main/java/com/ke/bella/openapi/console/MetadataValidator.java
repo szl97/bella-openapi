@@ -179,7 +179,7 @@ public class MetadataValidator {
             Assert.isTrue(CHANNEL_PRIORITY.contains(op.getPriority()),
                     "通道的优先级只能是：" + String.join("或", CHANNEL_PRIORITY));
         }
-        Assert.isTrue(op.getTrialEnabled() == 1 || op.getTrialEnabled() == 0, "试用开关只能是0或1");
+        Assert.isTrue(op.getTrialEnabled() == null || op.getTrialEnabled() == 1 || op.getTrialEnabled() == 0, "试用开关只能是0或1");
         checkJsonInfo(op.getChannelInfo());
         checkJsonInfo(op.getPriceInfo());
     }

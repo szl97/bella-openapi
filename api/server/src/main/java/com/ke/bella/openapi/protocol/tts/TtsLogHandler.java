@@ -24,6 +24,7 @@ public class TtsLogHandler implements EndpointLogHandler {
             Map<String, Object> map = new HashMap<>();
             map.put("ttlt", ttlt);
             processData.setMetrics(map);
+            processData.setDuration(ttlt);
         }
         processData.setUsage(request.getInput().length());
     }

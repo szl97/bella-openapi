@@ -8,9 +8,12 @@ import java.io.OutputStream;
 import java.util.List;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrAdaptor;
+import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
@@ -26,7 +29,7 @@ import com.ke.bella.openapi.annotations.EndpointAPI;
 import com.ke.bella.openapi.protocol.AdaptorManager;
 import com.ke.bella.openapi.protocol.ChannelRouter;
 import com.ke.bella.openapi.protocol.StreamByteSender;
-import com.ke.bella.openapi.protocol.asr.AsrFlashResponse;
+import com.ke.bella.openapi.protocol.asr.flash.FlashAsrResponse;
 import com.ke.bella.openapi.protocol.asr.AsrProperty;
 import com.ke.bella.openapi.protocol.asr.AsrRequest;
 import com.ke.bella.openapi.protocol.asr.AudioTranscriptionRequest.AudioTranscriptionReq;
@@ -45,6 +48,7 @@ import com.ke.bella.openapi.utils.JacksonUtils;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.socket.server.support.WebSocketHttpRequestHandler;
 
 @EndpointAPI
 @RestController
@@ -63,6 +67,41 @@ public class AudioController {
     @Autowired
     private JobQueueService jobQueueService;
 
+    /**
+     * 实时语音识别WebSocket接口
+     */
+    @RequestMapping("/asr/stream")
+    public void asrStream(@RequestHeader(value = "model", required = false) String model, HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        if(!"websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        String endpoint = EndpointContext.getRequest().getRequestURI();
+        EndpointContext.setEndpointData(endpoint, model, null);
+        EndpointProcessData processData = EndpointContext.getProcessData();
+
+        ChannelDB channel = router.route(endpoint, model, EndpointContext.getApikey(), processData.isMock());
+        EndpointContext.setEndpointData(channel);
+
+        if(!EndpointContext.getProcessData().isPrivate()) {
+            limiterManager.incrementConcurrentCount(EndpointContext.getProcessData().getAkCode(), model);
+        }
+
+        String protocol = processData.getProtocol();
+        String url = processData.getForwardUrl();
+        String channelInfo = channel.getChannelInfo();
+
+        RealTimeAsrAdaptor<AsrProperty> adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, RealTimeAsrAdaptor.class);
+
+        AsrProperty property = JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
+
+        RealTimeAsrHandler webSocketHandler = new RealTimeAsrHandler(url, property, processData, logger, adaptor);
+
+        WebSocketHttpRequestHandler requestHandler = new WebSocketHttpRequestHandler(webSocketHandler);
+        requestHandler.handleRequest(request, response);
+    }
 
     @PostMapping("/speech")
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -142,12 +181,13 @@ public class AudioController {
     }
 
     @PostMapping("/asr/flash")
-    public AsrFlashResponse flashAsr(@RequestHeader(value = "format", defaultValue = "wav") String format,
+    public FlashAsrResponse flashAsr(@RequestHeader(value = "format", defaultValue = "wav") String format,
             @RequestHeader(value = "sample_rate",defaultValue = "16000") int sampleRate,
             @RequestHeader(value = "max_sentence_silence", defaultValue = "3000") int maxSentenceSilence,
-            @RequestHeader(value = "model") String model, InputStream inputStream) throws IOException {
+            @RequestHeader(value = "model", required = false) String model, InputStream inputStream) throws IOException {
         String endpoint = EndpointContext.getRequest().getRequestURI();
         AsrRequest request = AsrRequest.builder()
+                .model(model)
                 .format(format)
                 .maxSentenceSilence(maxSentenceSilence)
                 .sampleRate(sampleRate)
@@ -169,4 +209,3 @@ public class AudioController {
     }
 
 }
-

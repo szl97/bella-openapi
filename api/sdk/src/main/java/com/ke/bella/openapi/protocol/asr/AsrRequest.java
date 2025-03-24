@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class AsrRequest {
     @JsonIgnore
     byte[] content;
+    String model;
     String format;
-    int maxSentenceSilence;
-    int sampleRate;
+    Integer maxSentenceSilence;
+    Integer sampleRate;
 }

@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol.asr.flash;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,6 @@ import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.Callbacks;
-import com.ke.bella.openapi.protocol.asr.AsrFlashResponse;
 import com.ke.bella.openapi.protocol.asr.AsrRequest;
 import com.ke.bella.openapi.protocol.asr.HuoshanProperty;
 import com.ke.bella.openapi.protocol.asr.HuoshanRealTimeAsrRequest;
@@ -24,11 +24,16 @@ import okhttp3.Request;
 public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
 
     @Override
-    public AsrFlashResponse asr(AsrRequest request, String url, HuoshanProperty property, EndpointProcessData processData) {
-        HuoshanRealTimeAsrRequest huoshanRequest = new HuoshanRealTimeAsrRequest(request, property, false);
+    public FlashAsrResponse asr(AsrRequest request, String url, HuoshanProperty property, EndpointProcessData processData) {
+        HuoshanRealTimeAsrRequest huoshanRequest = new HuoshanRealTimeAsrRequest(request, property);
         CompletableFuture<String> future = new CompletableFuture();
         Callbacks.TextSender sender = buildSender(future);
-        HuoshanStreamAsrCallback callback = new HuoshanStreamAsrCallback(huoshanRequest, sender, processData, null, HuoshanRealTimeAsrResponse.Result::getText);
+        HuoshanStreamAsrCallback callback = new HuoshanStreamAsrCallback(huoshanRequest, sender, processData, null, response -> {
+            if(response.getResult() == null) {
+                return Lists.newArrayList();
+            }
+            return response.getResult().stream().map(HuoshanRealTimeAsrResponse.Result::getText).collect(Collectors.toList());
+        });
         Request httpRequest = authorizationRequestBuilder(property.getAuth()).url(url).build();
         HttpUtils.websocketRequest(httpRequest, new BellaWebSocketListener(callback));
         return responseConverter(future, processData);
@@ -60,20 +65,20 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
             @Override
             public void close() {
                 if(!future.isDone()) {
-                future.complete(text);
+                    future.complete(text);
                 }
             }
         };
     }
 
-    private AsrFlashResponse responseConverter(CompletableFuture<String> future, EndpointProcessData processData) {
+    private FlashAsrResponse responseConverter(CompletableFuture<String> future, EndpointProcessData processData) {
         try {
             String text = future.get();
-            return AsrFlashResponse.builder()
+            return FlashAsrResponse.builder()
                     .taskId(processData.getChannelRequestId())
-                    .flashResult(AsrFlashResponse.FlashResult.builder()
+                    .flashResult(FlashAsrResponse.FlashResult.builder()
                             .duration(Integer.parseInt(processData.getMetrics().get("ttlt").toString()))
-                            .sentences(Lists.newArrayList(AsrFlashResponse.Sentence.builder()
+                            .sentences(Lists.newArrayList(FlashAsrResponse.Sentence.builder()
                                             .beginTime(processData.getRequestTime())
                                             .endTime(DateTimeUtils.getCurrentSeconds())
                                             .text(text).build()))

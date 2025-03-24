@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -33,7 +34,7 @@ public class EndpointProcessData {
     private Object request;
     private OpenapiResponse response;
     private Object usage;
-    private Map<String, Object> metrics;
+    private Map<String, Object> metrics = new HashMap<>();
     private String forwardUrl;
     private String protocol;
     private String priceInfo;

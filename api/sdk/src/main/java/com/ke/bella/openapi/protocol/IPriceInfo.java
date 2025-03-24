@@ -1,15 +1,12 @@
 package com.ke.bella.openapi.protocol;
 
 import com.ke.bella.openapi.IDescription;
-import com.ke.bella.openapi.protocol.asr.AsrFlashPriceInfo;
+import com.ke.bella.openapi.protocol.asr.flash.FlashAsrPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
 import com.ke.bella.openapi.protocol.tts.TtsPriceInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.io.Serializable;
-import java.util.Map;
 
 public interface IPriceInfo extends IDescription {
     String getUnit();
@@ -20,7 +17,7 @@ public interface IPriceInfo extends IDescription {
         COMPLETION("/v1/chat/completions", CompletionPriceInfo.class),
         EMBEDDING("/v1/embeddings", EmbeddingPriceInfo.class),
         TTS("/v1/audio/speech", TtsPriceInfo.class),
-        FLASH_ASR("/v1/audio/asr/flash", AsrFlashPriceInfo.class)
+        FLASH_ASR("/v1/audio/asr/flash", FlashAsrPriceInfo.class)
         ;
 
         private final String endpoint;

@@ -23,6 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okhttp3.WebSocket;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSources;
 
@@ -237,15 +238,16 @@ public class HttpUtils {
         }
     }
 
-    public static void websocketRequest(Request request, BellaWebSocketListener listener) {
+    public static WebSocket websocketRequest(Request request, BellaWebSocketListener listener) {
         CompletableFuture<?> future = new CompletableFuture<>();
         listener.setConnectionInitFuture(future);
-        defaultOkhttpClient().newWebSocket(request, listener);
+        WebSocket webSocket = defaultOkhttpClient().newWebSocket(request, listener);
         try {
             future.get();
+            return webSocket;
         } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
             Thread.currentThread().interrupt();
+            throw new RuntimeException(interruptedException);
         }  catch (ExecutionException e) {
             if(e.getCause() instanceof RuntimeException) {
                 throw (RuntimeException) e.getCause();

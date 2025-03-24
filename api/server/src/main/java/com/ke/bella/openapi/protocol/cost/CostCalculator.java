@@ -1,13 +1,12 @@
 package com.ke.bella.openapi.protocol.cost;
 
-import com.ke.bella.openapi.protocol.asr.AsrFlashPriceInfo;
+import com.ke.bella.openapi.protocol.asr.flash.FlashAsrPriceInfo;
+import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionPriceInfo;
 import com.ke.bella.openapi.protocol.completion.CompletionResponse;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingPriceInfo;
-import com.ke.bella.openapi.protocol.embedding.EmbeddingRequest;
 import com.ke.bella.openapi.protocol.embedding.EmbeddingResponse;
 import com.ke.bella.openapi.protocol.tts.TtsPriceInfo;
-import com.ke.bella.openapi.protocol.tts.TtsRequest;
 import com.ke.bella.openapi.utils.JacksonUtils;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.AllArgsConstructor;
@@ -47,6 +46,7 @@ public class CostCalculator  {
         EMBEDDING("/v*/embeddings", embedding),
         TTS("/v*/audio/speech", tts),
         ASR_FLASH("/v*/audio/asr/flash", asr_flash),
+        ASR_STREAM("/v*/audio/asr/stream", asr_stream),
         ;
         final String endpoint;
         final EndpointCostCalculator calculator;
@@ -101,13 +101,27 @@ public class CostCalculator  {
     static EndpointCostCalculator asr_flash = new EndpointCostCalculator() {
         @Override
         public BigDecimal calculate(String priceInfo, Object usage) {
-            AsrFlashPriceInfo price = JacksonUtils.deserialize(priceInfo, AsrFlashPriceInfo.class);
+            FlashAsrPriceInfo price = JacksonUtils.deserialize(priceInfo, FlashAsrPriceInfo.class);
             return price.getPrice();
         }
 
         @Override
         public boolean checkPriceInfo(String priceInfo) {
-            AsrFlashPriceInfo price = JacksonUtils.deserialize(priceInfo, AsrFlashPriceInfo.class);
+            FlashAsrPriceInfo price = JacksonUtils.deserialize(priceInfo, FlashAsrPriceInfo.class);
+            return price != null && price.getPrice() != null;
+        }
+    };
+
+    static EndpointCostCalculator asr_stream = new EndpointCostCalculator() {
+        @Override
+        public BigDecimal calculate(String priceInfo, Object usage) {
+            RealTimeAsrPriceInfo price = JacksonUtils.deserialize(priceInfo, RealTimeAsrPriceInfo.class);
+            return BigDecimal.valueOf((price.getPrice().doubleValue() / 3600 * 100) * Double.valueOf(usage.toString()));
+        }
+
+        @Override
+        public boolean checkPriceInfo(String priceInfo) {
+            RealTimeAsrPriceInfo price = JacksonUtils.deserialize(priceInfo, RealTimeAsrPriceInfo.class);
             return price != null && price.getPrice() != null;
         }
     };
