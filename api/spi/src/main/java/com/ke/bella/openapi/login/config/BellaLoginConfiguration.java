@@ -2,6 +2,7 @@ package com.ke.bella.openapi.login.config;
 
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.login.LoginFilter;
+import com.ke.bella.openapi.login.LoginProperties;
 import com.ke.bella.openapi.login.cas.BellaCasClient;
 import com.ke.bella.openapi.login.cas.BellaCasLoginFilter;
 import com.ke.bella.openapi.login.cas.BellaRedirectFilter;
@@ -90,8 +91,8 @@ public class BellaLoginConfiguration {
 
     @Bean
     @ConditionalOnCasEnable
-    public BellaCasClient bellaCasClient(CasProperties casProperties, SessionManager sessionManager) {
-        return new BellaCasClient(casProperties, sessionManager);
+    public BellaCasClient bellaCasClient(LoginProperties loginProperties, CasProperties casProperties, SessionManager sessionManager) {
+        return new BellaCasClient(loginProperties, casProperties, sessionManager);
     }
 
     @Bean
@@ -119,6 +120,12 @@ public class BellaLoginConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(value = "bella.login")
+    public LoginProperties loginProperties() {
+        return new LoginProperties();
+    }
+
+    @Bean
     @ProviderConditional.ConditionalOnGoogleAuthEnable
     public GoogleOAuthService googleOAuthService(OAuthProperties properties) {
         return new GoogleOAuthService(properties.getProviders().get("google"));
@@ -127,25 +134,28 @@ public class BellaLoginConfiguration {
     @Bean
     @ConditionalOnOAuthEnable
     public FilterRegistrationBean<OAuthLoginFilter> oauthLoginFilter(
+            LoginProperties loginProperties,
             List<OAuthService> services,
             SessionManager sessionManager,
             OAuthProperties properties) {
         FilterRegistrationBean<OAuthLoginFilter> registration = new FilterRegistrationBean<>();
         OAuthLoginFilter filter = new OAuthLoginFilter(services, sessionManager, properties);
         registration.setFilter(filter);
-        registration.setUrlPatterns(properties.getValidationUrlPatterns());
+        registration.setUrlPatterns(loginProperties.getValidationUrlPatterns());
+        registration.addUrlPatterns("/oauth/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 51);
         return registration;
     }
 
     @Bean
-    public FilterRegistrationBean<LoginFilter> loginFilter(SessionManager sessionManager) {
+    public FilterRegistrationBean<LoginFilter> loginFilter(LoginProperties properties, SessionManager sessionManager) {
         FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(new LoginFilter(sessionManager));
+        registration.setFilter(new LoginFilter(properties, sessionManager));
+        registration.setUrlPatterns(properties.getValidationUrlPatterns());
         registration.addUrlPatterns("/login");
         registration.addUrlPatterns("/logout");
         registration.addUrlPatterns("/userInfo");
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
         return registration;
     }
 }

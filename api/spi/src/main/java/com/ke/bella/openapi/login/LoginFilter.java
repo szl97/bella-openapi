@@ -15,6 +15,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ke.bella.openapi.BellaContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
@@ -23,10 +25,15 @@ import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.login.session.SessionManager;
 import com.ke.bella.openapi.utils.JacksonUtils;
 
-public class LoginFilter implements Filter {
-    private final SessionManager sessionManager;
+import static com.ke.bella.openapi.login.config.BellaLoginConfiguration.redirectParameter;
 
-    public LoginFilter(SessionManager sessionManager) {
+public class LoginFilter implements Filter {
+    private final LoginProperties properties;
+    private final SessionManager sessionManager;
+    private static final String REDIRECT_HEADER = "X-Redirect-Login";
+
+    public LoginFilter(LoginProperties properties, SessionManager sessionManager) {
+        this.properties = properties;
         this.sessionManager = sessionManager;
     }
 
@@ -35,7 +42,7 @@ public class LoginFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if("/login".equals(httpRequest.getRequestURI()) && httpRequest.getMethod().equalsIgnoreCase(HttpMethod.POST.name()) ) {
+        if("/login".equals(httpRequest.getRequestURI()) && httpRequest.getMethod().equalsIgnoreCase(HttpMethod.POST.name())) {
             if(!sessionManager.userRepoInitialized()) {
                 BellaResponse<Boolean> bellaResponse = new BellaResponse<>();
                 bellaResponse.setCode(503);
@@ -66,7 +73,7 @@ public class LoginFilter implements Filter {
             response.getWriter().write(JacksonUtils.serialize(bellaResponse));
             return;
         }
-        if ("/logout".equals(httpRequest.getRequestURI())) {
+        if("/logout".equals(httpRequest.getRequestURI())) {
             sessionManager.destroySession(httpRequest, httpResponse);
             httpResponse.setStatus(HttpStatus.OK.value());
             return;
@@ -80,7 +87,27 @@ public class LoginFilter implements Filter {
             response.getWriter().write(JacksonUtils.serialize(bellaResponse));
             return;
         }
-        chain.doFilter(request, response);
+
+        try {
+            if(StringUtils.isNotBlank(properties.getAuthorizationHeader())) {
+                String auth = httpRequest.getHeader(properties.getAuthorizationHeader());
+                if(StringUtils.isNotBlank(auth)) {
+                    chain.doFilter(request, response);
+                    return;
+                }
+            }
+            Operator operator = sessionManager.getSession(httpRequest);
+            if(operator != null) {
+                BellaContext.setOperator(operator);
+                chain.doFilter(request, response);
+                return;
+            }
+            httpResponse.setHeader(REDIRECT_HEADER, properties.getLoginPageUrl() + "?" + redirectParameter + "=");
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } finally {
+            BellaContext.clearAll();
+            sessionManager.renew(httpRequest);
+        }
     }
 
     private String readRequestBody(HttpServletRequest request) throws IOException {

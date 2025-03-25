@@ -1,11 +1,8 @@
 package com.ke.bella.openapi.login.cas;
 
-import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.login.config.BellaLoginConfiguration;
-import com.ke.bella.openapi.login.session.SessionManager;
-import org.apache.commons.lang3.StringUtils;
-
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -14,9 +11,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.login.config.BellaLoginConfiguration;
+import com.ke.bella.openapi.login.session.SessionManager;
 
 public class BellaCasLoginFilter implements Filter {
     private final String loginUrl;
@@ -72,13 +72,7 @@ public class BellaCasLoginFilter implements Filter {
             }
             return;
         }
-        try {
-            BellaContext.setOperator(operator);
-            chain.doFilter(request, response);
-        } finally {
-            BellaContext.clearAll();
-            sessionManager.renew(httpRequest);
-        }
+        chain.doFilter(request, response);
     }
 
 

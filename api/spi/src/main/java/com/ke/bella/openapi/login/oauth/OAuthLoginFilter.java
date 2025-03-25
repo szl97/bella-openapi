@@ -1,14 +1,11 @@
 package com.ke.bella.openapi.login.oauth;
 
-import com.ke.bella.openapi.BellaContext;
-import com.ke.bella.openapi.BellaResponse;
-import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.login.session.SessionManager;
-import com.ke.bella.openapi.utils.JacksonUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,18 +14,19 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
-import static com.ke.bella.openapi.login.config.BellaLoginConfiguration.redirectParameter;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
+
+import com.ke.bella.openapi.BellaResponse;
+import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.login.session.SessionManager;
+import com.ke.bella.openapi.utils.JacksonUtils;
 
 public class OAuthLoginFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(OAuthLoginFilter.class);
-    private static final String REDIRECT_HEADER = "X-Redirect-Login";
 
     private final Map<String, OAuthService> oauthServices;
     private final SessionManager sessionManager;
@@ -41,7 +39,6 @@ public class OAuthLoginFilter implements Filter {
         }
         this.sessionManager = sessionManager;
         this.properties = properties;
-        Assert.notNull(properties.getLoginPageUrl(), "登录页面url不可为空");
         Assert.notNull(properties.getClientIndex(), "主页url不可为空");
     }
 
@@ -50,28 +47,6 @@ public class OAuthLoginFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-
-        // Check if already authenticated
-        Operator operator = sessionManager.getSession(httpRequest);
-        if (operator != null) {
-            try {
-                BellaContext.setOperator(operator);
-                chain.doFilter(request, response);
-            } finally {
-                BellaContext.clearAll();
-                sessionManager.renew(httpRequest);
-            }
-            return;
-        }
-
-        // Check authorization header if configured
-        if (StringUtils.isNotBlank(properties.getAuthorizationHeader())) {
-            String auth = httpRequest.getHeader(properties.getAuthorizationHeader());
-            if (StringUtils.isNotBlank(auth)) {
-                chain.doFilter(request, response);
-                return;
-            }
-        }
 
         String requestUri = httpRequest.getRequestURI();
         
@@ -88,9 +63,7 @@ public class OAuthLoginFilter implements Filter {
             return;
         }
 
-        // Build login URL with provider auth URLs
-        httpResponse.setHeader(REDIRECT_HEADER, properties.getLoginPageUrl() + "?" + redirectParameter + "=");
-        httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        chain.doFilter(request, response);
     }
 
     private void handleOAuthConfig(HttpServletRequest request, HttpServletResponse response) throws IOException {

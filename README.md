@@ -146,7 +146,7 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 
 **配置管理为对配置的详细介绍，如果想使用docker直接启动**
 **请直接阅读： [启动和部署](#启动和部署)**
-**如果需要提供用户登录功能，需要增加 [登录服务配置](#登录服务配置)，否则只能使用密钥(apikey)登录**
+**如果需要提供用户登录功能，请阅读 [登录服务配置](#登录服务配置), 或在启动脚本中声明oauth相关参数，详情见[启动服务](#启动服务)，否则只能使用密钥登录**
 
 ### 环境变量配置
 
@@ -290,7 +290,7 @@ apollo:
 
 ### 登录服务配置
 
-**提供CAS和OAuth两种登录方式，可通过环境变量或配置文件进行配置**
+**提供CAS和OAuth两种登录方式，可通过环境变量或配置文件进行配置，使用启动脚本时，亦可通过启动脚本参数进行配置，详情见[启动服务](#启动服务)**
 
 #### 登录类型配置
 
@@ -309,12 +309,8 @@ CAS单点登录配置示例：
 ```yaml
 bella:
   cas:
-    validation-url-patterns:  # 需要CAS验证的URL路径
-      - /console/*
-      - /v1/meta/*
     client-support: true  # 是否支持客户端
-    authorizationHeader: Authorization  # 授权头名称
-    source: company_name  # 来源标识
+    source: company_name  # 来源标识，默认为cas
     server-url-prefix: https://your-cas-server.com/  # CAS服务器URL前缀
     server-login-url: https://your-cas-server.com/login  # CAS登录URL
     client-host: http://your-app-host:8080  # 客户端主机
@@ -328,13 +324,7 @@ OAuth登录配置示例：
 ```yaml
 bella:
   oauth:
-    login-page-url: http://localhost:3000/login  # 登录页面URL
-    authorization-header: Authorization  # 授权头名称
     client-index: http://localhost:3000  # 客户端首页URL
-    validation-url-patterns:  # 需要OAuth验证的URL路径
-      - /console/*
-      - /v1/meta/*
-      - /oauth/*
     providers:  # 支持多个OAuth提供商
       google:  # Google OAuth配置
         enabled: true
@@ -471,7 +461,12 @@ java -jar bella-openapi.jar --spring.profiles.active=dev
 ./start.sh -b -e prod            # 重新构建并以生产环境启动服务
 ./start.sh --skip-install        # 跳过依赖安装，加快构建速度
 ./start.sh --skip-auth           # 启动服务但跳过授权步骤
+./start.sh --frontend http://example.com --backend http://api.example.com -b #配置前后端URL
+./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} -b #配置github和google的oauth登录
+./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --frontend http://example.com --backend http://api.example.com -b #配置github和google的oauth登录以及前后端URL
+./start.sh --cas-server https://cas.example.com --cas-login https://cas.example.com/login -b #配置CAS登录需要CAS服务器URL和CAS登录URL，如果同时配置了cas和oauth，登录时会使用cas登录
 ```
+
 
 ### docker-compose环境变量配置
 
@@ -482,7 +477,7 @@ java -jar bella-openapi.jar --spring.profiles.active=dev
 2. Dockerfile中的ENV指令
 3. .env文件
 
-#### 构建时环境变量
+#### web构建时环境变量
 
 构建时环境变量通过docker-compose.yml的args部分传递给Dockerfile：
 
@@ -497,7 +492,7 @@ build:
 
 这些变量会影响应用的构建过程，例如Next.js会根据NODE_ENV的值加载不同的环境配置文件（.env.development, .env.production等）。
 
-#### 运行时环境变量
+#### web运行时环境变量
 
 运行时环境变量通过docker-compose.yml的environment部分设置：
 

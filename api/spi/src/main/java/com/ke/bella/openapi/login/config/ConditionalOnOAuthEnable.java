@@ -21,7 +21,7 @@ public @interface ConditionalOnOAuthEnable {
         @Override
         public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
             String loginType = context.getEnvironment().getProperty("bella.login.type");
-            String loginPageUrl = context.getEnvironment().getProperty("bella.oauth.login-page-url");
+            String loginPageUrl = context.getEnvironment().getProperty("bella.login.login-page-url");
 
             boolean isOAuthEnabled = "oauth".equalsIgnoreCase(loginType) && loginPageUrl != null && !loginPageUrl.isEmpty();
 
