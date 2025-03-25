@@ -12,8 +12,8 @@ import java.io.IOException;
 
 public class GoogleOAuthService extends AbstractOAuthService {
 
-    public GoogleOAuthService(OAuthProperties.ProviderConfig config) {
-        super(config);
+    public GoogleOAuthService(OAuthProperties properties) {
+        super(properties.getRedirect(), properties.getProviders().get("google"));
     }
 
     @Override

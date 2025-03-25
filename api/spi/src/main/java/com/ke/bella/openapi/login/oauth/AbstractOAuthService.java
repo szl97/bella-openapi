@@ -10,10 +10,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 
 public abstract class AbstractOAuthService implements OAuthService {
+    protected final String redirect;
     protected final OAuthProperties.ProviderConfig config;
     protected final OkHttpClient client;
 
-    protected AbstractOAuthService(OAuthProperties.ProviderConfig config) {
+    protected AbstractOAuthService(String redirect, OAuthProperties.ProviderConfig config) {
+        this.redirect = redirect;
         this.config = config;
         this.client = new OkHttpClient();
     }
@@ -22,7 +24,7 @@ public abstract class AbstractOAuthService implements OAuthService {
     public String getAuthorizationUrl(String state) {
         return UriComponentsBuilder.fromUriString(config.getAuthUri())
                 .queryParam("client_id", config.getClientId())
-                .queryParam("redirect_uri", config.getRedirectUri())
+                .queryParam("redirect_uri", getRedirectUrl())
                 .queryParam("response_type", "code")
                 .queryParam("scope", config.getScope())
                 .queryParam("state", state)
@@ -44,7 +46,7 @@ public abstract class AbstractOAuthService implements OAuthService {
                 .add("client_secret", config.getClientSecret())
                 .add("grant_type", "authorization_code")
                 .add("code", code)
-                .add("redirect_uri", config.getRedirectUri())
+                .add("redirect_uri", getRedirectUrl())
                 .build();
 
         Request request = new Request.Builder()
@@ -59,6 +61,10 @@ public abstract class AbstractOAuthService implements OAuthService {
             }
             return parseAccessToken(response.body().string());
         }
+    }
+
+    protected String getRedirectUrl() {
+        return redirect + "/openapi/oauth/callback/" + getProviderType();
     }
 
     protected abstract String parseAccessToken(String response) throws IOException;

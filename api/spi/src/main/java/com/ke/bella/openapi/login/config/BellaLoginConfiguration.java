@@ -1,20 +1,7 @@
 package com.ke.bella.openapi.login.config;
 
-import com.ke.bella.openapi.Operator;
-import com.ke.bella.openapi.login.LoginFilter;
-import com.ke.bella.openapi.login.LoginProperties;
-import com.ke.bella.openapi.login.cas.BellaCasClient;
-import com.ke.bella.openapi.login.cas.BellaCasLoginFilter;
-import com.ke.bella.openapi.login.cas.BellaRedirectFilter;
-import com.ke.bella.openapi.login.cas.BellaValidatorFilter;
-import com.ke.bella.openapi.login.cas.CasProperties;
-import com.ke.bella.openapi.login.oauth.OAuthLoginFilter;
-import com.ke.bella.openapi.login.oauth.OAuthProperties;
-import com.ke.bella.openapi.login.oauth.OAuthService;
-import com.ke.bella.openapi.login.oauth.providers.GoogleOAuthService;
-import com.ke.bella.openapi.login.session.SessionManager;
-import com.ke.bella.openapi.login.session.SessionProperty;
-import com.ke.bella.openapi.login.user.IUserRepo;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -30,7 +17,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
+import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.login.LoginFilter;
+import com.ke.bella.openapi.login.LoginProperties;
+import com.ke.bella.openapi.login.cas.BellaCasClient;
+import com.ke.bella.openapi.login.cas.BellaCasLoginFilter;
+import com.ke.bella.openapi.login.cas.BellaRedirectFilter;
+import com.ke.bella.openapi.login.cas.BellaValidatorFilter;
+import com.ke.bella.openapi.login.cas.CasProperties;
+import com.ke.bella.openapi.login.oauth.OAuthLoginFilter;
+import com.ke.bella.openapi.login.oauth.OAuthProperties;
+import com.ke.bella.openapi.login.oauth.OAuthService;
+import com.ke.bella.openapi.login.oauth.providers.GithubOAuthService;
+import com.ke.bella.openapi.login.oauth.providers.GoogleOAuthService;
+import com.ke.bella.openapi.login.session.SessionManager;
+import com.ke.bella.openapi.login.session.SessionProperty;
+import com.ke.bella.openapi.login.user.IUserRepo;
 
 @Configuration
 public class BellaLoginConfiguration {
@@ -128,7 +130,13 @@ public class BellaLoginConfiguration {
     @Bean
     @ProviderConditional.ConditionalOnGoogleAuthEnable
     public GoogleOAuthService googleOAuthService(OAuthProperties properties) {
-        return new GoogleOAuthService(properties.getProviders().get("google"));
+        return new GoogleOAuthService(properties);
+    }
+
+    @Bean
+    @ProviderConditional.ConditionalOnGithubAuthEnable
+    public GithubOAuthService githubOAuthService(OAuthProperties properties) {
+        return new GithubOAuthService(properties);
     }
 
     @Bean
@@ -142,7 +150,7 @@ public class BellaLoginConfiguration {
         OAuthLoginFilter filter = new OAuthLoginFilter(services, sessionManager, properties);
         registration.setFilter(filter);
         registration.setUrlPatterns(loginProperties.getValidationUrlPatterns());
-        registration.addUrlPatterns("/oauth/*");
+        registration.addUrlPatterns("/openapi/oauth/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 51);
         return registration;
     }
@@ -152,10 +160,8 @@ public class BellaLoginConfiguration {
         FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new LoginFilter(properties, sessionManager));
         registration.setUrlPatterns(properties.getValidationUrlPatterns());
-        registration.addUrlPatterns("/login");
-        registration.addUrlPatterns("/logout");
-        registration.addUrlPatterns("/userInfo");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
+        registration.addUrlPatterns("/openapi/*");
         return registration;
     }
 }

@@ -11,12 +11,12 @@ import java.util.Map;
 public class OAuthProperties {
     private Map<String, ProviderConfig> providers; // 支持的OAuth提供商配置
     private String clientIndex;
+    private String redirect;
 
     @Data
     public static class ProviderConfig {
         private String clientId;
         private String clientSecret;
-        private String redirectUri;
         private String scope;
         private String authUri;
         private String tokenUri;

@@ -37,7 +37,7 @@ function LoginContent() {
 
   useEffect(() => {
     // 检查是否已登录
-    openapi.get<UserInfo>('/userInfo')
+    openapi.get<UserInfo>('/openapi/userInfo')
       .then(response => {
         console.log(response)
         if (response.data?.userId) {
@@ -56,7 +56,7 @@ function LoginContent() {
 
   const loadOAuthConfig = () => {
     setLoading(true)
-    openapi.get<Provider[]>(`/oauth/config${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`)
+    openapi.get<Provider[]>(`/openapi/oauth/config${redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`)
       .then(response => {
         setProviders(response.data || [])
       })
@@ -98,8 +98,8 @@ function LoginContent() {
     setSecretError('')
 
     try {
-      const response = await openapi.post('/login', { secret: secret.trim() })
-      
+      const response = await openapi.post('/openapi/login', { secret: secret.trim() })
+
       if (response.data) {
         // 登录成功，跳转到首页或重定向页面
         router.push(redirect || '/')
@@ -191,8 +191,8 @@ function LoginContent() {
                           }
                         }}
                       />
-                      <Button 
-                        className="w-full" 
+                      <Button
+                        className="w-full"
                         onClick={handleSecretLogin}
                         disabled={secretLoading}
                       >

@@ -42,7 +42,7 @@ public class LoginFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        if("/login".equals(httpRequest.getRequestURI()) && httpRequest.getMethod().equalsIgnoreCase(HttpMethod.POST.name())) {
+        if("/openapi/login".equals(httpRequest.getRequestURI()) && httpRequest.getMethod().equalsIgnoreCase(HttpMethod.POST.name())) {
             if(!sessionManager.userRepoInitialized()) {
                 BellaResponse<Boolean> bellaResponse = new BellaResponse<>();
                 bellaResponse.setCode(503);
@@ -73,12 +73,12 @@ public class LoginFilter implements Filter {
             response.getWriter().write(JacksonUtils.serialize(bellaResponse));
             return;
         }
-        if("/logout".equals(httpRequest.getRequestURI())) {
+        if("/openapi/logout".equals(httpRequest.getRequestURI())) {
             sessionManager.destroySession(httpRequest, httpResponse);
             httpResponse.setStatus(HttpStatus.OK.value());
             return;
         }
-        if("/userInfo".equals(httpRequest.getRequestURI())) {
+        if("/openapi/userInfo".equals(httpRequest.getRequestURI())) {
             Operator operator = sessionManager.getSession(httpRequest);
             BellaResponse<Operator> bellaResponse = new BellaResponse<>();
             bellaResponse.setCode(operator == null ? 401 : 200);

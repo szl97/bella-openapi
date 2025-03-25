@@ -51,14 +51,14 @@ public class OAuthLoginFilter implements Filter {
         String requestUri = httpRequest.getRequestURI();
         
         // Handle OAuth callback
-        if (requestUri.startsWith("/oauth/callback/")) {
-            String provider = requestUri.substring("/oauth/callback/".length());
+        if (requestUri.startsWith("/openapi/oauth/callback/")) {
+            String provider = requestUri.substring("/openapi/oauth/callback/".length());
             handleCallback(provider, httpRequest, httpResponse);
             return;
         }
 
         // Handle OAuth config request
-        if (requestUri.equals("/oauth/config")) {
+        if (requestUri.equals("/openapi/oauth/config")) {
             handleOAuthConfig(httpRequest, httpResponse);
             return;
         }

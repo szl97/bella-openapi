@@ -6,6 +6,7 @@ import React from "react"
 import {UserInfo} from "@/lib/types/openapi";
 import { useRouter } from 'next/navigation'
 import { openapi } from '@/lib/api/openapi'
+import { useUser } from '@/lib/context/user-context'
 
 interface UserNavProps {
     user: UserInfo
@@ -13,14 +14,19 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
     const router = useRouter()
+    const { logout } = useUser()
 
     const handleLogout = async () => {
         try {
-            await openapi.post('/logout')
+            await openapi.post('/openapi/logout')
+            // 调用上下文中的logout函数清除用户状态
+            logout()
+            // 重定向到登录页面
             router.push('/login')
         } catch (error) {
             console.error('Logout failed:', error)
-            // 即使失败也跳转到登录页
+            // 即使API调用失败，也尝试清除前端状态并重定向
+            logout()
             router.push('/login')
         }
     }

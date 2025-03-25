@@ -1,27 +1,25 @@
 package com.ke.bella.openapi.login.oauth.providers;
 
+import java.io.IOException;
+import java.util.HashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.login.oauth.AbstractOAuthService;
 import com.ke.bella.openapi.login.oauth.OAuthProperties;
 import com.ke.bella.openapi.utils.JacksonUtils;
+
 import okhttp3.Request;
 import okhttp3.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.HashMap;
-
-@Component
-@ConditionalOnProperty(prefix = "bella.oauth.providers.github", name = "enabled", havingValue = "true")
 public class GithubOAuthService extends AbstractOAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GithubOAuthService.class);
 
     public GithubOAuthService(OAuthProperties properties) {
-        super(properties.getProviders().get("github"));
+        super(properties.getRedirect(), properties.getProviders().get("github"));
     }
 
     @Override

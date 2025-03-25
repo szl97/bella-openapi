@@ -330,7 +330,6 @@ bella:
         enabled: true
         client-id: your-google-client-id
         client-secret: your-google-client-secret
-        redirect-uri: http://localhost:8080/oauth/callback/google
         auth-uri: https://accounts.google.com/o/oauth2/v2/auth
         token-uri: https://oauth2.googleapis.com/token
         user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
@@ -339,7 +338,6 @@ bella:
         enabled: true
         client-id: your-github-client-id
         client-secret: your-github-client-secret
-        redirect-uri: http://localhost:8080/oauth/callback/github
         scope: read:user user:email
         authUri: https://github.com/login/oauth/authorize
         tokenUri: https://github.com/login/oauth/access_token
@@ -349,6 +347,7 @@ bella:
 ##### GitHub OAuth配置攻略
 
 要配置GitHub OAuth登录，请按照以下步骤操作：
+Google OAuth配置可参照此方式，登录 [Google Cloud Console](https://console.cloud.google.com/)进行配置
 
 1. **创建GitHub OAuth应用**：
    - 登录到您的GitHub账户
@@ -360,7 +359,7 @@ bella:
    - **Application name**：填写您的应用名称，例如 "Bella OpenAPI"
    - **Homepage URL**：填写您的应用主页URL，例如 `http://localhost:3000`
    - **Application description**：（可选）填写应用描述
-   - **Authorization callback URL**：填写回调URL，必须与配置文件中的`redirect-uri`完全一致，例如 `http://localhost:8080/oauth/callback/github`
+   - **Authorization callback URL**：填写回调URL，必须与配置文件中的`redirect`为域名，假设为`http://localhost:8080`， 那么url为 `/openapi/oauth/callback/github`， 如果google则为`http://localhost:8080/openapi/oauth/callback/google`
    - 点击 "Register application" 按钮
 
 3. **获取Client ID和Client Secret**：
@@ -379,7 +378,6 @@ bella:
            enabled: true
            client-id: 您的GitHub Client ID  # 例如：89a6d5f8c7b3e2a1d0f9
            client-secret: 您的GitHub Client Secret  # 例如：3e7d9c8b5a4f2e1d0c9b8a7f6e5d4c3b2a1f0e9d
-           redirect-uri: http://localhost:8080/oauth/callback/github
            scope: read:user user:email
            authUri: https://github.com/login/oauth/authorize
            tokenUri: https://github.com/login/oauth/access_token
@@ -451,6 +449,11 @@ java -jar bella-openapi.jar --spring.profiles.active=dev
 - `-e, --env ENV`: 指定环境（dev, test, prod）
 - `-h, --help`: 显示帮助信息
 - `--skip-auth`: 跳过授权步骤
+- `--server URL`: 配置服务域名（前端和后端使用同一域名，会自动重新构建）
+- `--github-oauth CLIENT_ID:CLIENT_SECRET`: 配置GitHub OAuth登录
+- `--google-oauth CLIENT_ID:CLIENT_SECRET`: 配置Google OAuth登录
+- `--cas-server URL`: 配置CAS服务器URL
+- `--cas-login URL`: 配置CAS登录URL
 
 示例:
 ```bash
@@ -461,13 +464,11 @@ java -jar bella-openapi.jar --spring.profiles.active=dev
 ./start.sh -b -e prod            # 重新构建并以生产环境启动服务
 ./start.sh --skip-install        # 跳过依赖安装，加快构建速度
 ./start.sh --skip-auth           # 启动服务但跳过授权步骤
-./start.sh --frontend http://example.com --backend http://api.example.com -b #配置前后端URL
-./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} -b #配置github和google的oauth登录
-./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --frontend http://example.com --backend http://api.example.com -b #配置github和google的oauth登录以及前后端URL
-./start.sh --cas-server https://cas.example.com --cas-login https://cas.example.com/login -b #配置CAS登录需要CAS服务器URL和CAS登录URL，如果同时配置了cas和oauth，登录时会使用cas登录
+./start.sh --server http://example.com #配置服务域名（会自动重新构建）
+./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} #配置github和google的oauth登录
+./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --server http://example.com #配置github和google的oauth登录以及服务域名（会自动重新构建）
+./start.sh --cas-server https://cas.example.com --cas-login https://cas.example.com/login --server http://example.com #配置CAS登录和服务域名（会自动重新构建）如果既配置cas登录又配置oauth登录，登录时会使用cas登录
 ```
-
-
 ### docker-compose环境变量配置
 
 #### 环境变量优先级
@@ -475,7 +476,7 @@ java -jar bella-openapi.jar --spring.profiles.active=dev
 在Docker环境中，环境变量的优先级从高到低为：
 1. docker-compose.yml中的environment设置
 2. Dockerfile中的ENV指令
-3. .env文件
+3. .env文件、 yaml文件
 
 #### web构建时环境变量
 
