@@ -189,9 +189,6 @@ NODE_ENV=development npm run build
 
 # 使用生产环境变量构建
 NODE_ENV=production npm run build
-
-# 指定自定义环境变量构建
-NEXT_PUBLIC_API_HOST=http://localhost:8080 npm run build
 ```
 
 #### web运行时环境变量
@@ -219,9 +216,6 @@ npm run start
 
 # 使用自定义端口运行
 PORT=3001 npm run start
-
-# 同时指定环境变量和端口运行
-NEXT_PUBLIC_API_HOST=http://localhost:8080 PORT=3001 npm run start
 ```
 
 ### 数据库配置
@@ -411,16 +405,6 @@ Google OAuth配置可参照此方式，登录 [Google Cloud Console](https://con
    - 您将被重定向到GitHub授权页面
    - 授权后，您将被重定向回应用，完成登录流程
 
-#### 前端配置
-
-前端应用需要配置对应的登录服务URL和回调地址：
-
-1. 在前端环境配置文件中设置API服务器地址：
-
-```javascript
-// .env.development 或 .env.production
-NEXT_PUBLIC_API_HOST=http://localhost:8080
-```
 
 #### 环境变量配置
 
