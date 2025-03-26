@@ -88,6 +88,15 @@ public class LoginFilter implements Filter {
             return;
         }
 
+        if(httpRequest.getRequestURI().startsWith("/openapi")) {
+            BellaResponse<?> bellaResponse = new BellaResponse<>();
+            bellaResponse.setCode(404);
+            bellaResponse.setMessage("Not Found");
+            response.setContentType("application/json");
+            response.getWriter().write(JacksonUtils.serialize(bellaResponse));
+            return;
+        }
+
         try {
             if(StringUtils.isNotBlank(properties.getAuthorizationHeader())) {
                 String auth = httpRequest.getHeader(properties.getAuthorizationHeader());

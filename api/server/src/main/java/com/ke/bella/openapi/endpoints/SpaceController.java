@@ -104,10 +104,4 @@ public class SpaceController {
         return spaceService.getMemberRole(memberUid, spaceCode);
     }
 
-    // TODO 用于刷存量历史数据，后续删除
-    @GetMapping("/space/spaceCode/list")
-    public List<String> listSpaceCode() {
-        return spaceService.listSpaceCode();
-    }
-
 }
