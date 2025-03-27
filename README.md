@@ -554,13 +554,7 @@ docker-compose logs -f
 ./start.sh --restart-web
 
 # 重启后端服务
-./start.sh --restart-api
-
-# 编译并重启后端服务（会先执行Maven编译，然后重新构建Docker镜像并重启服务）
-./start.sh -b --restart-api
-
-# 重新构建并重启前端服务
-./start.sh -b --restart-web
+./start.sh --restart-api --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --server http://example.com
 ```
 
 也可以直接使用Docker Compose命令：
@@ -571,12 +565,6 @@ docker-compose restart web
 
 # 查看前端日志
 docker-compose logs -f web
-
-# 重新构建并重启后端服务
-docker-compose up -d --build api
-
-# 重新构建并重启前端服务
-docker-compose up -d --build web
 ```
 
 ### 系统初始化
