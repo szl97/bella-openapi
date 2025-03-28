@@ -56,9 +56,10 @@ public class CacheTest {
     }
 
     public void deleteCache() {
-        String apikey = "ak-0d0b8f35-4dcb-4019-8f05-a2a52f438cef";
+        //替换为真实ak code
+        String akCode = "ak-0d0b8f35-4dcb-4019-8f05-a2a52f438cef";
         String month = DateTimeUtils.getCurrentMonth();
-        cacheRepoTest.deleteCost(apikey, month);
+        cacheRepoTest.deleteCost(akCode, month);
     }
 
     public void testJetCache() throws InterruptedException {

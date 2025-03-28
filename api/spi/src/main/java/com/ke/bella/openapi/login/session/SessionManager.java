@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +50,9 @@ public class SessionManager {
     }
 
     public String create(String secret, HttpServletRequest request, HttpServletResponse response) {
+        if (userRepo != null) {
+            throw new NotImplementedException();
+        }
         Operator operator = userRepo.checkSecret(secret);
         if(operator == null) {
             return null;

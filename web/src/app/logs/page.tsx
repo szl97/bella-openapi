@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { LogsSidebar } from '@/components/logs/sidebar'
+import { agent_url } from '@/config'
 
 const LogsPage = () => {
   const [startDate, setStartDate] = useState<Date>(() => {
@@ -432,7 +433,7 @@ const LogsPage = () => {
                         请复制异常响应内容，前往以下链接进行咨询：
                       </p>
                       <a
-                        href="https://bella.ke.com/#/mainArch/77805756424192"
+                        href={`${agent_url}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
