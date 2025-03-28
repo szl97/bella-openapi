@@ -10,6 +10,15 @@
     <name>server</name>
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- jooq数据库连接配置，jooq生成代码时替换为真实数据库配置 -->
+        <db.driver>com.mysql.cj.jdbc.Driver</db.driver>
+        <db.url>jdbc:mysql://localhost:3306/bella_openapi?useSSL=false</db.url>
+        <db.username>bella_user</db.username>
+        <db.password>123456</db.password>
+        <db.schema>bella_openapi</db.schema>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -299,14 +308,14 @@
                 <version>${jooq.version}</version>
                 <configuration>
                     <jdbc>
-                        <driver>com.mysql.cj.jdbc.Driver</driver>
-                        <url>jdbc:mysql://localhost:3306/bella_openapi?useSSL=false</url>
-                        <user>root</user>
-                        <password>123456</password>
+                        <driver>${db.driver}</driver>
+                        <url>${db.url}</url>
+                        <user>${db.username}</user>
+                        <password>${db.password}</password>
                     </jdbc>
                     <generator>
                         <database>
-                            <inputSchema>bella_openapi</inputSchema>
+                            <inputSchema>${db.schema}</inputSchema>
                             <outputSchemaToDefault>true</outputSchemaToDefault>
                             <includes>.*</includes>
                             <unsignedTypes>false</unsignedTypes>
