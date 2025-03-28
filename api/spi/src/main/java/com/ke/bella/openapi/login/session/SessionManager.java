@@ -50,7 +50,7 @@ public class SessionManager {
     }
 
     public String create(String secret, HttpServletRequest request, HttpServletResponse response) {
-        if (userRepo != null) {
+        if (userRepo == null) {
             throw new NotImplementedException();
         }
         Operator operator = userRepo.checkSecret(secret);
