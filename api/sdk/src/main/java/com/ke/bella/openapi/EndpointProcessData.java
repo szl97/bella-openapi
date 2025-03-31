@@ -27,9 +27,9 @@ public class EndpointProcessData {
     private String channelCode;
     private boolean isPrivate;
     private String user;
-    //时间单位都为s
-    private long requestTime;
-    private long firstPackageTime;
+    private long requestMillis;
+    private long requestTime; //s
+    private long firstPackageTime; //ms
     private long duration;
     private Object request;
     private OpenapiResponse response;

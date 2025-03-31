@@ -28,6 +28,7 @@ public class OpenapiRequestFilter extends BellaRequestFilter {
         try {
             super.bellaRequestFilter(request, response);
             EndpointContext.setHeaderInfo(BellaContext.getHeaders());
+            EndpointContext.getProcessData().setRequestMillis(DateTimeUtils.getCurrentMills());
             EndpointContext.getProcessData().setRequestTime(DateTimeUtils.getCurrentSeconds());
             ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
             EndpointContext.setRequest(wrappedRequest);

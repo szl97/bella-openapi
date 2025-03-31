@@ -34,7 +34,7 @@ public class CompletionLogHandler implements EndpointLogHandler {
         String encodingType = processData.getEncodingType();
         CompletionResponse.TokenUsage usage = countTokenUsage(request, processData.getResponse(), encodingType);
         processData.setUsage(usage);
-        processData.setMetrics(countMetrics(startTime, created, firstPackageTime, usage));
+        processData.setMetrics(countMetrics(startTime, processData.getRequestMillis(), created, firstPackageTime, usage));
     }
 
     @Override
@@ -42,12 +42,12 @@ public class CompletionLogHandler implements EndpointLogHandler {
         return "/v1/chat/completions";
     }
 
-    private Map<String, Object> countMetrics(long startTime, long endTime, long firstPackageTime, CompletionResponse.TokenUsage usage) {
+    private Map<String, Object> countMetrics(long startTime, long startMills, long endTime, long firstPackageTime, CompletionResponse.TokenUsage usage) {
         int inputToken = usage.getPrompt_tokens();
         int outputToken = usage.getCompletion_tokens();
         int ttft = 0;
         if(firstPackageTime != 0) {
-            ttft = (int) (firstPackageTime - startTime);
+            ttft = (int) (firstPackageTime - startMills);
         }
         int ttlt = (int) (endTime - startTime);
         return ImmutableMap.of("ttft", ttft, "ttlt", ttlt, "input_token", inputToken, "output_token", outputToken);

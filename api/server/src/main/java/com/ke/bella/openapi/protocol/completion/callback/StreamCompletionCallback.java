@@ -64,6 +64,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
 
     @Override
     public void callback(StreamCompletionResponse msg) {
+        msg.setCreated(DateTimeUtils.getCurrentSeconds());
         if(requestRiskData != null) {
             msg.setRequestRiskData(requestRiskData);
             requestRiskData = null;
@@ -109,7 +110,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
             safetyCheckIndex = 0;
         }
         if(firstPackageTime == null) {
-            firstPackageTime = streamResponse.getCreated();
+            firstPackageTime = DateTimeUtils.getCurrentMills();
         }
         StreamCompletionResponse.Choice choice = streamResponse.getChoices().get(0);
         Integer choiceIndex = choice.getIndex();
@@ -151,7 +152,7 @@ public class StreamCompletionCallback implements Callbacks.StreamCompletionCallb
         CompletionResponse response = responseBuffer;
         long created = response.getCreated() <= 0 ? DateTimeUtils.getCurrentSeconds() : response.getCreated();
         processData.setDuration(created - processData.getRequestTime());
-        processData.setFirstPackageTime(firstPackageTime == null ? DateTimeUtils.getCurrentSeconds() : firstPackageTime);
+        processData.setFirstPackageTime(firstPackageTime == null ? DateTimeUtils.getCurrentMills() : firstPackageTime);
         response.setChoices(Lists.newArrayList(choiceBuffer.values()));
         processData.setResponse(response);
         logger.log(processData);
