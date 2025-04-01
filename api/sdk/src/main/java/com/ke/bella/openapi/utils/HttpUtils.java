@@ -37,7 +37,7 @@ public class HttpUtils {
     private static final int defaultConnectionTimeout = 120;
     private static final int defaultReadTimeout = 300;
     private static final OkHttpClient.Builder clientBuilder = clientBuilder();
-    private static OkHttpClient defaultOkhttpClient() {
+    public static OkHttpClient defaultOkhttpClient() {
         OkHttpClient.Builder builder = clientBuilder()
                 .connectTimeout(defaultConnectionTimeout, TimeUnit.SECONDS)
                 .readTimeout(defaultReadTimeout, TimeUnit.SECONDS);
@@ -48,6 +48,7 @@ public class HttpUtils {
         dispatcher.setMaxRequests(2000);
         dispatcher.setMaxRequestsPerHost(500);
         return new OkHttpClient.Builder()
+                .proxySelector(ProxyUtils.getProxySelector())
                 .connectionPool(connectionPool)
                 .dispatcher(dispatcher)
                 .pingInterval(50, TimeUnit.SECONDS);

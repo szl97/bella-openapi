@@ -75,6 +75,10 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 - `--google-oauth CLIENT_ID:CLIENT_SECRET`: 配置Google OAuth登录
 - `--cas-server URL`: 配置CAS服务器URL
 - `--cas-login URL`: 配置CAS登录URL
+- `--proxy-host HOST`: 配置代理服务器主机名或IP地址
+- `--proxy-port PORT`: 配置代理服务器端口
+- `--proxy-type TYPE`: 配置代理类型（socks 或 http）
+- `--proxy-domains DOMAINS`: 配置需要通过代理访问的域名，多个域名用逗号分隔
 - `--version VERSION`: 指定镜像版本
 - `--push`: 构建后推送镜像到仓库
 - `--registry username`: 指定docker仓库 (username)
@@ -89,6 +93,8 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 ./start.sh -e test               # 以测试环境启动服务
 ./start.sh --skip-auth           # 启动服务但跳过授权步骤
 ./start.sh --server http://example.com #配置服务域名
+./start.sh --proxy-host 127.0.0.1 --proxy-port 8118 --proxy-type http --proxy-domains github.com,google.com # 配置HTTP代理
+./start.sh --proxy-host proxy.com --proxy-port 80 --proxy-type socks # 配置SOCKS代理，不指定特定域名
 
 # 没有修改源码，只想拉取远端镜像，并配置登录方式和服务域名，通常使用以下命令即可：
 #不配置域名，通常用于本地部署：
@@ -96,6 +102,9 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 
 #配置域名，通常用于服务端部署：
 ./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --server http://example.com #配置github和google的oauth登录以及服务域名
+
+#配置域名和代理，用于需要通过代理访问外部服务的环境：
+./start.sh --github-oauth ${clientId}:${secret} --google-oauth ${clientId}:${secret} --server http://example.com --proxy-host 127.0.0.1 --proxy-port 8118 --proxy-type http --proxy-domains github.com,google.com
 
 ./start.sh --cas-server https://cas.example.com --cas-login https://cas.example.com/login --server http://example.com #配置CAS登录和服务域名,如果既配置cas登录又配置oauth登录，登录时会使用cas登录
 ```

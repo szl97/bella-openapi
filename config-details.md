@@ -1,6 +1,6 @@
 # Bella OpenAPI 配置详情
 
-本文档详细介绍了 Bella OpenAPI 的配置管理，包括环境变量配置、数据库配置、缓存配置、Apollo配置和登录服务配置。
+本文档详细介绍了 Bella OpenAPI 的配置管理，包括环境变量配置、数据库配置、缓存配置、Apollo配置、登录服务配置和代理配置。
 
 ## 目录
 
@@ -17,6 +17,10 @@
   - [CAS配置](#cas配置)
   - [OAuth配置](#oauth配置)
     - [GitHub OAuth配置攻略](#github-oauth配置攻略)
+- [代理配置](#代理配置)
+  - [系统属性配置](#系统属性配置)
+  - [代理类型](#代理类型)
+  - [代理域名](#代理域名)
 
 ## 环境变量配置
 
@@ -292,6 +296,28 @@ export BELLA_OAUTH_CLIENT_INDEX=http://your-frontend-url
 # 启动应用时指定配置文件
 java -jar bella-openapi.jar --spring.profiles.active=dev
 ```
+
+## 代理配置
+
+### 系统属性配置
+
+可以通过系统属性配置代理服务器：
+
+```bash
+-Dbella.proxy.host=127.0.0.1
+-Dbella.proxy.type=http
+-Dbella.proxy.port=8118
+-Dbella.proxy.domains=github.com,google.com
+```
+
+### 代理类型
+
+支持两种代理类型：http和socks。
+
+### 代理域名
+
+- 可以配置域名过滤规则，指定哪些域名需要代理：
+- 如果只配置代理，不配置域名则代理全部域名
 
 ---
 *最后更新: 2025-03-31*

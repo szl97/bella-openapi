@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.login.oauth;
 
 import com.ke.bella.openapi.Operator;
+import com.ke.bella.openapi.utils.HttpUtils;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -17,7 +18,7 @@ public abstract class AbstractOAuthService implements OAuthService {
     protected AbstractOAuthService(String redirect, OAuthProperties.ProviderConfig config) {
         this.redirect = redirect;
         this.config = config;
-        this.client = new OkHttpClient();
+        this.client = HttpUtils.defaultOkhttpClient();
     }
 
     @Override
