@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol.asr;
 
-import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrMessage;
+import com.ke.bella.openapi.protocol.realtime.RealTimeMessage;
 import lombok.Data;
 
 @Data
@@ -31,14 +31,14 @@ public class HuoshanRealTimeAsrRequest {
         this.resultType = "full";
     }
 
-    public HuoshanRealTimeAsrRequest(RealTimeAsrMessage request, HuoshanProperty property) {
+    public HuoshanRealTimeAsrRequest(RealTimeMessage request, HuoshanProperty property) {
         this.async = true;
         this.uid = "0";
         this.appId = property.getAppid();
         this.token = property.getAuth().getSecret();
         this.cluster = property.getDeployName();
         this.format = request.getPayload().getFormat();
-        this.sampleRate = request.getPayload().getSample_rate();
+        this.sampleRate = request.getPayload().getSampleRate();
         this.chunkSize = property.getChunkSize();
         this.intervalMs = property.getIntervalMs();
         this.resultType = "single";

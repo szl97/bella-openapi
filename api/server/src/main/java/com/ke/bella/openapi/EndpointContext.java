@@ -19,7 +19,7 @@ public class EndpointContext {
 
     public static EndpointProcessData getProcessData() {
         if(endpointRequestInfo.get() == null) {
-            EndpointProcessData endpointProcessData = EndpointProcessData.builder().build();
+            EndpointProcessData endpointProcessData = new EndpointProcessData();
             endpointProcessData.setInnerLog(true);
             endpointProcessData.setBellaTraceId(BellaContext.getTraceId());
             endpointProcessData.setRequestId(BellaContext.getRequestId());

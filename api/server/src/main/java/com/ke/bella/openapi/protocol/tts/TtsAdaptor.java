@@ -11,7 +11,7 @@ public interface TtsAdaptor <T extends TtsProperty> extends IProtocolAdaptor {
 
     void streamTts(TtsRequest request, String url, T property, Callbacks.StreamCallback callback);
 
-    Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.ByteSender byteSender, EndpointProcessData processData, EndpointLogger logger);
+    Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.Sender byteSender, EndpointProcessData processData, EndpointLogger logger);
 
     @Override
     default String endpoint() {

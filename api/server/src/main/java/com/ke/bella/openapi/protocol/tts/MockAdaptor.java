@@ -30,7 +30,7 @@ public class MockAdaptor implements TtsAdaptor<TtsProperty> {
     }
 
     @Override
-    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.ByteSender byteSender,
+    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.Sender byteSender,
             EndpointProcessData processData, EndpointLogger logger) {
         throw new BizParamCheckException("尚未支持tts mock");
     }

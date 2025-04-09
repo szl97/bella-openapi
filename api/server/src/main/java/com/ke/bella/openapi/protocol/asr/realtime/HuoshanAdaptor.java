@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.ke.bella.openapi.protocol.realtime.RealTimeMessage;
 import org.springframework.stereotype.Component;
 
 import com.ke.bella.openapi.EndpointProcessData;
@@ -22,10 +23,10 @@ import okhttp3.Request;
 import okhttp3.WebSocket;
 
 @Component("HuoshanRealtimeAsr")
-public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
+public class HuoshanAdaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
 
     @Override
-    public WebSocket startTranscription(String url, HuoshanProperty property, RealTimeAsrMessage request, Callbacks.WebSocketCallback callback) {
+    public WebSocket startTranscription(String url, HuoshanProperty property, RealTimeMessage request, Callbacks.WebSocketCallback callback) {
         Request.Builder builder = authorizationRequestBuilder(property.getAuth());
         builder.url(url);
         WebSocket webSocket = HttpUtils.websocketRequest(builder.build(), new BellaWebSocketListener(callback));
@@ -42,7 +43,7 @@ public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
     }
 
     @Override
-    public boolean stopTranscription(WebSocket webSocket, RealTimeAsrMessage request, Callbacks.WebSocketCallback callback) {
+    public boolean stopTranscription(WebSocket webSocket, RealTimeMessage request, Callbacks.WebSocketCallback callback) {
         HuoshanStreamAsrCallback huoshanCallback = (HuoshanStreamAsrCallback) callback;
         huoshanCallback.sendAudioData(webSocket, null, true);
         return true;
@@ -54,8 +55,8 @@ public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
     }
 
     @Override
-    public Callbacks.WebSocketCallback createCallback(Callbacks.TextSender sender, EndpointProcessData processData, EndpointLogger logger,
-            String taskId, RealTimeAsrMessage request, HuoshanProperty property) {
+    public Callbacks.WebSocketCallback createCallback(Callbacks.Sender sender, EndpointProcessData processData, EndpointLogger logger,
+            String taskId, RealTimeMessage request, HuoshanProperty property) {
         HuoshanRealTimeAsrRequest huoshanRealTimeAsrRequest = new HuoshanRealTimeAsrRequest(request, property);
         return new HuoshanStreamAsrCallback(huoshanRealTimeAsrRequest, sender, processData, logger, new converter(taskId));
     }
@@ -87,10 +88,10 @@ public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
             List<String> result = new ArrayList<>();
             if(sentenceStart) {
                 index++;
-                RealTimeAsrMessage.Payload payload = new RealTimeAsrMessage.Payload();
+                RealTimeMessage.Payload payload = new RealTimeMessage.Payload();
                 payload.setIndex(index);
                 payload.setTime(response.getAddition() != null ? response.getAddition().getDuration() : 0);
-                RealTimeAsrMessage start = RealTimeAsrMessage.sentenceBegin(taskId, payload);
+                RealTimeMessage start = RealTimeMessage.sentenceBegin(taskId, payload);
                 result.add(JacksonUtils.serialize(start));
                 sentenceStart = false;
             }
@@ -100,7 +101,7 @@ public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
                         continue;
                     }
                     for(HuoshanRealTimeAsrResponse.Result huoshanResult : tempResult.getUtterances()) {
-                        RealTimeAsrMessage.Payload payload = new RealTimeAsrMessage.Payload();
+                        RealTimeMessage.Payload payload = new RealTimeMessage.Payload();
                         payload.setIndex(index);
                         payload.setTime(huoshanResult.getTime());
                         payload.setResult(huoshanResult.getText());
@@ -110,19 +111,19 @@ public class HuoshanAdpaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
                                     .collect(Collectors.toList()));
                         }
                         if(huoshanResult.isDefinite()) {
-                            payload.setBegin_time(huoshanResult.getBegin_time());
-                            RealTimeAsrMessage end = RealTimeAsrMessage.SentenceEnd(taskId, payload);
+                            payload.setBeginTime(huoshanResult.getBegin_time());
+                            RealTimeMessage end = RealTimeMessage.sentenceEnd(taskId, payload);
                             result.add(JacksonUtils.serialize(end));
                             sentenceStart = true;
                         } else {
-                            RealTimeAsrMessage changed = RealTimeAsrMessage.resultChange(taskId, payload);
+                            RealTimeMessage changed = RealTimeMessage.resultChange(taskId, payload);
                             result.add(JacksonUtils.serialize(changed));
                         }
                     }
                 }
             }
             if(response.getSequence() < 0) {
-                RealTimeAsrMessage completion = RealTimeAsrMessage.completion(taskId);
+                RealTimeMessage completion = RealTimeMessage.completion(taskId);
                 result.add(JacksonUtils.serialize(completion));
             }
             return result;

@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.protocol.asr.realtime;
+package com.ke.bella.openapi.protocol.realtime;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -10,7 +10,7 @@ import com.ke.bella.openapi.protocol.IPriceInfo;
 import lombok.Data;
 
 @Data
-public class RealTimeAsrPriceInfo implements IPriceInfo, Serializable {
+public class RealTimePriceInfo implements IPriceInfo, Serializable {
     private BigDecimal price;
     @Override
     public String getUnit() {

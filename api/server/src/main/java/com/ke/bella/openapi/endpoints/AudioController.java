@@ -12,8 +12,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrAdaptor;
-import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrHandler;
+import com.ke.bella.openapi.protocol.realtime.RealTimeAdaptor;
+import com.ke.bella.openapi.protocol.realtime.RealTimeHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StreamUtils;
@@ -70,7 +70,7 @@ public class AudioController {
     /**
      * 实时语音识别WebSocket接口
      */
-    @RequestMapping("/asr/stream")
+    @RequestMapping({"/realtime", "/asr/stream"})
     public void asrStream(@RequestHeader(value = "model", required = false) String model, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if(!"websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
@@ -93,11 +93,11 @@ public class AudioController {
         String url = processData.getForwardUrl();
         String channelInfo = channel.getChannelInfo();
 
-        RealTimeAsrAdaptor<AsrProperty> adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, RealTimeAsrAdaptor.class);
+        RealTimeAdaptor<AsrProperty> adaptor = adaptorManager.getProtocolAdaptor(endpoint, protocol, RealTimeAdaptor.class);
 
         AsrProperty property = JacksonUtils.deserialize(channelInfo, adaptor.getPropertyClass());
 
-        RealTimeAsrHandler webSocketHandler = new RealTimeAsrHandler(url, property, processData, logger, adaptor);
+        RealTimeHandler webSocketHandler = new RealTimeHandler(url, property, processData, logger, adaptor);
 
         WebSocketHttpRequestHandler requestHandler = new WebSocketHttpRequestHandler(webSocketHandler);
         requestHandler.handleRequest(request, response);

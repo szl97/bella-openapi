@@ -1,5 +1,6 @@
 package com.ke.bella.openapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EndpointProcessData {
+    @JsonIgnore
     private String apikey;
     private String requestId;
     private String accountType;
@@ -30,6 +32,7 @@ public class EndpointProcessData {
     private long requestMillis;
     private long requestTime; //s
     private long firstPackageTime; //ms
+    private long transcriptionDuration;
     private long duration;
     private Object request;
     private OpenapiResponse response;

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 @Slf4j
-public class StreamByteSender implements Callbacks.ByteSender {
+public class StreamByteSender implements Callbacks.Sender {
 
     private final AsyncContext context;
     private final OutputStream stream;
@@ -26,6 +26,11 @@ public class StreamByteSender implements Callbacks.ByteSender {
     }
 
     @Override
+    public void send(String text) {
+
+    }
+
+    @Override
     public void send(byte[] bytes) {
         try {
             stream.write(bytes);
@@ -35,6 +40,10 @@ public class StreamByteSender implements Callbacks.ByteSender {
         } catch (IOException e) {
             LOGGER.warn(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void onError(Throwable e) {
     }
 
     @Override

@@ -79,14 +79,14 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketCallback {
     final String sessionId = UUID.randomUUID().toString().replace("-", "");
 
     final TtsRequest request;
-    final ByteSender byteSender;
+    final Sender byteSender;
     final EndpointProcessData processData;
     final EndpointLogger logger;
     boolean end = false;
     boolean first = true;
     long startTime = DateTimeUtils.getCurrentMills();
 
-    public HuoshanStreamTtsCallback(TtsRequest request, ByteSender byteSender, EndpointProcessData processData, EndpointLogger logger) {
+    public HuoshanStreamTtsCallback(TtsRequest request, Sender byteSender, EndpointProcessData processData, EndpointLogger logger) {
         this.request = request;
         this.byteSender = byteSender;
         this.processData = processData;
@@ -179,7 +179,7 @@ public class HuoshanStreamTtsCallback implements Callbacks.WebSocketCallback {
         complete();
     }
 
-    void complete() {
+    private void complete() {
         if(!end) {
             processData.getMetrics().put("ttlt", DateTimeUtils.getCurrentMills() - startTime);
             byteSender.close();

@@ -68,7 +68,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
     }
 
     private final HuoshanRealTimeAsrRequest request;
-    private final TextSender sender;
+    private final Sender sender;
     private final EndpointProcessData processData;
     private final EndpointLogger logger;
     private final Function<HuoshanRealTimeAsrResponse, List<String>> converter;
@@ -88,7 +88,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
 
     private byte[] cached;
 
-    public HuoshanStreamAsrCallback(HuoshanRealTimeAsrRequest request, Callbacks.TextSender sender, EndpointProcessData processData,
+    public HuoshanStreamAsrCallback(HuoshanRealTimeAsrRequest request, Callbacks.Sender sender, EndpointProcessData processData,
             EndpointLogger logger, Function<HuoshanRealTimeAsrResponse, List<String>> converter) {
         this.request = request;
         this.sender = sender;

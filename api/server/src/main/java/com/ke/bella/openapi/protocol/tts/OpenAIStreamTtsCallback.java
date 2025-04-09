@@ -13,14 +13,14 @@ import com.ke.bella.openapi.utils.DateTimeUtils;
 
 public class OpenAIStreamTtsCallback implements Callbacks.HttpStreamTtsCallback {
 
-    final ByteSender byteSender;
+    final Sender byteSender;
     final EndpointProcessData processData;
     final EndpointLogger logger;
 
     boolean first = true;
     long startTime = DateTimeUtils.getCurrentMills();
 
-    public OpenAIStreamTtsCallback(ByteSender byteSender, EndpointProcessData processData, EndpointLogger logger) {
+    public OpenAIStreamTtsCallback(Sender byteSender, EndpointProcessData processData, EndpointLogger logger) {
         this.byteSender = byteSender;
         this.processData = processData;
         this.logger = logger;

@@ -29,7 +29,7 @@ public class OpenAIAdaptor implements TtsAdaptor<OpenAIProperty> {
     }
 
     @Override
-    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.ByteSender byteSender,
+    public Callbacks.StreamCallback buildCallback(TtsRequest request, Callbacks.Sender byteSender,
             EndpointProcessData processData, EndpointLogger logger) {
         return new OpenAIStreamTtsCallback(byteSender, processData, logger);
     }

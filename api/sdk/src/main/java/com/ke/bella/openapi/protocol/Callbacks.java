@@ -62,13 +62,10 @@ public interface Callbacks {
     }
 
 
-    interface ByteSender extends Callbacks {
-        void send(byte[] bytes);
-        void close();
-    }
 
-    interface TextSender extends Callbacks {
+    interface Sender extends Callbacks {
         void send(String text);
+        void send(byte[] bytes);
         void onError(Throwable e);
         void close();
     }

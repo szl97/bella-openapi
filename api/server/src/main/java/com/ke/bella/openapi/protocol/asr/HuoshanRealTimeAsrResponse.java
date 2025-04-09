@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol.asr;
 
-import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrMessage;
+import com.ke.bella.openapi.protocol.realtime.RealTimeMessage;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -46,8 +46,8 @@ public class HuoshanRealTimeAsrResponse {
             private int begin_time;
             private int end_time;
 
-            public RealTimeAsrMessage.Word convert() {
-                RealTimeAsrMessage.Word word = new RealTimeAsrMessage.Word();
+            public RealTimeMessage.Word convert() {
+                RealTimeMessage.Word word = new RealTimeMessage.Word();
                 word.setStartTime(this.begin_time);
                 word.setEndTime(this.end_time);
                 word.setProbability(confidence);

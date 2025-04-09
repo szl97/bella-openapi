@@ -1,10 +1,8 @@
-package com.ke.bella.openapi.protocol.asr;
+package com.ke.bella.openapi.protocol.realtime;
 
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.Callbacks;
-import com.ke.bella.openapi.protocol.asr.realtime.AsrEventType;
-import com.ke.bella.openapi.protocol.asr.realtime.RealTimeAsrMessage;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import com.ke.bella.openapi.utils.DateTimeUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
@@ -14,17 +12,19 @@ import okhttp3.Response;
 import okhttp3.WebSocket;
 import okio.ByteString;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static com.ke.bella.openapi.protocol.asr.realtime.AsrEventType.TRANSCRIPTION_STARTED;
+import static com.ke.bella.openapi.protocol.realtime.RealTimeEventType.TRANSCRIPTION_STARTED;
 
 @Slf4j
-public class KeStreamAsrCallback implements Callbacks.WebSocketCallback {
+public class KeRealtimeCallback implements Callbacks.WebSocketCallback {
 
-    private final TextSender sender;
+    private final Sender sender;
     private final EndpointProcessData processData;
     private final EndpointLogger logger;
     private final String taskId;
@@ -32,12 +32,14 @@ public class KeStreamAsrCallback implements Callbacks.WebSocketCallback {
     private final CompletableFuture<?> startFlag = new CompletableFuture<>();
 
     private final long startTime = DateTimeUtils.getCurrentMills();
+    private final List<Integer> ttsTtfts;
     private boolean end = false;
-    private boolean first = true;
 
-    public KeStreamAsrCallback(TextSender sender, EndpointProcessData processData, EndpointLogger logger, String taskId) {
+    public KeRealtimeCallback(Sender sender, EndpointProcessData processData, EndpointLogger logger, String taskId) {
         this.sender = sender;
         this.processData = processData;
+        this.ttsTtfts = new ArrayList<>();
+        processData.getMetrics().put("tts_metrics", ttsTtfts);
         this.logger = logger;
         this.taskId = taskId;
     }
@@ -49,44 +51,50 @@ public class KeStreamAsrCallback implements Callbacks.WebSocketCallback {
 
     @Override
     public void onMessage(WebSocket webSocket, ByteString bytes) {
+        sender.send(bytes.toByteArray());
     }
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        
-        RealTimeAsrMessage message = JacksonUtils.deserialize(text, RealTimeAsrMessage.class);
+
+        RealTimeMessage message = JacksonUtils.deserialize(text, RealTimeMessage.class);
         if(message == null || message.getHeader() == null || message.getHeader().getName() == null) {
             LOGGER.warn("无效的ASR响应消息格式:{}", text);
             return;
         }
 
         String eventName = message.getHeader().getName();
-        AsrEventType eventType = AsrEventType.fromString(eventName);
+        RealTimeEventType eventType = RealTimeEventType.fromString(eventName);
 
         if(eventType != TRANSCRIPTION_STARTED) {
             sender.send(text);
         }
 
         switch (eventType) {
-            case TRANSCRIPTION_STARTED:
-                startFlag.complete(null);
-                break;
+        case TRANSCRIPTION_STARTED:
+            startFlag.complete(null);
+            break;
 
-            case TRANSCRIPTION_COMPLETED:
-                complete();
-                break;
-                
-            case TRANSCRIPTION_FAILED:
-            case TASK_FAILED:
-                LOGGER.warn("转录失败: {}",
-                    message.getHeader().getStatus_message() != null ? 
-                    message.getHeader().getStatus_message() : "未知原因");
-                complete();
-                break;
-                
-            case UNKNOWN:
-                LOGGER.warn("收到未知事件类型: {}, text:{}", eventName, text);
-                break;
+        case TTS_TTFT:
+            if(message.getPayload() != null && message.getPayload().getLatency() != null) {
+                ttsTtfts.add(message.getPayload().getLatency());
+            }
+            break;
+
+        case SESSION_CLOSE:
+            complete();
+            break;
+
+        case TASK_FAILED:
+            LOGGER.warn("转录失败: {}",
+                    message.getHeader().getStatusMessage() != null ?
+                            message.getHeader().getStatusMessage() : "未知原因");
+            complete();
+            break;
+
+        case UNKNOWN:
+            LOGGER.warn("收到未知事件类型: {}, text:{}", eventName, text);
+            break;
         }
     }
 

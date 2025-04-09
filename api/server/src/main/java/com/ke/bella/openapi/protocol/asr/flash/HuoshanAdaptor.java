@@ -33,7 +33,7 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
     public FlashAsrResponse asr(AsrRequest request, String url, HuoshanProperty property, EndpointProcessData processData) {
         HuoshanRealTimeAsrRequest huoshanRequest = new HuoshanRealTimeAsrRequest(request, property);
         CompletableFuture<String> future = new CompletableFuture();
-        Callbacks.TextSender sender = buildSender(future);
+        Callbacks.Sender sender = buildSender(future);
         HuoshanStreamAsrCallback callback = new HuoshanStreamAsrCallback(huoshanRequest, sender, processData, null, response -> {
             if(response.getResult() == null) {
                 return Lists.newArrayList();
@@ -81,12 +81,16 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
         private int endTime;
     }
 
-    private Callbacks.TextSender buildSender(CompletableFuture<String> future) {
-        return new Callbacks.TextSender() {
+    private Callbacks.Sender buildSender(CompletableFuture<String> future) {
+        return new Callbacks.Sender() {
             String text;
             @Override
             public void send(String text) {
                 this.text = text;
+            }
+
+            @Override
+            public void send(byte[] bytes) {
             }
 
             @Override

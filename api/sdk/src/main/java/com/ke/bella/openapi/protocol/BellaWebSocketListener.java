@@ -1,6 +1,7 @@
 package com.ke.bella.openapi.protocol;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 public class BellaWebSocketListener extends WebSocketListener {
     @Setter
     protected CompletableFuture<?> connectionInitFuture;
@@ -48,6 +50,11 @@ public class BellaWebSocketListener extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+        if(t != null) {
+            LOGGER.warn(t.getMessage(), t);
+        } else {
+            LOGGER.warn(response.message());
+        }
         callback.onFailure(webSocket, t, response);
     }
 

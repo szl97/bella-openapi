@@ -46,7 +46,7 @@ public class ASRWebsocketDemo {
 
     public static void main(String[] args) throws Exception {
         for(int i = 0; i < 10; i++) {
-            new Thread(() -> {
+            Thread thread = new Thread(() -> {
 
                 // 解析音频元数据
                 AudioFormat format;
@@ -202,7 +202,9 @@ public class ASRWebsocketDemo {
 
                 // 关闭OkHttp客户端
                 client.dispatcher().executorService().shutdown();
-            }).start();
+            });
+            thread.setDaemon(true);
+            thread.start();
         }
     }
 
