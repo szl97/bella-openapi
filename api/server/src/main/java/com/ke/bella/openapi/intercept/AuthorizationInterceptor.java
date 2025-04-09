@@ -35,21 +35,22 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
         if(Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
             return true;
         }
-        boolean hasPermission;
+        boolean hasPermission = false;
         String url = request.getRequestURI();
         Operator op = BellaContext.getOperatorIgnoreNull();
         if(op != null) {
             if(StringUtils.isNotBlank(op.getManagerAk())) {
                 String akCode = op.getManagerAk();
-                ApikeyInfo apikeyInfo = apikeyService.queryByCode(akCode, true);
+                ApikeyInfo apikeyInfo = apikeyService.verifyAuth(akCode);
                 if(apikeyInfo == null) {
-                    throw new ChannelException.AuthorizationException("console apikey不存在");
+                    throw new ChannelException.AuthorizationException("apikey不存在");
                 }
                 op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
                 op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
                 EndpointContext.setApikey(apikeyInfo);
                 hasPermission = apikeyInfo.hasPermission(url);
-            } else {
+            }
+            if(!hasPermission) {
                 List<String> roles = Lists.newArrayList(properties.getLoginRoles());
                 List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
                 op.getOptionalInfo().put("roles", roles);
@@ -62,7 +63,7 @@ public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
             if(StringUtils.isEmpty(auth)) {
                 throw new ChannelException.AuthorizationException("Authorization is empty");
             }
-            ApikeyInfo apikeyInfo = apikeyService.verifyAuthHeader(auth);
+            ApikeyInfo apikeyInfo = apikeyService.verifyAuth(auth);
             EndpointContext.setApikey(apikeyInfo);
             hasPermission = apikeyInfo.hasPermission(url);
         }

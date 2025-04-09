@@ -36,6 +36,13 @@ public class ApikeyRepo extends StatusRepo<ApikeyDB, ApikeyRecord, String> imple
                 .fetchOneInto(ApikeyInfo.class);
     }
 
+    public void updateRoleBySha(String sha, String roleCode) {
+        db.update(APIKEY)
+                .set(APIKEY.ROLE_CODE, roleCode)
+                .where(APIKEY.AK_SHA.eq(sha))
+                .execute();
+    }
+
     public List<ApikeyDB> listAccessKeys(ApikeyOps.ApikeyCondition op) {
         return constructSql(op).fetchInto(ApikeyDB.class);
     }

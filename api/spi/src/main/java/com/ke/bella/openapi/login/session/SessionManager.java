@@ -43,7 +43,7 @@ public class SessionManager {
     public String create(Operator sessionInfo, HttpServletRequest request, HttpServletResponse response) {
         // 如果配置了用户持久化，则进行持久化
         if (userRepo != null) {
-            userRepo.persist(sessionInfo);
+            sessionInfo = userRepo.persist(sessionInfo);
         }
         return createSession(sessionInfo, request, response);
     }

@@ -222,7 +222,7 @@ public class ApikeyService {
         apikeyRepo.updateStatus(op.getCode(), status);
     }
 
-    public ApikeyInfo verifyAuthHeader(String auth) {
+    public ApikeyInfo verifyAuth(String auth) {
         String ak;
         if(auth.startsWith("Bearer ")) {
             ak = auth.substring(7);

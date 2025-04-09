@@ -18,7 +18,7 @@ public interface BaseRepo {
     default void fillCreatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        com.ke.bella.openapi.Operator oper = BellaContext.getOperator();
+        com.ke.bella.openapi.Operator oper = BellaContext.getOperatorIgnoreNull();
         if(oper != null) {
             if(oper.getUserId() != null) {
                 op.setCuid(oper.getUserId());
@@ -34,7 +34,7 @@ public interface BaseRepo {
     default void fillUpdatorInfo(Object object) {
         Assert.isTrue(object instanceof Operator, "非法的操作类型");
         Operator op = (Operator) object;
-        com.ke.bella.openapi.Operator oper = BellaContext.getOperator();
+        com.ke.bella.openapi.Operator oper = BellaContext.getOperatorIgnoreNull();
         if(oper != null) {
             op.setMuid(oper.getUserId());
             op.setMuName(oper.getUserName());

@@ -21,6 +21,8 @@ public class EntityConstants {
     public static final String INNER = "inner";
     public static final String MAINLAND = "mainland";
     public static final String OVERSEAS = "overseas";
+    public static final String BASIC_ROLE = "low";
+    public static final String MANAGER_ROLE = "console";
     public static final List<String> DATA_DESTINATIONS = ImmutableList.of(PROTECTED, INNER, MAINLAND, OVERSEAS);
     public static final String HIGH = "high";
     public static final String NORMAL = "normal";
@@ -32,6 +34,7 @@ public class EntityConstants {
     public static final String SYSTEM = "system";
     public static final String ORG = "org";
     public static final String PERSON = "person";
+    public static final String CONSOLE = "console";
     public static final List<String> OWNER_TYPES = ImmutableList.of(SYSTEM, ORG, PERSON);
     public static final List<String> AUTHORIZER_TYPES = ImmutableList.of(ORG, PERSON);
 

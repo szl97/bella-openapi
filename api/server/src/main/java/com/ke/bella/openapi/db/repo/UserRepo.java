@@ -2,8 +2,11 @@ package com.ke.bella.openapi.db.repo;
 
 import static com.ke.bella.openapi.Tables.USER;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.UUID;
 
+import com.ke.bella.openapi.tables.pojos.ApikeyDB;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +21,7 @@ import com.ke.bella.openapi.tables.pojos.UserDB;
 import com.ke.bella.openapi.tables.records.UserRecord;
 import com.ke.bella.openapi.utils.EncryptUtils;
 import com.ke.bella.openapi.utils.JacksonUtils;
+import org.springframework.util.Assert;
 
 @Component
 public class UserRepo implements IUserRepo {
@@ -41,10 +45,15 @@ public class UserRepo implements IUserRepo {
 
         if (existingUser != null) {
             // 用数据库中的值替换实体中的值
-            operator.setManagerAk(existingUser.getManagerAk());
             if (operator.getUserId() == null || operator.getUserId() <= 0) {
                 operator.setUserId(existingUser.getId());
             }
+            if(StringUtils.isBlank(existingUser.getManagerAk())) {
+                String ak = generateAk(operator);
+                existingUser.setManagerAk(ak);
+                existingUser.store();
+            }
+            operator.setManagerAk(existingUser.getManagerAk());
             return operator;
         }
 
@@ -54,7 +63,6 @@ public class UserRepo implements IUserRepo {
         newUser.setEmail(operator.getEmail());
         newUser.setSource(operator.getSource());
         newUser.setSourceId(operator.getSourceId());
-        newUser.setManagerAk(operator.getManagerAk());
         newUser.setOptionalInfo(JacksonUtils.serialize(operator.getOptionalInfo()));
 
         newUser.store();
@@ -63,7 +71,13 @@ public class UserRepo implements IUserRepo {
         if (operator.getUserId() == null || operator.getUserId() <= 0) {
             operator.setUserId(newUser.getId());
         }
-        
+
+        //生成playground ak
+        newUser.setManagerAk(generateAk(operator));
+        newUser.store();
+
+        operator.setManagerAk(newUser.getManagerAk());
+
         return operator;
     }
 
@@ -77,34 +91,55 @@ public class UserRepo implements IUserRepo {
         return Operator.builder()
                 .userId(StringUtils.isNumeric(apikeyInfo.getOwnerCode()) ? Long.parseLong(apikeyInfo.getOwnerCode()) : 0L)
                 .userName(apikeyInfo.getOwnerName())
-                .managerAk(apikeyInfo.getCode())
+                .managerAk(secret)
                 .optionalInfo(new HashMap<>())
                 .sourceId(apikeyInfo.getOwnerCode())
                 .source("secret")
                 .build();
     }
 
-    public UserDB addManagerById(Long id, String managerAk) {
-        dsl.update(USER)
-                .set(USER.MANAGER_AK, managerAk)
-                .where(USER.ID.eq(id))
-                .execute();
-        return dsl.selectFrom(USER).where(USER.ID.eq(id)).fetchOneInto(UserDB.class);
+    public UserDB addManagerById(Long id) {
+        UserDB user = dsl.selectFrom(USER).where(USER.ID.eq(id)).fetchOneInto(UserDB.class);
+        updateApikeyRoles(user.getManagerAk());
+        return user;
     }
 
-    public UserDB addManagerBySourceAndSourceId(String source, String sourceId, String managerAk) {
-        dsl.update(USER)
-                .set(USER.MANAGER_AK, managerAk)
-                .where(USER.SOURCE_ID.eq(sourceId).and(USER.SOURCE.eq(source)))
-                .execute();
-        return dsl.selectFrom(USER).where(USER.SOURCE_ID.eq(sourceId).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
+    public UserDB addManagerBySourceAndSourceId(String source, String sourceId) {
+        UserDB user = dsl.selectFrom(USER).where(USER.SOURCE_ID.eq(sourceId).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
+        updateApikeyRoles(user.getManagerAk());
+        return user;
     }
 
-    public UserDB addManagerBySourceAndEmail(String source, String email, String managerAk) {
-        dsl.update(USER)
-                .set(USER.MANAGER_AK, managerAk)
-                .where(USER.EMAIL.eq(email).and(USER.SOURCE.eq(source)))
-                .execute();
-        return dsl.selectFrom(USER).where(USER.EMAIL.eq(email).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
+    public UserDB addManagerBySourceAndEmail(String source, String email) {
+        UserDB user = dsl.selectFrom(USER).where(USER.EMAIL.eq(email).and(USER.SOURCE.eq(source))).fetchOneInto(UserDB.class);
+        updateApikeyRoles(user.getManagerAk());
+        return user;
+    }
+
+    private String generateAk(Operator op) {
+        String ak = UUID.randomUUID().toString();
+        String sha = EncryptUtils.sha256(ak);
+        String display = EncryptUtils.desensitize(ak);
+        ApikeyDB db = new ApikeyDB();
+        db.setAkSha(sha);
+        db.setAkDisplay(display);
+        db.setOwnerType(EntityConstants.CONSOLE);
+        db.setOwnerCode(op.getUserId().toString());
+        db.setOwnerName(op.getUserName());
+        db.setRoleCode(EntityConstants.BASIC_ROLE);
+        db.setSafetyLevel(EntityConstants.HIGHEST_SAFETY_LEVEL);
+        db.setMonthQuota(BigDecimal.valueOf(20));
+        db.setName("控制台AK");
+        db.setCuid(0L);
+        db.setCuName(EntityConstants.SYSTEM);
+        db.setMuid(0L);
+        db.setMuName(EntityConstants.SYSTEM);
+        apikeyRepo.insert(db);
+        return ak;
+    }
+
+    private void updateApikeyRoles(String apikey) {
+        String sha = EncryptUtils.sha256(apikey);
+        apikeyRepo.updateRoleBySha(sha, EntityConstants.MANAGER_ROLE);
     }
 }
