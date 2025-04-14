@@ -3,6 +3,7 @@ package com.ke.bella.openapi.protocol.realtime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ke.bella.openapi.protocol.OpenapiResponse;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

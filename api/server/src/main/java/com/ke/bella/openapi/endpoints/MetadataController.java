@@ -14,6 +14,7 @@ import com.ke.bella.openapi.metadata.EndpointCategoryTree;
 import com.ke.bella.openapi.metadata.EndpointDetails;
 import com.ke.bella.openapi.metadata.MetaDataOps;
 import com.ke.bella.openapi.metadata.Model;
+import com.ke.bella.openapi.protocol.tts.VoiceProperties;
 import com.ke.bella.openapi.service.CategoryService;
 import com.ke.bella.openapi.service.ChannelService;
 import com.ke.bella.openapi.service.EndpointService;
@@ -22,10 +23,13 @@ import com.ke.bella.openapi.tables.pojos.CategoryDB;
 import com.ke.bella.openapi.tables.pojos.ChannelDB;
 import com.ke.bella.openapi.tables.pojos.EndpointDB;
 import com.ke.bella.openapi.tables.pojos.ModelDB;
+import com.ke.bella.openapi.utils.JacksonUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -205,6 +209,30 @@ public class MetadataController {
         checkChannel(op.getChannelCode());
         channelService.changeStatus(op.getChannelCode(), false);
         return true;
+    }
+
+    @GetMapping("/property/voice")
+    public VoiceProperties fetchVoiceProperty(Condition.ChannelCondition condition) {
+        String model = condition.getEntityCode();
+        if(EntityConstants.ENDPOINT.equals(condition.getEntityType())) {
+            model = null;
+            List<ChannelDB> channels = channelService.listActives(condition.getEntityType(), condition.getEntityCode());
+            if(CollectionUtils.isEmpty(channels)) {
+                return null;
+            }
+            Map<String, Object> channelInfos = JacksonUtils.toMap(channels.get(0).getChannelInfo());
+            if(MapUtils.isNotEmpty(channelInfos) && channelInfos.containsKey("modelName")) {
+               model = channelInfos.get("modelName").toString();
+            }
+        }
+        if(model == null) {
+            return null;
+        }
+        ModelDB modelDB = modelService.getOne(model);
+        if(modelDB == null) {
+            return null;
+        }
+        return JacksonUtils.deserialize(modelDB.getProperties(), VoiceProperties.class);
     }
 
     private void checkChannel(String channelCode) {

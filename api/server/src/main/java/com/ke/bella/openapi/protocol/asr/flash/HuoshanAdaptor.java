@@ -1,5 +1,6 @@
 package com.ke.bella.openapi.protocol.asr.flash;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
     @Override
     public FlashAsrResponse asr(AsrRequest request, String url, HuoshanProperty property, EndpointProcessData processData) {
         HuoshanRealTimeAsrRequest huoshanRequest = new HuoshanRealTimeAsrRequest(request, property);
-        CompletableFuture<String> future = new CompletableFuture();
+        CompletableFuture<List<String>> future = new CompletableFuture();
         Callbacks.Sender sender = buildSender(future);
         HuoshanStreamAsrCallback callback = new HuoshanStreamAsrCallback(huoshanRequest, sender, processData, null, response -> {
             if(response.getResult() == null) {
@@ -81,12 +82,12 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
         private int endTime;
     }
 
-    private Callbacks.Sender buildSender(CompletableFuture<String> future) {
+    private Callbacks.Sender buildSender(CompletableFuture<List<String>> future) {
         return new Callbacks.Sender() {
-            String text;
+            final List<String> texts = new ArrayList<>();
             @Override
             public void send(String text) {
-                this.text = text;
+                texts.add(text);
             }
 
             @Override
@@ -101,27 +102,31 @@ public class HuoshanAdaptor implements FlashAsrAdaptor<HuoshanProperty> {
             @Override
             public void close() {
                 if(!future.isDone()) {
-                    future.complete(text);
+                    future.complete(texts);
                 }
             }
         };
     }
 
-    private FlashAsrResponse responseConverter(CompletableFuture<String> future, EndpointProcessData processData) {
+    private FlashAsrResponse responseConverter(CompletableFuture<List<String>> future, EndpointProcessData processData) {
         try {
-            String text = future.get();
-            Text obj = JacksonUtils.deserialize(text, Text.class);
-            return FlashAsrResponse.builder()
+            List<String> texts = future.get();
+            FlashAsrResponse response = FlashAsrResponse.builder()
                     .taskId(processData.getChannelRequestId())
                     .flashResult(FlashAsrResponse.FlashResult.builder()
                             .duration(Integer.parseInt(processData.getMetrics().get("ttlt").toString()))
-                            .sentences(Lists.newArrayList(FlashAsrResponse.Sentence.builder()
-                                            .beginTime(obj.getBeginTime())
-                                            .endTime(obj.getEndTime())
-                                            .text(obj.getText()).build()))
+                            .sentences(new ArrayList<>())
                             .build())
                     .user(processData.getUser())
                     .build();
+            for(String text : texts) {
+                Text obj = JacksonUtils.deserialize(text, Text.class);
+                response.getFlashResult().getSentences().add(FlashAsrResponse.Sentence.builder()
+                        .beginTime(obj.getBeginTime())
+                        .endTime(obj.getEndTime())
+                        .text(obj.getText()).build());
+            }
+            return response;
         } catch (Exception e) {
             throw ChannelException.fromException(e);
         }

@@ -65,7 +65,7 @@ public class TypeSchema implements Serializable {
             } else if(fieldType.isArray()) {
                 // 数组类型
                 schema.setValueType("array");
-                if(fieldType.getComponentType().isAssignableFrom(IDescription.class)) {
+                if(IDescription.class.isAssignableFrom(fieldType.getComponentType())) {
                     schema.setChild(JsonSchema.toSchema(fieldType.getComponentType()));
                 }
             } else if(Map.class.isAssignableFrom(fieldType)) {

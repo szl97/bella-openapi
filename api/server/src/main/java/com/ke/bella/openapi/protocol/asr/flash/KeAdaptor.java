@@ -4,7 +4,6 @@ import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.common.AudioFormat;
 import com.ke.bella.openapi.protocol.asr.AsrProperty;
 import com.ke.bella.openapi.protocol.asr.AsrRequest;
-import com.ke.bella.openapi.utils.FileUtils;
 import com.ke.bella.openapi.utils.HttpUtils;
 import okhttp3.MediaType;
 import okhttp3.Request;

@@ -1,6 +1,6 @@
 package com.ke.bella.openapi.protocol.realtime;
 
-import com.ke.bella.openapi.EndpointContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import com.ke.bella.openapi.EndpointProcessData;
@@ -16,14 +16,32 @@ import okhttp3.WebSocket;
 import okio.ByteString;
 
 @Component("KeRealtime")
-public class KeAdaptor implements RealTimeAdaptor<AsrProperty> {
+public class KeAdaptor implements RealTimeAdaptor<RealtimeProperty> {
 
     @Override
-    public WebSocket startTranscription(String url, AsrProperty property, RealTimeMessage request, Callbacks.WebSocketCallback callback) {
+    public WebSocket startTranscription(String url, RealtimeProperty property, RealTimeMessage request, Callbacks.WebSocketCallback callback) {
         Request.Builder builder = new Request.Builder()
                 .url(url)
                 .header("Authorization", request.getApikey());
         WebSocket webSocket = HttpUtils.websocketRequest(builder.build(), new BellaWebSocketListener(callback));
+        if(request.getPayload() != null) {
+            if(property.getTtsOption() != null) {
+                if(request.getPayload().getTtsOption() == null) {
+                    request.getPayload().setTtsOption(property.getTtsOption());
+                } else if(request.getPayload().getTtsOption().getModel() == null) {
+                    request.getPayload().getTtsOption().setModel(property.getTtsOption().getModel());
+                }
+            }
+            if(property.getLlmOption() != null && property.getLlmOption().getMain() != null) {
+                if(request.getPayload().getLlmOption() == null) {
+                    request.getPayload().setLlmOption(property.getLlmOption());
+                } else if(request.getPayload().getLlmOption().getMain() == null) {
+                    request.getPayload().getLlmOption().setMain(property.getLlmOption().getMain());
+                } else if(request.getPayload().getLlmOption().getMain().getModel() == null) {
+                    request.getPayload().getLlmOption().getMain().setModel(property.getLlmOption().getMain().getModel());
+                }
+            }
+        }
         webSocket.send(JacksonUtils.serialize(request));
         callback.started();
         return webSocket;
@@ -46,7 +64,7 @@ public class KeAdaptor implements RealTimeAdaptor<AsrProperty> {
 
     @Override
     public Callbacks.WebSocketCallback createCallback(Callbacks.Sender sender, EndpointProcessData processData, EndpointLogger logger,
-            String taskId, RealTimeMessage request, AsrProperty property) {
+            String taskId, RealTimeMessage request, RealtimeProperty property) {
         return new KeRealtimeCallback(sender, processData, logger, taskId);
     }
 
@@ -56,7 +74,7 @@ public class KeAdaptor implements RealTimeAdaptor<AsrProperty> {
     }
 
     @Override
-    public Class<AsrProperty> getPropertyClass() {
-        return AsrProperty.class;
+    public Class<RealtimeProperty> getPropertyClass() {
+        return RealtimeProperty.class;
     }
 }

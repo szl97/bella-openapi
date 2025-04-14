@@ -67,7 +67,6 @@ export const renderField = (schema: TypeSchema, value: any, onChange: (path: str
         case 'array':
             return (
                 <div>
-                    <Label htmlFor={path} className="mb-2 block">{schema.name}</Label>
                     <Textarea
                         {...commonProps}
                         value={Array.isArray(value) ? value.join(', ') : ''}
@@ -83,7 +82,6 @@ export const renderField = (schema: TypeSchema, value: any, onChange: (path: str
                     <CardContent className="p-4">
                         {schema.child?.params.map((param, index) => (
                             <div key={param.code} className={index !== 0 ? "mt-4" : ""}>
-                                <Label className="text-sm font-medium text-gray-700 mb-1">{param.name}</Label>
                                 {renderField(
                                     param,
                                     value?.[param.code],
@@ -101,7 +99,6 @@ export const renderField = (schema: TypeSchema, value: any, onChange: (path: str
         case 'map':
             return (
                 <div>
-                    <Label htmlFor={path} className="mb-2 block">{schema.name}</Label>
                     <Textarea
                         {...commonProps}
                         value={value ? JSON.stringify(value, null, 2) : ''}

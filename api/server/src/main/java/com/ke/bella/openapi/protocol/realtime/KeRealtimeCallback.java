@@ -127,6 +127,7 @@ public class KeRealtimeCallback implements Callbacks.WebSocketCallback {
             Thread.currentThread().interrupt();
             throw ChannelException.fromException(e);
         } catch (ExecutionException | TimeoutException e) {
+            LOGGER.warn(e.getMessage(), e);
             throw ChannelException.fromException(e);
         }
     }

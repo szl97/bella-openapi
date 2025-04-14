@@ -6,7 +6,6 @@ import com.ke.bella.openapi.EndpointContext;
 import com.ke.bella.openapi.Operator;
 import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.exception.ChannelException;
-import com.ke.bella.openapi.configuration.OpenApiProperties;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,37 +26,25 @@ import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_RE
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private ApikeyService apikeyService;
-    @Autowired
-    private OpenApiProperties properties;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if(Boolean.TRUE.equals(request.getAttribute(ASYNC_REQUEST_MARKER))) {
             return true;
         }
-        boolean hasPermission = false;
+        boolean hasPermission;
         String url = request.getRequestURI();
         Operator op = BellaContext.getOperatorIgnoreNull();
         if(op != null) {
-            if(StringUtils.isNotBlank(op.getManagerAk())) {
-                String akCode = op.getManagerAk();
-                ApikeyInfo apikeyInfo = apikeyService.verifyAuth(akCode);
-                if(apikeyInfo == null) {
-                    throw new ChannelException.AuthorizationException("apikey不存在");
-                }
-                op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
-                op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
-                EndpointContext.setApikey(apikeyInfo);
-                hasPermission = apikeyInfo.hasPermission(url);
+            String apikey = op.getManagerAk();
+            ApikeyInfo apikeyInfo = apikeyService.verifyAuth(apikey);
+            if(apikeyInfo == null) {
+                throw new ChannelException.AuthorizationException("apikey不存在");
             }
-            if(!hasPermission) {
-                List<String> roles = Lists.newArrayList(properties.getLoginRoles());
-                List<String> excludes = Lists.newArrayList(properties.getLoginExcludes());
-                op.getOptionalInfo().put("roles", roles);
-                op.getOptionalInfo().put("excludes", excludes);
-                hasPermission = roles.stream().anyMatch(role -> MatchUtils.matchUrl(role, url))
-                        && excludes.stream().noneMatch(exclude -> MatchUtils.matchUrl(exclude, url));
-            }
+            op.getOptionalInfo().put("roles", apikeyInfo.getRolePath().getIncluded());
+            op.getOptionalInfo().put("excludes", apikeyInfo.getRolePath().getExcluded());
+            EndpointContext.setApikey(apikeyInfo);
+            hasPermission = apikeyInfo.hasPermission(url);
         } else {
             String auth = request.getHeader(HttpHeaders.AUTHORIZATION);
             if(StringUtils.isEmpty(auth)) {

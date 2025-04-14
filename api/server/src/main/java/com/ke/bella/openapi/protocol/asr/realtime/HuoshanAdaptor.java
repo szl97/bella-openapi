@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.ke.bella.openapi.protocol.realtime.RealTimeMessage;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import com.ke.bella.openapi.EndpointProcessData;
@@ -86,19 +87,19 @@ public class HuoshanAdaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
         @Override
         public List<String> apply(HuoshanRealTimeAsrResponse response) {
             List<String> result = new ArrayList<>();
-            if(sentenceStart) {
-                index++;
-                RealTimeMessage.Payload payload = new RealTimeMessage.Payload();
-                payload.setIndex(index);
-                payload.setTime(response.getAddition() != null ? response.getAddition().getDuration() : 0);
-                RealTimeMessage start = RealTimeMessage.sentenceBegin(taskId, payload);
-                result.add(JacksonUtils.serialize(start));
-                sentenceStart = false;
-            }
             if(response.getResult() != null) {
                 for(HuoshanRealTimeAsrResponse.Result tempResult : response.getResult()) {
-                    if(tempResult.getUtterances() == null) {
+                    if(CollectionUtils.isEmpty(tempResult.getUtterances())) {
                         continue;
+                    }
+                    if(sentenceStart) {
+                        index++;
+                        RealTimeMessage.Payload payload = new RealTimeMessage.Payload();
+                        payload.setIndex(index);
+                        payload.setTime(response.getAddition() != null ? response.getAddition().getDuration() : 0);
+                        RealTimeMessage start = RealTimeMessage.sentenceBegin(taskId, payload);
+                        result.add(JacksonUtils.serialize(start));
+                        sentenceStart = false;
                     }
                     for(HuoshanRealTimeAsrResponse.Result huoshanResult : tempResult.getUtterances()) {
                         RealTimeMessage.Payload payload = new RealTimeMessage.Payload();
@@ -127,6 +128,10 @@ public class HuoshanAdaptor implements RealTimeAsrAdaptor<HuoshanProperty> {
                 result.add(JacksonUtils.serialize(completion));
             }
             return result;
+        }
+
+        private void addMessage(String msg) {
+
         }
     }
 }

@@ -56,11 +56,13 @@ public class RealTimeHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         try {
             String payload = message.getPayload();
-            
+            if(payload.equals("ping")) {
+                session.sendMessage(new TextMessage("pong"));
+                return;
+            }
             // 先解析基本消息结构，获取消息类型
             RealTimeMessage realTimeMessage = JacksonUtils.deserialize(payload, RealTimeMessage.class);
             if (realTimeMessage == null || realTimeMessage.getHeader() == null || realTimeMessage.getHeader().getName() == null) {
-                sendErrorResponse(session, 40000000,"无效的请求格式");
                 return;
             }
 

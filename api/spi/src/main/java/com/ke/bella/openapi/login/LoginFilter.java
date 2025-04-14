@@ -31,6 +31,7 @@ public class LoginFilter implements Filter {
     private final LoginProperties properties;
     private final SessionManager sessionManager;
     private static final String REDIRECT_HEADER = "X-Redirect-Login";
+    private static final String CONSOLE_HEADER = "X-BELLA_CONSOLE";
 
     public LoginFilter(LoginProperties properties, SessionManager sessionManager) {
         this.properties = properties;
@@ -111,8 +112,12 @@ public class LoginFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             }
-            httpResponse.setHeader(REDIRECT_HEADER, properties.getLoginPageUrl() + "?" + redirectParameter + "=");
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if("true".equals(httpRequest.getHeader(CONSOLE_HEADER))) {
+                httpResponse.setHeader(REDIRECT_HEADER, properties.getLoginPageUrl() + "?" + redirectParameter + "=");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            chain.doFilter(request, response);
         } finally {
             BellaContext.clearAll();
             sessionManager.renew(httpRequest);

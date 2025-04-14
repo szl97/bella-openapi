@@ -75,3 +75,5 @@ redis/data/
 
 system-apikey.txt
 
+
+node_modules/

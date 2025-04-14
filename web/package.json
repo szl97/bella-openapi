@@ -26,11 +26,13 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@tanstack/react-table": "^8.20.5",
+    "@types/uuid": "^10.0.0",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "eventsource-parser": "^3.0.1",
     "lucide-react": "^0.441.0",
     "next": "14.2.11",
     "next-themes": "^0.3.0",
@@ -40,7 +42,8 @@
     "react-hook-form": "^7.53.0",
     "recharts": "^2.14.1",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",

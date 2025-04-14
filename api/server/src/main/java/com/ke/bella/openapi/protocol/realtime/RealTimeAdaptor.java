@@ -2,9 +2,9 @@ package com.ke.bella.openapi.protocol.realtime;
 
 import com.ke.bella.openapi.EndpointProcessData;
 import com.ke.bella.openapi.protocol.Callbacks;
+import com.ke.bella.openapi.protocol.Callbacks.WebSocketCallback;
 import com.ke.bella.openapi.protocol.IProtocolAdaptor;
 import com.ke.bella.openapi.protocol.asr.AsrProperty;
-import com.ke.bella.openapi.protocol.Callbacks.WebSocketCallback;
 import com.ke.bella.openapi.protocol.log.EndpointLogger;
 import okhttp3.WebSocket;
 

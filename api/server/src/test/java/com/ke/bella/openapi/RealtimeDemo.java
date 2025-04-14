@@ -216,14 +216,12 @@ public class RealtimeDemo {
         //llm
         RealTimeMessage.LlmOption llmOption = new RealTimeMessage.LlmOption();
         RealTimeMessage.MainLlmOption mainLlmOption = new RealTimeMessage.MainLlmOption();
-        mainLlmOption.setModel("ali-qwen25-72b-base-v1-chat-20250311");
-        mainLlmOption.setPrompt("你是一个全能的语音助理，你的回复会转成音频给用户，所以请尽可能简洁的回复，同时首句话尽快结束以便更好的进行流式合成语音。");
+        mainLlmOption.setSysPrompt("你是一个全能的语音助理，你的回复会转成音频给用户，所以请尽可能简洁的回复，同时首句话尽快结束以便更好的进行流式合成语音。");
         llmOption.setMain(mainLlmOption);
         payload.setLlmOption(llmOption);
 
         //tts
         RealTimeMessage.TtsOption ttsOption = new RealTimeMessage.TtsOption();
-        ttsOption.setModel("Chat-TTS");
         ttsOption.setSampleRate(24000);
         ttsOption.setVoice("28");
         payload.setTtsOption(ttsOption);

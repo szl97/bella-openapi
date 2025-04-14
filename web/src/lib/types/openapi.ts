@@ -159,3 +159,8 @@ export interface MonitorData {
     channel_code: string;
     metrics: Record<string, number>;
 }
+
+export interface VoiceProperties {
+    voiceTypes: Record<string, string>;
+}
+

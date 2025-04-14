@@ -155,6 +155,9 @@ public class ChannelService {
 
     @Cached(name = channelCacheKey, key = "#entityType + ':' + #entityCode")
     public List<ChannelDB> listActives(String entityType, String entityCode) {
+        if(entityType == null || entityCode == null) {
+            return null;
+        }
         return listActivesWithDb(entityType, entityCode);
     }
 

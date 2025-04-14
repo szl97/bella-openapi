@@ -6,7 +6,7 @@ import {
     JsonSchema,
     Category,
     CategoryTree,
-    Endpoint
+    Endpoint, VoiceProperties
 } from '@/lib/types/openapi';
 import { openapi } from '@/lib/api/openapi';
 
@@ -33,6 +33,13 @@ export async function getAllCategoryTrees(): Promise<CategoryTree[]> {
 export async function getEndpointDetails(endpoint: string, modelName: string, features: string[]): Promise<EndpointDetails> {
     const response = await openapi.get<EndpointDetails>('/v1/meta/endpoint/details', {
         params: { endpoint, modelName, features: features.join(',') },
+    });
+    return response.data;
+}
+
+export async function getVoiceProperties(entityType: string, entityCode: string): Promise<VoiceProperties> {
+    const response = await openapi.get<VoiceProperties>('/v1/meta/property/voice', {
+        params: {entityType, entityCode},
     });
     return response.data;
 }

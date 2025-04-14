@@ -152,6 +152,14 @@ export class AntPathMatcher {
 
     private static matchStrings(pattern: string, str: string, uriTemplateVariables: Map<string, string> | null): boolean {
         // Implement string matching
-        return pattern === str; // Simplified for this example
+        for(let i = 0; i < pattern.length; i++) {
+            if(pattern.charAt(i) === '*') {
+                continue;
+            }
+            if (pattern.charAt(i) !== str.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

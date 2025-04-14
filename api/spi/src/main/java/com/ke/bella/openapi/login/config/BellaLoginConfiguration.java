@@ -149,8 +149,6 @@ public class BellaLoginConfiguration {
         FilterRegistrationBean<OAuthLoginFilter> registration = new FilterRegistrationBean<>();
         OAuthLoginFilter filter = new OAuthLoginFilter(services, sessionManager, properties);
         registration.setFilter(filter);
-        registration.setUrlPatterns(loginProperties.getValidationUrlPatterns());
-        registration.addUrlPatterns("/openapi/oauth/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 51);
         return registration;
     }
@@ -159,9 +157,7 @@ public class BellaLoginConfiguration {
     public FilterRegistrationBean<LoginFilter> loginFilter(LoginProperties properties, SessionManager sessionManager) {
         FilterRegistrationBean<LoginFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new LoginFilter(properties, sessionManager));
-        registration.setUrlPatterns(properties.getValidationUrlPatterns());
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
-        registration.addUrlPatterns("/openapi/*");
         return registration;
     }
 }

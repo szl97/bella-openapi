@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ke.bella.openapi.EndpointContext;
@@ -71,7 +72,7 @@ public class AudioController {
      * 实时语音识别WebSocket接口
      */
     @RequestMapping({"/realtime", "/asr/stream"})
-    public void asrStream(@RequestHeader(value = "model", required = false) String model, HttpServletRequest request, HttpServletResponse response)
+    public void asrStream(@RequestParam(required = false) String model, HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if(!"websocket".equalsIgnoreCase(request.getHeader("Upgrade"))) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

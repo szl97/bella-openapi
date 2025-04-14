@@ -7,4 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 public class TtsProperty {
     String encodingType = StringUtils.EMPTY;
     String defaultContentType = "wav";
+    String defaultVoice;
+    Integer defaultSampleRate;
 }

@@ -175,7 +175,7 @@ public class MetadataValidator {
         Assert.isTrue(StringUtils.isNotBlank(op.getPriority())
                 || StringUtils.isNotBlank(op.getChannelInfo())
                 || StringUtils.isNotBlank(op.getPriceInfo()), "可修改字段全部为空，无法修改");
-        if(StringUtils.isNotEmpty(op.getPriority())) {
+        if(op.getPriority() != null) {
             Assert.isTrue(CHANNEL_PRIORITY.contains(op.getPriority()),
                     "通道的优先级只能是：" + String.join("或", CHANNEL_PRIORITY));
         }
@@ -186,7 +186,7 @@ public class MetadataValidator {
 
     private static void checkJsonInfo(String info) {
         //只检查是否是json，其他信息在service中根据类型判断
-        if(StringUtils.isNotEmpty(info)) {
+        if(info != null) {
             Map<String, Object> map = json2Map(info);
             Assert.isTrue(map == null || !map.isEmpty(), "信息非json格式");
         }

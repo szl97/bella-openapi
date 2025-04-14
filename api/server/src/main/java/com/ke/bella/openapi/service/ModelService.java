@@ -137,14 +137,14 @@ public class ModelService {
     }
 
     private void checkPropertyAndFeatures(String properties, String features, Set<String> endpoints, String model) {
-        if(StringUtils.isEmpty(properties) && StringUtils.isEmpty(features)) {
+        if(properties == null  && features == null) {
             return;
         }
         List<String> basisEndpoints = getAllBasicEndpoints(endpoints, model);
-        if(StringUtils.isNotEmpty(properties)) {
+        if(properties != null) {
             checkJson(properties, "properties", basisEndpoints);
         }
-        if(StringUtils.isNotEmpty(features)) {
+        if(features != null) {
             checkJson(features, "features", basisEndpoints);
         }
     }

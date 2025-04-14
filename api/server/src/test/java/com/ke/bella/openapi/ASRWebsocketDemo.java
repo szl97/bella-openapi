@@ -27,13 +27,13 @@ public class ASRWebsocketDemo {
     private static final Logger logger = Logger.getLogger(ASRWebsocketDemo.class);
 
     // 替换为您的API Token
-    private static final String TOKEN = "Bearer ********";
+    private static final String TOKEN = "Bearer *************";
 
     // 替换为您的modelName
-    private static final String MODEL = "huoshan-realtime-asr";
+    private static final String MODEL = "";
     
     // WebSocket服务器地址
-    private static final String WEBSOCKET_URL = "ws://localhost:8080/v1/audio/asr/stream";
+    private static final String WEBSOCKET_URL = "ws://localhost:8080/v1/audio/asr/stream?model=" + MODEL;
 
     // 替换为您的音频文件路径
     private static final String AUDIO_FILE_PATH = "test.wav";
@@ -45,7 +45,7 @@ public class ASRWebsocketDemo {
     private static boolean isRunning = false;
 
     public static void main(String[] args) throws Exception {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 1; i++) {
             Thread thread = new Thread(() -> {
 
                 // 解析音频元数据
@@ -62,7 +62,6 @@ public class ASRWebsocketDemo {
                 // 设置WebSocket请求
                 Request request = new Request.Builder()
                         .url(WEBSOCKET_URL)
-                        .header("model", MODEL)
                         .header("Authorization", TOKEN)
                         .build();
 
@@ -193,19 +192,13 @@ public class ASRWebsocketDemo {
                     }
                 });
 
-                // 等待任务完成
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    logger.error("等待中断: " + e.getMessage());
-                }
-
                 // 关闭OkHttp客户端
                 client.dispatcher().executorService().shutdown();
             });
             thread.setDaemon(true);
             thread.start();
         }
+        latch.await();
     }
 
     /**

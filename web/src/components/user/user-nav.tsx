@@ -58,8 +58,8 @@ export function UserNav({ user }: UserNavProps) {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Link href="/apikey" className="w-full text-sm">
-                        API Key管理
+                    <Link href="/playground" className="w-full text-sm">
+                        Playground
                     </Link>
                 </DropdownMenuItem>
                 {hasPermission(user, '/console/model/**') && (
