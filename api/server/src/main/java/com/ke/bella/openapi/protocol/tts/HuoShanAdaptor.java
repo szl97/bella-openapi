@@ -62,7 +62,7 @@ public class HuoShanAdaptor implements TtsAdaptor<HuoShanProperty> {
                 .build();
 
         HuoShanRequest.User user = HuoShanRequest.User.builder()
-                .uid("ke_uid") //ttsRequest.getUser() 这个字段是否可以给厂商
+                .uid("uid")
                 .build();
 
         HuoShanRequest.Audio audio = HuoShanRequest.Audio.builder()
