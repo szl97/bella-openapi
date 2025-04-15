@@ -93,7 +93,7 @@ public class KeRealtimeCallback implements Callbacks.WebSocketCallback {
             break;
 
         case UNKNOWN:
-            LOGGER.warn("收到未知事件类型: {}, text:{}", eventName, text);
+            LOGGER.warn("收到未知事件类型: {}", eventName);
             break;
         }
     }
