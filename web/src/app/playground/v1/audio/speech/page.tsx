@@ -85,6 +85,7 @@ export default function SpeechPlayground() {
         input: inputText,
         stream: true,
         voice: voiceTypes[voiceName],
+        sample_rate: 24000,
         response_format: "pcm"
       };
 

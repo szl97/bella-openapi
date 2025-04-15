@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.ke.bella.openapi.common.EntityConstants.ACTIVE;
+import static com.ke.bella.openapi.common.EntityConstants.CONSOLE;
 import static com.ke.bella.openapi.common.EntityConstants.INACTIVE;
 import static com.ke.bella.openapi.common.EntityConstants.ORG;
 import static com.ke.bella.openapi.common.EntityConstants.PERSON;
@@ -302,7 +303,7 @@ public class ApikeyService {
         ApikeyInfo apikeyInfo = EndpointContext.getApikeyIgnoreNull();
         if(apikeyInfo == null) {
             Operator op = BellaContext.getOperator();
-            Assert.isTrue(db.getOwnerType().equals(PERSON) && db.getOwnerCode().equals(op.getUserId().toString()),
+            Assert.isTrue((db.getOwnerType().equals(PERSON) || db.getOwnerType().equals(CONSOLE)) && db.getOwnerCode().equals(op.getUserId().toString()),
                     "没有操作权限");
             return;
         }
@@ -314,11 +315,10 @@ public class ApikeyService {
         if(db.getOwnerType().equals(SYSTEM)) {
             throw new ChannelException.AuthorizationException("没有操作权限");
         }
-        if(db.getOwnerType().equals(PERSON)) {
-            validateUserPermission(apikeyInfo, db.getOwnerCode());
-        }
         if(db.getOwnerType().equals(ORG)) {
             validateOrgPermission(apikeyInfo, Sets.newHashSet(db.getOwnerCode()), orgCodes);
+        } else {
+            validateUserPermission(apikeyInfo, db.getOwnerCode());
         }
     }
 
@@ -360,7 +360,7 @@ public class ApikeyService {
     }
 
     private void validateUserPermission(ApikeyInfo apikeyInfo, String personalCode) {
-        if(apikeyInfo.getOwnerType().equals(SYSTEM) || (apikeyInfo.getOwnerType().equals(PERSON) && personalCode.equals(apikeyInfo.getOwnerCode()))) {
+        if(apikeyInfo.getOwnerType().equals(SYSTEM) || ((apikeyInfo.getOwnerType().equals(PERSON) || apikeyInfo.getOwnerType().equals(CONSOLE)) && personalCode.equals(apikeyInfo.getOwnerCode()))) {
             return;
         }
         throw new ChannelException.AuthorizationException("没有操作权限");
