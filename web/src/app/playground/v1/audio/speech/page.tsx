@@ -35,6 +35,7 @@ export default function SpeechPlayground() {
   // Refs
   const pcmPlayerRef = useRef<PCMPlayer | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const playbackCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 初始化 PCM 播放器
   useEffect(() => {
@@ -55,6 +56,10 @@ export default function SpeechPlayground() {
 
   // 播放语音
   const playTTS = async () => {
+    if (playbackCheckIntervalRef.current) {
+      clearInterval(playbackCheckIntervalRef.current);
+      playbackCheckIntervalRef.current = null;
+    }
     if (!inputText.trim()) {
       setErrorMessage('请输入要转换为语音的文本');
       return;
@@ -109,22 +114,43 @@ export default function SpeechPlayground() {
         throw new Error('无法获取响应流');
       }
 
+      // 创建固定大小的数据块
+      const CHUNK_SIZE = 2048; // 固定每次发送 2048 字节
+      let buffer = new Uint8Array(0);
+
       // 读取和处理音频数据
       while (true) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) {
+          if (buffer.length > 0 && pcmPlayerRef.current) {
+            const finalChunk = new Uint8Array(CHUNK_SIZE);
+            finalChunk.set(buffer);
+            pcmPlayerRef.current.feed(finalChunk);
+          }
+          break;
+        }
 
-        // 将二进制数据传递给 PCM 播放器
-        if (pcmPlayerRef.current && value) {
-          pcmPlayerRef.current.feed(value);
+        if (value) {
+          const newBuffer = new Uint8Array(buffer.length + value.length);
+          newBuffer.set(buffer);
+          newBuffer.set(value, buffer.length);
+          buffer = newBuffer;
+          while (buffer.length >= CHUNK_SIZE) {
+            if (pcmPlayerRef.current) {
+              const chunk = buffer.slice(0, CHUNK_SIZE);
+              pcmPlayerRef.current.feed(chunk);
+              buffer = buffer.slice(CHUNK_SIZE);
+            }
+          }
         }
       }
-      // 设置一个延迟，等待音频播放完成后自动停止
-      // 假设最后一个音频块需要约1秒钟播放完成
-      // setTimeout(() => {
-      //   stopPlayback();
-      // }, 1000);
-
+      // 使用PCMPlayer的isPlaybackEnded方法检查播放是否完成
+      const checkPlaybackStatus = () => {
+        if (pcmPlayerRef.current && pcmPlayerRef.current.isPlaybackEnded()) {
+          stopPlayback();
+        }
+      };
+      playbackCheckIntervalRef.current = setInterval(checkPlaybackStatus, 500);
       setIsProcessing(false);
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -146,6 +172,11 @@ export default function SpeechPlayground() {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
+    }
+
+    if (playbackCheckIntervalRef.current) {
+      clearInterval(playbackCheckIntervalRef.current);
+      playbackCheckIntervalRef.current = null;
     }
 
     setIsPlaying(false);

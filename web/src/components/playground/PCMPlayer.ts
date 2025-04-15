@@ -194,6 +194,14 @@ export class PCMPlayer {
     this.samples = new Float32Array();
   }
 
+  /**
+   * 检查是否有音频正在播放
+   * @returns 如果没有正在播放的音频，返回 true
+   */
+  isPlaybackEnded(): boolean {
+    return this.activeBufferSources.length === 0 && this.samples.length === 0;
+  }
+
   destroy() {
     if (this.interval) {
       clearInterval(this.interval);
