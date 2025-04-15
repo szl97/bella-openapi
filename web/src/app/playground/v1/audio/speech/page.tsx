@@ -121,9 +121,9 @@ export default function SpeechPlayground() {
       }
       // 设置一个延迟，等待音频播放完成后自动停止
       // 假设最后一个音频块需要约1秒钟播放完成
-      setTimeout(() => {
-        stopPlayback();
-      }, 1000);
+      // setTimeout(() => {
+      //   stopPlayback();
+      // }, 1000);
 
       setIsProcessing(false);
     } catch (error: any) {
