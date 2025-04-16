@@ -8,7 +8,6 @@ import com.ke.bella.openapi.apikey.ApikeyInfo;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.service.ApikeyService;
 import com.ke.bella.openapi.utils.MatchUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,6 @@ import java.util.List;
 import static com.ke.bella.openapi.intercept.ConcurrentStartInterceptor.ASYNC_REQUEST_MARKER;
 
 @Component
-@Slf4j
 public class AuthorizationInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     private ApikeyService apikeyService;

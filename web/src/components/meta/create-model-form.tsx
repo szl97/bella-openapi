@@ -28,8 +28,7 @@ export function CreateModelForm() {
         ownerName: '',
         visibility: 'private',
         status: 'active',
-        endpoints: [],
-        terminalModel: ''
+        endpoints: []
     });
     const [propertySchema, setPropertySchema] = useState<JsonSchema | null>(null);
     const [featureSchema, setFeatureSchema] = useState<JsonSchema | null>(null);

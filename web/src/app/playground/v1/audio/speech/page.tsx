@@ -83,11 +83,12 @@ export default function SpeechPlayground() {
       const protocol = typeof window !== 'undefined' ? window.location.protocol : 'http:';
       const host = api_host || 'localhost:8080';
       const url = `${protocol}//${host}/v1/audio/speech`;
+
       const requestBody = {
         user: userInfo?.userId,
         model: model,
         input: inputText,
-        stream: model.startsWith('huoshan') || model.startsWith('doubao'),
+        stream: true,
         voice: voiceTypes[voiceName],
         sample_rate: 24000,
         response_format: "pcm"
