@@ -84,6 +84,7 @@ Bella OpenAPI是一个综合性的AI开放API平台，提供以下主要组件�
 - `--registry username`: 指定docker仓库 (username)
 - `--restart-web`: 仅重启前端服务
 - `--restart-api`: 仅重启后端服务
+- `--nginx-port PORT`: 指定Nginx服务映射到的端口，默认为80
 
 示例:
 ```bash
