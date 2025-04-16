@@ -10,8 +10,9 @@ show_help() {
     echo "  -e, --env ENV    指定环境（dev, test, prod）"
     echo "  --skip-auth      新生成系统API Key时跳过管理员授权步骤"
     echo "  -v, --version VERSION 指定镜像版本"
-    echo "  --push           构建后推送镜像到仓库"
+    echo "  --push           构建后推送镜像到仓库（自动设置--build，推送后不启动）"
     echo "  --registry username   指定推送的docker仓库 (username)"
+    echo "  --update-image   从远程仓库更新镜像，即使本地已存在"
     echo "  --github-oauth CLIENT_ID:CLIENT_SECRET    配置GitHub OAuth"
     echo "  --google-oauth CLIENT_ID:CLIENT_SECRET    配置Google OAuth"
     echo "  --server URL                              配置服务域名，必须包含协议前缀 (例如: http://example.com 或 https://example.com)"
@@ -62,6 +63,8 @@ CAS_LOGIN=""
 PUSH=false
 REGISTRY=""
 NO_CACHE=""
+# 是否强制更新镜像
+UPDATE_IMAGE=false
 # 重启服务
 RESTART_SERVICE=""
 # 代理配置
@@ -127,13 +130,20 @@ pull_image_if_not_exists() {
     fi
 }
 
-# 拉取应用镜像（如果本地不存在）
+# 拉取应用镜像（如果本地不存在或强制更新）
 pull_app_image_if_not_exists() {
     local service=$1
     local version=${VERSION:-latest}
     
     # 镜像名称（带仓库前缀）
     local image_name="${REGISTRY:-saizhuolin}/bella-openapi-$service:$version"
+    
+    # 如果设置了强制更新镜像，则直接拉取
+    if [ "$UPDATE_IMAGE" = true ]; then
+        echo "强制从远程仓库更新镜像: $image_name ..."
+        retry_command docker pull $image_name
+        return $?
+    fi
     
     # 检查镜像是否存在
     if ! image_exists $image_name; then
@@ -209,6 +219,13 @@ while [[ $# -gt 0 ]]; do
             ;;
         --push)
             PUSH=true
+            BUILD="--build"
+            echo "设置推送模式，将自动构建镜像"
+            shift
+            ;;
+        --update-image)
+            UPDATE_IMAGE=true
+            echo "设置强制更新镜像模式"
             shift
             ;;
         --registry)
@@ -483,7 +500,8 @@ build_services() {
             
             # 推送后不自动启动服务，直接退出
             echo ""
-            echo "镜像已成功推送，可以在服务器上使用 start.sh 脚本启动服务"
+            echo "镜像已成功推送，可以在服务器上使用以下命令拉取和启动服务:"
+            echo "./start.sh --registry ${REGISTRY:-saizhuolin} --version ${VERSION:-v1.0.0}"
             exit 0
         else
             echo "错误: buildx 不可用，无法构建多架构镜像"
