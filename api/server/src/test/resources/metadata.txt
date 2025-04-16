@@ -1,0 +1,224 @@
+POST /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v1/chat/completions","endpointName":"test","maintainerCode":"0","maintainerName":"system"}
+400
+
+POST /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v/adadad","endpointName":"test","maintainerCode":"0","maintainerName":"system"}
+400
+
+POST /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v1/adadad","endpointName":"test","maintainerCode":"0","maintainerName":"system"}
+200
+
+POST /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v2/adadad","endpointName":"test222","maintainerCode":"0","maintainerName":"system"}
+200
+
+POST /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v2/adadad","endpointName":"test222","maintainerCode":"0","maintainerName":"system"}
+400
+
+PUT /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v2/adadad","endpointName":"test111"}
+200
+
+PUT /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v/adadad","endpointName":"test111","maintainerCode":"0","maintainerName":"system"}
+400
+
+PUT /console/endpoint
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v/adadad","endpointName":"test111","maintainerCode":"0","maintainerName":"system"}
+400
+
+POST /console/endpoint/inactivate
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v2/adadad"}
+200
+
+POST /console/endpoint/activate
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v2/adadad"}
+200
+
+POST /console/endpoint/activate
+{"Authorization":"Bearer {testApikey}"}
+{"endpoint":"/v1/chat/completions"}
+400
+
+POST /console/model
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5", "endpoints":["/v1/chat/completions"]}
+400
+
+POST /console/model
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5","endpoints":["/v1/chat/completions"],"ownerType":"system","ownerCode":"0","ownerName":"system","documentUrl":null,"properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+200
+
+POST /console/model
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-6","endpoints":["/v2/adadad"],"ownerType":"system","ownerCode":"0","ownerName":"system","documentUrl":null,"properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+200
+
+POST /console/model
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-6","endpoints":["/v1/chat/completions","/v1/adxxxxxadad"],"ownerType":"system","ownerCode":"0","ownerName":"system","documentUrl":null,"properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+400
+
+GET /v1/meta/model/info/gpt-5
+{"Authorization":"Bearer {testApikey}"}
+{}
+{"modelName":"gpt-5","ownerType":"system","ownerCode":"0","ownerName":"system","properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+
+PUT /console/model
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5","ownerType":"system","ownerCode":"0","ownerName":"system","endpoints":["/v1/chat/completions"],"documentUrl":"https://baidu.com","properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+200
+
+GET /v1/meta/model/info/gpt-5
+{"Authorization":"Bearer {testApikey}"}
+{}
+{"modelName":"gpt-5","documentUrl":"https://baidu.com","properties":"{\"max_input_context\":128000,\"max_output_context\":4096}","features":"{\"stream\":true,\"function_call\":true,\"stream_function_call\":true,\"parallel_tool_calls\":true,\"vision\":true,\"json_format\":false}"}
+
+POST /console/model/publish
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"overseas","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":null,"channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5-111","dataDestination":"overseas","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":null,"channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5-111","dataDestination":"overseas","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":null,"channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":""}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"overseas","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":"https://bk-sc.openai.azure.com//openai/deployments/GPT-4o-PTU/chat/completions?api-version=","channelInfo":"","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"overseas","priority":"xxadad","protocol":"OpenAIAdaptor","supplier":"Azure","url":"https://bk-sc.openai.azure.com//openai/deployments/GPT-4o-PTU/chat/completions?api-version=","channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"xxxx","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":"https://bk-sc.openai.azure.com//openai/deployments/GPT-4o-PTU/chat/completions?api-version=","channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"overseas","priority":"high","protocol":"OpenAIAdaptor","supplier":"Azure","url":"https://bk-sc.openai.azure.com//openai/deployments/GPT-4o-PTU/chat/completions?api-version=","channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+200
+
+POST /console/channel
+{"Authorization":"Bearer {testApikey}"}
+{"entityType":"model","entityCode":"gpt-5","dataDestination":"overseas","priority":"high","protocol":"xxxx","supplier":"Azure","url":"https://bk-sc.openai.azure.com//openai/deployments/GPT-4o-PTU/chat/completions?api-version=","channelInfo":"{\"deployName\":\"GPT-4o-PTU\",\"version\":\"0513\",\"apiKey\":\"123458789\",\"apiVersion\":\"2024-02-15-preview\"}","priceInfo":"{\"input\":21.0,\"output\":1.0}"}
+400
+
+POST /console/model/publish
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+GET /v1/meta/model/info/gpt-5
+{"Authorization":"Bearer {testApikey}"}
+{}
+{"modelName":"gpt-5","visibility":"public"}
+
+POST /console/model/inactivate
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+GET /v1/meta/model/info/gpt-5
+{"Authorization":"Bearer {testApikey}"}
+{}
+{"modelName":"gpt-5","status":"inactive"}
+
+POST /console/model/activate
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+GET /v1/meta/model/info/gpt-5
+{"Authorization":"Bearer {testApikey}"}
+{}
+{"modelName":"gpt-5","status":"active"}
+
+GET /v1/meta/model/list?personalCode=10000000
+{"Authorization":"Bearer {testApikey}"}
+{}
+[{"modelName":"gpt-5"}]
+
+GET /v1/meta/model/list?orgCodes=org_001&orgCodes=org_002
+{"Authorization":"Bearer {testApikey}"}
+{}
+[{"modelName":"gpt-5"}]
+
+POST /console/model/publish/cancel
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+GET /v1/meta/model/list?personalCode=10000000
+{"Authorization":"Bearer {testApikey}"}
+{}
+[]
+
+GET /v1/meta/model/list?orgCodes=org_001&orgCodes=org_002
+{"Authorization":"Bearer {testApikey}"}
+{}
+[]
+
+POST /console/model/authorize
+{"Authorization":"Bearer {testApikey}"}
+{"model":"gpt-5", "authorizers":[{"authorizerType":"org", "authorizerCode":"org_001", "authorizerName":"ait"}, {"authorizerType":"person", "authorizerCode":"10000000", "authorizerName":"szl"}]}
+200
+
+GET /v1/meta/model/list?personalCode=10000000
+{"Authorization":"Bearer {testApikey}"}
+{}
+[{"modelName":"gpt-5"}]
+
+GET /v1/meta/model/list?orgCodes=org_001&orgCodes=org_002
+{"Authorization":"Bearer {testApikey}"}
+{}
+[{"modelName":"gpt-5"}]
+
+POST /console/model/publish/cancel
+{"Authorization":"Bearer {testApikey}"}
+{"modelName":"gpt-5"}
+200
+
+POST /console/model/authorize
+{"Authorization":"Bearer {testApikey}"}
+{"model":"gpt-5", "authorizers":[{"authorizerType":"org", "authorizerCode":"org_001", "authorizerName":"ait"}]}
+200
+
+GET /v1/meta/model/list?personalCode=10000000
+{"Authorization":"Bearer {testApikey}"}
+{}
+[]
+
+GET /v1/meta/model/list?orgCodes=org_001&orgCodes=org_002
+{"Authorization":"Bearer {testApikey}"}
+{}
+[{"modelName":"gpt-5"}]
