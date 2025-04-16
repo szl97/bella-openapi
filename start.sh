@@ -136,7 +136,7 @@ pull_app_image_if_not_exists() {
     local version=${VERSION:-latest}
     
     # 镜像名称（带仓库前缀）
-    local image_name="${REGISTRY:-saizhuolin}/bella-openapi-$service:$version"
+    local image_name="${REGISTRY:-bellatop}/bella-openapi-$service:$version"
     
     # 如果设置了强制更新镜像，则直接拉取
     if [ "$UPDATE_IMAGE" = true ]; then
@@ -474,9 +474,9 @@ build_services() {
             docker buildx build $CACHE_OPT \
                 --platform $PLATFORMS \
                 --build-arg VERSION=${VERSION:-v1.0.0} \
-                --build-arg REGISTRY=${REGISTRY:-saizhuolin} \
-                -t ${REGISTRY:-saizhuolin}/bella-openapi-api:${VERSION:-v1.0.0} \
-                -t ${REGISTRY:-saizhuolin}/bella-openapi-api:latest \
+                --build-arg REGISTRY=${REGISTRY:-bellatop} \
+                -t ${REGISTRY:-bellatop}/bella-openapi-api:${VERSION:-v1.0.0} \
+                -t ${REGISTRY:-bellatop}/bella-openapi-api:latest \
                 --push ./api
                 
             # 构建并推送 Web 多架构镜像
@@ -484,16 +484,16 @@ build_services() {
             docker buildx build $CACHE_OPT \
                 --platform $PLATFORMS \
                 --build-arg VERSION=${VERSION:-v1.0.0} \
-                --build-arg REGISTRY=${REGISTRY:-saizhuolin} \
-                -t ${REGISTRY:-saizhuolin}/bella-openapi-web:${VERSION:-v1.0.0} \
-                -t ${REGISTRY:-saizhuolin}/bella-openapi-web:latest \
+                --build-arg REGISTRY=${REGISTRY:-bellatop} \
+                -t ${REGISTRY:-bellatop}/bella-openapi-web:${VERSION:-v1.0.0} \
+                -t ${REGISTRY:-bellatop}/bella-openapi-web:latest \
                 --push ./web
                 
             echo "验证多架构镜像..."
-            docker buildx imagetools inspect ${REGISTRY:-saizhuolin}/bella-openapi-api:${VERSION:-v1.0.0}
-            docker buildx imagetools inspect ${REGISTRY:-saizhuolin}/bella-openapi-web:${VERSION:-v1.0.0}
+            docker buildx imagetools inspect ${REGISTRY:-bellatop}/bella-openapi-api:${VERSION:-v1.0.0}
+            docker buildx imagetools inspect ${REGISTRY:-bellatop}/bella-openapi-web:${VERSION:-v1.0.0}
                 
-            echo "✅ 多架构镜像已成功推送到 ${REGISTRY:-saizhuolin}"
+            echo "✅ 多架构镜像已成功推送到 ${REGISTRY:-bellatop}"
             echo "   这些镜像可以在任何支持的平台上运行，包括:"
             echo "   - x86_64/amd64 系统 (大多数 Linux 服务器、Intel Mac、Windows)"
             echo "   - ARM64 系统 (Apple Silicon Mac、AWS Graviton、树莓派 4 64位)"
@@ -501,7 +501,7 @@ build_services() {
             # 推送后不自动启动服务，直接退出
             echo ""
             echo "镜像已成功推送，可以在服务器上使用以下命令拉取和启动服务:"
-            echo "./start.sh --registry ${REGISTRY:-saizhuolin} --version ${VERSION:-v1.0.0}"
+            echo "./start.sh --registry ${REGISTRY:-bellatop} --version ${VERSION:-v1.0.0}"
             exit 0
         else
             echo "错误: buildx 不可用，无法构建多架构镜像"
@@ -512,10 +512,10 @@ build_services() {
         echo "本地构建，使用 docker-compose..."
         if [ -n "$NO_CACHE" ]; then
             echo "强制重新构建（不使用缓存）..."
-            docker-compose build --no-cache --build-arg VERSION=${VERSION:-v1.0.0} --build-arg REGISTRY=${REGISTRY:-saizhuolin} --build-arg NODE_ENV=$NODE_ENV --build-arg DEPLOY_ENV=$DEPLOY_ENV
+            docker-compose build --no-cache --build-arg VERSION=${VERSION:-v1.0.0} --build-arg REGISTRY=${REGISTRY:-bellatop} --build-arg NODE_ENV=$NODE_ENV --build-arg DEPLOY_ENV=$DEPLOY_ENV
         else
             echo "重新构建..."
-            docker-compose build --build-arg VERSION=${VERSION:-v1.0.0} --build-arg REGISTRY=${REGISTRY:-saizhuolin} --build-arg NODE_ENV=$NODE_ENV --build-arg DEPLOY_ENV=$DEPLOY_ENV
+            docker-compose build --build-arg VERSION=${VERSION:-v1.0.0} --build-arg REGISTRY=${REGISTRY:-bellatop} --build-arg NODE_ENV=$NODE_ENV --build-arg DEPLOY_ENV=$DEPLOY_ENV
         fi
     fi
 }
