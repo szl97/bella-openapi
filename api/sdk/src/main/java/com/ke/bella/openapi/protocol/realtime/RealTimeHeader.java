@@ -35,7 +35,7 @@ public class RealTimeHeader implements Serializable {
 
     public static RealTimeHeader errorHeader(int status, String errorMessage, String taskId) {
         RealTimeHeader header = new RealTimeHeader();
-        header.setName(RealTimeEventType.TRANSCRIPTION_FAILED.getValue());
+        header.setName(RealTimeEventType.TASK_FAILED.getValue());
         header.setMessageId(UUID.randomUUID().toString());
         header.setTaskId(taskId != null ? taskId : "");
         header.setStatus(status);

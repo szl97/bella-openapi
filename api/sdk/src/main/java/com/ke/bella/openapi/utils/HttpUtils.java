@@ -1,22 +1,11 @@
 package com.ke.bella.openapi.utils;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ke.bella.openapi.common.exception.ChannelException;
 import com.ke.bella.openapi.protocol.BellaEventSourceListener;
 import com.ke.bella.openapi.protocol.BellaStreamCallback;
 import com.ke.bella.openapi.protocol.BellaWebSocketListener;
 import com.ke.bella.openapi.protocol.Callbacks;
-
 import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
@@ -26,6 +15,16 @@ import okhttp3.ResponseBody;
 import okhttp3.WebSocket;
 import okhttp3.internal.Util;
 import okhttp3.sse.EventSources;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Author: Stan Sai Date: 2024/8/14 12:09 description:
@@ -51,7 +50,7 @@ public class HttpUtils {
                 .proxySelector(ProxyUtils.getProxySelector())
                 .connectionPool(connectionPool)
                 .dispatcher(dispatcher)
-                .pingInterval(50, TimeUnit.SECONDS);
+                .pingInterval(30, TimeUnit.SECONDS);
     }
 
     public static Response httpRequest(Request request, int connectionTimeout, int readTimeout) throws IOException {

@@ -19,7 +19,7 @@ public class KeAdaptor implements FlashAsrAdaptor<AsrProperty> {
                 .header("format", request.getFormat())
                 .header("max_sentence_silence", request.getMaxSentenceSilence().toString())
                 .header("sample_rate", request.getSampleRate().toString())
-                .post(RequestBody.create(request.getContent(), MediaType.parse(AudioFormat.getContentType(request.getFormat()))))
+                .post(RequestBody.create(MediaType.parse(AudioFormat.getContentType(request.getFormat())), request.getContent()))
                 .build();
         return HttpUtils.httpRequest(httpRequest, FlashAsrResponse.class);
     }

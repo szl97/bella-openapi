@@ -2,7 +2,6 @@ package com.ke.bella.openapi.server;
 
 import java.util.Optional;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.context.ApplicationContextInitializer;
@@ -11,6 +10,8 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 
 import lombok.extern.slf4j.Slf4j;
+
+import javax.validation.constraints.NotNull;
 
 @Slf4j
 public class BellaServerContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {

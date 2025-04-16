@@ -32,7 +32,7 @@ public class OpenAIAdaptor implements EmbeddingAdaptor<OpenAIProperty> {
         request.setModel(property.getDeployName());
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JacksonUtils.serialize(request), MediaType.parse("application/json")));
+                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(request)));
         Request httpRequest = builder.build();
         return doRequest(httpRequest);
     }

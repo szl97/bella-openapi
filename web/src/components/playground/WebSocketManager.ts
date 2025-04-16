@@ -63,8 +63,6 @@ export class WebSocketManager {
 
   /**
    * 连接 WebSocket
-   * @param params 连接参数
-   * @param skipHandshake 是否跳过握手
    * @param timeoutMs 连接超时时间
    */
   public async connect(

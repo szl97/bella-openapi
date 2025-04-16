@@ -51,6 +51,9 @@ public enum RealTimeEventType {
     TTS_DELTA("TTS_DELTA", true, true),
     TTS_END("TTS_END", true, true),
 
+    //本轮会话信息
+    THREAD_MESSSATE_CREATED("THREAD_MESSSATE_CREATED", true, true),
+
     // 未知事件
     UNKNOWN("Unknown", true, false),
 

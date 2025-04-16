@@ -50,7 +50,7 @@ public class OpenAIAdaptor implements TtsAdaptor<OpenAIProperty> {
         }
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JacksonUtils.serialize(request), MediaType.parse("application/json")));
+                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(request)));
         return builder.build();
     }
 }

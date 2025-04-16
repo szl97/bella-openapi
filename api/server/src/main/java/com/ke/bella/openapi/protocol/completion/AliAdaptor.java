@@ -85,8 +85,7 @@ public class AliAdaptor implements CompletionAdaptorDelegator<AliProperty> {
     private Request buildRequest(AliCompletionRequest request, String url, AliProperty property) {
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JacksonUtils.serialize(request),
-                        MediaType.parse("application/json")));
+                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(request)));
         return builder.build();
     }
 

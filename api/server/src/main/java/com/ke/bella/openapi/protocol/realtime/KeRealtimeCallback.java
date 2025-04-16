@@ -133,7 +133,7 @@ public class KeRealtimeCallback implements Callbacks.WebSocketCallback {
     }
 
     private void onError(ChannelException exception) {
-        LOGGER.warn("ASR error: {}", exception.getMessage(), exception);
+        LOGGER.warn("realtime error: {}", exception.getMessage(), exception);
         sender.onError(exception);
         complete();
     }

@@ -70,7 +70,7 @@ public class OpenAIAdaptor implements CompletionAdaptorDelegator<OpenAIProperty>
         }
         Request.Builder builder = authorizationRequestBuilder(property.getAuth())
                 .url(url)
-                .post(RequestBody.create(JacksonUtils.serialize(request), MediaType.parse("application/json")));
+                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(request)));
         if(MapUtils.isNotEmpty(property.getExtraHeaders())) {
             property.getExtraHeaders().forEach(builder::addHeader);
         }

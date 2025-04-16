@@ -123,8 +123,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
         try {
             parseResponse(bytes.toByteArray(), webSocket);
         } catch (Exception e) {
-            LOGGER.error("ASR onMessage error", e);
-            onError(ChannelException.fromException(e));
+            onProcessError(ChannelException.fromException(e));
         }
     }
 
@@ -183,6 +182,14 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
         LOGGER.warn("ASR error: {}", exception.getMessage(), exception);
         sender.onError(exception);
         complete();
+    }
+
+    private void onProcessError(ChannelException exception) {
+        LOGGER.warn("ASR error: {}", exception.getMessage(), exception);
+        sender.onError(exception);
+        if(!request.isAsync()) {
+            complete();
+        }
     }
 
     /**
@@ -265,8 +272,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
             byte[] payload = constructAudioPayload(audioData, isLast);
             webSocket.send(ByteString.of(payload));
         } catch (Exception e) {
-            LOGGER.warn("Error sending audio data", e);
-            onError(ChannelException.fromException(e));
+            onProcessError(ChannelException.fromException(e));
         }
     }
 
@@ -308,8 +314,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
      */
     public void sendAudioDataInChunks(WebSocket webSocket, byte[] audioData, int chunkSize, int intervalMs) {
         if (audioData == null || audioData.length == 0) {
-            LOGGER.warn("No audio data to send");
-            onError(ChannelException.fromResponse(400, "No audio data to send"));
+            onProcessError(ChannelException.fromResponse(400, "No audio data to send"));
             return;
         }
         
@@ -330,8 +335,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.warn("Error sending audio chunks", e);
-                onError(ChannelException.fromException(e));
+                onProcessError(ChannelException.fromException(e));
             }
         });
     }
@@ -359,8 +363,7 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
             payloadOffset += 4;
             payloadOffset += 4;
         } else {
-            LOGGER.warn("Unsupported message type: {}", messageType);
-            onError(ChannelException.fromResponse(400, "Unsupported message type"));
+            onProcessError(ChannelException.fromResponse(400, "Unsupported message type"));
             return;
         }
 
@@ -439,7 +442,10 @@ public class HuoshanStreamAsrCallback implements Callbacks.WebSocketCallback {
     private void handleTranscriptionFailed(int code, String errorMsg) {
         LOGGER.error("Transcription failed: {}", errorMsg);
         isRunning = false;
-        onError(ChannelException.fromResponse(getHttpCode(code), errorMsg));
+        sender.onError(ChannelException.fromResponse(getHttpCode(code), errorMsg));
+        if(!request.isAsync()) {
+            complete();
+        }
     }
 
     private int getHttpCode(int code) {

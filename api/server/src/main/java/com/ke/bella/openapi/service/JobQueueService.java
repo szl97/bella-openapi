@@ -81,7 +81,7 @@ public class JobQueueService implements Callbacks.RealTimeTaskCallback, Callback
         return new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", "Bearer " + apikey)
-                .post(RequestBody.create(JacksonUtils.serialize(req), MediaType.parse("application/json")))
+                .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(req)))
                 .build();
     }
 
@@ -98,7 +98,7 @@ public class JobQueueService implements Callbacks.RealTimeTaskCallback, Callback
                     .build();
             Request request = new Request.Builder().url(url)
                     .addHeader("Authorization", "Bearer " + apikey)
-                    .post(RequestBody.create(JacksonUtils.serialize(req), MediaType.parse("application/json")))
+                    .post(RequestBody.create(MediaType.parse("application/json"), JacksonUtils.serialize(req)))
                     .build();
             // todo queue batch get
             TaskGetDetailResp taskGetDetailResp = HttpUtils.httpRequest(request, TaskGetDetailResp.class);
