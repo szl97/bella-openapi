@@ -1,0 +1,56 @@
+name: Check Version
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 获取所有历史记录和标签
+      
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'maven'
+      
+      - name: Check POM version against tags
+        id: check-version
+        run: |
+          # 获取最新的版本标签
+          git fetch --tags
+          LATEST_TAG=$(git tag -l "v*" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)
+          
+          # 获取 POM 版本
+          cd api
+          POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "POM version: $POM_VERSION"
+          
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No existing tags found. POM version $POM_VERSION is valid for first tag."
+            exit 0
+          fi
+          
+          echo "Latest tag: $LATEST_TAG"
+          TAG_VERSION=${LATEST_TAG#v}
+          echo "Tag version (without v): $TAG_VERSION"
+          
+          # 比较版本号（使用 sort -V 进行版本比较）
+          if [ "$(printf '%s\n' "$TAG_VERSION" "$POM_VERSION" | sort -V | head -n1)" = "$TAG_VERSION" ]; then
+            # POM 版本大于或等于标签版本
+            echo "✅ POM version ($POM_VERSION) is greater than or equal to latest tag version ($TAG_VERSION)"
+          else
+            # POM 版本小于标签版本
+            echo "❌ POM version ($POM_VERSION) is less than latest tag version ($TAG_VERSION)"
+            echo "::error::POM version ($POM_VERSION) must be greater than or equal to latest tag version ($TAG_VERSION)"
+            exit 1
+          fi
