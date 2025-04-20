@@ -4,15 +4,10 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    types: [closed]
-    branches:
-      - main
 
 jobs:
   create-release-tag:
-    # 只在 PR 被合并或直接推送到 main 分支时运行
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     
     steps:
