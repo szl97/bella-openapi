@@ -31,6 +31,13 @@ jobs:
           POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "POM version: $POM_VERSION"
           
+          # 检查是否为 SNAPSHOT 版本
+          if [[ "$POM_VERSION" == *-SNAPSHOT* ]]; then
+            echo " POM version ($POM_VERSION) is a SNAPSHOT version"
+            echo "::error::POM version cannot be a SNAPSHOT version for release. Please use a release version."
+            exit 1
+          fi
+          
           # 获取最新的版本标签
           git fetch --tags
           LATEST_TAG=$(git tag -l "v*" | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1)

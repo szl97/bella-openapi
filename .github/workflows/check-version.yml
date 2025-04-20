@@ -35,6 +35,13 @@ jobs:
           POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "POM version: $POM_VERSION"
           
+          # 检查是否为 SNAPSHOT 版本
+          if [[ "$POM_VERSION" == *-SNAPSHOT* ]]; then
+            echo "❌ POM version ($POM_VERSION) is a SNAPSHOT version"
+            echo "::error::POM version cannot be a SNAPSHOT version for release. Please use a release version."
+            exit 1
+          fi
+          
           if [ -z "$LATEST_TAG" ]; then
             echo "No existing tags found. POM version $POM_VERSION is valid for first tag."
             exit 0
