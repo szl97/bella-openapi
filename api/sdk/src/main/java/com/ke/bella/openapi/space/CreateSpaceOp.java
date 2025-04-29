@@ -1,10 +1,10 @@
 package com.ke.bella.openapi.space;
 
 import com.ke.bella.openapi.Operator;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+lombok.AllArgsConstructor;
+lombok.Data;
+lombok.NoArgsConstructor;
+lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -38,6 +38,12 @@ public class CreateSpaceOp extends Operator {
      */
     @Size(max = 64, message = "spaceCode不能超过64个字符")
     private String spaceCode;
+
+    /**
+     * 租户编码
+     */
+    @Size(max = 64, message = "tenantCode不能超过64个字符")
+    private String tenantCode;
 
     /**
      * 空间拥有者id

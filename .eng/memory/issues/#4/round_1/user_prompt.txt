@@ -1,0 +1,2872 @@
+# 项目文件描述
+
+
+- api/sdk/src/main/java/com/ke/bella/openapi/space/Space.java: Space类用于管理空间信息，包含了空间编码、空间名称和空间所有者的字段。主要功能是表示和传输空间的基本信息，与Bella OpenAPI的空间模块相关联。
+
+- api/sdk/src/main/java/com/ke/bella/openapi/space/Member.java: 定义成员信息的Java类，包括空间编码、角色编码、成员名和UID，主要用于存储和传输成员相关数据。为其他类提供基础数据结构。
+
+- api/sdk/src/main/java/com/ke/bella/openapi/space/CreateSpaceOp.java: 定义用于创建团队参数的Java类。包括空间名称、描述、编码和拥有者的基本属性和校验注解。
+
+- api/sdk/src/main/java/com/ke/bella/openapi/space/RoleWithSpace.java: RoleWithSpace.java定义了与角色相关的信息，包括角色编码和关联的空间信息，使用lombok生成标准方法。
+
+- api/server/src/main/java/com/ke/bella/openapi/service/SpaceService.java: SpaceService类用于管理用户空间的创建、更新和成员管理，提供各种操作空间和成员权限的方法。
+
+- api/server/src/main/java/com/ke/bella/openapi/db/repo/SpaceRepo.java: 此文件定义了SpaceRepo类，负责空间信息的数据库操作。提供空间的查询、创建、更新和成员管理功能。与数据库的空间相关表进行交互，并具备事务管理能力。
+
+- api/server/src/main/java/com/ke/bella/openapi/endpoints/SpaceController.java: 实现空间管理的RESTful接口，提供创建、修改空间及其成员的功能。主要类是SpaceController，调用SpaceService进行业务逻辑处理。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/Space.java: 这个文件由jOOQ生成，定义了数据库中的 Space 表及相关的字段和主键信息。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/SpaceMember.java: 该文件是由jOOQ生成的，定义了数据库的SpaceMember表模型。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/SpaceDB.java: 该文件由jOOQ生成，定义了SpaceDB类，表示空间表数据的Java对象。包含空间的基本信息，如空间编码、名称、描述等，以及创建和更新时间等字段。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/SpaceMemberDB.java: 此文件定义了SpaceMemberDB类，表示空间成员信息的POJO，包括空间编码、成员姓名、角色编码等信息。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/records/SpaceRecord.java: 此文件由jOOQ生成，定义了SpaceRecord类，是空间表的记录对象，包含空间的ID、名称、描述等。
+
+- api/server/src/codegen/java/com/ke/bella/openapi/tables/records/SpaceMemberRecord.java: SpaceMemberRecord.java是由jOOQ生成的数据库记录类，代表空间成员信息表，包含字段如id、spaceCode、roleCode等，并实现了接口Timed和Record10。内容与数据库表定型强相关，用于数据库操作。
+
+- api/server/sql/03-space.sql: 该SQL文件用于创建空间、空间角色和空间成员信息表，定义了相应的字段和键。
+
+- api/server/src/main/java/com/ke/bella/openapi/BellaContext.java: 无描述
+
+- api/sdk/src/main/java/com/ke/bella/openapi/BellaContext.java: Bella系统的上下文管理类，负责在请求处理过程中保存和传递上下文信息，如操作人和API key信息。
+
+
+# 文件内容
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/space/Space.java
+1 package com.ke.bella.openapi.space;
+2 
+3 import lombok.AllArgsConstructor;
+4 import lombok.Data;
+5 import lombok.NoArgsConstructor;
+6 import lombok.experimental.SuperBuilder;
+7 
+8 /**
+9  * function:
+10  *
+11  * @author chenhongliang001
+12  */
+13 @Data
+14 @SuperBuilder
+15 @AllArgsConstructor
+16 @NoArgsConstructor
+17 public class Space {
+18 
+19 	private String spaceCode;
+20 
+21 	private String spaceName;
+22 
+23 	private String ownerUid;
+24 }
+25
+```
+
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/space/Member.java
+1 package com.ke.bella.openapi.space;
+2 
+3 import lombok.AllArgsConstructor;
+4 import lombok.Data;
+5 import lombok.NoArgsConstructor;
+6 import lombok.experimental.SuperBuilder;
+7 
+8 /**
+9  * function:
+10  *
+11  * @author chenhongliang001
+12  */
+13 @Data
+14 @SuperBuilder
+15 @AllArgsConstructor
+16 @NoArgsConstructor
+17 public class Member {
+18 
+19     private String spaceCode;
+20 
+21     private String roleCode;
+22 
+23     private String memberName;
+24 
+25     private String memberUid;
+26 
+27 }
+28
+```
+
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/space/CreateSpaceOp.java
+1 package com.ke.bella.openapi.space;
+2 
+3 import com.ke.bella.openapi.Operator;
+4 import lombok.AllArgsConstructor;
+5 import lombok.Data;
+6 import lombok.NoArgsConstructor;
+7 import lombok.experimental.SuperBuilder;
+8 
+9 import javax.validation.constraints.NotEmpty;
+10 import javax.validation.constraints.Size;
+11 
+12 /**
+13  * function: 创建团队参数
+14  *
+15  * @author chenhongliang001
+16  */
+17 @Data
+18 @SuperBuilder
+19 @AllArgsConstructor
+20 @NoArgsConstructor
+21 public class CreateSpaceOp extends Operator {
+22 
+23     /**
+24      * 空间名称
+25      */
+26     @NotEmpty(message = "spaceName不能为空")
+27     @Size(max = 128, message = "spaceName不能超过128个字符")
+28     private String spaceName;
+29 
+30     /**
+31      * 空间描述
+32      */
+33     @Size(max = 255, message = "spaceDescription不能超过255个字符")
+34     private String spaceDescription;
+35 
+36     /**
+37      * 空间编码
+38      */
+39     @Size(max = 64, message = "spaceCode不能超过64个字符")
+40     private String spaceCode;
+41 
+42     /**
+43      * 空间拥有者id
+44      */
+45     @NotEmpty(message = "ownerUid不能为空")
+46     @Size(max = 64, message = "ownerUid不能超过64个字符")
+47     private String ownerUid;
+48 
+49     /**
+50      * 空间拥有者姓名
+51      */
+52     @NotEmpty(message = "ownerName不能为空")
+53     @Size(max = 64, message = "ownerName不能超过64个字符")
+54     private String ownerName;
+55 
+56 }
+57
+```
+
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/space/RoleWithSpace.java
+1 package com.ke.bella.openapi.space;
+2 
+3 import lombok.AllArgsConstructor;
+4 import lombok.Data;
+5 import lombok.NoArgsConstructor;
+6 import lombok.experimental.SuperBuilder;
+7 
+8 /**
+9  * function:
+10  *
+11  * @author chenhongliang001
+12  */
+13 @Data
+14 @SuperBuilder
+15 @AllArgsConstructor
+16 @NoArgsConstructor
+17 public class RoleWithSpace {
+18 
+19     /**
+20      * 角色编码
+21      */
+22     private String roleCode;
+23 
+24     /**
+25      * 空间编码
+26      */
+27     private String spaceCode;
+28 
+29     /**
+30      * 空间编码
+31      */
+32     private String spaceName;
+33 }
+34
+```
+
+
+
+
+```
+File: api/server/src/main/java/com/ke/bella/openapi/service/SpaceService.java
+1 package com.ke.bella.openapi.service;
+2 
+3 import com.google.common.collect.Lists;
+4 import com.google.common.collect.Maps;
+5 import com.ke.bella.openapi.common.RoleCodeEnum;
+6 import com.ke.bella.openapi.db.repo.SpaceRepo;
+7 import com.ke.bella.openapi.common.exception.BizParamCheckException;
+8 import com.ke.bella.openapi.space.ChangeSpaceOwnerOp;
+9 import com.ke.bella.openapi.space.CreateMemberOp;
+10 import com.ke.bella.openapi.space.CreateRoleDetail;
+11 import com.ke.bella.openapi.space.CreateRoleOp;
+12 import com.ke.bella.openapi.space.CreateSpaceOp;
+13 import com.ke.bella.openapi.space.ExitSpaceOp;
+14 import com.ke.bella.openapi.space.Member;
+15 import com.ke.bella.openapi.space.RemoveMemberOp;
+16 import com.ke.bella.openapi.space.RoleWithSpace;
+17 import com.ke.bella.openapi.space.Space;
+18 import com.ke.bella.openapi.space.UpdateMemberRoleOp;
+19 import com.ke.bella.openapi.space.UpdateSpaceNameOp;
+20 import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
+21 import com.ke.bella.openapi.tables.records.SpaceRecord;
+22 import com.ke.bella.openapi.tables.records.SpaceRoleRecord;
+23 import org.apache.commons.collections4.CollectionUtils;
+24 import org.apache.commons.lang3.StringUtils;
+25 import org.springframework.beans.BeanUtils;
+26 import org.springframework.beans.factory.annotation.Autowired;
+27 import org.springframework.stereotype.Component;
+28 import org.springframework.transaction.annotation.Transactional;
+29 
+30 import java.util.ArrayList;
+31 import java.util.Collections;
+32 import java.util.List;
+33 import java.util.Map;
+34 import java.util.Objects;
+35 import java.util.Set;
+36 import java.util.UUID;
+37 import java.util.function.Function;
+38 import java.util.stream.Collectors;
+39 
+40 /**
+41  * function: 空间
+42  *
+43  * @author chenhongliang001
+44  */
+45 @Component
+46 public class SpaceService {
+47 
+48     @Autowired
+49     private SpaceRepo spaceRepo;
+50 
+51     @Transactional(rollbackFor = Exception.class)
+52     public String createSpace(CreateSpaceOp op) {
+53 
+54         if(StringUtils.isEmpty(op.getSpaceCode())) {
+55             op.setSpaceCode(generateSpaceCode());
+56         }
+57         SpaceRecord space = spaceRepo.querySpaceBySpaceCode(op.getSpaceCode());
+58         // 判断空间是否已经存在
+59         if(space != null) {
+60             throw new BizParamCheckException(String.format("空间编码:%s已经存在", op.getSpaceCode()));
+61         }
+62         // 保存
+63         spaceRepo.createSpace(buildSpace(op));
+64 
+65         return op.getSpaceCode();
+66     }
+67 
+68     public void fillCreateSpaceOperator(SpaceRecord spaceRecord, Long userId) {
+69         spaceRecord.setCuid(userId);
+70         spaceRecord.setMuid(userId);
+71     }
+72 
+73     public void fillCreateRoleOperator(SpaceRoleRecord role, Long userId) {
+74         role.setCuid(userId);
+75         role.setMuid(userId);
+76     }
+77 
+78     @Transactional(rollbackFor = Exception.class)
+79     public boolean createRole(CreateRoleOp op) {
+80         spaceRepo.batchInsertRole(buildRoles(op.getRoles(), op.getSpaceCode(), op.getUserId()), op.getSpaceCode());
+81         return true;
+82     }
+83 
+84     private List<SpaceRoleRecord> buildRoles(List<CreateRoleDetail> details, String spaceCode, Long userId) {
+85         if(CollectionUtils.isEmpty(details)) {
+86             return Lists.newArrayList();
+87         }
+88         List<SpaceRoleRecord> roles = Lists.newArrayList();
+89         for (CreateRoleDetail detail : details) {
+90             SpaceRoleRecord role = new SpaceRoleRecord();
+91             BeanUtils.copyProperties(detail, role);
+92             role.setSpaceCode(spaceCode);
+93             fillCreateRoleOperator(role, userId);
+94             roles.add(role);
+95         }
+96         return roles;
+97     }
+98 
+99     private SpaceRecord buildSpace(CreateSpaceOp spaceCreateOp) {
+100         SpaceRecord space = new SpaceRecord();
+101         BeanUtils.copyProperties(spaceCreateOp, space);
+102         fillCreateSpaceOperator(space, spaceCreateOp.getUserId());
+103         return space;
+104     }
+105 
+106     @Transactional(rollbackFor = Exception.class)
+107     public Boolean updateSpaceName(UpdateSpaceNameOp op) {
+108         spaceRepo.updateSpaceName(op.getSpaceCode(), op.getSpaceName(), op.getUserId());
+109         return true;
+110     }
+111 
+112     public String generateSpaceCode() {
+113         return UUID.randomUUID().toString();
+114     }
+115 
+116     @Transactional(rollbackFor = Exception.class)
+117     public Boolean changeSpaceOwner(ChangeSpaceOwnerOp op) {
+118 
+119         // 只有空间拥有者才能将自己的空间转给其它人
+120         SpaceRecord space = spaceRepo.querySpaceBySpaceCode(op.getSpaceCode());
+121         if(space == null) {
+122             throw new BizParamCheckException(String.format("转让空间失败，空间:%s不存在", op.getSpaceCode()));
+123         }
+124         if(!Objects.equals(space.getOwnerUid(), String.valueOf(op.getUserId()))) {
+125             throw new BizParamCheckException("只有空间拥有者有权限将团队转让给其他人");
+126         }
+127 
+128         // 转让人必须在空间内
+129         SpaceMemberRecord member = spaceRepo.queryBySpaceCodeAndMemberUid(op.getSpaceCode(), op.getOwnerUid());
+130         if(member == null) {
+131             throw new BizParamCheckException("新的拥有者必须在空间内，请先将心的拥有者添加到空间中");
+132         }
+133         // 空间转让
+134         spaceRepo.changeSpaceOwner(op.getSpaceCode(), op.getOwnerUid(), op.getUserId());
+135 
+136         // 成员表设置，原拥有者变更为管理员
+137         spaceRepo.updateMemberRole(op.getUserId(), space.getOwnerUid(),
+138                 op.getSpaceCode(), RoleCodeEnum.ADMIN.getCode());
+139         // 成员表设置，设置新拥有者
+140         spaceRepo.updateMemberRole(op.getUserId(), op.getOwnerUid(),
+141                 op.getSpaceCode(), RoleCodeEnum.OWNER.getCode());
+142 
+143         return true;
+144 
+145     }
+146 
+147     @Transactional(rollbackFor = Exception.class)
+148     public Boolean createMember(CreateMemberOp op) {
+149 
+150         SpaceRecord space = spaceRepo.querySpaceBySpaceCode(op.getSpaceCode());
+151         if(space == null) {
+152             throw new BizParamCheckException(String.format("空间不存在:%s", op.getSpaceCode()));
+153         }
+154 
+155         List<String> memberUids = op.getMembers().stream()
+156                 .map(CreateMemberOp.Member::getMemberUid)
+157                 .collect(Collectors.toList());
+158 
+159         List<SpaceMemberRecord> existingMembers = spaceRepo.queryMemberByTeamCodeAndMemberUids(op.getSpaceCode(), memberUids);
+160         Set<String> existingMemberUids = existingMembers.stream()
+161                 .map(SpaceMemberRecord::getMemberUid)
+162                 .collect(Collectors.toSet());
+163 
+164         Set<String> duplicates = memberUids.stream()
+165                 .filter(existingMemberUids::contains)
+166                 .collect(Collectors.toSet());
+167 
+168         if(!duplicates.isEmpty()) {
+169             throw new BizParamCheckException(String.format("重复添加成员: %s", duplicates));
+170         }
+171 
+172         List<SpaceMemberRecord> newMembers = op.getMembers().stream()
+173                 .map(m -> {
+174                     SpaceMemberRecord record = new SpaceMemberRecord();
+175                     BeanUtils.copyProperties(m, record);
+176                     record.setCuid(op.getUserId());
+177                     record.setMuid(op.getUserId());
+178                     record.setSpaceCode(op.getSpaceCode());
+179                     record.setRoleCode(op.getRoleCode());
+180                     return record;
+181                 })
+182                 .collect(Collectors.toList());
+183 
+184         spaceRepo.batchInsertMember(newMembers);
+185         return true;
+186     }
+187 
+188     public Boolean removeMember(RemoveMemberOp op) {
+189 
+190         SpaceMemberRecord member = spaceRepo.queryMemberBySpaceCodeAndMemberUid(op.getSpaceCode(), op.getMemberUid());
+191         if(member == null) {
+192             throw new BizParamCheckException("成员不存在无法删除");
+193         }
+194 
+195         spaceRepo.removeMember(op.getUserId(), op.getMemberUid(), op.getSpaceCode());
+196         return true;
+197     }
+198 
+199     @Transactional(rollbackFor = Exception.class)
+200     public Boolean updateMember(UpdateMemberRoleOp op) {
+201         spaceRepo.updateMemberRole(op.getUserId(), op.getMemberUid(), op.getSpaceCode(), op.getRoleCode());
+202         return true;
+203     }
+204 
+205     public Boolean exitSpace(ExitSpaceOp op) {
+206         SpaceMemberRecord member = spaceRepo.queryBySpaceCodeAndMemberUid(op.getSpaceCode(), op.getMemberUid());
+207         if(member == null) {
+208             throw new BizParamCheckException(String.format("退出空间失败，用户:%s不在此空间中", op.getMemberUid()));
+209         }
+210         spaceRepo.removeMember(op.getUserId(), op.getMemberUid(), op.getSpaceCode());
+211         return true;
+212     }
+213 
+214     public List<Member> listMember(String spaceCode) {
+215         List<SpaceMemberRecord> records = spaceRepo.listBySpaceCode(spaceCode);
+216         if(CollectionUtils.isEmpty(records)) {
+217             return Lists.newArrayList();
+218         }
+219 
+220         List<Member> members = Lists.newArrayList();
+221         for (SpaceMemberRecord record : records) {
+222             members.add(Member.builder()
+223                     .roleCode(record.getRoleCode())
+224                     .spaceCode(record.getSpaceCode())
+225                     .memberUid(record.getMemberUid())
+226                     .memberName(record.getMemberName())
+227                     .build());
+228         }
+229         return members;
+230     }
+231 
+232     public Space querySpaceBySpaceCode(String spaceCode) {
+233         SpaceRecord spaceRecord = spaceRepo.querySpaceBySpaceCode(spaceCode);
+234         if(spaceRecord == null) {
+235             return null;
+236         }
+237         return Space.builder()
+238                 .spaceName(spaceRecord.getSpaceName())
+239                 .spaceCode(spaceRecord.getSpaceCode())
+240                 .ownerUid(spaceRecord.getOwnerUid())
+241                 .build();
+242     }
+243 
+244     public List<Space> listSpace(List<String> spaceCodes) {
+245 
+246         List<SpaceRecord> spaceRecords = spaceRepo.querySpaceBySpaceCodes(spaceCodes);
+247 
+248         if(CollectionUtils.isEmpty(spaceRecords)) {
+249             return Collections.emptyList();
+250         }
+251 
+252         return spaceRecords.stream()
+253                 .map(record -> Space.builder()
+254                         .spaceName(record.getSpaceName())
+255                         .spaceCode(record.getSpaceCode())
+256                         .ownerUid(record.getOwnerUid())
+257                         .build())
+258                 .collect(Collectors.toList());
+259     }
+260 
+261     public List<RoleWithSpace> listRole(String memberUid) {
+262 
+263         List<RoleWithSpace> rolesAll = Lists.newArrayList();
+264         rolesAll.add(RoleWithSpace.builder()
+265                 .roleCode(RoleCodeEnum.OWNER.getCode())
+266                 .spaceCode(memberUid)
+267                 .spaceName("个人空间").build());
+268 
+269         List<SpaceMemberRecord> members = spaceRepo.listMemberByMemberUid(memberUid);
+270         if(CollectionUtils.isEmpty(members)) {
+271             return rolesAll;
+272         }
+273 
+274         // 收集唯一的空间编码
+275         Set<String> spaceCodes = members.stream()
+276                 .map(SpaceMemberRecord::getSpaceCode)
+277                 .collect(Collectors.toSet());
+278 
+279         // 查询团队信息并转换为 Map
+280         Map<String, SpaceRecord> spaceMap = queryMapBySpaceCodes(new ArrayList<>(spaceCodes));
+281 
+282         // 构建团队角色列表，并设置团队名称
+283         List<RoleWithSpace> roles = members.stream()
+284                 .map(member -> {
+285                     RoleWithSpace role = new RoleWithSpace();
+286                     role.setRoleCode(member.getRoleCode());
+287                     role.setSpaceCode(member.getSpaceCode());
+288                     SpaceRecord space = spaceMap.get(member.getSpaceCode());
+289                     if(space != null) {
+290                         role.setSpaceName(space.getSpaceName());
+291                     }
+292                     return role;
+293                 })
+294                 .collect(Collectors.toList());
+295         if(CollectionUtils.isNotEmpty(roles)) {
+296             rolesAll.addAll(roles);
+297         }
+298         return rolesAll;
+299     }
+300 
+301     public RoleWithSpace getMemberRole(String memberUid, String spaceCode) {
+302 
+303         if(Objects.equals(memberUid, spaceCode)) {
+304             return RoleWithSpace.builder()
+305                     .roleCode(RoleCodeEnum.OWNER.getCode())
+306                     .spaceCode(spaceCode)
+307                     .spaceName("个人空间")
+308                     .build();
+309         }
+310 
+311         SpaceMemberRecord member = spaceRepo.queryMemberBySpaceCodeAndMemberUid(spaceCode, memberUid);
+312         if(member == null) {
+313             return null;
+314         }
+315 
+316         SpaceRecord space = spaceRepo.querySpaceBySpaceCode(spaceCode);
+317         return RoleWithSpace.builder()
+318                 .roleCode(member.getRoleCode())
+319                 .spaceCode(member.getSpaceCode())
+320                 .spaceName(space != null ? space.getSpaceName() : "")
+321                 .build();
+322     }
+323 
+324     public List<String> listSpaceCode() {
+325         return spaceRepo.listSpaceCode();
+326     }
+327 
+328     public Map<String, SpaceRecord> queryMapBySpaceCodes(List<String> spaceCodes) {
+329 
+330         if(CollectionUtils.isEmpty(spaceCodes)) {
+331             return Maps.newHashMap();
+332         }
+333 
+334         List<SpaceRecord> spaces = spaceRepo.listBySpaceCodes(spaceCodes);
+335         if(CollectionUtils.isEmpty(spaces)) {
+336             return Maps.newHashMap();
+337         }
+338 
+339         return spaces.stream().collect(Collectors.toMap(
+340                 SpaceRecord::getSpaceCode,
+341                 Function.identity(),
+342                 (existing, replacement) -> existing // 如果有重复键，保留已有的值
+343         ));
+344 
+345     }
+346 
+347 }
+348
+```
+
+
+
+
+```
+File: api/server/src/main/java/com/ke/bella/openapi/db/repo/SpaceRepo.java
+1 package com.ke.bella.openapi.db.repo;
+2 
+3 import com.ke.bella.openapi.Tables;
+4 import com.ke.bella.openapi.common.StatusEnum;
+5 import com.ke.bella.openapi.common.exception.BizParamCheckException;
+6 import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
+7 import com.ke.bella.openapi.tables.records.SpaceRecord;
+8 import com.ke.bella.openapi.tables.records.SpaceRoleRecord;
+9 import org.apache.commons.collections4.CollectionUtils;
+10 import org.apache.commons.lang3.StringUtils;
+11 import org.jooq.DSLContext;
+12 import org.springframework.stereotype.Component;
+13 import org.springframework.transaction.annotation.Transactional;
+14 
+15 import javax.annotation.Resource;
+16 import java.util.List;
+17 import java.util.stream.Collectors;
+18 
+19 /**
+20  * function:
+21  *
+22  * @author chenhongliang001
+23  */
+24 @Component
+25 public class SpaceRepo implements BaseRepo {
+26 
+27     @Resource
+28     private DSLContext db;
+29 
+30     public SpaceRecord querySpaceBySpaceCode(String spaceCode) {
+31         return db.selectFrom(Tables.SPACE)
+32                 .where(Tables.SPACE.SPACE_CODE.eq(spaceCode))
+33                 .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+34                 .fetchOneInto(SpaceRecord.class);
+35     }
+36 
+37     public List<SpaceRecord> querySpaceBySpaceCodes(List<String> spaceCodes) {
+38         return db.selectFrom(Tables.SPACE)
+39                 .where(Tables.SPACE.SPACE_CODE.in(spaceCodes))
+40                 .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+41                 .fetchInto(SpaceRecord.class);
+42     }
+43 
+44     @Transactional(rollbackFor = Exception.class)
+45     public void createSpace(SpaceRecord record) {
+46         if(StringUtils.isEmpty(record.getSpaceDescription())) {
+47             record.setSpaceDescription("");
+48         }
+49         db.insertInto(Tables.SPACE).set(record).execute();
+50     }
+51 
+52     @Transactional(rollbackFor = Exception.class)
+53     public void batchInsertRole(List<SpaceRoleRecord> roles, String spaceCode) {
+54         if(CollectionUtils.isEmpty(roles)) {
+55             return;
+56         }
+57 
+58         // 收集所有的角色代码
+59         List<String> roleCodes = roles.stream()
+60                 .map(SpaceRoleRecord::getRoleCode)
+61                 .collect(Collectors.toList());
+62 
+63         // 查询数据库中已存在的角色
+64         List<SpaceRoleRecord> rolesFromDb = queryRoleByTeamCodeAndRoleCode(spaceCode, roleCodes);
+65 
+66         // 如果存在重复的角色代码，抛出异常
+67         if(CollectionUtils.isNotEmpty(rolesFromDb)) {
+68             String duplicateRoles = rolesFromDb.stream()
+69                     .map(SpaceRoleRecord::getRoleCode)
+70                     .collect(Collectors.joining(","));
+71             throw new BizParamCheckException(String.format("保存角色失败，部分角色编码已经存在:%s", duplicateRoles));
+72         }
+73 
+74         // 设置角色描述为空字符串（如果原本为空）
+75         roles.forEach(role -> {
+76             if(StringUtils.isEmpty(role.getRoleDesc())) {
+77                 role.setRoleDesc("");
+78             }
+79         });
+80 
+81         db.batchInsert(roles).execute();
+82     }
+83 
+84     public List<SpaceRoleRecord> queryRoleByTeamCodeAndRoleCode(String spaceCode, List<String> roleCodes) {
+85         return db.selectFrom(Tables.SPACE_ROLE)
+86                 .where(Tables.SPACE_ROLE.SPACE_CODE.eq(spaceCode))
+87                 .and(Tables.SPACE_ROLE.ROLE_CODE.in(roleCodes))
+88                 .and(Tables.SPACE_ROLE.STATUS.eq(StatusEnum.VALID.getCode()))
+89                 .fetchInto(SpaceRoleRecord.class);
+90     }
+91 
+92     @Transactional(rollbackFor = Exception.class)
+93     public void updateSpaceName(String spaceCode, String spaceName, Long muid) {
+94         db.update(Tables.SPACE)
+95                 .set(Tables.SPACE.SPACE_NAME, spaceName)
+96                 .set(Tables.SPACE.MUID, muid)
+97                 .where(Tables.SPACE.SPACE_CODE.eq(spaceCode))
+98                 .execute();
+99     }
+100 
+101     public SpaceMemberRecord queryBySpaceCodeAndMemberUid(String spaceCode, String memberUid) {
+102         return db.selectFrom(Tables.SPACE_MEMBER)
+103                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+104                 .and(Tables.SPACE_MEMBER.MEMBER_UID.eq(memberUid))
+105                 .and(Tables.SPACE_MEMBER.STATUS.eq(StatusEnum.VALID.getCode()))
+106                 .fetchOneInto(SpaceMemberRecord.class);
+107     }
+108 
+109     @Transactional(rollbackFor = Exception.class)
+110     public void changeSpaceOwner(String spaceCode, String ownerUid, Long muid) {
+111         db.update(Tables.SPACE)
+112                 .set(Tables.SPACE.OWNER_UID, ownerUid)
+113                 .set(Tables.SPACE.MUID, muid)
+114                 .where(Tables.SPACE.SPACE_CODE.eq(spaceCode))
+115                 .execute();
+116     }
+117 
+118     @Transactional(rollbackFor = Exception.class)
+119     public void updateMemberRole(Long muid, String memberUid, String spaceCode, String roleCode) {
+120         db.update(Tables.SPACE_MEMBER)
+121                 .set(Tables.SPACE_MEMBER.MUID, muid)
+122                 .set(Tables.SPACE_MEMBER.ROLE_CODE, roleCode)
+123                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+124                 .and(Tables.SPACE_MEMBER.MEMBER_UID.eq(memberUid))
+125                 .execute();
+126     }
+127 
+128     public List<SpaceMemberRecord> queryMemberByTeamCodeAndMemberUids(String spaceCode, List<String> memberUids) {
+129         return db.selectFrom(Tables.SPACE_MEMBER)
+130                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+131                 .and(Tables.SPACE_MEMBER.MEMBER_UID.in(memberUids))
+132                 .and(Tables.SPACE_MEMBER.STATUS.eq(StatusEnum.VALID.getCode()))
+133                 .fetchInto(SpaceMemberRecord.class);
+134     }
+135 
+136     @Transactional(rollbackFor = Exception.class)
+137     public void batchInsertMember(List<SpaceMemberRecord> records) {
+138         if(records != null && !records.isEmpty()) {
+139             db.batchInsert(records).execute();
+140         }
+141     }
+142 
+143     public SpaceMemberRecord queryMemberBySpaceCodeAndMemberUid(String spaceCode, String memberUid) {
+144         return db.selectFrom(Tables.SPACE_MEMBER)
+145                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+146                 .and(Tables.SPACE_MEMBER.MEMBER_UID.eq(memberUid))
+147                 .and(Tables.SPACE_MEMBER.STATUS.eq(StatusEnum.VALID.getCode()))
+148                 .fetchOneInto(SpaceMemberRecord.class);
+149     }
+150 
+151     @Transactional(rollbackFor = Exception.class)
+152     public void removeMember(Long muid, String memberUid, String spaceCode) {
+153         db.update(Tables.SPACE_MEMBER)
+154                 .set(Tables.SPACE_MEMBER.STATUS, StatusEnum.INVALID.getCode())
+155                 .set(Tables.SPACE_MEMBER.MUID, muid)
+156                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+157                 .and(Tables.SPACE_MEMBER.MEMBER_UID.eq(memberUid))
+158                 .execute();
+159     }
+160 
+161     public List<String> listSpaceCode() {
+162         return db.select(Tables.SPACE.SPACE_CODE)
+163                 .from(Tables.SPACE)
+164                 .where(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+165                 .fetch(Tables.SPACE.SPACE_CODE);
+166     }
+167 
+168     public List<SpaceMemberRecord> listBySpaceCode(String spaceCode) {
+169         return db.selectFrom(Tables.SPACE_MEMBER)
+170                 .where(Tables.SPACE_MEMBER.SPACE_CODE.eq(spaceCode))
+171                 .and(Tables.SPACE_MEMBER.STATUS.eq(StatusEnum.VALID.getCode()))
+172                 .fetchInto(SpaceMemberRecord.class);
+173     }
+174 
+175     public List<SpaceRecord> listBySpaceCodes(List<String> spaceCodes) {
+176         return db.selectFrom(Tables.SPACE)
+177                 .where(Tables.SPACE.SPACE_CODE.in(spaceCodes))
+178                 .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+179                 .fetchInto(SpaceRecord.class);
+180     }
+181 
+182     public List<SpaceMemberRecord> listMemberByMemberUid(String memberUid) {
+183         return db.selectFrom(Tables.SPACE_MEMBER)
+184                 .where(Tables.SPACE_MEMBER.MEMBER_UID.eq(memberUid))
+185                 .and(Tables.SPACE_MEMBER.STATUS.eq(StatusEnum.VALID.getCode()))
+186                 .fetchInto(SpaceMemberRecord.class);
+187     }
+188 
+189 }
+190
+```
+
+
+
+
+```
+File: api/server/src/main/java/com/ke/bella/openapi/endpoints/SpaceController.java
+1 package com.ke.bella.openapi.endpoints;
+2 
+3 import com.ke.bella.openapi.annotations.BellaAPI;
+4 import com.ke.bella.openapi.service.SpaceService;
+5 import com.ke.bella.openapi.space.CreateMemberOp;
+6 import com.ke.bella.openapi.space.ExitSpaceOp;
+7 import com.ke.bella.openapi.space.Member;
+8 import com.ke.bella.openapi.space.RemoveMemberOp;
+9 import com.ke.bella.openapi.space.RoleWithSpace;
+10 import com.ke.bella.openapi.space.Space;
+11 import com.ke.bella.openapi.space.UpdateMemberRoleOp;
+12 import com.ke.bella.openapi.space.CreateRoleOp;
+13 import com.ke.bella.openapi.space.CreateSpaceOp;
+14 import com.ke.bella.openapi.space.UpdateSpaceNameOp;
+15 import com.ke.bella.openapi.space.ChangeSpaceOwnerOp;
+16 import io.swagger.v3.oas.annotations.tags.Tag;
+17 import org.springframework.beans.factory.annotation.Autowired;
+18 import org.springframework.validation.annotation.Validated;
+19 import org.springframework.web.bind.annotation.GetMapping;
+20 import org.springframework.web.bind.annotation.PostMapping;
+21 import org.springframework.web.bind.annotation.RequestBody;
+22 import org.springframework.web.bind.annotation.RequestMapping;
+23 import org.springframework.web.bind.annotation.RequestParam;
+24 import org.springframework.web.bind.annotation.RestController;
+25 
+26 import java.util.List;
+27 
+28 /**
+29  * function: 空间管理
+30  *
+31  * @author chenhongliang001
+32  */
+33 @BellaAPI
+34 @RestController
+35 @RequestMapping("/v1/space")
+36 @Tag(name = "空间管理")
+37 public class SpaceController {
+38 
+39     @Autowired
+40     private SpaceService spaceService;
+41 
+42     @PostMapping("/create")
+43     public String createSpace(@RequestBody @Validated CreateSpaceOp op) {
+44         return spaceService.createSpace(op);
+45     }
+46 
+47     @PostMapping("/name/update")
+48     public Boolean updateSpaceName(@RequestBody @Validated UpdateSpaceNameOp op) {
+49         return spaceService.updateSpaceName(op);
+50     }
+51 
+52     @GetMapping("/get")
+53     public Space getSpace(@RequestParam String spaceCode) {
+54         return spaceService.querySpaceBySpaceCode(spaceCode);
+55     }
+56 
+57     @GetMapping("/list")
+58     public List<Space> listSpace(@RequestParam List<String> spaceCodes) {
+59         return spaceService.listSpace(spaceCodes);
+60     }
+61 
+62     @PostMapping("/owner/change")
+63     public Boolean changeSpaceOwner(@RequestBody ChangeSpaceOwnerOp op) {
+64         return spaceService.changeSpaceOwner(op);
+65     }
+66 
+67     @PostMapping("/role/create")
+68     public Boolean createRole(@RequestBody @Validated CreateRoleOp op) {
+69         return spaceService.createRole(op);
+70     }
+71 
+72     @GetMapping("/role/list")
+73     public List<RoleWithSpace> listRole(@RequestParam String memberUid) {
+74         return spaceService.listRole(memberUid);
+75     }
+76 
+77     @PostMapping("/member/create")
+78     public Boolean createMember(@RequestBody @Validated CreateMemberOp op) {
+79         return spaceService.createMember(op);
+80     }
+81 
+82     @PostMapping("/member/remove")
+83     public Boolean removeMember(@RequestBody @Validated RemoveMemberOp op) {
+84         return spaceService.removeMember(op);
+85     }
+86 
+87     @PostMapping("/member/update")
+88     public Boolean updateMember(@RequestBody @Validated UpdateMemberRoleOp op) {
+89         return spaceService.updateMember(op);
+90     }
+91 
+92     @PostMapping("/member/exit")
+93     public Boolean exitSpace(@RequestBody @Validated ExitSpaceOp op) {
+94         return spaceService.exitSpace(op);
+95     }
+96 
+97     @GetMapping("/member/list")
+98     public List<Member> listMember(@RequestParam String spaceCode) {
+99         return spaceService.listMember(spaceCode);
+100     }
+101 
+102     @GetMapping("/member/role")
+103     public RoleWithSpace getMemberRole(@RequestParam String memberUid, @RequestParam String spaceCode) {
+104         return spaceService.getMemberRole(memberUid, spaceCode);
+105     }
+106 
+107 }
+108
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/Space.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables;
+5 
+6 
+7 import com.ke.bella.openapi.DefaultSchema;
+8 import com.ke.bella.openapi.Keys;
+9 import com.ke.bella.openapi.tables.records.SpaceRecord;
+10 
+11 import java.time.LocalDateTime;
+12 import java.util.Arrays;
+13 import java.util.List;
+14 
+15 import org.jooq.Field;
+16 import org.jooq.ForeignKey;
+17 import org.jooq.Identity;
+18 import org.jooq.Name;
+19 import org.jooq.Record;
+20 import org.jooq.Row10;
+21 import org.jooq.Schema;
+22 import org.jooq.Table;
+23 import org.jooq.TableField;
+24 import org.jooq.TableOptions;
+25 import org.jooq.UniqueKey;
+26 import org.jooq.impl.DSL;
+27 import org.jooq.impl.SQLDataType;
+28 import org.jooq.impl.TableImpl;
+29 
+30 
+31 /**
+32  * 空间表
+33  */
+34 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+35 public class Space extends TableImpl<SpaceRecord> {
+36 
+37     private static final long serialVersionUID = 1L;
+38 
+39     /**
+40      * The reference instance of <code>space</code>
+41      */
+42     public static final Space SPACE = new Space();
+43 
+44     /**
+45      * The class holding records for this type
+46      */
+47     @Override
+48     public Class<SpaceRecord> getRecordType() {
+49         return SpaceRecord.class;
+50     }
+51 
+52     /**
+53      * The column <code>space.id</code>. 主键
+54      */
+55     public final TableField<SpaceRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键");
+56 
+57     /**
+58      * The column <code>space.space_code</code>. 空间编码
+59      */
+60     public final TableField<SpaceRecord, String> SPACE_CODE = createField(DSL.name("space_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "空间编码");
+61 
+62     /**
+63      * The column <code>space.space_name</code>. 空间名称
+64      */
+65     public final TableField<SpaceRecord, String> SPACE_NAME = createField(DSL.name("space_name"), SQLDataType.VARCHAR(128).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "空间名称");
+66 
+67     /**
+68      * The column <code>space.space_description</code>. 空间描述
+69      */
+70     public final TableField<SpaceRecord, String> SPACE_DESCRIPTION = createField(DSL.name("space_description"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "空间描述");
+71 
+72     /**
+73      * The column <code>space.status</code>. 删除状态(0未删除，-1已删除)
+74      */
+75     public final TableField<SpaceRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "删除状态(0未删除，-1已删除)");
+76 
+77     /**
+78      * The column <code>space.ctime</code>. 创建时间
+79      */
+80     public final TableField<SpaceRecord, LocalDateTime> CTIME = createField(DSL.name("ctime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+81 
+82     /**
+83      * The column <code>space.mtime</code>. 最后一次更新时间
+84      */
+85     public final TableField<SpaceRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "最后一次更新时间");
+86 
+87     /**
+88      * The column <code>space.owner_uid</code>. 空间拥有人id
+89      */
+90     public final TableField<SpaceRecord, String> OWNER_UID = createField(DSL.name("owner_uid"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "空间拥有人id");
+91 
+92     /**
+93      * The column <code>space.cuid</code>. 空间创建人id
+94      */
+95     public final TableField<SpaceRecord, Long> CUID = createField(DSL.name("cuid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "空间创建人id");
+96 
+97     /**
+98      * The column <code>space.muid</code>. 空间最后一次更新人id
+99      */
+100     public final TableField<SpaceRecord, Long> MUID = createField(DSL.name("muid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "空间最后一次更新人id");
+101 
+102     private Space(Name alias, Table<SpaceRecord> aliased) {
+103         this(alias, aliased, null);
+104     }
+105 
+106     private Space(Name alias, Table<SpaceRecord> aliased, Field<?>[] parameters) {
+107         super(alias, null, aliased, parameters, DSL.comment("空间表"), TableOptions.table());
+108     }
+109 
+110     /**
+111      * Create an aliased <code>space</code> table reference
+112      */
+113     public Space(String alias) {
+114         this(DSL.name(alias), SPACE);
+115     }
+116 
+117     /**
+118      * Create an aliased <code>space</code> table reference
+119      */
+120     public Space(Name alias) {
+121         this(alias, SPACE);
+122     }
+123 
+124     /**
+125      * Create a <code>space</code> table reference
+126      */
+127     public Space() {
+128         this(DSL.name("space"), null);
+129     }
+130 
+131     public <O extends Record> Space(Table<O> child, ForeignKey<O, SpaceRecord> key) {
+132         super(child, key, SPACE);
+133     }
+134 
+135     @Override
+136     public Schema getSchema() {
+137         return DefaultSchema.DEFAULT_SCHEMA;
+138     }
+139 
+140     @Override
+141     public Identity<SpaceRecord, Long> getIdentity() {
+142         return (Identity<SpaceRecord, Long>) super.getIdentity();
+143     }
+144 
+145     @Override
+146     public UniqueKey<SpaceRecord> getPrimaryKey() {
+147         return Keys.KEY_SPACE_PRIMARY;
+148     }
+149 
+150     @Override
+151     public List<UniqueKey<SpaceRecord>> getKeys() {
+152         return Arrays.<UniqueKey<SpaceRecord>>asList(Keys.KEY_SPACE_PRIMARY, Keys.KEY_SPACE_UNIQ_IDX_SPACE_CODE);
+153     }
+154 
+155     @Override
+156     public Space as(String alias) {
+157         return new Space(DSL.name(alias), this);
+158     }
+159 
+160     @Override
+161     public Space as(Name alias) {
+162         return new Space(alias, this);
+163     }
+164 
+165     /**
+166      * Rename this table
+167      */
+168     @Override
+169     public Space rename(String name) {
+170         return new Space(DSL.name(name), null);
+171     }
+172 
+173     /**
+174      * Rename this table
+175      */
+176     @Override
+177     public Space rename(Name name) {
+178         return new Space(name, null);
+179     }
+180 
+181     // -------------------------------------------------------------------------
+182     // Row10 type methods
+183     // -------------------------------------------------------------------------
+184 
+185     @Override
+186     public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> fieldsRow() {
+187         return (Row10) super.fieldsRow();
+188     }
+189 }
+190
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/SpaceMember.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables;
+5 
+6 
+7 import com.ke.bella.openapi.DefaultSchema;
+8 import com.ke.bella.openapi.Indexes;
+9 import com.ke.bella.openapi.Keys;
+10 import com.ke.bella.openapi.tables.records.SpaceMemberRecord;
+11 
+12 import java.time.LocalDateTime;
+13 import java.util.Arrays;
+14 import java.util.List;
+15 
+16 import org.jooq.Field;
+17 import org.jooq.ForeignKey;
+18 import org.jooq.Identity;
+19 import org.jooq.Index;
+20 import org.jooq.Name;
+21 import org.jooq.Record;
+22 import org.jooq.Row10;
+23 import org.jooq.Schema;
+24 import org.jooq.Table;
+25 import org.jooq.TableField;
+26 import org.jooq.TableOptions;
+27 import org.jooq.UniqueKey;
+28 import org.jooq.impl.DSL;
+29 import org.jooq.impl.SQLDataType;
+30 import org.jooq.impl.TableImpl;
+31 
+32 
+33 /**
+34  * 空间成员信息表
+35  */
+36 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+37 public class SpaceMember extends TableImpl<SpaceMemberRecord> {
+38 
+39     private static final long serialVersionUID = 1L;
+40 
+41     /**
+42      * The reference instance of <code>space_member</code>
+43      */
+44     public static final SpaceMember SPACE_MEMBER = new SpaceMember();
+45 
+46     /**
+47      * The class holding records for this type
+48      */
+49     @Override
+50     public Class<SpaceMemberRecord> getRecordType() {
+51         return SpaceMemberRecord.class;
+52     }
+53 
+54     /**
+55      * The column <code>space_member.id</code>. 主键
+56      */
+57     public final TableField<SpaceMemberRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键");
+58 
+59     /**
+60      * The column <code>space_member.space_code</code>. 空间编码
+61      */
+62     public final TableField<SpaceMemberRecord, String> SPACE_CODE = createField(DSL.name("space_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "空间编码");
+63 
+64     /**
+65      * The column <code>space_member.role_code</code>. 角色编码
+66      */
+67     public final TableField<SpaceMemberRecord, String> ROLE_CODE = createField(DSL.name("role_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "角色编码");
+68 
+69     /**
+70      * The column <code>space_member.member_name</code>. 成员姓名
+71      */
+72     public final TableField<SpaceMemberRecord, String> MEMBER_NAME = createField(DSL.name("member_name"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "成员姓名");
+73 
+74     /**
+75      * The column <code>space_member.member_uid</code>. 成员id
+76      */
+77     public final TableField<SpaceMemberRecord, String> MEMBER_UID = createField(DSL.name("member_uid"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "成员id");
+78 
+79     /**
+80      * The column <code>space_member.status</code>. 删除状态(0未删除，-1已删除)
+81      */
+82     public final TableField<SpaceMemberRecord, Byte> STATUS = createField(DSL.name("status"), SQLDataType.TINYINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.TINYINT)), this, "删除状态(0未删除，-1已删除)");
+83 
+84     /**
+85      * The column <code>space_member.ctime</code>. 创建时间
+86      */
+87     public final TableField<SpaceMemberRecord, LocalDateTime> CTIME = createField(DSL.name("ctime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "创建时间");
+88 
+89     /**
+90      * The column <code>space_member.mtime</code>. 最后一次修改时间
+91      */
+92     public final TableField<SpaceMemberRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "最后一次修改时间");
+93 
+94     /**
+95      * The column <code>space_member.cuid</code>. 创建人id
+96      */
+97     public final TableField<SpaceMemberRecord, Long> CUID = createField(DSL.name("cuid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "创建人id");
+98 
+99     /**
+100      * The column <code>space_member.muid</code>. 最后一次更新人id
+101      */
+102     public final TableField<SpaceMemberRecord, Long> MUID = createField(DSL.name("muid"), SQLDataType.BIGINT.nullable(false).defaultValue(DSL.inline("0", SQLDataType.BIGINT)), this, "最后一次更新人id");
+103 
+104     private SpaceMember(Name alias, Table<SpaceMemberRecord> aliased) {
+105         this(alias, aliased, null);
+106     }
+107 
+108     private SpaceMember(Name alias, Table<SpaceMemberRecord> aliased, Field<?>[] parameters) {
+109         super(alias, null, aliased, parameters, DSL.comment("空间成员信息表"), TableOptions.table());
+110     }
+111 
+112     /**
+113      * Create an aliased <code>space_member</code> table reference
+114      */
+115     public SpaceMember(String alias) {
+116         this(DSL.name(alias), SPACE_MEMBER);
+117     }
+118 
+119     /**
+120      * Create an aliased <code>space_member</code> table reference
+121      */
+122     public SpaceMember(Name alias) {
+123         this(alias, SPACE_MEMBER);
+124     }
+125 
+126     /**
+127      * Create a <code>space_member</code> table reference
+128      */
+129     public SpaceMember() {
+130         this(DSL.name("space_member"), null);
+131     }
+132 
+133     public <O extends Record> SpaceMember(Table<O> child, ForeignKey<O, SpaceMemberRecord> key) {
+134         super(child, key, SPACE_MEMBER);
+135     }
+136 
+137     @Override
+138     public Schema getSchema() {
+139         return DefaultSchema.DEFAULT_SCHEMA;
+140     }
+141 
+142     @Override
+143     public List<Index> getIndexes() {
+144         return Arrays.<Index>asList(Indexes.SPACE_MEMBER_IDX_MEMBER_UID);
+145     }
+146 
+147     @Override
+148     public Identity<SpaceMemberRecord, Long> getIdentity() {
+149         return (Identity<SpaceMemberRecord, Long>) super.getIdentity();
+150     }
+151 
+152     @Override
+153     public UniqueKey<SpaceMemberRecord> getPrimaryKey() {
+154         return Keys.KEY_SPACE_MEMBER_PRIMARY;
+155     }
+156 
+157     @Override
+158     public List<UniqueKey<SpaceMemberRecord>> getKeys() {
+159         return Arrays.<UniqueKey<SpaceMemberRecord>>asList(Keys.KEY_SPACE_MEMBER_PRIMARY);
+160     }
+161 
+162     @Override
+163     public SpaceMember as(String alias) {
+164         return new SpaceMember(DSL.name(alias), this);
+165     }
+166 
+167     @Override
+168     public SpaceMember as(Name alias) {
+169         return new SpaceMember(alias, this);
+170     }
+171 
+172     /**
+173      * Rename this table
+174      */
+175     @Override
+176     public SpaceMember rename(String name) {
+177         return new SpaceMember(DSL.name(name), null);
+178     }
+179 
+180     /**
+181      * Rename this table
+182      */
+183     @Override
+184     public SpaceMember rename(Name name) {
+185         return new SpaceMember(name, null);
+186     }
+187 
+188     // -------------------------------------------------------------------------
+189     // Row10 type methods
+190     // -------------------------------------------------------------------------
+191 
+192     @Override
+193     public Row10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> fieldsRow() {
+194         return (Row10) super.fieldsRow();
+195     }
+196 }
+197
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/SpaceDB.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables.pojos;
+5 
+6 
+7 import com.ke.bella.openapi.db.repo.Timed;
+8 
+9 import java.io.Serializable;
+10 import java.time.LocalDateTime;
+11 
+12 
+13 /**
+14  * 空间表
+15  */
+16 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+17 public class SpaceDB implements Timed, Serializable {
+18 
+19     private static final long serialVersionUID = 1L;
+20 
+21     private Long          id;
+22     private String        spaceCode;
+23     private String        spaceName;
+24     private String        spaceDescription;
+25     private Byte          status;
+26     private LocalDateTime ctime;
+27     private LocalDateTime mtime;
+28     private String        ownerUid;
+29     private Long          cuid;
+30     private Long          muid;
+31 
+32     public SpaceDB() {}
+33 
+34     public SpaceDB(SpaceDB value) {
+35         this.id = value.id;
+36         this.spaceCode = value.spaceCode;
+37         this.spaceName = value.spaceName;
+38         this.spaceDescription = value.spaceDescription;
+39         this.status = value.status;
+40         this.ctime = value.ctime;
+41         this.mtime = value.mtime;
+42         this.ownerUid = value.ownerUid;
+43         this.cuid = value.cuid;
+44         this.muid = value.muid;
+45     }
+46 
+47     public SpaceDB(
+48         Long          id,
+49         String        spaceCode,
+50         String        spaceName,
+51         String        spaceDescription,
+52         Byte          status,
+53         LocalDateTime ctime,
+54         LocalDateTime mtime,
+55         String        ownerUid,
+56         Long          cuid,
+57         Long          muid
+58     ) {
+59         this.id = id;
+60         this.spaceCode = spaceCode;
+61         this.spaceName = spaceName;
+62         this.spaceDescription = spaceDescription;
+63         this.status = status;
+64         this.ctime = ctime;
+65         this.mtime = mtime;
+66         this.ownerUid = ownerUid;
+67         this.cuid = cuid;
+68         this.muid = muid;
+69     }
+70 
+71     /**
+72      * Getter for <code>space.id</code>. 主键
+73      */
+74     public Long getId() {
+75         return this.id;
+76     }
+77 
+78     /**
+79      * Setter for <code>space.id</code>. 主键
+80      */
+81     public void setId(Long id) {
+82         this.id = id;
+83     }
+84 
+85     /**
+86      * Getter for <code>space.space_code</code>. 空间编码
+87      */
+88     public String getSpaceCode() {
+89         return this.spaceCode;
+90     }
+91 
+92     /**
+93      * Setter for <code>space.space_code</code>. 空间编码
+94      */
+95     public void setSpaceCode(String spaceCode) {
+96         this.spaceCode = spaceCode;
+97     }
+98 
+99     /**
+100      * Getter for <code>space.space_name</code>. 空间名称
+101      */
+102     public String getSpaceName() {
+103         return this.spaceName;
+104     }
+105 
+106     /**
+107      * Setter for <code>space.space_name</code>. 空间名称
+108      */
+109     public void setSpaceName(String spaceName) {
+110         this.spaceName = spaceName;
+111     }
+112 
+113     /**
+114      * Getter for <code>space.space_description</code>. 空间描述
+115      */
+116     public String getSpaceDescription() {
+117         return this.spaceDescription;
+118     }
+119 
+120     /**
+121      * Setter for <code>space.space_description</code>. 空间描述
+122      */
+123     public void setSpaceDescription(String spaceDescription) {
+124         this.spaceDescription = spaceDescription;
+125     }
+126 
+127     /**
+128      * Getter for <code>space.status</code>. 删除状态(0未删除，-1已删除)
+129      */
+130     public Byte getStatus() {
+131         return this.status;
+132     }
+133 
+134     /**
+135      * Setter for <code>space.status</code>. 删除状态(0未删除，-1已删除)
+136      */
+137     public void setStatus(Byte status) {
+138         this.status = status;
+139     }
+140 
+141     /**
+142      * Getter for <code>space.ctime</code>. 创建时间
+143      */
+144     public LocalDateTime getCtime() {
+145         return this.ctime;
+146     }
+147 
+148     /**
+149      * Setter for <code>space.ctime</code>. 创建时间
+150      */
+151     public void setCtime(LocalDateTime ctime) {
+152         this.ctime = ctime;
+153     }
+154 
+155     /**
+156      * Getter for <code>space.mtime</code>. 最后一次更新时间
+157      */
+158     public LocalDateTime getMtime() {
+159         return this.mtime;
+160     }
+161 
+162     /**
+163      * Setter for <code>space.mtime</code>. 最后一次更新时间
+164      */
+165     public void setMtime(LocalDateTime mtime) {
+166         this.mtime = mtime;
+167     }
+168 
+169     /**
+170      * Getter for <code>space.owner_uid</code>. 空间拥有人id
+171      */
+172     public String getOwnerUid() {
+173         return this.ownerUid;
+174     }
+175 
+176     /**
+177      * Setter for <code>space.owner_uid</code>. 空间拥有人id
+178      */
+179     public void setOwnerUid(String ownerUid) {
+180         this.ownerUid = ownerUid;
+181     }
+182 
+183     /**
+184      * Getter for <code>space.cuid</code>. 空间创建人id
+185      */
+186     public Long getCuid() {
+187         return this.cuid;
+188     }
+189 
+190     /**
+191      * Setter for <code>space.cuid</code>. 空间创建人id
+192      */
+193     public void setCuid(Long cuid) {
+194         this.cuid = cuid;
+195     }
+196 
+197     /**
+198      * Getter for <code>space.muid</code>. 空间最后一次更新人id
+199      */
+200     public Long getMuid() {
+201         return this.muid;
+202     }
+203 
+204     /**
+205      * Setter for <code>space.muid</code>. 空间最后一次更新人id
+206      */
+207     public void setMuid(Long muid) {
+208         this.muid = muid;
+209     }
+210 
+211     @Override
+212     public String toString() {
+213         StringBuilder sb = new StringBuilder("SpaceDB (");
+214 
+215         sb.append(id);
+216         sb.append(", ").append(spaceCode);
+217         sb.append(", ").append(spaceName);
+218         sb.append(", ").append(spaceDescription);
+219         sb.append(", ").append(status);
+220         sb.append(", ").append(ctime);
+221         sb.append(", ").append(mtime);
+222         sb.append(", ").append(ownerUid);
+223         sb.append(", ").append(cuid);
+224         sb.append(", ").append(muid);
+225 
+226         sb.append(")");
+227         return sb.toString();
+228     }
+229 }
+230
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/SpaceMemberDB.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables.pojos;
+5 
+6 
+7 import com.ke.bella.openapi.db.repo.Timed;
+8 
+9 import java.io.Serializable;
+10 import java.time.LocalDateTime;
+11 
+12 
+13 /**
+14  * 空间成员信息表
+15  */
+16 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+17 public class SpaceMemberDB implements Timed, Serializable {
+18 
+19     private static final long serialVersionUID = 1L;
+20 
+21     private Long          id;
+22     private String        spaceCode;
+23     private String        roleCode;
+24     private String        memberName;
+25     private String        memberUid;
+26     private Byte          status;
+27     private LocalDateTime ctime;
+28     private LocalDateTime mtime;
+29     private Long          cuid;
+30     private Long          muid;
+31 
+32     public SpaceMemberDB() {}
+33 
+34     public SpaceMemberDB(SpaceMemberDB value) {
+35         this.id = value.id;
+36         this.spaceCode = value.spaceCode;
+37         this.roleCode = value.roleCode;
+38         this.memberName = value.memberName;
+39         this.memberUid = value.memberUid;
+40         this.status = value.status;
+41         this.ctime = value.ctime;
+42         this.mtime = value.mtime;
+43         this.cuid = value.cuid;
+44         this.muid = value.muid;
+45     }
+46 
+47     public SpaceMemberDB(
+48         Long          id,
+49         String        spaceCode,
+50         String        roleCode,
+51         String        memberName,
+52         String        memberUid,
+53         Byte          status,
+54         LocalDateTime ctime,
+55         LocalDateTime mtime,
+56         Long          cuid,
+57         Long          muid
+58     ) {
+59         this.id = id;
+60         this.spaceCode = spaceCode;
+61         this.roleCode = roleCode;
+62         this.memberName = memberName;
+63         this.memberUid = memberUid;
+64         this.status = status;
+65         this.ctime = ctime;
+66         this.mtime = mtime;
+67         this.cuid = cuid;
+68         this.muid = muid;
+69     }
+70 
+71     /**
+72      * Getter for <code>space_member.id</code>. 主键
+73      */
+74     public Long getId() {
+75         return this.id;
+76     }
+77 
+78     /**
+79      * Setter for <code>space_member.id</code>. 主键
+80      */
+81     public void setId(Long id) {
+82         this.id = id;
+83     }
+84 
+85     /**
+86      * Getter for <code>space_member.space_code</code>. 空间编码
+87      */
+88     public String getSpaceCode() {
+89         return this.spaceCode;
+90     }
+91 
+92     /**
+93      * Setter for <code>space_member.space_code</code>. 空间编码
+94      */
+95     public void setSpaceCode(String spaceCode) {
+96         this.spaceCode = spaceCode;
+97     }
+98 
+99     /**
+100      * Getter for <code>space_member.role_code</code>. 角色编码
+101      */
+102     public String getRoleCode() {
+103         return this.roleCode;
+104     }
+105 
+106     /**
+107      * Setter for <code>space_member.role_code</code>. 角色编码
+108      */
+109     public void setRoleCode(String roleCode) {
+110         this.roleCode = roleCode;
+111     }
+112 
+113     /**
+114      * Getter for <code>space_member.member_name</code>. 成员姓名
+115      */
+116     public String getMemberName() {
+117         return this.memberName;
+118     }
+119 
+120     /**
+121      * Setter for <code>space_member.member_name</code>. 成员姓名
+122      */
+123     public void setMemberName(String memberName) {
+124         this.memberName = memberName;
+125     }
+126 
+127     /**
+128      * Getter for <code>space_member.member_uid</code>. 成员id
+129      */
+130     public String getMemberUid() {
+131         return this.memberUid;
+132     }
+133 
+134     /**
+135      * Setter for <code>space_member.member_uid</code>. 成员id
+136      */
+137     public void setMemberUid(String memberUid) {
+138         this.memberUid = memberUid;
+139     }
+140 
+141     /**
+142      * Getter for <code>space_member.status</code>. 删除状态(0未删除，-1已删除)
+143      */
+144     public Byte getStatus() {
+145         return this.status;
+146     }
+147 
+148     /**
+149      * Setter for <code>space_member.status</code>. 删除状态(0未删除，-1已删除)
+150      */
+151     public void setStatus(Byte status) {
+152         this.status = status;
+153     }
+154 
+155     /**
+156      * Getter for <code>space_member.ctime</code>. 创建时间
+157      */
+158     public LocalDateTime getCtime() {
+159         return this.ctime;
+160     }
+161 
+162     /**
+163      * Setter for <code>space_member.ctime</code>. 创建时间
+164      */
+165     public void setCtime(LocalDateTime ctime) {
+166         this.ctime = ctime;
+167     }
+168 
+169     /**
+170      * Getter for <code>space_member.mtime</code>. 最后一次修改时间
+171      */
+172     public LocalDateTime getMtime() {
+173         return this.mtime;
+174     }
+175 
+176     /**
+177      * Setter for <code>space_member.mtime</code>. 最后一次修改时间
+178      */
+179     public void setMtime(LocalDateTime mtime) {
+180         this.mtime = mtime;
+181     }
+182 
+183     /**
+184      * Getter for <code>space_member.cuid</code>. 创建人id
+185      */
+186     public Long getCuid() {
+187         return this.cuid;
+188     }
+189 
+190     /**
+191      * Setter for <code>space_member.cuid</code>. 创建人id
+192      */
+193     public void setCuid(Long cuid) {
+194         this.cuid = cuid;
+195     }
+196 
+197     /**
+198      * Getter for <code>space_member.muid</code>. 最后一次更新人id
+199      */
+200     public Long getMuid() {
+201         return this.muid;
+202     }
+203 
+204     /**
+205      * Setter for <code>space_member.muid</code>. 最后一次更新人id
+206      */
+207     public void setMuid(Long muid) {
+208         this.muid = muid;
+209     }
+210 
+211     @Override
+212     public String toString() {
+213         StringBuilder sb = new StringBuilder("SpaceMemberDB (");
+214 
+215         sb.append(id);
+216         sb.append(", ").append(spaceCode);
+217         sb.append(", ").append(roleCode);
+218         sb.append(", ").append(memberName);
+219         sb.append(", ").append(memberUid);
+220         sb.append(", ").append(status);
+221         sb.append(", ").append(ctime);
+222         sb.append(", ").append(mtime);
+223         sb.append(", ").append(cuid);
+224         sb.append(", ").append(muid);
+225 
+226         sb.append(")");
+227         return sb.toString();
+228     }
+229 }
+230
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/records/SpaceRecord.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables.records;
+5 
+6 
+7 import com.ke.bella.openapi.db.repo.Timed;
+8 import com.ke.bella.openapi.tables.Space;
+9 
+10 import java.time.LocalDateTime;
+11 
+12 import org.jooq.Field;
+13 import org.jooq.Record1;
+14 import org.jooq.Record10;
+15 import org.jooq.Row10;
+16 import org.jooq.impl.UpdatableRecordImpl;
+17 
+18 
+19 /**
+20  * 空间表
+21  */
+22 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+23 public class SpaceRecord extends UpdatableRecordImpl<SpaceRecord> implements Timed, Record10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> {
+24 
+25     private static final long serialVersionUID = 1L;
+26 
+27     /**
+28      * Setter for <code>space.id</code>. 主键
+29      */
+30     public void setId(Long value) {
+31         set(0, value);
+32     }
+33 
+34     /**
+35      * Getter for <code>space.id</code>. 主键
+36      */
+37     public Long getId() {
+38         return (Long) get(0);
+39     }
+40 
+41     /**
+42      * Setter for <code>space.space_code</code>. 空间编码
+43      */
+44     public void setSpaceCode(String value) {
+45         set(1, value);
+46     }
+47 
+48     /**
+49      * Getter for <code>space.space_code</code>. 空间编码
+50      */
+51     public String getSpaceCode() {
+52         return (String) get(1);
+53     }
+54 
+55     /**
+56      * Setter for <code>space.space_name</code>. 空间名称
+57      */
+58     public void setSpaceName(String value) {
+59         set(2, value);
+60     }
+61 
+62     /**
+63      * Getter for <code>space.space_name</code>. 空间名称
+64      */
+65     public String getSpaceName() {
+66         return (String) get(2);
+67     }
+68 
+69     /**
+70      * Setter for <code>space.space_description</code>. 空间描述
+71      */
+72     public void setSpaceDescription(String value) {
+73         set(3, value);
+74     }
+75 
+76     /**
+77      * Getter for <code>space.space_description</code>. 空间描述
+78      */
+79     public String getSpaceDescription() {
+80         return (String) get(3);
+81     }
+82 
+83     /**
+84      * Setter for <code>space.status</code>. 删除状态(0未删除，-1已删除)
+85      */
+86     public void setStatus(Byte value) {
+87         set(4, value);
+88     }
+89 
+90     /**
+91      * Getter for <code>space.status</code>. 删除状态(0未删除，-1已删除)
+92      */
+93     public Byte getStatus() {
+94         return (Byte) get(4);
+95     }
+96 
+97     /**
+98      * Setter for <code>space.ctime</code>. 创建时间
+99      */
+100     public void setCtime(LocalDateTime value) {
+101         set(5, value);
+102     }
+103 
+104     /**
+105      * Getter for <code>space.ctime</code>. 创建时间
+106      */
+107     public LocalDateTime getCtime() {
+108         return (LocalDateTime) get(5);
+109     }
+110 
+111     /**
+112      * Setter for <code>space.mtime</code>. 最后一次更新时间
+113      */
+114     public void setMtime(LocalDateTime value) {
+115         set(6, value);
+116     }
+117 
+118     /**
+119      * Getter for <code>space.mtime</code>. 最后一次更新时间
+120      */
+121     public LocalDateTime getMtime() {
+122         return (LocalDateTime) get(6);
+123     }
+124 
+125     /**
+126      * Setter for <code>space.owner_uid</code>. 空间拥有人id
+127      */
+128     public void setOwnerUid(String value) {
+129         set(7, value);
+130     }
+131 
+132     /**
+133      * Getter for <code>space.owner_uid</code>. 空间拥有人id
+134      */
+135     public String getOwnerUid() {
+136         return (String) get(7);
+137     }
+138 
+139     /**
+140      * Setter for <code>space.cuid</code>. 空间创建人id
+141      */
+142     public void setCuid(Long value) {
+143         set(8, value);
+144     }
+145 
+146     /**
+147      * Getter for <code>space.cuid</code>. 空间创建人id
+148      */
+149     public Long getCuid() {
+150         return (Long) get(8);
+151     }
+152 
+153     /**
+154      * Setter for <code>space.muid</code>. 空间最后一次更新人id
+155      */
+156     public void setMuid(Long value) {
+157         set(9, value);
+158     }
+159 
+160     /**
+161      * Getter for <code>space.muid</code>. 空间最后一次更新人id
+162      */
+163     public Long getMuid() {
+164         return (Long) get(9);
+165     }
+166 
+167     // -------------------------------------------------------------------------
+168     // Primary key information
+169     // -------------------------------------------------------------------------
+170 
+171     @Override
+172     public Record1<Long> key() {
+173         return (Record1) super.key();
+174     }
+175 
+176     // -------------------------------------------------------------------------
+177     // Record10 type implementation
+178     // -------------------------------------------------------------------------
+179 
+180     @Override
+181     public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> fieldsRow() {
+182         return (Row10) super.fieldsRow();
+183     }
+184 
+185     @Override
+186     public Row10<Long, String, String, String, Byte, LocalDateTime, LocalDateTime, String, Long, Long> valuesRow() {
+187         return (Row10) super.valuesRow();
+188     }
+189 
+190     @Override
+191     public Field<Long> field1() {
+192         return Space.SPACE.ID;
+193     }
+194 
+195     @Override
+196     public Field<String> field2() {
+197         return Space.SPACE.SPACE_CODE;
+198     }
+199 
+200     @Override
+201     public Field<String> field3() {
+202         return Space.SPACE.SPACE_NAME;
+203     }
+204 
+205     @Override
+206     public Field<String> field4() {
+207         return Space.SPACE.SPACE_DESCRIPTION;
+208     }
+209 
+210     @Override
+211     public Field<Byte> field5() {
+212         return Space.SPACE.STATUS;
+213     }
+214 
+215     @Override
+216     public Field<LocalDateTime> field6() {
+217         return Space.SPACE.CTIME;
+218     }
+219 
+220     @Override
+221     public Field<LocalDateTime> field7() {
+222         return Space.SPACE.MTIME;
+223     }
+224 
+225     @Override
+226     public Field<String> field8() {
+227         return Space.SPACE.OWNER_UID;
+228     }
+229 
+230     @Override
+231     public Field<Long> field9() {
+232         return Space.SPACE.CUID;
+233     }
+234 
+235     @Override
+236     public Field<Long> field10() {
+237         return Space.SPACE.MUID;
+238     }
+239 
+240     @Override
+241     public Long component1() {
+242         return getId();
+243     }
+244 
+245     @Override
+246     public String component2() {
+247         return getSpaceCode();
+248     }
+249 
+250     @Override
+251     public String component3() {
+252         return getSpaceName();
+253     }
+254 
+255     @Override
+256     public String component4() {
+257         return getSpaceDescription();
+258     }
+259 
+260     @Override
+261     public Byte component5() {
+262         return getStatus();
+263     }
+264 
+265     @Override
+266     public LocalDateTime component6() {
+267         return getCtime();
+268     }
+269 
+270     @Override
+271     public LocalDateTime component7() {
+272         return getMtime();
+273     }
+274 
+275     @Override
+276     public String component8() {
+277         return getOwnerUid();
+278     }
+279 
+280     @Override
+281     public Long component9() {
+282         return getCuid();
+283     }
+284 
+285     @Override
+286     public Long component10() {
+287         return getMuid();
+288     }
+289 
+290     @Override
+291     public Long value1() {
+292         return getId();
+293     }
+294 
+295     @Override
+296     public String value2() {
+297         return getSpaceCode();
+298     }
+299 
+300     @Override
+301     public String value3() {
+302         return getSpaceName();
+303     }
+304 
+305     @Override
+306     public String value4() {
+307         return getSpaceDescription();
+308     }
+309 
+310     @Override
+311     public Byte value5() {
+312         return getStatus();
+313     }
+314 
+315     @Override
+316     public LocalDateTime value6() {
+317         return getCtime();
+318     }
+319 
+320     @Override
+321     public LocalDateTime value7() {
+322         return getMtime();
+323     }
+324 
+325     @Override
+326     public String value8() {
+327         return getOwnerUid();
+328     }
+329 
+330     @Override
+331     public Long value9() {
+332         return getCuid();
+333     }
+334 
+335     @Override
+336     public Long value10() {
+337         return getMuid();
+338     }
+339 
+340     @Override
+341     public SpaceRecord value1(Long value) {
+342         setId(value);
+343         return this;
+344     }
+345 
+346     @Override
+347     public SpaceRecord value2(String value) {
+348         setSpaceCode(value);
+349         return this;
+350     }
+351 
+352     @Override
+353     public SpaceRecord value3(String value) {
+354         setSpaceName(value);
+355         return this;
+356     }
+357 
+358     @Override
+359     public SpaceRecord value4(String value) {
+360         setSpaceDescription(value);
+361         return this;
+362     }
+363 
+364     @Override
+365     public SpaceRecord value5(Byte value) {
+366         setStatus(value);
+367         return this;
+368     }
+369 
+370     @Override
+371     public SpaceRecord value6(LocalDateTime value) {
+372         setCtime(value);
+373         return this;
+374     }
+375 
+376     @Override
+377     public SpaceRecord value7(LocalDateTime value) {
+378         setMtime(value);
+379         return this;
+380     }
+381 
+382     @Override
+383     public SpaceRecord value8(String value) {
+384         setOwnerUid(value);
+385         return this;
+386     }
+387 
+388     @Override
+389     public SpaceRecord value9(Long value) {
+390         setCuid(value);
+391         return this;
+392     }
+393 
+394     @Override
+395     public SpaceRecord value10(Long value) {
+396         setMuid(value);
+397         return this;
+398     }
+399 
+400     @Override
+401     public SpaceRecord values(Long value1, String value2, String value3, String value4, Byte value5, LocalDateTime value6, LocalDateTime value7, String value8, Long value9, Long value10) {
+402         value1(value1);
+403         value2(value2);
+404         value3(value3);
+405         value4(value4);
+406         value5(value5);
+407         value6(value6);
+408         value7(value7);
+409         value8(value8);
+410         value9(value9);
+411         value10(value10);
+412         return this;
+413     }
+414 
+415     // -------------------------------------------------------------------------
+416     // Constructors
+417     // -------------------------------------------------------------------------
+418 
+419     /**
+420      * Create a detached SpaceRecord
+421      */
+422     public SpaceRecord() {
+423         super(Space.SPACE);
+424     }
+425 
+426     /**
+427      * Create a detached, initialised SpaceRecord
+428      */
+429     public SpaceRecord(Long id, String spaceCode, String spaceName, String spaceDescription, Byte status, LocalDateTime ctime, LocalDateTime mtime, String ownerUid, Long cuid, Long muid) {
+430         super(Space.SPACE);
+431 
+432         setId(id);
+433         setSpaceCode(spaceCode);
+434         setSpaceName(spaceName);
+435         setSpaceDescription(spaceDescription);
+436         setStatus(status);
+437         setCtime(ctime);
+438         setMtime(mtime);
+439         setOwnerUid(ownerUid);
+440         setCuid(cuid);
+441         setMuid(muid);
+442     }
+443 }
+444
+```
+
+
+
+
+```
+File: api/server/src/codegen/java/com/ke/bella/openapi/tables/records/SpaceMemberRecord.java
+1 /*
+2  * This file is generated by jOOQ.
+3  */
+4 package com.ke.bella.openapi.tables.records;
+5 
+6 
+7 import com.ke.bella.openapi.db.repo.Timed;
+8 import com.ke.bella.openapi.tables.SpaceMember;
+9 
+10 import java.time.LocalDateTime;
+11 
+12 import org.jooq.Field;
+13 import org.jooq.Record1;
+14 import org.jooq.Record10;
+15 import org.jooq.Row10;
+16 import org.jooq.impl.UpdatableRecordImpl;
+17 
+18 
+19 /**
+20  * 空间成员信息表
+21  */
+22 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
+23 public class SpaceMemberRecord extends UpdatableRecordImpl<SpaceMemberRecord> implements Timed, Record10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> {
+24 
+25     private static final long serialVersionUID = 1L;
+26 
+27     /**
+28      * Setter for <code>space_member.id</code>. 主键
+29      */
+30     public void setId(Long value) {
+31         set(0, value);
+32     }
+33 
+34     /**
+35      * Getter for <code>space_member.id</code>. 主键
+36      */
+37     public Long getId() {
+38         return (Long) get(0);
+39     }
+40 
+41     /**
+42      * Setter for <code>space_member.space_code</code>. 空间编码
+43      */
+44     public void setSpaceCode(String value) {
+45         set(1, value);
+46     }
+47 
+48     /**
+49      * Getter for <code>space_member.space_code</code>. 空间编码
+50      */
+51     public String getSpaceCode() {
+52         return (String) get(1);
+53     }
+54 
+55     /**
+56      * Setter for <code>space_member.role_code</code>. 角色编码
+57      */
+58     public void setRoleCode(String value) {
+59         set(2, value);
+60     }
+61 
+62     /**
+63      * Getter for <code>space_member.role_code</code>. 角色编码
+64      */
+65     public String getRoleCode() {
+66         return (String) get(2);
+67     }
+68 
+69     /**
+70      * Setter for <code>space_member.member_name</code>. 成员姓名
+71      */
+72     public void setMemberName(String value) {
+73         set(3, value);
+74     }
+75 
+76     /**
+77      * Getter for <code>space_member.member_name</code>. 成员姓名
+78      */
+79     public String getMemberName() {
+80         return (String) get(3);
+81     }
+82 
+83     /**
+84      * Setter for <code>space_member.member_uid</code>. 成员id
+85      */
+86     public void setMemberUid(String value) {
+87         set(4, value);
+88     }
+89 
+90     /**
+91      * Getter for <code>space_member.member_uid</code>. 成员id
+92      */
+93     public String getMemberUid() {
+94         return (String) get(4);
+95     }
+96 
+97     /**
+98      * Setter for <code>space_member.status</code>. 删除状态(0未删除，-1已删除)
+99      */
+100     public void setStatus(Byte value) {
+101         set(5, value);
+102     }
+103 
+104     /**
+105      * Getter for <code>space_member.status</code>. 删除状态(0未删除，-1已删除)
+106      */
+107     public Byte getStatus() {
+108         return (Byte) get(5);
+109     }
+110 
+111     /**
+112      * Setter for <code>space_member.ctime</code>. 创建时间
+113      */
+114     public void setCtime(LocalDateTime value) {
+115         set(6, value);
+116     }
+117 
+118     /**
+119      * Getter for <code>space_member.ctime</code>. 创建时间
+120      */
+121     public LocalDateTime getCtime() {
+122         return (LocalDateTime) get(6);
+123     }
+124 
+125     /**
+126      * Setter for <code>space_member.mtime</code>. 最后一次修改时间
+127      */
+128     public void setMtime(LocalDateTime value) {
+129         set(7, value);
+130     }
+131 
+132     /**
+133      * Getter for <code>space_member.mtime</code>. 最后一次修改时间
+134      */
+135     public LocalDateTime getMtime() {
+136         return (LocalDateTime) get(7);
+137     }
+138 
+139     /**
+140      * Setter for <code>space_member.cuid</code>. 创建人id
+141      */
+142     public void setCuid(Long value) {
+143         set(8, value);
+144     }
+145 
+146     /**
+147      * Getter for <code>space_member.cuid</code>. 创建人id
+148      */
+149     public Long getCuid() {
+150         return (Long) get(8);
+151     }
+152 
+153     /**
+154      * Setter for <code>space_member.muid</code>. 最后一次更新人id
+155      */
+156     public void setMuid(Long value) {
+157         set(9, value);
+158     }
+159 
+160     /**
+161      * Getter for <code>space_member.muid</code>. 最后一次更新人id
+162      */
+163     public Long getMuid() {
+164         return (Long) get(9);
+165     }
+166 
+167     // -------------------------------------------------------------------------
+168     // Primary key information
+169     // -------------------------------------------------------------------------
+170 
+171     @Override
+172     public Record1<Long> key() {
+173         return (Record1) super.key();
+174     }
+175 
+176     // -------------------------------------------------------------------------
+177     // Record10 type implementation
+178     // -------------------------------------------------------------------------
+179 
+180     @Override
+181     public Row10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> fieldsRow() {
+182         return (Row10) super.fieldsRow();
+183     }
+184 
+185     @Override
+186     public Row10<Long, String, String, String, String, Byte, LocalDateTime, LocalDateTime, Long, Long> valuesRow() {
+187         return (Row10) super.valuesRow();
+188     }
+189 
+190     @Override
+191     public Field<Long> field1() {
+192         return SpaceMember.SPACE_MEMBER.ID;
+193     }
+194 
+195     @Override
+196     public Field<String> field2() {
+197         return SpaceMember.SPACE_MEMBER.SPACE_CODE;
+198     }
+199 
+200     @Override
+201     public Field<String> field3() {
+202         return SpaceMember.SPACE_MEMBER.ROLE_CODE;
+203     }
+204 
+205     @Override
+206     public Field<String> field4() {
+207         return SpaceMember.SPACE_MEMBER.MEMBER_NAME;
+208     }
+209 
+210     @Override
+211     public Field<String> field5() {
+212         return SpaceMember.SPACE_MEMBER.MEMBER_UID;
+213     }
+214 
+215     @Override
+216     public Field<Byte> field6() {
+217         return SpaceMember.SPACE_MEMBER.STATUS;
+218     }
+219 
+220     @Override
+221     public Field<LocalDateTime> field7() {
+222         return SpaceMember.SPACE_MEMBER.CTIME;
+223     }
+224 
+225     @Override
+226     public Field<LocalDateTime> field8() {
+227         return SpaceMember.SPACE_MEMBER.MTIME;
+228     }
+229 
+230     @Override
+231     public Field<Long> field9() {
+232         return SpaceMember.SPACE_MEMBER.CUID;
+233     }
+234 
+235     @Override
+236     public Field<Long> field10() {
+237         return SpaceMember.SPACE_MEMBER.MUID;
+238     }
+239 
+240     @Override
+241     public Long component1() {
+242         return getId();
+243     }
+244 
+245     @Override
+246     public String component2() {
+247         return getSpaceCode();
+248     }
+249 
+250     @Override
+251     public String component3() {
+252         return getRoleCode();
+253     }
+254 
+255     @Override
+256     public String component4() {
+257         return getMemberName();
+258     }
+259 
+260     @Override
+261     public String component5() {
+262         return getMemberUid();
+263     }
+264 
+265     @Override
+266     public Byte component6() {
+267         return getStatus();
+268     }
+269 
+270     @Override
+271     public LocalDateTime component7() {
+272         return getCtime();
+273     }
+274 
+275     @Override
+276     public LocalDateTime component8() {
+277         return getMtime();
+278     }
+279 
+280     @Override
+281     public Long component9() {
+282         return getCuid();
+283     }
+284 
+285     @Override
+286     public Long component10() {
+287         return getMuid();
+288     }
+289 
+290     @Override
+291     public Long value1() {
+292         return getId();
+293     }
+294 
+295     @Override
+296     public String value2() {
+297         return getSpaceCode();
+298     }
+299 
+300     @Override
+301     public String value3() {
+302         return getRoleCode();
+303     }
+304 
+305     @Override
+306     public String value4() {
+307         return getMemberName();
+308     }
+309 
+310     @Override
+311     public String value5() {
+312         return getMemberUid();
+313     }
+314 
+315     @Override
+316     public Byte value6() {
+317         return getStatus();
+318     }
+319 
+320     @Override
+321     public LocalDateTime value7() {
+322         return getCtime();
+323     }
+324 
+325     @Override
+326     public LocalDateTime value8() {
+327         return getMtime();
+328     }
+329 
+330     @Override
+331     public Long value9() {
+332         return getCuid();
+333     }
+334 
+335     @Override
+336     public Long value10() {
+337         return getMuid();
+338     }
+339 
+340     @Override
+341     public SpaceMemberRecord value1(Long value) {
+342         setId(value);
+343         return this;
+344     }
+345 
+346     @Override
+347     public SpaceMemberRecord value2(String value) {
+348         setSpaceCode(value);
+349         return this;
+350     }
+351 
+352     @Override
+353     public SpaceMemberRecord value3(String value) {
+354         setRoleCode(value);
+355         return this;
+356     }
+357 
+358     @Override
+359     public SpaceMemberRecord value4(String value) {
+360         setMemberName(value);
+361         return this;
+362     }
+363 
+364     @Override
+365     public SpaceMemberRecord value5(String value) {
+366         setMemberUid(value);
+367         return this;
+368     }
+369 
+370     @Override
+371     public SpaceMemberRecord value6(Byte value) {
+372         setStatus(value);
+373         return this;
+374     }
+375 
+376     @Override
+377     public SpaceMemberRecord value7(LocalDateTime value) {
+378         setCtime(value);
+379         return this;
+380     }
+381 
+382     @Override
+383     public SpaceMemberRecord value8(LocalDateTime value) {
+384         setMtime(value);
+385         return this;
+386     }
+387 
+388     @Override
+389     public SpaceMemberRecord value9(Long value) {
+390         setCuid(value);
+391         return this;
+392     }
+393 
+394     @Override
+395     public SpaceMemberRecord value10(Long value) {
+396         setMuid(value);
+397         return this;
+398     }
+399 
+400     @Override
+401     public SpaceMemberRecord values(Long value1, String value2, String value3, String value4, String value5, Byte value6, LocalDateTime value7, LocalDateTime value8, Long value9, Long value10) {
+402         value1(value1);
+403         value2(value2);
+404         value3(value3);
+405         value4(value4);
+406         value5(value5);
+407         value6(value6);
+408         value7(value7);
+409         value8(value8);
+410         value9(value9);
+411         value10(value10);
+412         return this;
+413     }
+414 
+415     // -------------------------------------------------------------------------
+416     // Constructors
+417     // -------------------------------------------------------------------------
+418 
+419     /**
+420      * Create a detached SpaceMemberRecord
+421      */
+422     public SpaceMemberRecord() {
+423         super(SpaceMember.SPACE_MEMBER);
+424     }
+425 
+426     /**
+427      * Create a detached, initialised SpaceMemberRecord
+428      */
+429     public SpaceMemberRecord(Long id, String spaceCode, String roleCode, String memberName, String memberUid, Byte status, LocalDateTime ctime, LocalDateTime mtime, Long cuid, Long muid) {
+430         super(SpaceMember.SPACE_MEMBER);
+431 
+432         setId(id);
+433         setSpaceCode(spaceCode);
+434         setRoleCode(roleCode);
+435         setMemberName(memberName);
+436         setMemberUid(memberUid);
+437         setStatus(status);
+438         setCtime(ctime);
+439         setMtime(mtime);
+440         setCuid(cuid);
+441         setMuid(muid);
+442     }
+443 }
+444
+```
+
+
+
+
+```
+File: api/server/sql/03-space.sql
+1 SET NAMES utf8mb4;
+2 CREATE TABLE `space`
+3 (
+4     `id`                bigint unsigned                                               NOT NULL AUTO_INCREMENT COMMENT '主键',
+5     `space_code`        varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT '空间编码',
+6     `space_name`        varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '空间名称',
+7     `space_description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '空间描述',
+8     `status`            tinyint                                                       NOT NULL DEFAULT '0' COMMENT '删除状态(0未删除，-1已删除)',
+9     `ctime`             datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+10     `mtime`             datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后一次更新时间',
+11     `owner_uid`         varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT '空间拥有人系统号',
+12     `cuid`              bigint                                                        NOT NULL DEFAULT '0' COMMENT '空间创建人系统号',
+13     `muid`              bigint                                                        NOT NULL DEFAULT '0' COMMENT '空间最后一次更新人系统号',
+14     PRIMARY KEY (`id`),
+15     UNIQUE KEY `uniq_idx_space_code` (`space_code`) USING BTREE
+16 ) ENGINE = InnoDB
+17   DEFAULT CHARSET = utf8mb4
+18   COLLATE = utf8mb4_0900_ai_ci COMMENT ='空间表';
+19 
+20 
+21 CREATE TABLE `space_role`
+22 (
+23     `id`         bigint unsigned                                              NOT NULL AUTO_INCREMENT COMMENT '主键',
+24     `space_code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '团队编码',
+25     `role_code`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '角色编码',
+26     `role_name`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '角色名称',
+27     `role_desc`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '角色描述',
+28     `role_type`  tinyint unsigned                                                      DEFAULT '1' COMMENT '角色类型(1系统内置，2自定义)',
+29     `status`     tinyint                                                      NOT NULL DEFAULT '0' COMMENT '删除状态(0未删除，-1已删除)',
+30     `ctime`      datetime                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+31     `mtime`      datetime                                                     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后一次更新时间',
+32     `cuid`       bigint                                                       NOT NULL DEFAULT '0' COMMENT '创建人系统号',
+33     `muid`       bigint                                                       NOT NULL DEFAULT '0' COMMENT '最后一次更新人系统号',
+34     PRIMARY KEY (`id`),
+35     UNIQUE KEY `uniq_idx_space_code_role_code` (`space_code`, `role_code`) USING BTREE
+36 ) ENGINE = InnoDB
+37   DEFAULT CHARSET = utf8mb4
+38   COLLATE = utf8mb4_0900_ai_ci COMMENT ='空间角色表';
+39 
+40 
+41 CREATE TABLE `space_member`
+42 (
+43     `id`          bigint unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+44     `space_code`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '空间编码',
+45     `role_code`   varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '角色编码',
+46     `member_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '成员姓名',
+47     `member_uid`  varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '成员系统号',
+48     `status`      tinyint         NOT NULL DEFAULT '0' COMMENT '删除状态(0未删除，-1已删除)',
+49     `ctime`       datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+50     `mtime`       datetime        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后一次修改时间',
+51     `cuid`        bigint          NOT NULL DEFAULT '0' COMMENT '创建人系统号',
+52     `muid`        bigint          NOT NULL DEFAULT '0' COMMENT '最后一次更新人系统号',
+53     PRIMARY KEY (`id`) USING BTREE,
+54     KEY `idx_member_uid` (`member_uid`) USING BTREE
+55 ) ENGINE = InnoDB
+56   DEFAULT CHARSET = utf8mb4
+57   COLLATE = utf8mb4_0900_ai_ci COMMENT ='空间成员信息表';
+58
+```
+
+
+
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/BellaContext.java
+1 package com.ke.bella.openapi;
+2 
+3 import com.ke.bella.openapi.apikey.ApikeyInfo;
+4 import com.ke.bella.openapi.utils.JacksonUtils;
+5 import org.springframework.util.Assert;
+6 
+7 import java.util.HashMap;
+8 import java.util.Map;
+9 import java.util.UUID;
+10 
+11 public class BellaContext {
+12     public static final String BELLA_TRACE_HEADER = "X-BELLA-TRACE-ID";
+13     public static final String BELLA_REQUEST_ID_HEADER = "X-BELLA-REQUEST-ID";
+14     public static final String BELLA_REQUEST_MOCK_HEADER = "X-BELLA-MOCK-REQUEST";
+15 
+16     private static final ThreadLocal<Operator> operatorLocal = new ThreadLocal<>();
+17     private static final ThreadLocal<Map<String, String>> headersThreadLocal = new ThreadLocal<>();
+18     private static final ThreadLocal<ApikeyInfo> akThreadLocal = new ThreadLocal<>();
+19     public static String generateTraceId(String serviceId) {
+20         return serviceId + "-" + UUID.randomUUID();
+21     }
+22 
+23     public static Map<String, String> getHeaders() {
+24         if(headersThreadLocal.get() == null) {
+25             headersThreadLocal.set(new HashMap<>());
+26         }
+27         return headersThreadLocal.get();
+28     }
+29 
+30     public static String getHeader(String key) {
+31         return getHeaders().get(key);
+32     }
+33 
+34     public static ApikeyInfo getApikey() {
+35         Assert.notNull(akThreadLocal.get(), "ak is empty");
+36         return akThreadLocal.get();
+37     }
+38 
+39     public static String getTraceId() {
+40         return getHeaders().get(BELLA_TRACE_HEADER);
+41     }
+42 
+43     public static String getRequestId() {
+44         return getHeaders().get(BELLA_REQUEST_ID_HEADER);
+45     }
+46 
+47     public static boolean isMock() {
+48         return "true".equalsIgnoreCase(getHeaders().get(BELLA_REQUEST_MOCK_HEADER));
+49     }
+50 
+51     public static ApikeyInfo getApikeyIgnoreNull() {
+52         return akThreadLocal.get();
+53     }
+54 
+55     public static String getAkCode() {
+56         return getApikeyIgnoreNull() == null ? null : getApikey().getCode();
+57     }
+58 
+59     public static void setApikey(ApikeyInfo ak) {
+60         akThreadLocal.set(ak);
+61     }
+62 
+63     public static Operator getOperator() {
+64         Operator userInfo = operatorLocal.get();
+65         Assert.notNull(userInfo, "userInfo is null");
+66         return userInfo;
+67     }
+68 
+69     public static Operator getOperatorIgnoreNull() {
+70         return operatorLocal.get();
+71     }
+72 
+73     public static void setOperator(Operator operator) {
+74         operatorLocal.set(getPureOper(operator));
+75     }
+76 
+77     private static Operator getPureOper(Operator oper) {
+78         return Operator.builder()
+79                 .userId(oper.getUserId())
+80                 .userName(oper.getUserName())
+81                 .email(oper.getEmail())
+82                 .tenantId(oper.getTenantId())
+83                 .spaceCode(oper.getSpaceCode())
+84                 .managerAk(oper.getManagerAk())
+85                 .optionalInfo(oper.getOptionalInfo() == null ? new HashMap<>() : oper.getOptionalInfo())
+86                 .build();
+87     }
+88 
+89     public static Map<String, Object> snapshot() {
+90         Map<String, Object> map = new HashMap<>();
+91         map.put("oper", operatorLocal.get());
+92         map.put("ak", akThreadLocal.get());
+93         map.put("headers", headersThreadLocal.get());
+94         return map;
+95     }
+96 
+97     public static void replace(Map<String, Object> map) {
+98         operatorLocal.set((Operator) map.get("oper"));
+99         akThreadLocal.set((ApikeyInfo) map.get("ak"));
+100         headersThreadLocal.set((Map<String, String>) map.get("headers"));
+101     }
+102 
+103     public static void replace(String json) {
+104         Map map = JacksonUtils.deserialize(json, Map.class);
+105         map.put("oper", JacksonUtils.convertValue((Map) map.get("oper"), Operator.class));
+106         map.put("ak", JacksonUtils.convertValue((Map) map.get("ak"), ApikeyInfo.class));
+107         replace(map);
+108     }
+109 
+110     public static final Operator SYS = Operator.builder()
+111             .userId(0L).userName("system")
+112             .build();
+113 
+114     public static void clearAll() {
+115         headersThreadLocal.remove();
+116         akThreadLocal.remove();
+117         operatorLocal.remove();
+118     }
+119 
+120 }
+121
+```
+
+
+
+
+# 用户需求
+
+---
+name: 租户管理功能
+about: 实现多租户系统的数据隔离能力
+---
+
+## 1. 背景与目标
+### 背景
+- 当前系统为单租户架构，无法支持客户独立管理数据和配置的需求
+
+### 功能目标
+- [ ] 实现租户级数据隔离（数据库层面）
+
+## 2. 需求描述
+### 核心功能点
+1. **租户管理**
+   - 租户管理统一收口
+
+2. **数据隔离方案**
+   - 空间管理相关接口增加租户维度，默认有兜底空间

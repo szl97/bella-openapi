@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * function:
  *
- * @author chenhongliang001
+ * author chenhongliang001
  */
 @Component
 public class SpaceRepo implements BaseRepo {
@@ -34,9 +34,41 @@ public class SpaceRepo implements BaseRepo {
                 .fetchOneInto(SpaceRecord.class);
     }
 
+    /**
+     * 根据空间编码和租户编码查询空间
+     */
+    public SpaceRecord querySpaceBySpaceCodeAndTenantCode(String spaceCode, String tenantCode) {
+        return db.selectFrom(Tables.SPACE)
+                .where(Tables.SPACE.SPACE_CODE.eq(spaceCode))
+                .and(Tables.SPACE.TENANT_CODE.eq(tenantCode))
+                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+                .fetchOneInto(SpaceRecord.class);
+    }
+
     public List<SpaceRecord> querySpaceBySpaceCodes(List<String> spaceCodes) {
         return db.selectFrom(Tables.SPACE)
                 .where(Tables.SPACE.SPACE_CODE.in(spaceCodes))
+                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+                .fetchInto(SpaceRecord.class);
+    }
+
+    /**
+     * 根据租户编码查询空间
+     */
+    public List<SpaceRecord> querySpacesByTenantCode(String tenantCode) {
+        return db.selectFrom(Tables.SPACE)
+                .where(Tables.SPACE.TENANT_CODE.eq(tenantCode))
+                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
+                .fetchInto(SpaceRecord.class);
+    }
+
+    /**
+     * 根据租户编码和空间编码列表查询空间
+     */
+    public List<SpaceRecord> querySpacesByTenantCodeAndSpaceCodes(String tenantCode, List<String> spaceCodes) {
+        return db.selectFrom(Tables.SPACE)
+                .where(Tables.SPACE.TENANT_CODE.eq(tenantCode))
+                .and(Tables.SPACE.SPACE_CODE.in(spaceCodes))
                 .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
                 .fetchInto(SpaceRecord.class);
     }

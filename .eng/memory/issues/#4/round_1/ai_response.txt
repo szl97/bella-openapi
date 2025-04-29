@@ -1,0 +1,718 @@
+I'll implement a multi-tenant system to add tenant management capabilities to the existing space management functionality. Let's start by analyzing the current architecture and then making the necessary changes.
+
+First, we need to:
+1. Create a Tenant model
+2. Add tenant relationships to Space entities
+3. Modify the existing APIs to support tenant isolation
+4. Update the database schema to include tenant information
+5. Implement tenant-aware data access
+
+Let's start with the implementation:
+
+```diff
+--- /dev/null
++++ api/server/sql/04-tenant.sql
+@@ -0,0 +1,23 @@
++SET NAMES utf8mb4;
++
++CREATE TABLE `tenant`
++(
++    `id`                bigint unsigned                                               NOT NULL AUTO_INCREMENT COMMENT '主键',
++    `tenant_code`       varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT '租户编码',
++    `tenant_name`       varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '租户名称',
++    `tenant_description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '租户描述',
++    `status`            tinyint                                                       NOT NULL DEFAULT '0' COMMENT '删除状态(0未删除，-1已删除)',
++    `ctime`             datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
++    `mtime`             datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后一次更新时间',
++    `owner_uid`         varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL DEFAULT '' COMMENT '租户拥有人系统号',
++    `cuid`              bigint                                                        NOT NULL DEFAULT '0' COMMENT '租户创建人系统号',
++    `muid`              bigint                                                        NOT NULL DEFAULT '0' COMMENT '租户最后一次更新人系统号',
++    PRIMARY KEY (`id`),
++    UNIQUE KEY `uniq_idx_tenant_code` (`tenant_code`) USING BTREE
++) ENGINE = InnoDB
++  DEFAULT CHARSET = utf8mb4
++  COLLATE = utf8mb4_0900_ai_ci COMMENT ='租户表';
++
++-- Add tenant_code column to space table
++ALTER TABLE `space` ADD COLUMN `tenant_code` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '' COMMENT '租户编码' AFTER `space_code`;
++CREATE INDEX `idx_space_tenant_code` ON `space` (`tenant_code`);
+```
+
+Now let's create the tenant model:
+
+```diff
+--- /dev/null
++++ api/sdk/src/main/java/com/ke/bella/openapi/tenant/Tenant.java
+@@ -0,0 +1,24 @@
++package com.ke.bella.openapi.tenant;
++
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++import lombok.experimental.SuperBuilder;
++
++/**
++ * function: 租户信息
++ *
++ * @author chenhongliang001
++ */
++@Data
++@SuperBuilder
++@AllArgsConstructor
++@NoArgsConstructor
++public class Tenant {
++
++    private String tenantCode;
++
++    private String tenantName;
++
++    private String ownerUid;
++}
+```
+
+Let's create the operations for tenant management:
+
+```diff
+--- /dev/null
++++ api/sdk/src/main/java/com/ke/bella/openapi/tenant/CreateTenantOp.java
+@@ -0,0 +1,48 @@
++package com.ke.bella.openapi.tenant;
++
++import com.ke.bella.openapi.Operator;
++import lombok.AllArgsConstructor;
++import lombok.Data;
++import lombok.NoArgsConstructor;
++import lombok.experimental.SuperBuilder;
++
++import javax.validation.constraints.NotEmpty;
++import javax.validation.constraints.Size;
++
++/**
++ * function: 创建租户参数
++ *
++ * @author chenhongliang001
++ */
++@Data
++@SuperBuilder
++@AllArgsConstructor
++@NoArgsConstructor
++public class CreateTenantOp extends Operator {
++
++    /**
++     * 租户名称
++     */
++    @NotEmpty(message = "tenantName不能为空")
++    @Size(max = 128, message = "tenantName不能超过128个字符")
++    private String tenantName;
++
++    /**
++     * 租户描述
++     */
++    @Size(max = 255, message = "tenantDescription不能超过255个字符")
++    private String tenantDescription;
++
++    /**
++     * 租户编码
++     */
++    @Size(max = 64, message = "tenantCode不能超过64个字符")
++    private String tenantCode;
++
++    /**
++     * 租户拥有者id
++     */
++    @NotEmpty(message = "ownerUid不能为空")
++    @Size(max = 64, message = "ownerUid不能超过64个字符")
++    private String ownerUid;
++}
+```
+
+Now, let's update the Space model to include tenant information:
+
+```diff
+--- api/sdk/src/main/java/com/ke/bella/openapi/space/Space.java
++++ api/sdk/src/main/java/com/ke/bella/openapi/space/Space.java
+@@ -20,5 +20,7 @@ public class Space {
+ 
+ 	private String spaceName;
+ 
++	private String tenantCode;
++
+ 	private String ownerUid;
+ }
+```
+
+Let's update the CreateSpaceOp to include tenant information:
+
+```diff
+--- api/sdk/src/main/java/com/ke/bella/openapi/space/CreateSpaceOp.java
++++ api/sdk/src/main/java/com/ke/bella/openapi/space/CreateSpaceOp.java
+@@ -39,6 +39,12 @@ public class CreateSpaceOp extends Operator {
+     @Size(max = 64, message = "spaceCode不能超过64个字符")
+     private String spaceCode;
+ 
++    /**
++     * 租户编码
++     */
++    @Size(max = 64, message = "tenantCode不能超过64个字符")
++    private String tenantCode;
++
+     /**
+      * 空间拥有者id
+      */
+```
+
+Now let's create the TenantService:
+
+```diff
+--- /dev/null
++++ api/server/src/main/java/com/ke/bella/openapi/service/TenantService.java
+@@ -0,0 +1,156 @@
++package com.ke.bella.openapi.service;
++
++import com.google.common.collect.Lists;
++import com.google.common.collect.Maps;
++import com.ke.bella.openapi.common.StatusEnum;
++import com.ke.bella.openapi.common.exception.BizParamCheckException;
++import com.ke.bella.openapi.db.repo.TenantRepo;
++import com.ke.bella.openapi.tenant.CreateTenantOp;
++import com.ke.bella.openapi.tenant.Tenant;
++import com.ke.bella.openapi.tables.records.TenantRecord;
++import org.apache.commons.collections4.CollectionUtils;
++import org.apache.commons.lang3.StringUtils;
++import org.springframework.beans.BeanUtils;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.stereotype.Component;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.Collections;
++import java.util.List;
++import java.util.Map;
++import java.util.UUID;
++import java.util.function.Function;
++import java.util.stream.Collectors;
++
++/**
++ * function: 租户管理
++ *
++ * @author chenhongliang001
++ */
++@Component
++public class TenantService {
++
++    public static final String DEFAULT_TENANT_CODE = "default";
++    
++    @Autowired
++    private TenantRepo tenantRepo;
++
++    /**
++     * 创建租户
++     */
++    @Transactional(rollbackFor = Exception.class)
++    public String createTenant(CreateTenantOp op) {
++        if(StringUtils.isEmpty(op.getTenantCode())) {
++            op.setTenantCode(generateTenantCode());
++        }
++        
++        TenantRecord tenant = tenantRepo.queryTenantByTenantCode(op.getTenantCode());
++        // 判断租户是否已经存在
++        if(tenant != null) {
++            throw new BizParamCheckException(String.format("租户编码:%s已经存在", op.getTenantCode()));
++        }
++        // 保存
++        tenantRepo.createTenant(buildTenant(op));
++
++        return op.getTenantCode();
++    }
++
++    /**
++     * 生成租户编码
++     */
++    public String generateTenantCode() {
++        return UUID.randomUUID().toString();
++    }
++
++    /**
++     * 构建租户记录
++     */
++    private TenantRecord buildTenant(CreateTenantOp tenantCreateOp) {
++        TenantRecord tenant = new TenantRecord();
++        BeanUtils.copyProperties(tenantCreateOp, tenant);
++        fillCreateTenantOperator(tenant, tenantCreateOp.getUserId());
++        return tenant;
++    }
++
++    /**
++     * 填充创建租户的操作者信息
++     */
++    public void fillCreateTenantOperator(TenantRecord tenantRecord, Long userId) {
++        tenantRecord.setCuid(userId);
++        tenantRecord.setMuid(userId);
++    }
++
++    /**
++     * 根据租户编码查询租户
++     */
++    public Tenant queryTenantByTenantCode(String tenantCode) {
++        TenantRecord tenantRecord = tenantRepo.queryTenantByTenantCode(tenantCode);
++        if(tenantRecord == null) {
++            return null;
++        }
++        return Tenant.builder()
++                .tenantName(tenantRecord.getTenantName())
++                .tenantCode(tenantRecord.getTenantCode())
++                .ownerUid(tenantRecord.getOwnerUid())
++                .build();
++    }
++
++    /**
++     * 获取或创建默认租户
++     */
++    public String getOrCreateDefaultTenant() {
++        TenantRecord tenantRecord = tenantRepo.queryTenantByTenantCode(DEFAULT_TENANT_CODE);
++        if (tenantRecord != null) {
++            return DEFAULT_TENANT_CODE;
++        }
++        
++        // 创建默认租户
++        TenantRecord defaultTenant = new TenantRecord();
++        defaultTenant.setTenantCode(DEFAULT_TENANT_CODE);
++        defaultTenant.setTenantName("默认租户");
++        defaultTenant.setTenantDescription("系统默认租户");
++        defaultTenant.setOwnerUid("0");
++        defaultTenant.setCuid(0L);
++        defaultTenant.setMuid(0L);
++        defaultTenant.setStatus(StatusEnum.VALID.getCode());
++        
++        tenantRepo.createTenant(defaultTenant);
++        return DEFAULT_TENANT_CODE;
++    }
++
++    /**
++     * 列出所有租户
++     */
++    public List<Tenant> listTenants() {
++        List<TenantRecord> tenantRecords = tenantRepo.listTenants();
++        
++        if(CollectionUtils.isEmpty(tenantRecords)) {
++            return Collections.emptyList();
++        }
++
++        return tenantRecords.stream()
++                .map(record -> Tenant.builder()
++                        .tenantName(record.getTenantName())
++                        .tenantCode(record.getTenantCode())
++                        .ownerUid(record.getOwnerUid())
++                        .build())
++                .collect(Collectors.toList());
++    }
++
++    /**
++     * 根据多个租户编码查询租户
++     */
++    public List<Tenant> listTenants(List<String> tenantCodes) {
++        List<TenantRecord> tenantRecords = tenantRepo.queryTenantsByTenantCodes(tenantCodes);
++        
++        if(CollectionUtils.isEmpty(tenantRecords)) {
++            return Collections.emptyList();
++        }
++
++        return tenantRecords.stream()
++                .map(record -> Tenant.builder()
++                        .tenantName(record.getTenantName())
++                        .tenantCode(record.getTenantCode())
++                        .ownerUid(record.getOwnerUid())
++                        .build())
++                .collect(Collectors.toList());
++    }
++}
+```
+
+Now let's create the TenantRepo:
+
+```diff
+--- /dev/null
++++ api/server/src/main/java/com/ke/bella/openapi/db/repo/TenantRepo.java
+@@ -0,0 +1,84 @@
++package com.ke.bella.openapi.db.repo;
++
++import com.ke.bella.openapi.Tables;
++import com.ke.bella.openapi.common.StatusEnum;
++import com.ke.bella.openapi.tables.records.TenantRecord;
++import org.apache.commons.lang3.StringUtils;
++import org.jooq.DSLContext;
++import org.springframework.stereotype.Component;
++import org.springframework.transaction.annotation.Transactional;
++
++import javax.annotation.Resource;
++import java.util.List;
++
++/**
++ * function: 租户数据操作
++ *
++ * @author chenhongliang001
++ */
++@Component
++public class TenantRepo implements BaseRepo {
++
++    @Resource
++    private DSLContext db;
++
++    /**
++     * 根据租户编码查询租户
++     */
++    public TenantRecord queryTenantByTenantCode(String tenantCode) {
++        return db.selectFrom(Tables.TENANT)
++                .where(Tables.TENANT.TENANT_CODE.eq(tenantCode))
++                .and(Tables.TENANT.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchOneInto(TenantRecord.class);
++    }
++
++    /**
++     * 根据多个租户编码查询租户
++     */
++    public List<TenantRecord> queryTenantsByTenantCodes(List<String> tenantCodes) {
++        return db.selectFrom(Tables.TENANT)
++                .where(Tables.TENANT.TENANT_CODE.in(tenantCodes))
++                .and(Tables.TENANT.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchInto(TenantRecord.class);
++    }
++
++    /**
++     * 创建租户
++     */
++    @Transactional(rollbackFor = Exception.class)
++    public void createTenant(TenantRecord record) {
++        if(StringUtils.isEmpty(record.getTenantDescription())) {
++            record.setTenantDescription("");
++        }
++        db.insertInto(Tables.TENANT).set(record).execute();
++    }
++
++    /**
++     * 更新租户名称
++     */
++    @Transactional(rollbackFor = Exception.class)
++    public void updateTenantName(String tenantCode, String tenantName, Long muid) {
++        db.update(Tables.TENANT)
++                .set(Tables.TENANT.TENANT_NAME, tenantName)
++                .set(Tables.TENANT.MUID, muid)
++                .where(Tables.TENANT.TENANT_CODE.eq(tenantCode))
++                .execute();
++    }
++
++    /**
++     * 更新租户拥有者
++     */
++    @Transactional(rollbackFor = Exception.class)
++    public void changeTenantOwner(String tenantCode, String ownerUid, Long muid) {
++        db.update(Tables.TENANT)
++                .set(Tables.TENANT.OWNER_UID, ownerUid)
++                .set(Tables.TENANT.MUID, muid)
++                .where(Tables.TENANT.TENANT_CODE.eq(tenantCode))
++                .execute();
++    }
++
++    /**
++     * 列出所有租户
++     */
++    public List<TenantRecord> listTenants() {
++        return db.selectFrom(Tables.TENANT)
++                .where(Tables.TENANT.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchInto(TenantRecord.class);
++    }
++}
+```
+
+Now let's create the TenantController:
+
+```diff
+--- /dev/null
++++ api/server/src/main/java/com/ke/bella/openapi/endpoints/TenantController.java
+@@ -0,0 +1,54 @@
++package com.ke.bella.openapi.endpoints;
++
++import com.ke.bella.openapi.annotations.BellaAPI;
++import com.ke.bella.openapi.service.TenantService;
++import com.ke.bella.openapi.tenant.CreateTenantOp;
++import com.ke.bella.openapi.tenant.Tenant;
++import io.swagger.v3.oas.annotations.tags.Tag;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.validation.annotation.Validated;
++import org.springframework.web.bind.annotation.GetMapping;
++import org.springframework.web.bind.annotation.PostMapping;
++import org.springframework.web.bind.annotation.RequestBody;
++import org.springframework.web.bind.annotation.RequestMapping;
++import org.springframework.web.bind.annotation.RequestParam;
++import org.springframework.web.bind.annotation.RestController;
++
++import java.util.List;
++
++/**
++ * function: 租户管理
++ *
++ * @author chenhongliang001
++ */
++@BellaAPI
++@RestController
++@RequestMapping("/v1/tenant")
++@Tag(name = "租户管理")
++public class TenantController {
++
++    @Autowired
++    private TenantService tenantService;
++
++    @PostMapping("/create")
++    public String createTenant(@RequestBody @Validated CreateTenantOp op) {
++        return tenantService.createTenant(op);
++    }
++
++    @GetMapping("/get")
++    public Tenant getTenant(@RequestParam String tenantCode) {
++        return tenantService.queryTenantByTenantCode(tenantCode);
++    }
++
++    @GetMapping("/list")
++    public List<Tenant> listTenants() {
++        return tenantService.listTenants();
++    }
++    
++    @GetMapping("/list/codes")
++    public List<Tenant> listTenantsByCodes(@RequestParam List<String> tenantCodes) {
++        return tenantService.listTenants(tenantCodes);
++    }
++}
+```
+
+Now let's update the SpaceService to be tenant-aware:
+
+```diff
+--- api/server/src/main/java/com/ke/bella/openapi/service/SpaceService.java
++++ api/server/src/main/java/com/ke/bella/openapi/service/SpaceService.java
+@@ -47,8 +47,13 @@ public class SpaceService {
+ 
+     @Autowired
+     private SpaceRepo spaceRepo;
++    
++    @Autowired
++    private TenantService tenantService;
+ 
+     @Transactional(rollbackFor = Exception.class)
++    /**
++     * 创建空间，支持租户隔离
++     */
+     public String createSpace(CreateSpaceOp op) {
+ 
+         if(StringUtils.isEmpty(op.getSpaceCode())) {
+@@ -59,6 +64,14 @@ public class SpaceService {
+         if(space != null) {
+             throw new BizParamCheckException(String.format("空间编码:%s已经存在", op.getSpaceCode()));
+         }
++        
++        // 处理租户编码，如果未提供则使用默认租户
++        if(StringUtils.isEmpty(op.getTenantCode())) {
++            String defaultTenantCode = tenantService.getOrCreateDefaultTenant();
++            op.setTenantCode(defaultTenantCode);
++        } else {
++            validateTenantExists(op.getTenantCode());
++        }
+         // 保存
+         spaceRepo.createSpace(buildSpace(op));
+ 
+@@ -75,6 +88,14 @@ public class SpaceService {
+         role.setMuid(userId);
+     }
+ 
++    /**
++     * 验证租户是否存在
++     */
++    private void validateTenantExists(String tenantCode) {
++        if (tenantService.queryTenantByTenantCode(tenantCode) == null) {
++            throw new BizParamCheckException(String.format("租户不存在: %s", tenantCode));
++        }
++    }
++
+     @Transactional(rollbackFor = Exception.class)
+     public boolean createRole(CreateRoleOp op) {
+         spaceRepo.batchInsertRole(buildRoles(op.getRoles(), op.getSpaceCode(), op.getUserId()), op.getSpaceCode());
+@@ -229,14 +250,28 @@ public class SpaceService {
+         return members;
+     }
+ 
++    /**
++     * 根据空间编码查询空间，增加租户信息
++     */
+     public Space querySpaceBySpaceCode(String spaceCode) {
+         SpaceRecord spaceRecord = spaceRepo.querySpaceBySpaceCode(spaceCode);
+         if(spaceRecord == null) {
+             return null;
+         }
++        
+         return Space.builder()
+                 .spaceName(spaceRecord.getSpaceName())
+                 .spaceCode(spaceRecord.getSpaceCode())
++                .tenantCode(spaceRecord.getTenantCode())
++                .ownerUid(spaceRecord.getOwnerUid())
++                .build();
++    }
++    
++    /**
++     * 根据空间编码和租户编码查询空间
++     */
++    public Space querySpaceBySpaceCodeAndTenantCode(String spaceCode, String tenantCode) {
++        SpaceRecord spaceRecord = spaceRepo.querySpaceBySpaceCodeAndTenantCode(spaceCode, tenantCode);
++        if(spaceRecord == null) {
++            return null;
++        }
++        
++        return Space.builder()
++                .spaceName(spaceRecord.getSpaceName())
++                .spaceCode(spaceRecord.getSpaceCode())
++                .tenantCode(spaceRecord.getTenantCode())
+                 .ownerUid(spaceRecord.getOwnerUid())
+                 .build();
+     }
+@@ -253,6 +288,36 @@ public class SpaceService {
+                 .map(record -> Space.builder()
+                         .spaceName(record.getSpaceName())
+                         .spaceCode(record.getSpaceCode())
++                        .tenantCode(record.getTenantCode())
++                        .ownerUid(record.getOwnerUid())
++                        .build())
++                .collect(Collectors.toList());
++    }
++    
++    /**
++     * 根据租户编码查询所有空间
++     */
++    public List<Space> listSpacesByTenantCode(String tenantCode) {
++        // 验证租户是否存在
++        validateTenantExists(tenantCode);
++        
++        List<SpaceRecord> spaceRecords = spaceRepo.querySpacesByTenantCode(tenantCode);
++
++        if(CollectionUtils.isEmpty(spaceRecords)) {
++            return Collections.emptyList();
++        }
++
++        return spaceRecords.stream()
++                .map(record -> Space.builder()
++                        .spaceName(record.getSpaceName())
++                        .spaceCode(record.getSpaceCode())
++                        .tenantCode(record.getTenantCode())
++                        .ownerUid(record.getOwnerUid())
++                        .build())
++                .collect(Collectors.toList());
++    }
++    
++    /**
++     * 根据租户编码和空间编码列表查询空间
++     */
++    public List<Space> listSpacesByTenantCodeAndSpaceCodes(String tenantCode, List<String> spaceCodes) {
++        // 验证租户是否存在
++        validateTenantExists(tenantCode);
++        
++        List<SpaceRecord> spaceRecords = spaceRepo.querySpacesByTenantCodeAndSpaceCodes(tenantCode, spaceCodes);
++
++        if(CollectionUtils.isEmpty(spaceRecords)) {
++            return Collections.emptyList();
++        }
++
++        return spaceRecords.stream()
++                .map(record -> Space.builder()
++                        .spaceName(record.getSpaceName())
++                        .spaceCode(record.getSpaceCode())
++                        .tenantCode(record.getTenantCode())
+                         .ownerUid(record.getOwnerUid())
+                         .build())
+                 .collect(Collectors.toList());
+```
+
+Now let's update the SpaceRepo to be tenant-aware:
+
+```diff
+--- api/server/src/main/java/com/ke/bella/openapi/db/repo/SpaceRepo.java
++++ api/server/src/main/java/com/ke/bella/openapi/db/repo/SpaceRepo.java
+@@ -34,6 +34,16 @@ public class SpaceRepo implements BaseRepo {
++    /**
++     * 根据空间编码和租户编码查询空间
++     */
++    public SpaceRecord querySpaceBySpaceCodeAndTenantCode(String spaceCode, String tenantCode) {
++        return db.selectFrom(Tables.SPACE)
++                .where(Tables.SPACE.SPACE_CODE.eq(spaceCode))
++                .and(Tables.SPACE.TENANT_CODE.eq(tenantCode))
++                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchOneInto(SpaceRecord.class);
++    }
++
+     public List<SpaceRecord> querySpaceBySpaceCodes(List<String> spaceCodes) {
+         return db.selectFrom(Tables.SPACE)
+                 .where(Tables.SPACE.SPACE_CODE.in(spaceCodes))
+@@ -41,6 +51,26 @@ public class SpaceRepo implements BaseRepo {
+                 .fetchInto(SpaceRecord.class);
+     }
+ 
++    /**
++     * 根据租户编码查询空间
++     */
++    public List<SpaceRecord> querySpacesByTenantCode(String tenantCode) {
++        return db.selectFrom(Tables.SPACE)
++                .where(Tables.SPACE.TENANT_CODE.eq(tenantCode))
++                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchInto(SpaceRecord.class);
++    }
++
++    /**
++     * 根据租户编码和空间编码列表查询空间
++     */
++    public List<SpaceRecord> querySpacesByTenantCodeAndSpaceCodes(String tenantCode, List<String> spaceCodes) {
++        return db.selectFrom(Tables.SPACE)
++                .where(Tables.SPACE.TENANT_CODE.eq(tenantCode))
++                .and(Tables.SPACE.SPACE_CODE.in(spaceCodes))
++                .and(Tables.SPACE.STATUS.eq(StatusEnum.VALID.getCode()))
++                .fetchInto(SpaceRecord.class);
++    }
++
+     @Transactional(rollbackFor = Exception.class)
+     public void createSpace(SpaceRecord record) {
+         if(StringUtils.isEmpty(record.getSpaceDescription())) {
+```
+
+Let's update the SpaceController to be tenant-aware:
+
+```diff
+--- api/server/src/main/java/com/ke/bella/openapi/endpoints/SpaceController.java
++++ api/server/src/main/java/com/ke/bella/openapi/endpoints/SpaceController.java
+@@ -54,11 +54,21 @@ public class SpaceController {
+         return spaceService.querySpaceBySpaceCode(spaceCode);
+     }
+ 
++    @GetMapping("/get/tenant")
++    public Space getSpaceByTenant(@RequestParam String spaceCode, @RequestParam String tenantCode) {
++        return spaceService.querySpaceBySpaceCodeAndTenantCode(spaceCode, tenantCode);
++    }
++
+     @GetMapping("/list")
+     public List<Space> listSpace(@RequestParam List<String> spaceCodes) {
+         return spaceService.listSpace(spaceCodes);
+     }
+ 
++    @GetMapping("/list/tenant")
++    public List<Space> listSpaceByTenant(@RequestParam String tenantCode, @RequestParam(required = false) List<String> spaceCodes) {
++        return spaceCodes == null ? spaceService.listSpacesByTenantCode(tenantCode) : 
++                                    spaceService.listSpacesByTenantCodeAndSpaceCodes(tenantCode, spaceCodes);
++    }
++
+     @PostMapping("/owner/change")
+     public Boolean changeSpaceOwner(@RequestBody ChangeSpaceOwnerOp op) {
+         return spaceService.changeSpaceOwner(op);
+```
+
+Let's update the Operator class to include tenantId:
+
+```diff
+--- api/sdk/src/main/java/com/ke/bella/openapi/Operator.java
++++ api/sdk/src/main/java/com/ke/bella/openapi/Operator.java
+@@ -0,0 +1,30 @@
++package com.ke.bella.openapi;
++
++import lombok.All

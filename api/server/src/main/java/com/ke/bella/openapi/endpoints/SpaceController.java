@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * function: 空间管理
  *
- * @author chenhongliang001
+ * author chenhongliang001
  */
 @BellaAPI
 @RestController
@@ -54,9 +54,20 @@ public class SpaceController {
         return spaceService.querySpaceBySpaceCode(spaceCode);
     }
 
+    @GetMapping("/get/tenant")
+    public Space getSpaceByTenant(@RequestParam String spaceCode, @RequestParam String tenantCode) {
+        return spaceService.querySpaceBySpaceCodeAndTenantCode(spaceCode, tenantCode);
+    }
+
     @GetMapping("/list")
     public List<Space> listSpace(@RequestParam List<String> spaceCodes) {
         return spaceService.listSpace(spaceCodes);
+    }
+
+    @GetMapping("/list/tenant")
+    public List<Space> listSpaceByTenant(@RequestParam String tenantCode, @RequestParam(required = false) List<String> spaceCodes) {
+        return spaceCodes == null ? spaceService.listSpacesByTenantCode(tenantCode) : 
+                                    spaceService.listSpacesByTenantCodeAndSpaceCodes(tenantCode, spaceCodes);
     }
 
     @PostMapping("/owner/change")

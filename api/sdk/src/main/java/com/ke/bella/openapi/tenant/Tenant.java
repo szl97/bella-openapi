@@ -1,4 +1,4 @@
-package com.ke.bella.openapi.space;
+package com.ke.bella.openapi.tenant;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 /**
- * function:
+ * function: 租户信息
  *
  * @author chenhongliang001
  */
@@ -14,13 +14,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Space {
+public class Tenant {
 
-	private String spaceCode;
+    private String tenantCode;
 
-	private String spaceName;
+    private String tenantName;
 
-	private String tenantCode;
-
-	private String ownerUid;
+    private String ownerUid;
 }

@@ -40,15 +40,21 @@ import java.util.stream.Collectors;
 /**
  * function: 空间
  *
- * @author chenhongliang001
+ * author chenhongliang001
  */
 @Component
 public class SpaceService {
 
     @Autowired
     private SpaceRepo spaceRepo;
+    
+    @Autowired
+    private TenantService tenantService;
 
     @Transactional(rollbackFor = Exception.class)
+    /**
+     * 创建空间，支持租户隔离
+     */
     public String createSpace(CreateSpaceOp op) {
 
         if(StringUtils.isEmpty(op.getSpaceCode())) {
@@ -58,6 +64,14 @@ public class SpaceService {
         // 判断空间是否已经存在
         if(space != null) {
             throw new BizParamCheckException(String.format("空间编码:%s已经存在", op.getSpaceCode()));
+        }
+        
+        // 处理租户编码，如果未提供则使用默认租户
+        if(StringUtils.isEmpty(op.getTenantCode())) {
+            String defaultTenantCode = tenantService.getOrCreateDefaultTenant();
+            op.setTenantCode(defaultTenantCode);
+        } else {
+            validateTenantExists(op.getTenantCode());
         }
         // 保存
         spaceRepo.createSpace(buildSpace(op));
@@ -73,6 +87,15 @@ public class SpaceService {
     public void fillCreateRoleOperator(SpaceRoleRecord role, Long userId) {
         role.setCuid(userId);
         role.setMuid(userId);
+    }
+
+    /**
+     * 验证租户是否存在
+     */
+    private void validateTenantExists(String tenantCode) {
+        if (tenantService.queryTenantByTenantCode(tenantCode) == null) {
+            throw new BizParamCheckException(String.format("租户不存在: %s", tenantCode));
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -229,14 +252,36 @@ public class SpaceService {
         return members;
     }
 
+    /**
+     * 根据空间编码查询空间，增加租户信息
+     */
     public Space querySpaceBySpaceCode(String spaceCode) {
         SpaceRecord spaceRecord = spaceRepo.querySpaceBySpaceCode(spaceCode);
         if(spaceRecord == null) {
             return null;
         }
+        
         return Space.builder()
                 .spaceName(spaceRecord.getSpaceName())
                 .spaceCode(spaceRecord.getSpaceCode())
+                .tenantCode(spaceRecord.getTenantCode())
+                .ownerUid(spaceRecord.getOwnerUid())
+                .build();
+    }
+    
+    /**
+     * 根据空间编码和租户编码查询空间
+     */
+    public Space querySpaceBySpaceCodeAndTenantCode(String spaceCode, String tenantCode) {
+        SpaceRecord spaceRecord = spaceRepo.querySpaceBySpaceCodeAndTenantCode(spaceCode, tenantCode);
+        if(spaceRecord == null) {
+            return null;
+        }
+        
+        return Space.builder()
+                .spaceName(spaceRecord.getSpaceName())
+                .spaceCode(spaceRecord.getSpaceCode())
+                .tenantCode(spaceRecord.getTenantCode())
                 .ownerUid(spaceRecord.getOwnerUid())
                 .build();
     }
@@ -253,6 +298,53 @@ public class SpaceService {
                 .map(record -> Space.builder()
                         .spaceName(record.getSpaceName())
                         .spaceCode(record.getSpaceCode())
+                        .tenantCode(record.getTenantCode())
+                        .ownerUid(record.getOwnerUid())
+                        .build())
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 根据租户编码查询所有空间
+     */
+    public List<Space> listSpacesByTenantCode(String tenantCode) {
+        // 验证租户是否存在
+        validateTenantExists(tenantCode);
+        
+        List<SpaceRecord> spaceRecords = spaceRepo.querySpacesByTenantCode(tenantCode);
+
+        if(CollectionUtils.isEmpty(spaceRecords)) {
+            return Collections.emptyList();
+        }
+
+        return spaceRecords.stream()
+                .map(record -> Space.builder()
+                        .spaceName(record.getSpaceName())
+                        .spaceCode(record.getSpaceCode())
+                        .tenantCode(record.getTenantCode())
+                        .ownerUid(record.getOwnerUid())
+                        .build())
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 根据租户编码和空间编码列表查询空间
+     */
+    public List<Space> listSpacesByTenantCodeAndSpaceCodes(String tenantCode, List<String> spaceCodes) {
+        // 验证租户是否存在
+        validateTenantExists(tenantCode);
+        
+        List<SpaceRecord> spaceRecords = spaceRepo.querySpacesByTenantCodeAndSpaceCodes(tenantCode, spaceCodes);
+
+        if(CollectionUtils.isEmpty(spaceRecords)) {
+            return Collections.emptyList();
+        }
+
+        return spaceRecords.stream()
+                .map(record -> Space.builder()
+                        .spaceName(record.getSpaceName())
+                        .spaceCode(record.getSpaceCode())
+                        .tenantCode(record.getTenantCode())
                         .ownerUid(record.getOwnerUid())
                         .build())
                 .collect(Collectors.toList());
