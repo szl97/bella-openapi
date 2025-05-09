@@ -2,7 +2,7 @@
 FROM docker.ipigsy.com/library/node:20.11-alpine3.19 AS base
 
 # 国内使用阿里云镜像源
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+#RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 # install packages
 FROM base AS packages
@@ -12,12 +12,10 @@ WORKDIR /app/web
 COPY package.json .
 COPY package-lock.json .
 
-# 设置 npm 配置以提高稳定性
 RUN npm config set registry https://registry.npmmirror.com/
 
-# 使用 cnpm 安装依赖，更稳定
-RUN npm install -g cnpm --registry=https://registry.npmmirror.com/ \
-    && cnpm install --no-audit --no-fund --ignore-scripts
+# 使用 npm ci 安装依赖
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
 # build resources
 FROM base AS builder
