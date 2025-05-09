@@ -1,4 +1,4 @@
-README.md:这个文件是Bella OpenAPI项目的自述文件，详细介绍了项目的核心功能和系统优势。它描述了AI能力点、元数据管理、统一登录服务、计费与限流等功能，还提供了快速启动指南和常见问题的解决方案。
+README.md:Bella OpenAPI项目的README文件，介绍了项目的主要功能、系统优势、快速启动步骤和常见问题解决方案。包含的AI能力有聊天补全、文本向量化、语音识别、语音合成等。与其他文件交互包括配置详情和启动部署详情。
 api/.editorconfig:项目的代码格式配置文件，规范化各类文件的缩进和编码格式。
 api/Dockerfile:这个文件是用于构建bella-openapi项目的Dockerfile，设置了运行环境和所需目录以及端口暴露。
 api/build.sh:此脚本用于编译API服务，包含Maven构建流程及相关配置。
@@ -390,7 +390,7 @@ start-details.md:提供Bella OpenAPI的启动与部署说明，涵盖项目概�
 start.sh:这是一个用于管理和部署服务的shell脚本。它支持构建、重启服务、配置环境变量、设置代理、处理OAuth、生成动态服务配置等功能。关键函数包括retry_command(), pull_image_if_not_exists(), build_services()和generate_service_configs()。通过命令行参数与其他脚本和服务进行交互。
 stop.sh:这个shell脚本用于停止Bella OpenAPI服务，使用docker-compose停止api和web服务。
 web/.dockerignore:该.dockerignore文件用于在构建Docker镜像时排除特定文件和目录，例如日志、node_modules、.env文件等。
-web/Dockerfile:该Dockerfile用于构建Web应用的Docker镜像，包括基础环境设置、依赖安装、构建过程及最终运行时配置，优化和加速部署流程。
+web/Dockerfile:该Dockerfile用于构建和部署Bella OpenAPI项目的前端Web模块。使用Node.js基础镜像，分阶段安装包、构建资源和配置生产环境。设置了环境变量和时区，使用PM2进行进程管理。
 web/README.md:Next.js项目的README文件，提供项目启动和部署的基本说明信息。
 web/components.json:包含了UI组件库的配置，定义Style、Tailwind CSS配置、路径别名等信息，供前端开发使用。此文件作为前端项目的基础配置文件，支持模块化组件的使用。
 web/docker/entrypoint.sh:Docker容器的入口脚本，设置环境变量并启动pm2进程管理工具来运行应用。
