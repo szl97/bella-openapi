@@ -1,9 +1,10 @@
-README.md:这个文件是Bella OpenAPI项目的自述文件，详细介绍了项目的核心功能和系统优势。它描述了AI能力点、元数据管理、统一登录服务、计费与限流等功能，还提供了快速启动指南和常见问题的解决方案。
+README.md:Bella OpenAPI的中文介绍文档，内容与README_EN.md相似，提供对AI能力、系统优势、快速启动和常见问题的详细说明，适合中文用户使用。
+README_EN.md:Bella OpenAPI的英文介绍文档，描述其作为API网关的主要功能，包括AI能力、元数据管理、统一登录服务、计费与限流等。文档详细列出系统的优势和部署方法，提供了使用Docker Compose快速启动的指导。
 api/.editorconfig:项目的代码格式配置文件，规范化各类文件的缩进和编码格式。
 api/Dockerfile:这个文件是用于构建bella-openapi项目的Dockerfile，设置了运行环境和所需目录以及端口暴露。
 api/build.sh:此脚本用于编译API服务，包含Maven构建流程及相关配置。
 api/lombok.config:该配置文件用于控制lombok插件行为，例如日志字段名称、是否静态等。
-api/pom.xml:Maven项目对象模型文件，定义了项目的模块化结构及依赖管理，包括server、sdk、spi模块。
+api/pom.xml:api/pom.xml 是 Maven 项目的配置文件，定义了项目的模块、依赖管理和构建插件。主要功能是管理项目的依赖和构建过程，包含的关键配置有 Spring Boot、Spring Cloud 以及各种插件如 maven-source-plugin 和 maven-gpg-plugin，和 server、sdk、spi 模块的交互显著。
 api/run.sh:用于启动Java应用的脚本，设置JVM及GC参数，并根据环境变量适配不同配置。
 api/sdk/pom.xml:这个文件是 Maven 项目对象模型配置文件，定义了 `sdk` 模块的依赖和插件，涉及 Spring, Lombok, OkHttp 等。
 api/sdk/src/main/java/com/ke/bella/openapi/BaseDto.java:BaseDto类是Bella API中数据传输对象的基类，提供了创建和修改用户的基础信息，如用户ID与名称及时间戳，用于其他DTO的继承。
@@ -61,12 +62,12 @@ api/sdk/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanProperty.java:定
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/asr/flash/FlashAsrPriceInfo.java:实现了FlashAsrPriceInfo类，提供ASR的价格信息描述。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/asr/flash/FlashAsrResponse.java:这个文件定义了FlashAsrResponse类，继承自OpenapiResponse，用于ASR语音识别的闪电响应，包括任务ID、用户信息和闪电结果等。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/AliProperty.java:AliProperty类继承自CompletionProperty，主要描述阿里云完成任务的属性，例如鉴权配置和部署名称等。
-api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/AwsProperty.java:描述了AWS相关的属性配置类，用于协议适配器中。支持区域、部署名称等配置，提供鉴权和思考过程支持。
+api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/AwsProperty.java:
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionModelFeatures.java:定义了CompletionModelFeatures类，描述了完成模型的功能特性，如流式输出和函数调用，主要用于模型功能配置。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionModelProperties.java:定义了CompletionModelProperties类，实现IModelProperties接口，用于描述完成模型的输入和输出上下文属性。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionPriceInfo.java:实现CompletionPriceInfo类，提供完成操作的价格信息。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionProperty.java:定义Completion配置属性类，实现协议属性接口，包含编码类型、队列名等配置。
-api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionRequest.java:该文件定义了CompletionRequest类，表示发往OpenAPI的请求。
+api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionRequest.java:这个文件定义了CompletionRequest类，主要用于构建开放API的请求。它实现了UserRequest接口，并包含多个字段如model、user、messages等，用于配置API请求的参数和行为。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionResponse.java:该文件定义了CompletionResponse类，包含OpenAPI响应的细节信息与Choice内部类。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionSseListener.java:实现了CompletionSseListener类，用于处理SSE事件流中的完成消息，通过Callback接口进行回调。
 api/sdk/src/main/java/com/ke/bella/openapi/protocol/completion/Message.java:定义了Message类，用于描述协议消息的结构体，包含角色、内容、功能调用等信息。
@@ -127,7 +128,7 @@ api/sdk/src/main/java/com/ke/bella/openapi/utils/Renders.java:提供Pebble模板
 api/sdk/src/main/resources/com/ke/bella/openapi/simulation/PythonFuncCall.g4:这个文件定义了PythonFuncCall语法的ANTLR语法规则，用于解析带有函数调用的Python代码块。
 api/sdk/src/main/resources/com/ke/bella/openapi/simulation/function_call_template.pebble:这是一个Pebble模板文件，用于生成模型中的函数调用能力，引入了响应用户请求的多种策略。
 api/sdk/src/main/resources/com/ke/bella/opnepai/mock/content.txt:这个文件包含《道德经》全文及其译文，用于文本分析或演示。没有关键类或函数，与其他文件没有直接交互。
-api/server/pom.xml:项目的Maven配置文件，定义了项目的依赖、插件和构建配置。关键依赖包括Spring Boot及JOOQ等，能够与数据库进行交互。
+api/server/pom.xml:此文件是server模块的Maven POM文件，继承自父POM(bella-openapi)，定义了模块的依赖，如Spring Boot、Jooq等，并配置了数据库连接属性以及代码生成插件。
 api/server/sql/01-apikey.sql:该SQL文件用于创建apikey、apikey_role和apikey_month_cost三个数据库表，这些表用于存储API密钥、角色及每月花费等信息。
 api/server/sql/02-meta.sql:SQL脚本文件，创建和管理应用中的数据库表结构，涉及模型、能力点和通道等表，定义了相关的字段和约束，用于系统的数据存储及关系定义。
 api/server/sql/03-space.sql:该SQL文件用于创建空间、空间角色和空间成员信息表，定义了相应的字段和键。
@@ -136,9 +137,9 @@ api/server/sql/05-20240920_alter_apikey.sql:SQL脚本文件，用于修改apikey
 api/server/sql/06-20240925_alter_model.sql:SQL脚本，用于修改model表，添加linked_to字段，该字段用于记录模型的软链信息。
 api/server/sql/07-20241212_alter_channel.sql:SQL脚本用于修改channel表，添加字段trial_enabled以标识是否支持试用。
 api/server/sql/08-user.sql:该SQL文件用于创建用户表，定义了用户的ID、用户名、邮箱等字段及唯一键。
-api/server/sql/09-20250227_alter_endpoint.sql:SQL脚本，修改endpoint表结构，增加document_url字段以存储文档地址。
+api/server/sql/09-20250227_alter_endpoint.sql:SQL脚本文件，用于在endpoint表中添加名为document_url的列，用来存储文档地址信息。
 api/server/sql/10-20250306_alter.channel.sql:SQL脚本文件，用于修改channel表结构，增加所有者信息和可见性字段。
-api/server/sql/11-20250312_alter_endpoint.sql:SQL脚本，修改endpoint表以添加新的计费脚本字段，确保字符集为utf8mb4。
+api/server/sql/11-20250312_alter_endpoint.sql:SQL脚本文件，用于在endpoint表中添加名为cost_script的列，用来存储计费脚本信息。
 api/server/src/codegen/java/com/ke/bella/openapi/DefaultCatalog.java:这个文件是由jOOQ生成的类，定义了数据库的默认目录DefaultCatalog。包含默认的模式DEFAULT_SCHEMA。没有额外的关键类或函数，定位于数据库架构定义。
 api/server/src/codegen/java/com/ke/bella/openapi/DefaultSchema.java:由jOOQ生成的数据库默认Schema类，包含表定义和Schema的元数据信息。
 api/server/src/codegen/java/com/ke/bella/openapi/Indexes.java:通过jOOQ生成，建模数据库默认模式中表的索引，包括MODEL_AUTHORIZER_REL_IDX_AUTHORIZER_CODE等，提供查询优化支持，不直接与其他文件交互。
@@ -243,18 +244,18 @@ api/server/src/main/java/com/ke/bella/openapi/protocol/ChannelRouter.java:负责
 api/server/src/main/java/com/ke/bella/openapi/protocol/IProtocolAdaptor.java:定义协议适配器接口IProtocolAdaptor，主要提供终端信息和授权请求生成方法，支持不同类型的授权请求构建。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/AudioTranscriptionRequest.java:这个文件定义了AudioTranscriptionRequest类，包括请求音频转录所需的各种参数和设置。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/AudioTranscriptionResponse.java:这个文件定义了语音转录的响应类AudioTranscriptionResponse及其内部类，处理转录任务的结果数据。
-api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanLMRealTimeAsrResponse.java:实现了火山引擎大模型流式语音识别响应类，用于处理ASR响应。包含的类有AudioInfo、Result等，提供音频识别信息。
+api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanLMRealTimeAsrResponse.java:此文件定义了火山引擎大模型流式语音识别的响应结构。包含的关键类是HuoshanLMRealTimeAsrResponse，用于解析和存储识别结果，包括音频信息、识别文本及其置信度等。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanRealTimeAsrRequest.java:HuoshanRealTimeAsrRequest.java定义了用于实时ASR请求的Java类，包含属性如uid、appId、token、和音频配置。通过使用AsrRequest与HuoshanProperty初始化，用于语音识别请求的数据封装。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanRealTimeAsrResponse.java:这个文件定义了HuoshanRealTimeAsrResponse类和几个内部静态类，表示实时语音识别的响应结果，包含识别文本和置信度，并提供了将结果转换为RealTimeMessage.Word对象的方法。
-api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanStreamAsrCallback.java:此文件实现了Huoshan ASR服务的WebSocket回调，用于语音转文字处理。主要类是HuoshanStreamAsrCallback，负责WebSocket生命周期的事件处理、音频数据的发送和解析服务器响应。与日志记录器和请求处理密切交互。
-api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanStreamLMAsrCallback.java:实现实时语音识别的WebSocket回调处理，包含ClientRequest等类，用于发送客户端请求和接收处理服务器响应，与音频流数据交互。
+api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanStreamAsrCallback.java:这个文件实现了火山流式语音识别的回调处理。关键类是HuoshanStreamAsrCallback，负责解析服务器响应，发送音频数据和处理转录结果。与WebSocket进行交互，支持音频数据的分块发送及响应解析。
+api/server/src/main/java/com/ke/bella/openapi/protocol/asr/HuoshanStreamLMAsrCallback.java:这个文件实现了火山流式大模型语音识别的WebSocket回调。关键类是HuoshanStreamLMAsrCallback，负责发送音频数据、处理服务器响应以及管理识别过程状态。与WebSocket进行交互，支持GZIP压缩和解压。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/flash/FlashAsrAdaptor.java:这个文件定义了 Flash ASR 适配器接口 `FlashAsrAdaptor`，用于快速音频识别服务，提供方法 `asr` 实现 ASR 请求处理。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/flash/FlashAsrLogHandler.java:这个文件定义了FlashAsrLogHandler类，实现了EndpointLogHandler接口，用于处理Flash ASR端点的日志记录。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/flash/HuoshanAdaptor.java:实现了FlashAsrAdaptor接口，处理火山协议相关的ASR请求。包含asr方法用于发送请求与处理响应，创建如createCallback等回调方法，主要与HuoshanRealTimeAsrRequest交互。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/flash/HuoshanLMAdaptor.java:实现火山大模型协议的适配器，创建请求和回调，处理ASR响应，为火山协议提供接口。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/flash/KeAdaptor.java:KeAdaptor类实现了FlashAsrAdaptor接口，负责处理ASR请求，通过HTTP请求与外部服务交互进行语音识别。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/HuoshanAdaptor.java:HuoshanAdaptor实现了RealTimeAsrAdaptor接口，处理火山协议的实时语音识别，包括建立WebSocket连接及发送音频数据。
-api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/HuoshanLMAdaptor.java:定义了HuoshanLMAdaptor类，继承HuoshanAdaptor，用于连接火山引擎的实时语音识别服务，处理音频数据传输与结果解析。
+api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/HuoshanLMAdaptor.java:该文件实现了火山引擎大模型流式语音识别的适配器。主要类是HuoshanLMAdaptor，它继承自HuoshanAdaptor。关键函数包括createRequest、createCallback、sendAudioData和stopTranscription，用于处理语音识别的网络请求和数据流。它与其他文件交互主要通过HuoshanRealTimeAsrRequest和HuoshanStreamLMAsrCallback类。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/KeAdaptor.java:该类继承并实现实时ASR适配器接口，使用了组件注解实现Spring管理Bean。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/RealTimeAsrAdaptor.java:这个文件定义了实时 ASR 适配器接口 `RealTimeAsrAdaptor`，用于处理实时音频流的 ASR 服务，提供默认端点实现。
 api/server/src/main/java/com/ke/bella/openapi/protocol/asr/realtime/RealTimeAsrLogHandler.java:RealTimeAsrLogHandler继承自RealTimeLogHandler，处理ASR流式日志，与/endpoint路径相结合。
@@ -262,8 +263,8 @@ api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AliAdaptor.jav
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AliCompletionRequest.java:此文件定义了AliCompletionRequest类，用于封装请求模型的参数和配置。包含内部类AliCompletionInput和AliCompletionParameters，支持模型推理参数设置。没有明显的外部交互。
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AliCompletionResponse.java:阿里完成响应类，定义了处理来自阿里的响应信息的结构，支持JSON属性绑定，用于接收完成模型的反馈。
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AwsAdaptor.java:这个文件实现了CompletionAdaptor接口，负责处理与AWS协议相关的操作。提供了文本生成请求和流式文本生成的功能。关键类/方法：AwsCompletionConverter、completion、streamCompletion等。
-api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AwsClientManager.java:这个文件定义了AwsClientManager类，负责管理AWS客户端的创建和缓存。它包含用于创建同步和异步BedrockRuntime客户端的方法，以及用于提供AWS凭据的AwsAuthorizationProvider类。
-api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AwsCompletionConverter.java:AwsCompletionConverter.java负责将OpenAI请求转换为AWS请求，并处理响应。包括convert2AwsRequest等方法，用于请求转换和响应解析。与AWS Bedrock Runtime集成，处理对话请求的转换。
+api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AwsClientManager.java:此Java文件定义了AwsClientManager类，负责管理AWS BedrockRuntime客户端的创建和缓存。包含同步和异步客户端的创建方法及内部认证提供者AwsAuthorizationProvider类。
+api/server/src/main/java/com/ke/bella/openapi/protocol/completion/AwsCompletionConverter.java:
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionAdaptor.java:定义CompletionAdaptor接口，用于处理补全请求，支持普通和流式补全。关联CompletionProperty类，用于异步或同步数据补全。
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionAdaptorDelegator.java:CompletionAdaptorDelegator.java定义了一个接口，用于处理完成请求和流式完成请求，主要提供了completion和streamCompletion方法，处理请求的实际逻辑由实装类提供。
 api/server/src/main/java/com/ke/bella/openapi/protocol/completion/CompletionLogHandler.java:处理Completion接口的日志记录，计算完成请求的时间和令牌使用。
@@ -301,7 +302,7 @@ api/server/src/main/java/com/ke/bella/openapi/protocol/metrics/MetricsResolver.j
 api/server/src/main/java/com/ke/bella/openapi/protocol/queue/QueueRequest.java:定义用于队列请求的协议类QueueTaskPutReq和QueueTaskGetResultReq，包含任务放入和获取结果的请求结构。
 api/server/src/main/java/com/ke/bella/openapi/protocol/queue/QueueResponse.java:该文件定义了QueueResponse中用于队列任务的响应类，包含任务放入、结果获取及详请响应的数据结构。
 api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/KeAdaptor.java:KeAdaptor类实现了实时转录和音频处理功能，通过WebSocket与其他组件进行交互，包括实时消息的发送和接收。
-api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/KeRealtimeCallback.java:这个文件实现了 WebSocket 回调接口 `KeRealtimeCallback`，处理 ASR 实时转录过程中的各种事件，并进行日志记录和错误处理。
+api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/KeRealtimeCallback.java:这个文件实现了实时回调的处理逻辑，主要通过WebSocket接收消息并进行处理。包含的关键类是KeRealtimeCallback，负责管理任务的开始和结束，并记录性能指标。主要与WebSocket进行交互，处理实时语音转录事件。
 api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/RealTimeAdaptor.java:RealTimeAdaptor接口定义了实时音频转录的适配器，包含startTranscription、sendAudioData等方法，与WebSocket进行交互。
 api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/RealTimeHandler.java:此Java类负责处理实时语音WebSocket连接。主要功能包括接收和发送文本/二进制消息、处理和管理实时转录任务。关键类和函数包括afterConnectionEstablished(), handleTextMessage(), handleBinaryMessage(), handleStartTranscription()和handleStopTranscription()。与WebSocket API和ASR（Automatic Speech Recognition）服务进行交互。
 api/server/src/main/java/com/ke/bella/openapi/protocol/realtime/RealTimeLogHandler.java:RealTimeLogHandler类用于处理实时日志记录，计算并设置请求的持续时间和使用情况，与开放API的实时音频端点相关联。
@@ -331,7 +332,7 @@ api/server/src/main/java/com/ke/bella/openapi/utils/ImageUtils.java:图像工具
 api/server/src/main/java/com/ke/bella/openapi/utils/PunctuationUtils.java:提供工具方法，用于确定字符串是否以标点符号结尾。
 api/server/src/main/java/com/ke/bella/openapi/utils/SseHelper.java:提供SSE连接管理的帮助类SseHelper，包含连接创建、事件发送及异常处理的方法，增强SSE通信的稳定性和可管理性。
 api/server/src/main/java/com/ke/bella/openapi/utils/TokenCounter.java:提供字符串和图像token计数的工具类，通过不同编码模型计算文本token数量及图像分辨率调整后的token数。与图像处理和文本编码相关工具交互。
-api/server/src/main/resources/application-docker.yml:Docker环境的Spring应用配置文件，定义数据源、Redis及登录配置等。
+api/server/src/main/resources/application-docker.yml:Docker环境的Spring Boot配置文件，定义了MySQL和Redis的连接配置、OAuth认证设置、日志级别等信息。
 api/server/src/main/resources/application.yml:该文件是Spring Boot应用程序的配置文件，设置了服务器、数据源、缓存、Swagger等配置，负责应用程序的初始参数。
 api/server/src/main/resources/bootstrap.yml:服务启动配置文件，配置服务端口、Dubbo端口等，帮助服务在启动时加载初始配置。
 api/server/src/main/resources/logback-spring.xml:配置Logback日志框架，包括日志文件的大小、历史、路径设置及不同环境下的日志策略。
@@ -376,6 +377,9 @@ api/spi/src/main/java/com/ke/bella/openapi/server/BellaServerContextInitializer.
 api/spi/src/main/resources/META-INF/spring.factories:这个文件配置了Spring工厂加载机制，指定了ApplicationContextInitializer的实现类。
 authorize-admin.sh:用于管理员授权的脚本，通过API请求系统，使用用户ID或邮箱授予管理员权限。
 config-details.md:详细介绍了Bella OpenAPI配置，包括环境变量、数据库、缓存和OAuth配置的说明文档。
+contributor-guid.md:该文件为 Bella OpenAPI 项目的贡献者指南，提供了项目概述、开发流程、代码贡献、代码风格等详细说明。主要功能是帮助新贡献者快速了解项目并参与开发。文件详细介绍了如何提交 Issues 和 Pull Requests，与 GitHub 仓库的交互尤为重要。
+contributor-guide.md:Bella OpenAPI 贡献者指南，帮助新的贡献者快速上手项目开发。主要内容包括项目概述、开发流程、提交Issues、代码贡献和社区支持等，详细说明了如何配置环境和提交代码。与bella-issues-bot交互，自动处理Issues。
+contributor-guide_EN.md:Bella OpenAPI Contributor Guide，提供英文版的项目贡献指南。内容与中文版相同，包括项目概述、开发流程、提交Issues、代码贡献和社区支持等。与bella-issues-bot交互，自动处理Issues。
 doc/chat-completions.md:该文档提供了智能问答接口的使用说明，详细描述了请求和响应格式、支持的消息类型以及错误码等。此外，它还介绍了如何调用工具来扩展模型的功能。主要与OpenAI的Chat Completions API交互。
 doc/embeddings.md:文本向量接口文档，描述了创建文本嵌入的方法和API调用，支持语义搜索、文本分类等应用。详细介绍了请求和响应格式，及典型应用场景。
 doc/flash-asr.md:语音识别接口的文档，描述了接口的功能、请求和响应格式，包括示例和错误码说明，适用于开发者集成该语音识别服务。
@@ -383,11 +387,11 @@ doc/realtime.md:实时语音对话接口文档，详细描述了接口功能、�
 doc/tts.md:语音合成接口文档，描述了如何根据文本生成语音，包括请求方法、参数、响应格式及示例。支持多种声音和音频格式，是其他开发者进行语音合成集成的指南。
 docker-compose.yml:定义了多个Docker服务的编排配置，包括API服务、Web服务、Nginx、MySQL和Redis服务。配置了环境变量、端口和依赖关系等。
 generate-system-apikey.sh:用于生成系统API key并插入数据库的脚本。通过检查Docker中的MySQL容器，生成API key、计算SHA值并插入数据库表，保存访问密钥到文件中。
-nginx/conf.d/default.conf:Nginx配置文件，用于反向代理，请求/v1, /console, /openapi路径转发到API服务，其他转发到Web服务。
+nginx/conf.d/default.conf:这个文件是Nginx的配置文件，定义了服务器的基本设置和路径转发规则。主要将/v1、/console、/openapi路径的请求转发到api服务，其他请求转发到web服务。文件通过代理设置与bella-openapi-api和bella-openapi-web服务进行交互。
 package-lock.json:记录了bella-openapi项目的所有依赖及其版本信息，确保项目在不同环境中的一致性。
 package.json:定义了项目的JavaScript依赖项，以npm包管理格式列出所有所需的库及其版本范围。
 start-details.md:提供Bella OpenAPI的启动与部署说明，涵盖项目概述、前提条件、启动服务、环境变量配置、服务管理和系统初始化等。
-start.sh:这是一个用于管理和部署服务的shell脚本。它支持构建、重启服务、配置环境变量、设置代理、处理OAuth、生成动态服务配置等功能。关键函数包括retry_command(), pull_image_if_not_exists(), build_services()和generate_service_configs()。通过命令行参数与其他脚本和服务进行交互。
+start.sh:Shell脚本，用于通过Docker Compose启动和管理Bella OpenAPI服务，支持构建、推送镜像、配置OAuth等多种功能。
 stop.sh:这个shell脚本用于停止Bella OpenAPI服务，使用docker-compose停止api和web服务。
 web/.dockerignore:该.dockerignore文件用于在构建Docker镜像时排除特定文件和目录，例如日志、node_modules、.env文件等。
 web/Dockerfile:该Dockerfile用于构建Web应用的Docker镜像，包括基础环境设置、依赖安装、构建过程及最终运行时配置，优化和加速部署流程。
@@ -493,8 +497,8 @@ web/src/components/ui/textarea.tsx:这个文件定义了Textarea组件，允许�
 web/src/components/ui/toast.tsx:实现Toast消息提示组件，支持提示消息的显示和关闭，使用Radix UI库和React。
 web/src/components/ui/toaster.tsx:这个文件实现了Toaster组件，主要用于显示即时通知。使用了useToast钩子管理通知状态。
 web/src/components/ui/tooltip.tsx:定义了提示工具组件使用Radix UI的Tooltip Primitive，包括触发和内容显示。用于创建可悬停查看的提示信息。
-web/src/components/user/client-header.tsx:client-header.tsx定义了React组件ClientHeader，它是一个用户界面组件，用于在网页上显示包含导航栏和用户信息的头部，用到了UserNav等子组件，处理登录会话、用户信息及权限等功能。
-web/src/components/user/user-nav.tsx:用户导航组件，显示用户信息和导航选项。包括登出功能，链接到主页、能力点监控等页面。依赖next/link和用户权限检测以动态显示内容。
+web/src/components/user/client-header.tsx:这个文件定义了ClientHeader组件，用于在页面顶部展示用户信息和导航栏。它通过useUser Hook获取用户信息，并根据用户状态显示不同的导航栏组件。
+web/src/components/user/user-nav.tsx:这个文件实现了UserNav组件，用于展示用户的导航菜单，包括用户信息展示和登出功能。它使用了DropdownMenu组件来实现下拉菜单，并与openapi API交互以处理用户登出请求。
 web/src/config.ts:config.ts中定义了与环境变量相关的API地址配置，用于应用的HTTP请求目标。
 web/src/hooks/use-toast.ts:定义通知弹窗（toast）的状态管理和操作，允许创建、更新、消除通知，并提供自定义样式。
 web/src/lib/ant-path-matcher.ts:ant-path-matcher.ts实现了路径匹配功能，模仿Spring的AntPathMatcher。包含静态方法match和doMatch，用于路径与模式的比较操作。是一个路径匹配实用工具。
