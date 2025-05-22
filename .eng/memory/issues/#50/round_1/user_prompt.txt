@@ -1,31 +1,25 @@
 # 项目文件描述
 
 
-- api/server/sql/01-apikey.sql: 该SQL文件用于创建apikey、apikey_role和apikey_month_cost三个数据库表，这些表用于存储API密钥、角色及每月花费等信息。
+- web/src/components/apikey/apikey-balance.tsx: 无描述
 
-- api/server/src/codegen/java/com/ke/bella/openapi/tables/ApikeyMonthCost.java: ApikeyMonthCost.java是jOOQ生成的表定义，表明API密钥的月度使用成本，包含创始时间和修改时间等字段。
-
-- api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/ApikeyMonthCostDB.java: 由jOOQ生成的POJO类，表示数据库中的apikey_month_cost表，存储API密钥每月费用的相关信息。实现了Timed和Serializable接口。
-
-- api/server/src/codegen/java/com/ke/bella/openapi/tables/records/ApikeyMonthCostRecord.java: ApikeyMonthCostRecord类表示API密钥的月度成本记录，包含主键ID、AK编码、月份和花费等字段，用于数据库操作。
-
-- api/server/src/main/java/com/ke/bella/openapi/db/repo/ApikeyCostRepo.java: 此文件定义了ApikeyCostRepo类，负责API密钥月度费用的数据库操作。提供插入、更新费用及查询功能。与APIKEY_MONTH_COST表进行交互，并支持跨事务操作。
-
-- api/server/src/main/java/com/ke/bella/openapi/service/ApikeyService.java: API key管理服务。提供API key的创建、更新、验证和权限检查等功能，使用缓存和数据库进行存储和校验。
-
-- api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java: 该文件定义了ApikeyConsoleController类，提供API Key管理的RESTful接口。
-
-- api/server/src/main/java/com/ke/bella/openapi/endpoints/ApikeyController.java: API密钥控制器，提供创建、查询和权限检查的API接口，通过ApikeyService与服务交互。
-
-- api/sdk/src/main/java/com/ke/bella/openapi/apikey/ApikeyInfo.java: 包含ApikeyInfo类，管理API密钥的信息和权限。支持序列化与反序列化，并提供权限检查功能。使用Lombok简化代码。
-
-- api/sdk/src/main/java/com/ke/bella/openapi/utils/DateTimeUtils.java: 提供日期时间相关的实用方法，如获取当前月份和当前系统时间的毫秒数。
-
-- web/src/app/apikey/page.tsx: 这个文件是 React 组件，用于管理用户的 API key。主要功能包括显示 API key 列表、创建新的 API key，以及在对话框中展示创建成功的 API key。主要交互包括与 API key 信息获取和创建函数的调用。
+- web/src/lib/types/apikey-balance.ts: 无描述
 
 - web/src/components/apikey/apikey-coloumn.tsx: 这个文件实现了API Key展示组件，提供多种列功能，包括编辑、删除、重置和复制API Key。使用React和相关UI组件实现交互界面，与用户交互的元素较多。
 
+- web/src/app/apikey/page.tsx: 这个文件是 React 组件，用于管理用户的 API key。主要功能包括显示 API key 列表、创建新的 API key，以及在对话框中展示创建成功的 API key。主要交互包括与 API key 信息获取和创建函数的调用。
+
 - web/src/lib/api/apikey.ts: 定义了一系列关于API密钥的异步操作函数，如获取、申请、删除、重置和更新API密钥等。这些函数通过openapi与后端API进行交互。
+
+- web/src/lib/types/openapi.ts: 定义与OpenAPI交互的各类接口，包括分页、用户信息、API密钥信息等，描述数据结构和类型约定。
+
+- api/sdk/src/main/java/com/ke/bella/openapi/apikey/ApikeyInfo.java: 包含ApikeyInfo类，管理API密钥的信息和权限。支持序列化与反序列化，并提供权限检查功能。使用Lombok简化代码。
+
+- api/server/src/main/java/com/ke/bella/openapi/db/repo/ApikeyCostRepo.java: 此文件定义了ApikeyCostRepo类，负责API密钥月度费用的数据库操作。提供插入、更新费用及查询功能。与APIKEY_MONTH_COST表进行交互，并支持跨事务操作。
+
+- api/server/src/main/java/com/ke/bella/openapi/endpoints/ApikeyController.java: API密钥控制器，提供创建、查询和权限检查的API接口，通过ApikeyService与服务交互。
+
+- api/server/src/main/java/com/ke/bella/openapi/service/ApikeyService.java: API key管理服务。提供API key的创建、更新、验证和权限检查等功能，使用缓存和数据库进行存储和校验。
 
 
 # 文件内容
@@ -33,719 +27,1019 @@
 
 
 ```
-File: api/server/sql/01-apikey.sql
-1 SET NAMES utf8mb4;
-2 create table apikey
-3 (
-4     id           bigint(20) not null auto_increment comment '主键ID',
-5     code         varchar(64)    default ''                not null comment 'ak编码',
-6     ak_sha       varchar(64)    default ''                not null comment '加密ak',
-7     ak_display   varchar(64)    default ''                not null comment '脱敏ak',
-8     name         varchar(64)    default ''                not null comment '名字',
-9     parent_code  varchar(64)    default ''                not null comment '父ak',
-10     out_entity_code varchar(64) default ''                not null comment '授权实体code',
-11     service_id   varchar(64)    default ''                not null comment '服务id',
-12     owner_type   varchar(16)    default ''                not null comment '所有者类型（系统/组织/个人）',
-13     owner_code   varchar(64)    default ''                not null comment '所有者系统号',
-14     owner_name   varchar(16)    default ''                not null comment '所有者名称',
-15     role_code    varchar(64)    default ''                not null comment '角色编码',
-16     certify_code varchar(128)   default ''                not null comment '安全认证码',
-17     safety_level tinyint(2) default 0 not null comment '安全等级',
-18     month_quota  DECIMAL(10, 2) default 0                 not null comment '每月额度',
-19     status       varchar(64)    default 'active'          not null comment '状态(active/inactive)',
-20     remark       varchar(1024)  default ''                not null comment '备注',
-21     cuid         bigint(20) default 0 not null comment '创建人id',
-22     cu_name      varchar(16)    default ''                not null comment '创建人姓名',
-23     muid         bigint(20) default 0 not null comment '编辑人id',
-24     mu_name      varchar(16)    default ''                not null comment '编辑人姓名',
-25     ctime        timestamp      default CURRENT_TIMESTAMP not null,
-26     mtime        timestamp      default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-27     primary key (id),
-28     unique key `uniq_idx_code` (`code`),
-29     unique key `uniq_idx_ak_sha` (`ak_sha`),
-30     key          `idx_parent_out_entity_code` (`parent_code`, `out_entity_code`),
-31     key          `idx_owner_type_code` (`owner_type`, `owner_code`)
-32 )engine=InnoDB default charset=utf8mb4 comment='ak';
-33 
-34 create table apikey_role
-35 (
-36     id         bigint(20) not null auto_increment comment '主键ID',
-37     role_code  varchar(64) default ''                not null comment 'ak编码',
-38     path       text                                  not null comment '授权的path',
-39     cuid       bigint(20) default 0 not null comment '创建人id',
-40     cu_name    varchar(16) default ''                not null comment '创建人姓名',
-41     muid       bigint(20) default 0 not null comment '编辑人id',
-42     mu_name    varchar(16) default ''                not null comment '编辑人姓名',
-43     ctime      timestamp   default CURRENT_TIMESTAMP not null,
-44     mtime      timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-45     primary key (id),
-46     unique key `uniq_idx_role_code` (`role_code`)
-47 )engine=InnoDB default charset=utf8mb4 comment='ak角色';
-48 
-49 create table apikey_month_cost
-50 (
-51     id         bigint(20) not null auto_increment comment '主键ID',
-52     ak_code    varchar(64)    default ''  not null comment 'ak编码',
-53     month      varchar(16)    default ''  not null comment '月份',
-54     amount     DECIMAL(12, 4) default 0   not null comment '开销（分）',
-55     ctime      timestamp   default CURRENT_TIMESTAMP not null,
-56     mtime      timestamp   default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-57     primary key (id),
-58     unique key `uniq_idx_ak_code_month` (`ak_code`, `month`),
-59     key             `idx_month` (`month`)
-60 )engine=InnoDB default charset=utf8mb4 comment='ak月花费';
-61
-```
-
-
-
-
-```
-File: api/server/src/codegen/java/com/ke/bella/openapi/tables/ApikeyMonthCost.java
-1 /*
-2  * This file is generated by jOOQ.
-3  */
-4 package com.ke.bella.openapi.tables;
-5 
-6 
-7 import com.ke.bella.openapi.DefaultSchema;
-8 import com.ke.bella.openapi.Indexes;
-9 import com.ke.bella.openapi.Keys;
-10 import com.ke.bella.openapi.tables.records.ApikeyMonthCostRecord;
-11 
-12 import java.math.BigDecimal;
-13 import java.time.LocalDateTime;
-14 import java.util.Arrays;
-15 import java.util.List;
-16 
-17 import org.jooq.Field;
-18 import org.jooq.ForeignKey;
-19 import org.jooq.Identity;
-20 import org.jooq.Index;
-21 import org.jooq.Name;
-22 import org.jooq.Record;
-23 import org.jooq.Row6;
-24 import org.jooq.Schema;
-25 import org.jooq.Table;
-26 import org.jooq.TableField;
-27 import org.jooq.TableOptions;
-28 import org.jooq.UniqueKey;
-29 import org.jooq.impl.DSL;
-30 import org.jooq.impl.SQLDataType;
-31 import org.jooq.impl.TableImpl;
-32 
-33 
-34 /**
-35  * ak月花费
-36  */
-37 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-38 public class ApikeyMonthCost extends TableImpl<ApikeyMonthCostRecord> {
-39 
-40     private static final long serialVersionUID = 1L;
-41 
-42     /**
-43      * The reference instance of <code>apikey_month_cost</code>
-44      */
-45     public static final ApikeyMonthCost APIKEY_MONTH_COST = new ApikeyMonthCost();
-46 
-47     /**
-48      * The class holding records for this type
-49      */
-50     @Override
-51     public Class<ApikeyMonthCostRecord> getRecordType() {
-52         return ApikeyMonthCostRecord.class;
-53     }
+File: web/src/components/apikey/apikey-balance.tsx
+1 import React, { useState, useEffect } from 'react';
+2 import { getApiKeyBalance } from '@/lib/api/apikey';
+3 import { ApiKeyBalance } from '@/lib/types/apikey-balance';
+4 import {
+5   Dialog,
+6   DialogContent,
+7   DialogDescription,
+8   DialogHeader,
+9   DialogTitle,
+10 } from "@/components/ui/dialog";
+11 import { Button } from '@/components/ui/button';
+12 import { Badge } from '@/components/ui/badge';
+13 import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+14 
+15 interface ApiKeyBalanceDialogProps {
+16   code: string;
+17   isOpen: boolean;
+18   onClose: () => void;
+19 }
+20 
+21 interface ApiKeyBalanceIndicatorProps {
+22   code: string;
+23 }
+24 
+25 export const ApiKeyBalanceIndicator: React.FC<ApiKeyBalanceIndicatorProps> = ({ code }) => {
+26   const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
+27   const [loading, setLoading] = useState<boolean>(true);
+28   const [error, setError] = useState<boolean>(false);
+29 
+30   useEffect(() => {
+31     if (code) {
+32       setLoading(true);
+33       setError(false);
+34       getApiKeyBalance(code)
+35         .then((data) => {
+36           if (data) {
+37             setBalance(data);
+38           } else {
+39             setError(true);
+40           }
+41         })
+42         .catch(() => {
+43           setError(true);
+44         })
+45         .finally(() => {
+46           setLoading(false);
+47         });
+48     }
+49   }, [code]);
+50 
+51   if (loading) {
+52     return <div className="flex justify-center"><div className="h-5 w-5 animate-pulse bg-gray-200 rounded-full"></div></div>;
+53   }
 54 
-55     /**
-56      * The column <code>apikey_month_cost.id</code>. 主键ID
-57      */
-58     public final TableField<ApikeyMonthCostRecord, Long> ID = createField(DSL.name("id"), SQLDataType.BIGINT.nullable(false).identity(true), this, "主键ID");
-59 
-60     /**
-61      * The column <code>apikey_month_cost.ak_code</code>. ak编码
-62      */
-63     public final TableField<ApikeyMonthCostRecord, String> AK_CODE = createField(DSL.name("ak_code"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "ak编码");
-64 
-65     /**
-66      * The column <code>apikey_month_cost.month</code>. 月份
-67      */
-68     public final TableField<ApikeyMonthCostRecord, String> MONTH = createField(DSL.name("month"), SQLDataType.VARCHAR(16).nullable(false).defaultValue(DSL.inline("", SQLDataType.VARCHAR)), this, "月份");
-69 
-70     /**
-71      * The column <code>apikey_month_cost.amount</code>. 开销（分）
-72      */
-73     public final TableField<ApikeyMonthCostRecord, BigDecimal> AMOUNT = createField(DSL.name("amount"), SQLDataType.DECIMAL(12, 4).nullable(false).defaultValue(DSL.inline("0.0000", SQLDataType.DECIMAL)), this, "开销（分）");
-74 
-75     /**
-76      * The column <code>apikey_month_cost.ctime</code>.
-77      */
-78     public final TableField<ApikeyMonthCostRecord, LocalDateTime> CTIME = createField(DSL.name("ctime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
-79 
-80     /**
-81      * The column <code>apikey_month_cost.mtime</code>.
-82      */
-83     public final TableField<ApikeyMonthCostRecord, LocalDateTime> MTIME = createField(DSL.name("mtime"), SQLDataType.LOCALDATETIME(0).nullable(false).defaultValue(DSL.field("CURRENT_TIMESTAMP", SQLDataType.LOCALDATETIME)), this, "");
-84 
-85     private ApikeyMonthCost(Name alias, Table<ApikeyMonthCostRecord> aliased) {
-86         this(alias, aliased, null);
-87     }
-88 
-89     private ApikeyMonthCost(Name alias, Table<ApikeyMonthCostRecord> aliased, Field<?>[] parameters) {
-90         super(alias, null, aliased, parameters, DSL.comment("ak月花费"), TableOptions.table());
-91     }
-92 
-93     /**
-94      * Create an aliased <code>apikey_month_cost</code> table reference
-95      */
-96     public ApikeyMonthCost(String alias) {
-97         this(DSL.name(alias), APIKEY_MONTH_COST);
-98     }
-99 
-100     /**
-101      * Create an aliased <code>apikey_month_cost</code> table reference
-102      */
-103     public ApikeyMonthCost(Name alias) {
-104         this(alias, APIKEY_MONTH_COST);
-105     }
-106 
-107     /**
-108      * Create a <code>apikey_month_cost</code> table reference
-109      */
-110     public ApikeyMonthCost() {
-111         this(DSL.name("apikey_month_cost"), null);
-112     }
-113 
-114     public <O extends Record> ApikeyMonthCost(Table<O> child, ForeignKey<O, ApikeyMonthCostRecord> key) {
-115         super(child, key, APIKEY_MONTH_COST);
-116     }
-117 
-118     @Override
-119     public Schema getSchema() {
-120         return DefaultSchema.DEFAULT_SCHEMA;
-121     }
-122 
-123     @Override
-124     public List<Index> getIndexes() {
-125         return Arrays.<Index>asList(Indexes.APIKEY_MONTH_COST_IDX_MONTH);
-126     }
-127 
-128     @Override
-129     public Identity<ApikeyMonthCostRecord, Long> getIdentity() {
-130         return (Identity<ApikeyMonthCostRecord, Long>) super.getIdentity();
-131     }
-132 
-133     @Override
-134     public UniqueKey<ApikeyMonthCostRecord> getPrimaryKey() {
-135         return Keys.KEY_APIKEY_MONTH_COST_PRIMARY;
-136     }
-137 
-138     @Override
-139     public List<UniqueKey<ApikeyMonthCostRecord>> getKeys() {
-140         return Arrays.<UniqueKey<ApikeyMonthCostRecord>>asList(Keys.KEY_APIKEY_MONTH_COST_PRIMARY, Keys.KEY_APIKEY_MONTH_COST_UNIQ_IDX_AK_CODE_MONTH);
-141     }
-142 
-143     @Override
-144     public ApikeyMonthCost as(String alias) {
-145         return new ApikeyMonthCost(DSL.name(alias), this);
-146     }
-147 
-148     @Override
-149     public ApikeyMonthCost as(Name alias) {
-150         return new ApikeyMonthCost(alias, this);
-151     }
-152 
-153     /**
-154      * Rename this table
-155      */
-156     @Override
-157     public ApikeyMonthCost rename(String name) {
-158         return new ApikeyMonthCost(DSL.name(name), null);
-159     }
-160 
-161     /**
-162      * Rename this table
-163      */
-164     @Override
-165     public ApikeyMonthCost rename(Name name) {
-166         return new ApikeyMonthCost(name, null);
-167     }
-168 
-169     // -------------------------------------------------------------------------
-170     // Row6 type methods
-171     // -------------------------------------------------------------------------
-172 
-173     @Override
-174     public Row6<Long, String, String, BigDecimal, LocalDateTime, LocalDateTime> fieldsRow() {
-175         return (Row6) super.fieldsRow();
-176     }
-177 }
-178
+55   if (error || !balance) {
+56     return <Badge variant="outline" className="bg-gray-100 text-gray-500">未知</Badge>;
+57   }
+58 
+59   const usagePercentage = (balance.cost / balance.quota) * 100;
+60   
+61   if (usagePercentage >= 80) {
+62     return (
+63       <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
+64         <AlertCircle className="h-3 w-3" /> 余额紧张 ({Math.round(usagePercentage)}%)
+65       </Badge>
+66     );
+67   }
+68   
+69   return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> 余额充足</Badge>;
+70 };
+71 
+72 export const ApiKeyBalanceDialog: React.FC<ApiKeyBalanceDialogProps> = ({ 
+73   code, 
+74   isOpen, 
+75   onClose 
+76 }) => {
+77   const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
+78   const [loading, setLoading] = useState<boolean>(false);
+79   const [error, setError] = useState<string | null>(null);
+80 
+81   useEffect(() => {
+82     if (isOpen && code) {
+83       setLoading(true);
+84       setError(null);
+85       getApiKeyBalance(code)
+86         .then((data) => {
+87           if (data) {
+88             setBalance(data);
+89           } else {
+90             setError('无法获取余额信息');
+91           }
+92         })
+93         .catch(err => {
+94           console.error('Failed to fetch balance:', err);
+95           setError('获取余额信息时发生错误');
+96         })
+97         .finally(() => {
+98           setLoading(false);
+99         });
+100     }
+101   }, [isOpen, code]);
+102 
+103   return (
+104     <Dialog open={isOpen} onOpenChange={onClose}>
+105       <DialogContent className="sm:max-w-md">
+106         <DialogHeader>
+107           <DialogTitle>API Key 余额详情</DialogTitle>
+108           <DialogDescription>当前月份的使用情况和剩余额度</DialogDescription>
+109         </DialogHeader>
+110         <div className="py-4">
+111           {loading ? (
+112             <div className="flex justify-center items-center p-8">
+113               <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+114             </div>
+115           ) : error ? (
+116             <div className="flex items-center justify-center text-red-500 p-4"><AlertCircle className="h-5 w-5 mr-2" />{error}</div>
+117           ) : balance && (
+118             <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+119               <div className="grid grid-cols-2 gap-4 text-sm">
+120                 <div className="font-medium text-gray-500">月份</div>
+121                 <div>{balance.month}</div>
+122                 <div className="font-medium text-gray-500">总额度</div>
+123                 <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.quota)}</div>
+124                 <div className="font-medium text-gray-500">已使用</div>
+125                 <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.cost)}</div>
+126                 <div className="font-medium text-gray-500">剩余额度</div>
+127                 <div className={`font-semibold ${balance.balance < balance.quota * 0.2 ? 'text-red-600' : 'text-green-600'}`}>
+128                   {new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.balance)}
+129                 </div>
+130               </div>
+131               <div className={`text-sm mt-4 p-2 rounded ${balance.balance < balance.quota * 0.2 ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`}>
+132                 {balance.balance < balance.quota * 0.2 ? (
+133                   <p className="flex items-center"><AlertCircle className="h-4 w-4 mr-2" />余额不足，请考虑增加额度</p>
+134                 ) : (
+135                   <p>余额充足</p>
+136                 )}
+137               </div>
+138             </div>
+139           )}
+140         </div>
+141         <div className="flex justify-end">
+142           <Button onClick={onClose}>关闭</Button>
+143         </div>
+144       </DialogContent>
+145     </Dialog>
+146   );
+147 };
+148
 ```
 
 
 
 
 ```
-File: api/server/src/codegen/java/com/ke/bella/openapi/tables/pojos/ApikeyMonthCostDB.java
-1 /*
-2  * This file is generated by jOOQ.
-3  */
-4 package com.ke.bella.openapi.tables.pojos;
-5 
-6 
-7 import com.ke.bella.openapi.db.repo.Timed;
-8 
-9 import java.io.Serializable;
-10 import java.math.BigDecimal;
-11 import java.time.LocalDateTime;
-12 
-13 
-14 /**
-15  * ak月花费
-16  */
-17 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-18 public class ApikeyMonthCostDB implements Timed, Serializable {
-19 
-20     private static final long serialVersionUID = 1L;
-21 
-22     private Long          id;
-23     private String        akCode;
-24     private String        month;
-25     private BigDecimal    amount;
-26     private LocalDateTime ctime;
-27     private LocalDateTime mtime;
+File: web/src/lib/types/apikey-balance.ts
+1 export interface ApiKeyBalance {
+2   akCode: string;
+3   month: string;
+4   cost: number;
+5   quota: number;
+6   balance: number;
+7 }
+8
+```
+
+
+
+
+```
+File: web/src/components/apikey/apikey-coloumn.tsx
+1 'use client'
+2 
+3 import React, {ReactNode, useEffect, useRef, useState} from "react"
+4 import {ColumnDef} from "@tanstack/react-table"
+5 import {ApikeyInfo} from "@/lib/types/openapi"
+6 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+7 import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} from "./apikey-dialog"
+8 import {HoverContext} from "@/components/ui/data-table";
+9 import {Badge} from "@/components/ui/badge"
+10 import {Button} from "@/components/ui/button"
+11 import {Copy, Wallet} from 'lucide-react'
+12 import {useToast} from "@/hooks/use-toast";
+13 import {safety_apply_url} from "@/config";
+14 import {ApiKeyBalanceDialog, ApiKeyBalanceIndicator} from "./apikey-balance";
+15 
+16 interface EditableCellProps {
+17     content: ReactNode;
+18     dialogComponent: (isOpen: boolean, onClose: () => void) => React.ReactElement;
+19     positionCalc: string;
+20     rowId: string;
+21 }
+22 
+23 const EditableCell: React.FC<EditableCellProps> = ({ content, dialogComponent, positionCalc, rowId }) => {
+24     const hoveredRowId = React.useContext(HoverContext);
+25     const [isDialogOpen, setIsDialogOpen] = useState(false);
+26     const contentRef = useRef<HTMLSpanElement>(null);
+27     const [iconPosition, setIconPosition] = useState(0);
 28 
-29     public ApikeyMonthCostDB() {}
-30 
-31     public ApikeyMonthCostDB(ApikeyMonthCostDB value) {
-32         this.id = value.id;
-33         this.akCode = value.akCode;
-34         this.month = value.month;
-35         this.amount = value.amount;
-36         this.ctime = value.ctime;
-37         this.mtime = value.mtime;
-38     }
-39 
-40     public ApikeyMonthCostDB(
-41         Long          id,
-42         String        akCode,
-43         String        month,
-44         BigDecimal    amount,
-45         LocalDateTime ctime,
-46         LocalDateTime mtime
-47     ) {
-48         this.id = id;
-49         this.akCode = akCode;
-50         this.month = month;
-51         this.amount = amount;
-52         this.ctime = ctime;
-53         this.mtime = mtime;
-54     }
-55 
-56     /**
-57      * Getter for <code>apikey_month_cost.id</code>. 主键ID
-58      */
-59     public Long getId() {
-60         return this.id;
-61     }
-62 
-63     /**
-64      * Setter for <code>apikey_month_cost.id</code>. 主键ID
-65      */
-66     public void setId(Long id) {
-67         this.id = id;
-68     }
-69 
-70     /**
-71      * Getter for <code>apikey_month_cost.ak_code</code>. ak编码
-72      */
-73     public String getAkCode() {
-74         return this.akCode;
-75     }
+29     useEffect(() => {
+30         if (contentRef.current) {
+31             const contentWidth = contentRef.current.offsetWidth;
+32             setIconPosition(contentWidth / 2 + 5);
+33         }
+34     }, [content]);
+35 
+36     const showButton = hoveredRowId === rowId || isDialogOpen;
+37 
+38     return (
+39         <div className="relative flex justify-center items-center w-full">
+40             <span ref={contentRef} className="font-medium">{content}</span>
+41             {showButton && (
+42                 <div style={{ position: 'absolute', left: `calc(${positionCalc} + ${iconPosition}px)` }}>
+43                     {dialogComponent(isDialogOpen, () => setIsDialogOpen(!isDialogOpen))}
+44                 </div>
+45             )}
+46         </div>
+47     );
+48 };
+49 
+50 
+51 const RemarkCell = ({ value }: { value: string }) => {
+52     const remark = value || '/'
+53     return (
+54         <TooltipProvider>
+55             <Tooltip>
+56                 <TooltipTrigger asChild>
+57                     <div className="truncate max-w-xs cursor-help">{remark}</div>
+58                 </TooltipTrigger>
+59                 <TooltipContent side="bottom" className="w-64 break-words">
+60                     <p>{remark}</p>
+61                 </TooltipContent>
+62             </Tooltip>
+63         </TooltipProvider>
+64     )
+65 }
+66 
+67 const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey: string) => void }) => {
+68     const { toast } = useToast();
+69     const [showBalance, setShowBalance] = useState(false);
+70     
+71     const copyToClipboard = () => {
+72         navigator.clipboard.writeText(code).then(() => {
+73             toast({ title: "复制成功", description: "API Key编码复制成功。" })
+74         });
+75     };
 76 
-77     /**
-78      * Setter for <code>apikey_month_cost.ak_code</code>. ak编码
-79      */
-80     public void setAkCode(String akCode) {
-81         this.akCode = akCode;
-82     }
-83 
-84     /**
-85      * Getter for <code>apikey_month_cost.month</code>. 月份
-86      */
-87     public String getMonth() {
-88         return this.month;
-89     }
-90 
-91     /**
-92      * Setter for <code>apikey_month_cost.month</code>. 月份
-93      */
-94     public void setMonth(String month) {
-95         this.month = month;
-96     }
-97 
-98     /**
-99      * Getter for <code>apikey_month_cost.amount</code>. 开销（分）
-100      */
-101     public BigDecimal getAmount() {
-102         return this.amount;
-103     }
-104 
-105     /**
-106      * Setter for <code>apikey_month_cost.amount</code>. 开销（分）
-107      */
-108     public void setAmount(BigDecimal amount) {
-109         this.amount = amount;
-110     }
-111 
-112     /**
-113      * Getter for <code>apikey_month_cost.ctime</code>.
-114      */
-115     public LocalDateTime getCtime() {
-116         return this.ctime;
-117     }
-118 
-119     /**
-120      * Setter for <code>apikey_month_cost.ctime</code>.
-121      */
-122     public void setCtime(LocalDateTime ctime) {
-123         this.ctime = ctime;
-124     }
-125 
-126     /**
-127      * Getter for <code>apikey_month_cost.mtime</code>.
-128      */
-129     public LocalDateTime getMtime() {
-130         return this.mtime;
-131     }
-132 
-133     /**
-134      * Setter for <code>apikey_month_cost.mtime</code>.
-135      */
-136     public void setMtime(LocalDateTime mtime) {
-137         this.mtime = mtime;
-138     }
-139 
-140     @Override
-141     public String toString() {
-142         StringBuilder sb = new StringBuilder("ApikeyMonthCostDB (");
-143 
-144         sb.append(id);
-145         sb.append(", ").append(akCode);
-146         sb.append(", ").append(month);
-147         sb.append(", ").append(amount);
-148         sb.append(", ").append(ctime);
-149         sb.append(", ").append(mtime);
-150 
-151         sb.append(")");
-152         return sb.toString();
-153     }
-154 }
-155
-```
-
-
-
-
-```
-File: api/server/src/codegen/java/com/ke/bella/openapi/tables/records/ApikeyMonthCostRecord.java
-1 /*
-2  * This file is generated by jOOQ.
-3  */
-4 package com.ke.bella.openapi.tables.records;
-5 
-6 
-7 import com.ke.bella.openapi.db.repo.Timed;
-8 import com.ke.bella.openapi.tables.ApikeyMonthCost;
-9 
-10 import java.math.BigDecimal;
-11 import java.time.LocalDateTime;
-12 
-13 import org.jooq.Field;
-14 import org.jooq.Record1;
-15 import org.jooq.Record6;
-16 import org.jooq.Row6;
-17 import org.jooq.impl.UpdatableRecordImpl;
-18 
-19 
-20 /**
-21  * ak月花费
-22  */
-23 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
-24 public class ApikeyMonthCostRecord extends UpdatableRecordImpl<ApikeyMonthCostRecord> implements Timed, Record6<Long, String, String, BigDecimal, LocalDateTime, LocalDateTime> {
-25 
-26     private static final long serialVersionUID = 1L;
-27 
-28     /**
-29      * Setter for <code>apikey_month_cost.id</code>. 主键ID
-30      */
-31     public void setId(Long value) {
-32         set(0, value);
-33     }
-34 
-35     /**
-36      * Getter for <code>apikey_month_cost.id</code>. 主键ID
-37      */
-38     public Long getId() {
-39         return (Long) get(0);
-40     }
-41 
-42     /**
-43      * Setter for <code>apikey_month_cost.ak_code</code>. ak编码
-44      */
-45     public void setAkCode(String value) {
-46         set(1, value);
-47     }
-48 
-49     /**
-50      * Getter for <code>apikey_month_cost.ak_code</code>. ak编码
-51      */
-52     public String getAkCode() {
-53         return (String) get(1);
-54     }
-55 
-56     /**
-57      * Setter for <code>apikey_month_cost.month</code>. 月份
-58      */
-59     public void setMonth(String value) {
-60         set(2, value);
-61     }
-62 
-63     /**
-64      * Getter for <code>apikey_month_cost.month</code>. 月份
-65      */
-66     public String getMonth() {
-67         return (String) get(2);
-68     }
-69 
-70     /**
-71      * Setter for <code>apikey_month_cost.amount</code>. 开销（分）
-72      */
-73     public void setAmount(BigDecimal value) {
-74         set(3, value);
-75     }
-76 
-77     /**
-78      * Getter for <code>apikey_month_cost.amount</code>. 开销（分）
-79      */
-80     public BigDecimal getAmount() {
-81         return (BigDecimal) get(3);
-82     }
-83 
-84     /**
-85      * Setter for <code>apikey_month_cost.ctime</code>.
-86      */
-87     public void setCtime(LocalDateTime value) {
-88         set(4, value);
-89     }
-90 
-91     /**
-92      * Getter for <code>apikey_month_cost.ctime</code>.
-93      */
-94     public LocalDateTime getCtime() {
-95         return (LocalDateTime) get(4);
-96     }
-97 
-98     /**
-99      * Setter for <code>apikey_month_cost.mtime</code>.
-100      */
-101     public void setMtime(LocalDateTime value) {
-102         set(5, value);
-103     }
-104 
-105     /**
-106      * Getter for <code>apikey_month_cost.mtime</code>.
-107      */
-108     public LocalDateTime getMtime() {
-109         return (LocalDateTime) get(5);
-110     }
-111 
-112     // -------------------------------------------------------------------------
-113     // Primary key information
-114     // -------------------------------------------------------------------------
-115 
-116     @Override
-117     public Record1<Long> key() {
-118         return (Record1) super.key();
-119     }
-120 
-121     // -------------------------------------------------------------------------
-122     // Record6 type implementation
-123     // -------------------------------------------------------------------------
-124 
-125     @Override
-126     public Row6<Long, String, String, BigDecimal, LocalDateTime, LocalDateTime> fieldsRow() {
-127         return (Row6) super.fieldsRow();
-128     }
-129 
-130     @Override
-131     public Row6<Long, String, String, BigDecimal, LocalDateTime, LocalDateTime> valuesRow() {
-132         return (Row6) super.valuesRow();
-133     }
+77     
+78     return (
+79         <div className="flex flex-wrap justify-end gap-2">
+80             <Button onClick={copyToClipboard} variant="ghost" size="icon" className="p-0 focus:ring-0">
+81                 <TooltipProvider>
+82                     <Tooltip>
+83                         <TooltipTrigger asChild>
+84                             <div>
+85                                 <Copy className="h-4 w-4" />
+86                                 <span className="sr-only">复制ak code</span>
+87                             </div>
+88                         </TooltipTrigger>
+89                         <TooltipContent>
+90                             <p>复制ak code</p>
+91                         </TooltipContent>
+92                     </Tooltip>
+93                 </TooltipProvider>
+94             </Button>
+95             <DeleteDialog code={code} refresh={refresh}/>
+96             <ResetDialog code={code} showApikey={showApikey}/>
+97             <Button 
+98                 onClick={() => setShowBalance(true)} 
+99                 variant="ghost" 
+100                 size="icon" 
+101                 className="p-0 focus:ring-0"
+102             >
+103                 <TooltipProvider>
+104                     <Tooltip>
+105                         <TooltipTrigger asChild>
+106                             <div>
+107                                 <Wallet className="h-4 w-4" />
+108                                 <span className="sr-only">查看余额</span>
+109                             </div>
+110                         </TooltipTrigger>
+111                         <TooltipContent>查看余额</TooltipContent>
+112                     </Tooltip>
+113                 </TooltipProvider>
+114             </Button>
+115             <ApiKeyBalanceDialog code={code} isOpen={showBalance} onClose={() => setShowBalance(false)} />
+116         </div>
+117     )
+118 }
+119 
+120 function getSafetyLevel(level: number) : string {
+121     switch (level) {
+122         case 10:
+123             return "极低";
+124         case 20:
+125             return "低";
+126         case 30:
+127             return "中";
+128         case 40:
+129             return "高";
+130         default:
+131             return "N/A";
+132     }
+133 }
 134 
-135     @Override
-136     public Field<Long> field1() {
-137         return ApikeyMonthCost.APIKEY_MONTH_COST.ID;
-138     }
-139 
-140     @Override
-141     public Field<String> field2() {
-142         return ApikeyMonthCost.APIKEY_MONTH_COST.AK_CODE;
-143     }
-144 
-145     @Override
-146     public Field<String> field3() {
-147         return ApikeyMonthCost.APIKEY_MONTH_COST.MONTH;
-148     }
-149 
-150     @Override
-151     public Field<BigDecimal> field4() {
-152         return ApikeyMonthCost.APIKEY_MONTH_COST.AMOUNT;
-153     }
-154 
-155     @Override
-156     public Field<LocalDateTime> field5() {
-157         return ApikeyMonthCost.APIKEY_MONTH_COST.CTIME;
-158     }
-159 
-160     @Override
-161     public Field<LocalDateTime> field6() {
-162         return ApikeyMonthCost.APIKEY_MONTH_COST.MTIME;
-163     }
-164 
-165     @Override
-166     public Long component1() {
-167         return getId();
-168     }
-169 
-170     @Override
-171     public String component2() {
-172         return getAkCode();
-173     }
-174 
-175     @Override
-176     public String component3() {
-177         return getMonth();
-178     }
-179 
-180     @Override
-181     public BigDecimal component4() {
-182         return getAmount();
-183     }
+135 export const ApikeyColumns = (refresh: () => void, showApikey: (apikey : string) => void): ColumnDef<ApikeyInfo>[] => [
+136     {
+137         accessorKey: "akDisplay",
+138         header: "AK",
+139         cell: ({row}) =>
+140             (<div className="font-mono text-sm">
+141                 {row.original.akDisplay}
+142             </div>)
+143         ,
+144     },
+145     {
+146         accessorKey: "name",
+147         header: "名称",
+148         cell: ({row}) => (
+149             <EditableCell
+150                 content={row.original.name}
+151                 dialogComponent={(isOpen, onClose) => (
+152                     <RenameDialog
+153                         code={row.original.code}
+154                         origin={row.original.name}
+155                         refresh={refresh}
+156                         isOpen={isOpen}
+157                         onClose={onClose}
+158                     />
+159                 )}
+160                 positionCalc="50%"
+161                 rowId={row.id}
+162             />
+163         ),
+164     },
+165     {
+166         accessorKey: "serviceId",
+167         header:
+168             "服务名",
+169         cell:
+170             ({row}) => <div>{row.getValue("serviceId")}</div>,
+171     },
+172     {
+173         accessorKey: "safetyLevel",
+174         header: "安全等级",
+175         cell: ({row}) => {
+176             const level = row.original.safetyLevel as number;
+177             let color = "bg-green-100 text-green-800";
+178             if (level == 1) {
+179                 color = "bg-yellow-100 text-yellow-800";
+180             }
+181             if (level == 0) {
+182                 color = "bg-red-100 text-red-800";
+183             }
 184 
-185     @Override
-186     public LocalDateTime component5() {
-187         return getCtime();
-188     }
-189 
-190     @Override
-191     public LocalDateTime component6() {
-192         return getMtime();
-193     }
-194 
-195     @Override
-196     public Long value1() {
-197         return getId();
-198     }
-199 
-200     @Override
-201     public String value2() {
-202         return getAkCode();
-203     }
-204 
-205     @Override
-206     public String value3() {
-207         return getMonth();
-208     }
-209 
-210     @Override
-211     public BigDecimal value4() {
-212         return getAmount();
-213     }
-214 
-215     @Override
-216     public LocalDateTime value5() {
-217         return getCtime();
-218     }
-219 
-220     @Override
-221     public LocalDateTime value6() {
-222         return getMtime();
-223     }
-224 
-225     @Override
-226     public ApikeyMonthCostRecord value1(Long value) {
-227         setId(value);
-228         return this;
-229     }
-230 
-231     @Override
-232     public ApikeyMonthCostRecord value2(String value) {
-233         setAkCode(value);
-234         return this;
-235     }
-236 
-237     @Override
-238     public ApikeyMonthCostRecord value3(String value) {
-239         setMonth(value);
-240         return this;
-241     }
-242 
-243     @Override
-244     public ApikeyMonthCostRecord value4(BigDecimal value) {
-245         setAmount(value);
-246         return this;
-247     }
-248 
-249     @Override
-250     public ApikeyMonthCostRecord value5(LocalDateTime value) {
-251         setCtime(value);
-252         return this;
-253     }
-254 
-255     @Override
-256     public ApikeyMonthCostRecord value6(LocalDateTime value) {
-257         setMtime(value);
-258         return this;
-259     }
-260 
-261     @Override
-262     public ApikeyMonthCostRecord values(Long value1, String value2, String value3, BigDecimal value4, LocalDateTime value5, LocalDateTime value6) {
-263         value1(value1);
-264         value2(value2);
-265         value3(value3);
-266         value4(value4);
-267         value5(value5);
-268         value6(value6);
-269         return this;
-270     }
-271 
-272     // -------------------------------------------------------------------------
-273     // Constructors
-274     // -------------------------------------------------------------------------
-275 
-276     /**
-277      * Create a detached ApikeyMonthCostRecord
-278      */
-279     public ApikeyMonthCostRecord() {
-280         super(ApikeyMonthCost.APIKEY_MONTH_COST);
-281     }
-282 
-283     /**
-284      * Create a detached, initialised ApikeyMonthCostRecord
-285      */
-286     public ApikeyMonthCostRecord(Long id, String akCode, String month, BigDecimal amount, LocalDateTime ctime, LocalDateTime mtime) {
-287         super(ApikeyMonthCost.APIKEY_MONTH_COST);
-288 
-289         setId(id);
-290         setAkCode(akCode);
-291         setMonth(month);
-292         setAmount(amount);
-293         setCtime(ctime);
-294         setMtime(mtime);
-295     }
-296 }
-297
+185             return (
+186                 safety_apply_url ?
+187                 <EditableCell
+188                     content={<Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
+189                 </Badge>}
+190                     dialogComponent={(isOpen, onClose) => (
+191                         <CertifyDialog
+192                             code={row.original.code}
+193                             refresh={refresh}
+194                             isOpen={isOpen}
+195                             onClose={onClose}
+196                         />
+197                     )}
+198                     positionCalc="60%"
+199                     rowId={row.id}
+200                 /> : <Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
+201                     </Badge>
+202             );
+203         },
+204     },
+205     {
+206         accessorKey: "monthQuota",
+207         header: "每月额度",
+208         cell: ({row}) => {
+209             const formatted = new Intl.NumberFormat("zh-CN", {
+210                 style: "currency",
+211                 currency: "CNY",
+212             }).format(row.original.monthQuota);
+213 
+214             return (
+215                 <EditableCell
+216                     content={formatted}
+217                     dialogComponent={(isOpen, onClose) => (
+218                         <QuotaDialog
+219                             code={row.original.code}
+220                             origin={row.original.monthQuota}
+221                             refresh={refresh}
+222                             isOpen={isOpen}
+223                             onClose={onClose}
+224                         />
+225                     )}
+226                     positionCalc="50%"
+227                     rowId={row.id}
+228                 />
+229             );
+230         }
+231     },
+232     {
+233         accessorKey: "code",
+234         header: "余额状态",
+235         cell: ({row}) => 
+236             <ApiKeyBalanceIndicator code={row.original.code} />
+237     },
+238     {
+239         accessorKey: "remark",
+240         header: "备注",
+241         cell: ({row}) => <RemarkCell value={row.original.remark}/>,
+242     },
+243     {
+244         id: "actions",
+245         header: "",
+246         cell: ({row}) => (
+247             <ActionCell code={row.original.code} refresh={refresh} showApikey={showApikey}/>
+248         ),
+249     },
+250 ]
+```
+
+
+
+
+```
+File: web/src/app/apikey/page.tsx
+1 'use client'
+2 
+3 import React, { useEffect, useState } from "react"
+4 import { DataTable } from "@/components/ui/data-table"
+5 import { getApikeyInfos, applyApikey, getApiKeyBalance } from "@/lib/api/apikey"
+6 import { ApikeyColumns } from "@/components/apikey/apikey-coloumn"
+7 import { ApikeyInfo } from "@/lib/types/openapi"
+8 import { ClientHeader } from "@/components/user/client-header"
+9 import { Button } from "@/components/ui/button"
+10 import { Input } from "@/components/ui/input"
+11 import { Search, Plus, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react"
+12 import { useUser } from "@/lib/context/user-context"
+13 import { useToast } from "@/hooks/use-toast"
+14 import {ToastAction} from "@/components/ui/toast"
+15 import {
+16     Dialog,
+17     DialogContent,
+18     DialogDescription,
+19     DialogFooter,
+20     DialogHeader,
+21     DialogTitle,
+22 } from "@/components/ui/dialog"
+23 import { ApiKeyBalanceSummary } from "@/components/apikey/apikey-balance"
+24 
+25 const ApikeyPage: React.FC = () => {
+26     const [page, setPage] = useState<number>(1)
+27     const [data, setData] = useState<ApikeyInfo[] | null>(null)
+28     const [totalPages, setTotalPages] = useState<number>(1)
+29     const [isLoading, setIsLoading] = useState<boolean>(true)
+30     const [searchTerm, setSearchTerm] = useState<string>("")
+31     const [newApiKey, setNewApiKey] = useState<string | null>(null)
+32     const [showDialog, setShowDialog] = useState<boolean>(false)
+33     const [copied, setCopied] = useState<boolean>(false)
+34     const { userInfo } = useUser()
+35     const { toast } = useToast()
+36 
+37     const refresh = async () => {
+38         setIsLoading(true)
+39         if (userInfo) {
+40             try {
+41                 const res = await getApikeyInfos(page, userInfo?.userId || null, searchTerm || null)
+42                 setData(res?.data || null)
+43                 if (res) {
+44                     setTotalPages(Math.ceil(res.total / 10))
+45                 } else {
+46                     setTotalPages(1)
+47                 }
+48             } catch (error) {
+49                 console.error('Failed to fetch API keys:', error)
+50                 setData(null)
+51             } finally {
+52                 setIsLoading(false)
+53             }
+54         }
+55     }
+56 
+57     const showApikey = async (apikey : string)  => {
+58         await refresh()
+59         setNewApiKey(apikey)
+60         setShowDialog(true)
+61         setCopied(false)
+62     }
+63 
+64     useEffect(() => {
+65         refresh()
+66     }, [page, userInfo])
+67 
+68     const handlePageChange = (newPage: number) => {
+69         setPage(newPage)
+70     }
+71 
+72     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+73         setSearchTerm(event.target.value)
+74     }
+75 
+76     const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+77         event.preventDefault()
+78         setPage(1)
+79         refresh()
+80     }
+81 
+82     const handleCopyApiKey = () => {
+83         if (newApiKey) {
+84             navigator.clipboard.writeText(newApiKey).then(() => {
+85                 setCopied(true)
+86                 setTimeout(() => setCopied(false), 2000)
+87                 toast({
+88                     title: "已复制",
+89                     description: "API Key 已复制到剪贴板",
+90                 })
+91             }).catch(err => {
+92                 console.error('复制失败:', err)
+93                 toast({
+94                     title: "复制失败",
+95                     description: "无法复制到剪贴板，请手动复制",
+96                     variant: "destructive",
+97                 })
+98             })
+99         }
+100     }
+101 
+102     const handleCreateApiKey = async () => {
+103         if (!userInfo) {
+104             toast({
+105                 title: "错误",
+106                 description: "用户未登录，无法创建 API Key",
+107                 variant: "destructive",
+108             })
+109             return
+110         }
+111 
+112         try {
+113             setIsLoading(true)
+114             const apikey = await applyApikey(userInfo.userId.toString(), userInfo.userName)
+115             if (apikey) {
+116                 showApikey(apikey)
+117             } else {
+118                 toast({
+119                     title: "错误",
+120                     description: "创建 API Key 失败",
+121                     variant: "destructive",
+122                 })
+123             }
+124         } catch (error) {
+125             console.error('Failed to create API key:', error)
+126             toast({
+127                 title: "错误",
+128                 description: "创建 API Key 时发生错误",
+129                 variant: "destructive",
+130             })
+131         } finally {
+132             setIsLoading(false)
+133         }
+134     }
+135 
+136     const columns = ApikeyColumns(refresh, showApikey)
+137 
+138     return (
+139         <div className="min-h-screen bg-gray-50">
+140             <ClientHeader title='API Key 管理'/>
+141             <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+142                 <div className="p-6">
+143                     <div className="mb-4 flex justify-between items-center">
+144                         <div className="flex-1">
+145                             {data && data.length > 0 && (
+146                                 <ApiKeyBalanceSummary apikeys={data} />
+147                             )}
+148                         </div>
+149                         <div className="flex gap-4">
+150                         <form onSubmit={handleSearchSubmit} className="relative">
+151                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+152                             <Input
+153                                 type="text"
+154                                 placeholder="搜索 API Key 名称"
+155                                 value={searchTerm}
+156                                 onChange={handleSearch}
+157                                 className="pl-10 w-64"
+158                             />
+159                         </form>
+160                         <Button onClick={handleCreateApiKey} className="bg-gray-700 hover:bg-gray-900 text-white">
+161                             <Plus className="h-4 w-4 mr-2" />
+162                             创建 API Key
+163                         </Button>
+164                         </div>
+165                     </div>
+166 
+167                     {isLoading ? (
+168                         <div className="flex justify-center items-center h-64">
+169                             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+170                         </div>
+171                     ) : data ? (
+172                         <DataTable columns={columns} data={data}/>
+173                     ) : (
+174                         <p className="text-center text-gray-500">No API keys found.</p>
+175                     )}
+176                     <div className="mt-6 flex items-center justify-between">
+177                         <div className="flex items-center space-x-2">
+178                             <Button
+179                                 onClick={() => handlePageChange(page - 1)}
+180                                 disabled={page === 1 || isLoading}
+181                                 variant="outline"
+182                                 size="sm"
+183                                 className="text-gray-600 hover:bg-gray-50 border-gray-200"
+184                             >
+185                                 <ChevronLeft className="h-4 w-4 mr-2"/>
+186                                 上一页
+187                             </Button>
+188                             <Button
+189                                 onClick={() => handlePageChange(page + 1)}
+190                                 disabled={page === totalPages || isLoading}
+191                                 variant="outline"
+192                                 size="sm"
+193                                 className="text-gray-600 hover:bg-gray-50 border-gray-200"
+194                             >
+195                                 下一页
+196                                 <ChevronRight className="h-4 w-4 ml-2"/>
+197                             </Button>
+198                         </div>
+199                         <span className="text-sm text-gray-600">
+200                             第 {page} 页，共 {totalPages} 页
+201                         </span>
+202                     </div>
+203                 </div>
+204             </div>
+205 
+206             {/* API Key 创建成功弹窗 */}
+207             <Dialog open={showDialog} onOpenChange={setShowDialog}>
+208                 <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 border-0">
+209                     <DialogHeader>
+210                         <DialogTitle className="text-center text-xl font-semibold">API Key 创建成功</DialogTitle>
+211                         <DialogDescription className="text-center pt-2">
+212                             <div className="space-y-4 mt-2">
+213                                 <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-md border border-blue-100 dark:border-blue-800">
+214                                     <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
+215                                         请保存您的API Key，它只会显示一次。关闭此窗口后将无法再次查看完整的API Key。
+216                                     </p>
+217                                 </div>
+218                             </div>
+219                         </DialogDescription>
+220                     </DialogHeader>
+221                     <div className="flex flex-col items-center mt-6">
+222                         <div className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-sm">
+223                             <div className="bg-white dark:bg-gray-800 p-4 rounded-md font-mono text-sm break-all border border-gray-100 dark:border-gray-700 shadow-inner">
+224                                 {newApiKey}
+225                             </div>
+226                         </div>
+227                         <div className="flex items-center mt-4 text-amber-600 dark:text-amber-500">
+228                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+229                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+230                             </svg>
+231                             <p className="text-sm">
+232                                 请妥善保管您的API Key，不要与他人分享。
+233                             </p>
+234                         </div>
+235                         <div className="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-md border border-amber-100 dark:border-amber-800">
+236                             <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+237                                 此API Key 仅用于openapi的接口请求鉴权。后续申请额度等操作，需要填写的并非此apikey，而是<span className="font-bold underline">ak code</span>（即apikey的id，不是用于身份验证的密钥），获取方式为：点击每一行操作栏中的复制按钮。
+238                             </p>
+239                         </div>
+240                     </div>
+241                     <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+242                         <Button
+243                             type="button"
+244                             variant="outline"
+245                             onClick={handleCopyApiKey}
+246                             className="w-full relative overflow-hidden group"
+247                         >
+248                             <span className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}>
+249                                 <Check className="h-4 w-4 mr-2" />
+250                                 已复制
+251                             </span>
+252                             <span className={`flex items-center justify-center transition-opacity duration-300 ${copied ? 'opacity-0' : 'opacity-100'}`}>
+253                                 <Copy className="h-4 w-4 mr-2" />
+254                                 复制API Key
+255                             </span>
+256                         </Button>
+257                         <Button
+258                             type="button"
+259                             onClick={() => setShowDialog(false)}
+260                             className="w-full bg-gray-800 hover:bg-gray-900"
+261                         >
+262                             确认并关闭
+263                         </Button>
+264                     </DialogFooter>
+265                 </DialogContent>
+266             </Dialog>
+267         </div>
+268     )
+269 }
+270 
+271 export default ApikeyPage
+272
+```
+
+
+
+
+```
+File: web/src/lib/api/apikey.ts
+1 import { ApikeyInfo, Page} from "@/lib/types/openapi";
+2 import { openapi } from '@/lib/api/openapi';
+3 import { ApiKeyBalance } from "@/lib/types/apikey-balance";
+4 
+5 export async function getApikeyInfos(page: number, ownerCode: number | null, search: string | null): Promise<Page<ApikeyInfo> | null> {
+6     try {
+7         const response = await openapi.get<Page<ApikeyInfo>>(`/console/apikey/page`, {
+8             params: { status: 'active', ownerType:'person', ownerCode: ownerCode, searchParam: search, page }
+9         });
+10         return response.data;
+11     } catch (error) {
+12         console.error('Error fetching api:', error);
+13         throw error;
+14     }
+15 }
+16 
+17 export async function applyApikey(ownerCode: string, ownerName: string): Promise<string> {
+18     const response = await openapi.post<string>(`/console/apikey/apply`,
+19         {ownerType:'person', ownerCode: ownerCode, ownerName: ownerName, monthQuota: 50});
+20     return response.data;
+21 }
+22 
+23 export async function deleteApikey(code: string): Promise<boolean> {
+24     const response = await openapi.post<boolean>(`/console/apikey/inactivate`, { code });
+25     return response.data ?? false;
+26 }
+27 
+28 export async function resetApikey(code: string): Promise<string | null> {
+29     const response = await openapi.post<string>(`/console/apikey/reset`, { code });
+30     return response.data || null;
+31 }
+32 
+33 export async function updateCertify(code: string, certifyCode: string): Promise<boolean> {
+34     const response = await openapi.post<boolean>('/console/apikey/certify', { code, certifyCode });
+35     return response.data ?? false;
+36 }
+37 
+38 export async function updateQuota(code: string, monthQuota: number): Promise<boolean> {
+39     const response = await openapi.post<boolean>('/console/apikey/quota/update', { code, monthQuota });
+40     return response.data ?? false;
+41 }
+42 
+43 export async function rename(code: string, name: string): Promise<boolean> {
+44     const response = await openapi.post<boolean>('/console/apikey/rename', { code, name });
+45     return response.data ?? false;
+46 }
+47 
+48 export async function getApiKeyBalance(code: string): Promise<ApiKeyBalance | null> {
+49     try {
+50         const response = await openapi.get<ApiKeyBalance>(`/console/apikey/balance/${code}`);
+51         return response.data;
+52     } catch (error) {
+53         console.error('Error fetching apikey balance:', error);
+54         return null;
+55     }
+56 }
+57
+```
+
+
+
+
+```
+File: web/src/lib/types/openapi.ts
+1 export interface BellaResponse<T> {
+2     code?: number;
+3     message?: string;
+4     timestamp?: number;
+5     data?: T;
+6     stacktrace?: string;
+7 }
+8 
+9 
+10 export interface Page<T> {
+11     data?: T[];
+12     has_more: boolean;
+13     page: number;
+14     limit: number;
+15     total: number;
+16 }
+17 
+18 export interface UserInfo {
+19     userId: number;
+20     userName: string;
+21     image?: string;
+22     optionalInfo: Record<string, any>
+23 }
+24 
+25 export interface ApikeyInfo {
+26     code: string;
+27     serviceId: string;
+28     akSha: string;
+29     akDisplay: string;
+30     name: string;
+31     outEntityCode: string;
+32     parentCode: string;
+33     ownerType: string;
+34     ownerCode: string;
+35     ownerName: string;
+36     roleCode: string;
+37     safetyLevel: number;
+38     monthQuota: number;
+39     rolePath?: RolePath;
+40     status: string;
+41     remark: string;
+42     userId: number;
+43 }
+44 
+45 export interface RolePath {
+46     included: string[];
+47     excluded?: string[];
+48 }
+49 
+50 
+51 export interface Category {
+52     id: number;
+53     categoryCode: string;
+54     categoryName: string;
+55     parentCode: string;
+56     status: string;
+57     cuid: number;
+58     cuName: string;
+59     muid: number;
+60     muName: string;
+61     ctime: string;
+62     mtime: string;
+63 }
+64 
+65 export interface Endpoint {
+66     endpoint: string;
+67     endpointCode: string;
+68     endpointName: string;
+69     maintainerCode: string;
+70     maintainerName: string;
+71     status: string;
+72     cuid: number;
+73     cuName: string;
+74     muid: number;
+75     muName: string;
+76     ctime: string;
+77     mtime: string;
+78     documentUrl?: string;
+79 }
+80 
+81 export interface CategoryTree {
+82     categoryCode: string;
+83     categoryName: string;
+84     endpoints: Endpoint[] | null;
+85     children: CategoryTree[] | null;
+86 }
+87 
+88 export interface MetadataFeature {
+89     code: string;
+90     name: string;
+91 }
+92 
+93 export interface Model {
+94     modelName: string;
+95     documentUrl: string;
+96     properties: string;
+97     features: string;
+98     ownerType: string;
+99     ownerCode:string;
+100     ownerName: string;
+101     visibility: string;
+102     status: string;
+103     linkedTo: string;
+104     endpoints: string[];
+105     priceDetails: PriceDetails;
+106     terminalModel: string;
+107 }
+108 
+109 export interface Channel {
+110     entityType: string;
+111     entityCode: string;
+112     channelCode: string;
+113     status: string;
+114     trialEnabled: number;
+115     dataDestination: string;
+116     priority: string;
+117     protocol: string;
+118     supplier: string;
+119     url: string;
+120     channelInfo: string;
+121     priceInfo: string;
+122     ownerType?: string;
+123     ownerCode?: string;
+124     ownerName?: string;
+125     visibility?: string;
+126 }
+127 
+128 export interface ModelDetails {
+129     model: Model;
+130     channels: Channel[];
+131 }
+132 
+133 export interface EndpointDetails {
+134     endpoint: string;
+135     models: Model[];
+136     features: MetadataFeature[];
+137     priceDetails: PriceDetails;
+138 }
+139 
+140 export interface PriceDetails {
+141     displayPrice: Record<string, string>;
+142     unit: string;
+143 }
+144 
+145 export interface TypeSchema {
+146     code: string;
+147     name: string;
+148     valueType: string;
+149     selections: string[]
+150     child?: JsonSchema;
+151 }
+152 
+153 export interface JsonSchema {
+154     params: TypeSchema[];
+155 }
+156 
+157 export interface MonitorData {
+158     time: string;
+159     channel_code: string;
+160     metrics: Record<string, number>;
+161 }
+162 
+163 export interface VoiceProperties {
+164     voiceTypes: Record<string, string>;
+165 }
+166 
+167
+```
+
+
+
+
+```
+File: api/sdk/src/main/java/com/ke/bella/openapi/apikey/ApikeyInfo.java
+1 package com.ke.bella.openapi.apikey;
+2 
+3 import com.fasterxml.jackson.annotation.JsonIgnore;
+4 import com.ke.bella.openapi.utils.JacksonUtils;
+5 import com.ke.bella.openapi.utils.MatchUtils;
+6 import lombok.AllArgsConstructor;
+7 import lombok.Builder;
+8 import lombok.Data;
+9 import lombok.NoArgsConstructor;
+10 
+11 import java.io.Serializable;
+12 import java.math.BigDecimal;
+13 import java.util.ArrayList;
+14 import java.util.List;
+15 
+16 @Data
+17 @Builder
+18 @NoArgsConstructor
+19 @AllArgsConstructor
+20 public class ApikeyInfo implements Serializable {
+21     private static final long serialVersionUID = 1L;
+22     private String apikey;
+23     private String code;
+24     private String serviceId;
+25     private String akSha;
+26     private String akDisplay;
+27     private String name;
+28     private String outEntityCode;
+29     private String parentCode;
+30     private String ownerType;
+31     private String ownerCode;
+32     private String ownerName;
+33     private String roleCode;
+34     @JsonIgnore
+35     private String path;
+36     private String safetySceneCode;
+37     private Byte safetyLevel;
+38     private BigDecimal monthQuota;
+39     private RolePath rolePath;
+40     private String status;
+41     private String remark;
+42     private Long userId;
+43     private ApikeyInfo parentInfo;
+44 
+45     public RolePath getRolePath() {
+46         if(rolePath != null) {
+47             return rolePath;
+48         }
+49         if(path == null) {
+50             return new RolePath();
+51         }
+52         rolePath = JacksonUtils.deserialize(path, RolePath.class);
+53         return rolePath;
+54     }
+55 
+56     public boolean hasPermission(String url) {
+57        return getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
+58                 && getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
+59     }
+60 
+61     @Data
+62     public static class RolePath implements Serializable {
+63         private static final long serialVersionUID = 1L;
+64         private List<String> included = new ArrayList<>();
+65         private List<String> excluded = new ArrayList<>();
+66     }
+67 }
+68
 ```
 
 
@@ -814,6 +1108,63 @@ File: api/server/src/main/java/com/ke/bella/openapi/db/repo/ApikeyCostRepo.java
 59     }
 60 }
 61
+```
+
+
+
+
+```
+File: api/server/src/main/java/com/ke/bella/openapi/endpoints/ApikeyController.java
+1 package com.ke.bella.openapi.endpoints;
+2 
+3 import com.ke.bella.openapi.EndpointContext;
+4 import com.ke.bella.openapi.annotations.BellaAPI;
+5 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
+6 import com.ke.bella.openapi.apikey.ApikeyInfo;
+7 import com.ke.bella.openapi.service.ApikeyService;
+8 import io.swagger.v3.oas.annotations.tags.Tag;
+9 import org.apache.commons.collections4.CollectionUtils;
+10 import org.apache.commons.lang3.StringUtils;
+11 import org.springframework.beans.factory.annotation.Autowired;
+12 import org.springframework.util.Assert;
+13 import org.springframework.web.bind.annotation.GetMapping;
+14 import org.springframework.web.bind.annotation.PostMapping;
+15 import org.springframework.web.bind.annotation.RequestBody;
+16 import org.springframework.web.bind.annotation.RequestMapping;
+17 import org.springframework.web.bind.annotation.RequestParam;
+18 import org.springframework.web.bind.annotation.RestController;
+19 
+20 @BellaAPI
+21 @RestController
+22 @RequestMapping("/v1/apikey")
+23 @Tag(name = "信息查询")
+24 public class ApikeyController {
+25 
+26     @Autowired
+27     private ApikeyService as;
+28 
+29     @PostMapping("/create")
+30     public String createApikey(@RequestBody ApikeyCreateOp op) {
+31         ApikeyInfo cur = EndpointContext.getApikey();
+32         Assert.isTrue(StringUtils.isEmpty(cur.getParentCode()), "当前AK无创建子AK权限");
+33         Assert.notNull(op.getMonthQuota(), "配额应不可为null");
+34         Assert.notNull(op.getSafetyLevel(), "安全等级不可为空");
+35         Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode()) || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
+36         op.setParentCode(cur.getCode());
+37         return as.createByParentCode(op);
+38     }
+39 
+40     @GetMapping("/whoami")
+41     public ApikeyInfo whoami() {
+42         return EndpointContext.getApikey();
+43     }
+44 
+45     @GetMapping("/permission/check")
+46     public Boolean permissionCheck(@RequestParam String url) {
+47         return EndpointContext.getApikey().hasPermission(url);
+48     }
+49 }
+50
 ```
 
 
@@ -1211,850 +1562,538 @@ File: api/server/src/main/java/com/ke/bella/openapi/service/ApikeyService.java
 
 
 
-```
-File: api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java
-1 package com.ke.bella.openapi.console;
-2 
-3 import com.ke.bella.openapi.annotations.BellaAPI;
-4 import com.ke.bella.openapi.apikey.ApikeyInfo;
-5 import com.ke.bella.openapi.apikey.ApikeyOps;
-6 import com.ke.bella.openapi.db.repo.Page;
-7 import com.ke.bella.openapi.service.ApikeyService;
-8 import com.ke.bella.openapi.tables.pojos.ApikeyDB;
-9 import com.ke.bella.openapi.tables.pojos.ApikeyMonthCostDB;
-10 import io.swagger.v3.oas.annotations.tags.Tag;
-11 import org.apache.commons.collections4.CollectionUtils;
-12 import org.apache.commons.lang3.StringUtils;
-13 import org.springframework.beans.factory.annotation.Autowired;
-14 import org.springframework.util.Assert;
-15 import org.springframework.web.bind.annotation.GetMapping;
-16 import org.springframework.web.bind.annotation.PathVariable;
-17 import org.springframework.web.bind.annotation.PostMapping;
-18 import org.springframework.web.bind.annotation.RequestBody;
-19 import org.springframework.web.bind.annotation.RequestMapping;
-20 import org.springframework.web.bind.annotation.RequestParam;
-21 import org.springframework.web.bind.annotation.RestController;
-22 
-23 import java.util.List;
-24 
-25 @BellaAPI
-26 @RestController
-27 @RequestMapping("/console/apikey")
-28 @Tag(name = "API Key管理")
-29 public class ApikeyConsoleController {
-30     @Autowired
-31     private ApikeyService apikeyService;
-32     @PostMapping("/apply")
-33     public String apply(@RequestBody ApikeyOps.ApplyOp op) {
-34         Assert.isTrue(op.getMonthQuota() == null || op.getMonthQuota().doubleValue() > 0, "配额应大于0");
-35         return apikeyService.apply(op);
-36     }
-37 
-38     @PostMapping("/reset")
-39     public String reset(@RequestBody ApikeyOps.CodeOp op) {
-40         Assert.hasText(op.getCode(), "code不可为空");
-41         return apikeyService.reset(op);
-42     }
-43 
-44     @PostMapping("/rename")
-45     public Boolean rename(@RequestBody ApikeyOps.NameOp op) {
-46         Assert.hasText(op.getCode(), "code不可为空");
-47         Assert.notNull(op.getName(), "name不可为null");
-48         apikeyService.rename(op);
-49         return true;
-50     }
-51 
-52     @PostMapping("/bindService")
-53     public Boolean bindService(@RequestBody ApikeyOps.ServiceOp op) {
-54         Assert.hasText(op.getCode(), "code不可为空");
-55         Assert.notNull(op.getServiceId(), "name不可为null");
-56         apikeyService.bindService(op);
-57         return true;
-58     }
-59 
-60     @PostMapping("/role/update")
-61     public Boolean updateRole(@RequestBody ApikeyOps.RoleOp op) {
-62         Assert.hasText(op.getCode(), "code不可为空");
-63         Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode())
-64                         || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
-65         apikeyService.updateRole(op);
-66         return true;
-67     }
-68 
-69     @PostMapping("/quota/update")
-70     public Boolean updateQuota(@RequestBody ApikeyOps.QuotaOp op) {
-71         Assert.hasText(op.getCode(), "code不可为空");
-72         Assert.notNull(op.getMonthQuota(), "配额不可为空");
-73         Assert.isTrue(op.getMonthQuota().doubleValue() > 0, "配额应大于0");
-74         apikeyService.updateQuota(op);
-75         return true;
-76     }
-77 
-78     @PostMapping("/certify")
-79     public Boolean certify(@RequestBody ApikeyOps.CertifyOp op) {
-80         Assert.hasText(op.getCode(), "code不可为空");
-81         Assert.notNull(op.getCertifyCode(), "认证码不可为空");
-82         apikeyService.certify(op);
-83         return true;
-84     }
-85 
-86     @PostMapping("/activate")
-87     public Boolean activate(@RequestBody ApikeyOps.CodeOp op) {
-88         Assert.hasText(op.getCode(), "code不可为空");
-89         apikeyService.changeStatus(op, true);
-90         return true;
-91     }
-92 
-93     @PostMapping("/inactivate")
-94     public Boolean inactivate(@RequestBody ApikeyOps.CodeOp op) {
-95         Assert.hasText(op.getCode(), "code不可为空");
-96         apikeyService.changeStatus(op, false);
-97         return true;
-98     }
-99 
-100 
-101     @GetMapping("/cost/{akCode}")
-102     public List<ApikeyMonthCostDB> listApiKeyBillings(@PathVariable String akCode) {
-103         return apikeyService.queryBillingsByAkCode(akCode);
-104     }
-105 
-106     @GetMapping("/fetchByCode")
-107     public ApikeyInfo fetchByCode(@RequestParam("code") String code, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
-108         return apikeyService.queryByCode(code, onlyActive);
-109     }
-110 
-111     @GetMapping("/fetchBySha")
-112     public ApikeyInfo fetchBySha(@RequestParam("sha") String sha, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
-113         return apikeyService.queryBySha(sha, onlyActive);
-114     }
-115 
-116     @GetMapping("/page")
-117     public Page<ApikeyDB> pageApikey(ApikeyOps.ApikeyCondition condition) {
-118         return apikeyService.pageApikey(condition);
-119     }
-120 }
-121
+# 历史执行信息
+
+【round_1】
+requirement: 
+在apikey管理页面中支持查看当月的余额
+agent_response: 
+I'll implement the functionality to display the current month's balance for API keys on the API key management page. This will involve creating both backend and frontend components to fetch, calculate, and display this information.
+
+Let's start by analyzing what we need to implement:
+
+1. Backend: Add an endpoint to fetch the current month's API key cost and remaining balance
+2. Frontend: Update the API key management page to display this information
+
+Let's begin with the implementation:
+
+```diff
+--- api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java
++++ api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java
+@@ -12,6 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
+ import org.apache.commons.lang3.StringUtils;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.util.Assert;
++import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.PathVariable;
+ import org.springframework.web.bind.annotation.PostMapping;
+ import org.springframework.web.bind.annotation.RequestBody;
+@@ -20,6 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
+ import org.springframework.web.bind.annotation.RestController;
+ 
+ import java.util.List;
++import java.util.Map;
++import java.util.HashMap;
++import java.math.BigDecimal;
++import com.ke.bella.openapi.utils.DateTimeUtils;
+ 
+ @BellaAPI
+ @RestController
+@@ -103,6 +108,19 @@ public class ApikeyConsoleController {
+         return apikeyService.queryBillingsByAkCode(akCode);
+     }
+ 
++    @GetMapping("/balance/{akCode}")
++    public Map<String, Object> getApiKeyBalance(@PathVariable String akCode) {
++        String currentMonth = DateTimeUtils.getCurrentMonth();
++        BigDecimal monthCost = apikeyService.loadCost(akCode, currentMonth);
++        ApikeyInfo apiKeyInfo = apikeyService.queryByCode(akCode, true);
++        Map<String, Object> result = new HashMap<>();
++        result.put("akCode", akCode);
++        result.put("month", currentMonth);
++        result.put("cost", monthCost);
++        result.put("quota", apiKeyInfo != null ? apiKeyInfo.getMonthQuota() : BigDecimal.ZERO);
++        result.put("balance", apiKeyInfo != null ? apiKeyInfo.getMonthQuota().subtract(monthCost) : BigDecimal.ZERO);
++        return result;
++    }
++
+     @GetMapping("/fetchByCode")
+     public ApikeyInfo fetchByCode(@RequestParam("code") String code, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
+         return apikeyService.queryByCode(code, onlyActive);
 ```
 
+Now, let's create a new file for the API type and function to retrieve the balance:
 
-
-
-```
-File: api/server/src/main/java/com/ke/bella/openapi/endpoints/ApikeyController.java
-1 package com.ke.bella.openapi.endpoints;
-2 
-3 import com.ke.bella.openapi.EndpointContext;
-4 import com.ke.bella.openapi.annotations.BellaAPI;
-5 import com.ke.bella.openapi.apikey.ApikeyCreateOp;
-6 import com.ke.bella.openapi.apikey.ApikeyInfo;
-7 import com.ke.bella.openapi.service.ApikeyService;
-8 import io.swagger.v3.oas.annotations.tags.Tag;
-9 import org.apache.commons.collections4.CollectionUtils;
-10 import org.apache.commons.lang3.StringUtils;
-11 import org.springframework.beans.factory.annotation.Autowired;
-12 import org.springframework.util.Assert;
-13 import org.springframework.web.bind.annotation.GetMapping;
-14 import org.springframework.web.bind.annotation.PostMapping;
-15 import org.springframework.web.bind.annotation.RequestBody;
-16 import org.springframework.web.bind.annotation.RequestMapping;
-17 import org.springframework.web.bind.annotation.RequestParam;
-18 import org.springframework.web.bind.annotation.RestController;
-19 
-20 @BellaAPI
-21 @RestController
-22 @RequestMapping("/v1/apikey")
-23 @Tag(name = "信息查询")
-24 public class ApikeyController {
-25 
-26     @Autowired
-27     private ApikeyService as;
-28 
-29     @PostMapping("/create")
-30     public String createApikey(@RequestBody ApikeyCreateOp op) {
-31         ApikeyInfo cur = EndpointContext.getApikey();
-32         Assert.isTrue(StringUtils.isEmpty(cur.getParentCode()), "当前AK无创建子AK权限");
-33         Assert.notNull(op.getMonthQuota(), "配额应不可为null");
-34         Assert.notNull(op.getSafetyLevel(), "安全等级不可为空");
-35         Assert.isTrue(StringUtils.isNotEmpty(op.getRoleCode()) || CollectionUtils.isNotEmpty(op.getPaths()), "权限不可为空");
-36         op.setParentCode(cur.getCode());
-37         return as.createByParentCode(op);
-38     }
-39 
-40     @GetMapping("/whoami")
-41     public ApikeyInfo whoami() {
-42         return EndpointContext.getApikey();
-43     }
-44 
-45     @GetMapping("/permission/check")
-46     public Boolean permissionCheck(@RequestParam String url) {
-47         return EndpointContext.getApikey().hasPermission(url);
-48     }
-49 }
-50
+```diff
+--- /dev/null
++++ web/src/lib/types/apikey-balance.ts
+@@ -0,0 +1,8 @@
++export interface ApiKeyBalance {
++  akCode: string;
++  month: string;
++  cost: number;
++  quota: number;
++  balance: number;
++}
++
 ```
 
+Let's update the API functions to add the new endpoint:
 
-
-
-```
-File: api/sdk/src/main/java/com/ke/bella/openapi/apikey/ApikeyInfo.java
-1 package com.ke.bella.openapi.apikey;
-2 
-3 import com.fasterxml.jackson.annotation.JsonIgnore;
-4 import com.ke.bella.openapi.utils.JacksonUtils;
-5 import com.ke.bella.openapi.utils.MatchUtils;
-6 import lombok.AllArgsConstructor;
-7 import lombok.Builder;
-8 import lombok.Data;
-9 import lombok.NoArgsConstructor;
-10 
-11 import java.io.Serializable;
-12 import java.math.BigDecimal;
-13 import java.util.ArrayList;
-14 import java.util.List;
-15 
-16 @Data
-17 @Builder
-18 @NoArgsConstructor
-19 @AllArgsConstructor
-20 public class ApikeyInfo implements Serializable {
-21     private static final long serialVersionUID = 1L;
-22     private String apikey;
-23     private String code;
-24     private String serviceId;
-25     private String akSha;
-26     private String akDisplay;
-27     private String name;
-28     private String outEntityCode;
-29     private String parentCode;
-30     private String ownerType;
-31     private String ownerCode;
-32     private String ownerName;
-33     private String roleCode;
-34     @JsonIgnore
-35     private String path;
-36     private String safetySceneCode;
-37     private Byte safetyLevel;
-38     private BigDecimal monthQuota;
-39     private RolePath rolePath;
-40     private String status;
-41     private String remark;
-42     private Long userId;
-43     private ApikeyInfo parentInfo;
-44 
-45     public RolePath getRolePath() {
-46         if(rolePath != null) {
-47             return rolePath;
-48         }
-49         if(path == null) {
-50             return new RolePath();
-51         }
-52         rolePath = JacksonUtils.deserialize(path, RolePath.class);
-53         return rolePath;
-54     }
-55 
-56     public boolean hasPermission(String url) {
-57        return getRolePath().getIncluded().stream().anyMatch(pattern -> MatchUtils.matchUrl(pattern, url))
-58                 && getRolePath().getExcluded().stream().noneMatch(pattern -> MatchUtils.matchUrl(pattern, url));
-59     }
-60 
-61     @Data
-62     public static class RolePath implements Serializable {
-63         private static final long serialVersionUID = 1L;
-64         private List<String> included = new ArrayList<>();
-65         private List<String> excluded = new ArrayList<>();
-66     }
-67 }
-68
+```diff
+--- web/src/lib/api/apikey.ts
++++ web/src/lib/api/apikey.ts
+@@ -1,5 +1,6 @@
+ import { ApikeyInfo, Page} from "@/lib/types/openapi";
+ import { openapi } from '@/lib/api/openapi';
++import { ApiKeyBalance } from "@/lib/types/apikey-balance";
+ 
+ export async function getApikeyInfos(page: number, ownerCode: number | null, search: string | null): Promise<Page<ApikeyInfo> | null> {
+     try {
+@@ -43,3 +44,12 @@ export async function rename(code: string, name: string): Promise<boolean> {
+     const response = await openapi.post<boolean>('/console/apikey/rename', { code, name });
+     return response.data ?? false;
+ }
++
++export async function getApiKeyBalance(code: string): Promise<ApiKeyBalance | null> {
++    try {
++        const response = await openapi.get<ApiKeyBalance>(`/console/apikey/balance/${code}`);
++        return response.data;
++    } catch (error) {
++        console.error('Error fetching apikey balance:', error);
++        return null;
++    }
++}
 ```
 
+Now, let's create a component to display the API key balance:
 
-
-
-```
-File: api/sdk/src/main/java/com/ke/bella/openapi/utils/DateTimeUtils.java
-1 package com.ke.bella.openapi.utils;
-2 
-3 import java.time.LocalDate;
-4 import java.time.format.DateTimeFormatter;
-5 
-6 public class DateTimeUtils {
-7     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-8     public static boolean isCurrentMonth(String month) {
-9         return getCurrentMonth().equals(month);
-10     }
-11 
-12     public static String getCurrentMonth() {
-13         return LocalDate.now().format(formatter);
-14     }
-15 
-16     public static long getCurrentMills() {
-17        return System.currentTimeMillis();
-18     }
-19 
-20     public static long getCurrentSeconds() {
-21         return getCurrentMills() / 1000;
-22     }
-23 }
-24
-```
-
-
-
-
-```
-File: web/src/app/apikey/page.tsx
-1 'use client'
-2 
-3 import React, { useEffect, useState } from "react"
-4 import { DataTable } from "@/components/ui/data-table"
-5 import { getApikeyInfos, applyApikey } from "@/lib/api/apikey"
-6 import { ApikeyColumns } from "@/components/apikey/apikey-coloumn"
-7 import { ApikeyInfo } from "@/lib/types/openapi"
-8 import { ClientHeader } from "@/components/user/client-header"
-9 import { Button } from "@/components/ui/button"
-10 import { Input } from "@/components/ui/input"
-11 import { Search, Plus, ChevronLeft, ChevronRight, Copy, Check } from "lucide-react"
-12 import { useUser } from "@/lib/context/user-context"
-13 import { useToast } from "@/hooks/use-toast"
-14 import {ToastAction} from "@/components/ui/toast"
-15 import {
-16     Dialog,
-17     DialogContent,
-18     DialogDescription,
-19     DialogFooter,
-20     DialogHeader,
-21     DialogTitle,
-22 } from "@/components/ui/dialog"
-23 
-24 const ApikeyPage: React.FC = () => {
-25     const [page, setPage] = useState<number>(1)
-26     const [data, setData] = useState<ApikeyInfo[] | null>(null)
-27     const [totalPages, setTotalPages] = useState<number>(1)
-28     const [isLoading, setIsLoading] = useState<boolean>(true)
-29     const [searchTerm, setSearchTerm] = useState<string>("")
-30     const [newApiKey, setNewApiKey] = useState<string | null>(null)
-31     const [showDialog, setShowDialog] = useState<boolean>(false)
-32     const [copied, setCopied] = useState<boolean>(false)
-33     const { userInfo } = useUser()
-34     const { toast } = useToast()
-35 
-36     const refresh = async () => {
-37         setIsLoading(true)
-38         if (userInfo) {
-39             try {
-40                 const res = await getApikeyInfos(page, userInfo?.userId || null, searchTerm || null)
-41                 setData(res?.data || null)
-42                 if (res) {
-43                     setTotalPages(Math.ceil(res.total / 10))
-44                 } else {
-45                     setTotalPages(1)
-46                 }
-47             } catch (error) {
-48                 console.error('Failed to fetch API keys:', error)
-49                 setData(null)
-50             } finally {
-51                 setIsLoading(false)
-52             }
-53         }
-54     }
-55 
-56     const showApikey = async (apikey : string)  => {
-57         await refresh()
-58         setNewApiKey(apikey)
-59         setShowDialog(true)
-60         setCopied(false)
-61     }
-62 
-63     useEffect(() => {
-64         refresh()
-65     }, [page, userInfo])
-66 
-67     const handlePageChange = (newPage: number) => {
-68         setPage(newPage)
-69     }
-70 
-71     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-72         setSearchTerm(event.target.value)
-73     }
-74 
-75     const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-76         event.preventDefault()
-77         setPage(1)
-78         refresh()
-79     }
-80 
-81     const handleCopyApiKey = () => {
-82         if (newApiKey) {
-83             navigator.clipboard.writeText(newApiKey).then(() => {
-84                 setCopied(true)
-85                 setTimeout(() => setCopied(false), 2000)
-86                 toast({
-87                     title: "已复制",
-88                     description: "API Key 已复制到剪贴板",
-89                 })
-90             }).catch(err => {
-91                 console.error('复制失败:', err)
-92                 toast({
-93                     title: "复制失败",
-94                     description: "无法复制到剪贴板，请手动复制",
-95                     variant: "destructive",
-96                 })
-97             })
-98         }
-99     }
-100 
-101     const handleCreateApiKey = async () => {
-102         if (!userInfo) {
-103             toast({
-104                 title: "错误",
-105                 description: "用户未登录，无法创建 API Key",
-106                 variant: "destructive",
-107             })
-108             return
-109         }
-110 
-111         try {
-112             setIsLoading(true)
-113             const apikey = await applyApikey(userInfo.userId.toString(), userInfo.userName)
-114             if (apikey) {
-115                 showApikey(apikey)
-116             } else {
-117                 toast({
-118                     title: "错误",
-119                     description: "创建 API Key 失败",
-120                     variant: "destructive",
-121                 })
-122             }
-123         } catch (error) {
-124             console.error('Failed to create API key:', error)
-125             toast({
-126                 title: "错误",
-127                 description: "创建 API Key 时发生错误",
-128                 variant: "destructive",
-129             })
-130         } finally {
-131             setIsLoading(false)
-132         }
-133     }
-134 
-135     const columns = ApikeyColumns(refresh, showApikey)
-136 
-137     return (
-138         <div className="min-h-screen bg-gray-50">
-139             <ClientHeader title='API Key 管理'/>
-140             <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-141                 <div className="p-6">
-142                     <div className="mb-4 flex justify-between items-center">
-143                         <form onSubmit={handleSearchSubmit} className="relative">
-144                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-145                             <Input
-146                                 type="text"
-147                                 placeholder="搜索 API Key 名称"
-148                                 value={searchTerm}
-149                                 onChange={handleSearch}
-150                                 className="pl-10 w-64"
-151                             />
-152                         </form>
-153                         <Button onClick={handleCreateApiKey} className="bg-gray-700 hover:bg-gray-900 text-white">
-154                             <Plus className="h-4 w-4 mr-2" />
-155                             创建 API Key
-156                         </Button>
-157                     </div>
-158 
-159                     {isLoading ? (
-160                         <div className="flex justify-center items-center h-64">
-161                             <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-162                         </div>
-163                     ) : data ? (
-164                         <DataTable columns={columns} data={data}/>
-165                     ) : (
-166                         <p className="text-center text-gray-500">No API keys found.</p>
-167                     )}
-168                     <div className="mt-6 flex items-center justify-between">
-169                         <div className="flex items-center space-x-2">
-170                             <Button
-171                                 onClick={() => handlePageChange(page - 1)}
-172                                 disabled={page === 1 || isLoading}
-173                                 variant="outline"
-174                                 size="sm"
-175                                 className="text-gray-600 hover:bg-gray-50 border-gray-200"
-176                             >
-177                                 <ChevronLeft className="h-4 w-4 mr-2"/>
-178                                 上一页
-179                             </Button>
-180                             <Button
-181                                 onClick={() => handlePageChange(page + 1)}
-182                                 disabled={page === totalPages || isLoading}
-183                                 variant="outline"
-184                                 size="sm"
-185                                 className="text-gray-600 hover:bg-gray-50 border-gray-200"
-186                             >
-187                                 下一页
-188                                 <ChevronRight className="h-4 w-4 ml-2"/>
-189                             </Button>
-190                         </div>
-191                         <span className="text-sm text-gray-600">
-192                             第 {page} 页，共 {totalPages} 页
-193                         </span>
-194                     </div>
-195                 </div>
-196             </div>
-197 
-198             {/* API Key 创建成功弹窗 */}
-199             <Dialog open={showDialog} onOpenChange={setShowDialog}>
-200                 <DialogContent className="sm:max-w-md bg-white dark:bg-gray-800 border-0">
-201                     <DialogHeader>
-202                         <DialogTitle className="text-center text-xl font-semibold">API Key 创建成功</DialogTitle>
-203                         <DialogDescription className="text-center pt-2">
-204                             <div className="space-y-4 mt-2">
-205                                 <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-md border border-blue-100 dark:border-blue-800">
-206                                     <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
-207                                         请保存您的API Key，它只会显示一次。关闭此窗口后将无法再次查看完整的API Key。
-208                                     </p>
-209                                 </div>
-210                             </div>
-211                         </DialogDescription>
-212                     </DialogHeader>
-213                     <div className="flex flex-col items-center mt-6">
-214                         <div className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 shadow-sm">
-215                             <div className="bg-white dark:bg-gray-800 p-4 rounded-md font-mono text-sm break-all border border-gray-100 dark:border-gray-700 shadow-inner">
-216                                 {newApiKey}
-217                             </div>
-218                         </div>
-219                         <div className="flex items-center mt-4 text-amber-600 dark:text-amber-500">
-220                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-221                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
-222                             </svg>
-223                             <p className="text-sm">
-224                                 请妥善保管您的API Key，不要与他人分享。
-225                             </p>
-226                         </div>
-227                         <div className="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-md border border-amber-100 dark:border-amber-800">
-228                             <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-229                                 此API Key 仅用于openapi的接口请求鉴权。后续申请额度等操作，需要填写的并非此apikey，而是<span className="font-bold underline">ak code</span>（即apikey的id，不是用于身份验证的密钥），获取方式为：点击每一行操作栏中的复制按钮。
-230                             </p>
-231                         </div>
-232                     </div>
-233                     <DialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
-234                         <Button
-235                             type="button"
-236                             variant="outline"
-237                             onClick={handleCopyApiKey}
-238                             className="w-full relative overflow-hidden group"
-239                         >
-240                             <span className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}>
-241                                 <Check className="h-4 w-4 mr-2" />
-242                                 已复制
-243                             </span>
-244                             <span className={`flex items-center justify-center transition-opacity duration-300 ${copied ? 'opacity-0' : 'opacity-100'}`}>
-245                                 <Copy className="h-4 w-4 mr-2" />
-246                                 复制API Key
-247                             </span>
-248                         </Button>
-249                         <Button
-250                             type="button"
-251                             onClick={() => setShowDialog(false)}
-252                             className="w-full bg-gray-800 hover:bg-gray-900"
-253                         >
-254                             确认并关闭
-255                         </Button>
-256                     </DialogFooter>
-257                 </DialogContent>
-258             </Dialog>
-259         </div>
-260     )
-261 }
-262 
-263 export default ApikeyPage
-264
+```diff
+--- /dev/null
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -0,0 +1,70 @@
++import React, { useState, useEffect } from 'react';
++import { getApiKeyBalance } from '@/lib/api/apikey';
++import { ApiKeyBalance } from '@/lib/types/apikey-balance';
++import {
++  Dialog,
++  DialogContent,
++  DialogDescription,
++  DialogHeader,
++  DialogTitle,
++} from "@/components/ui/dialog";
++import { Button } from '@/components/ui/button';
++import { CircleDollarSign, AlertCircle } from 'lucide-react';
++
++interface ApiKeyBalanceDialogProps {
++  code: string;
++  isOpen: boolean;
++  onClose: () => void;
++}
++
++export const ApiKeyBalanceDialog: React.FC<ApiKeyBalanceDialogProps> = ({ 
++  code, 
++  isOpen, 
++  onClose 
++}) => {
++  const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
++  const [loading, setLoading] = useState<boolean>(false);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => {
++    if (isOpen && code) {
++      setLoading(true);
++      setError(null);
++      getApiKeyBalance(code)
++        .then((data) => {
++          if (data) {
++            setBalance(data);
++          } else {
++            setError('无法获取余额信息');
++          }
++        })
++        .catch(err => {
++          console.error('Failed to fetch balance:', err);
++          setError('获取余额信息时发生错误');
++        })
++        .finally(() => {
++          setLoading(false);
++        });
++    }
++  }, [isOpen, code]);
++
++  return (
++    <Dialog open={isOpen} onOpenChange={onClose}>
++      <DialogContent className="sm:max-w-md">
++        <DialogHeader>
++          <DialogTitle>API Key 余额详情</DialogTitle>
++          <DialogDescription>当前月份的使用情况和剩余额度</DialogDescription>
++        </DialogHeader>
++        <div className="py-4">
++          {loading ? (
++            <div className="flex justify-center items-center p-8">
++              <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
++            </div>
++          ) : error ? (
++            <div className="flex items-center justify-center text-red-500 p-4"><AlertCircle className="h-5 w-5 mr-2" />{error}</div>
++          ) : balance && (
++            <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
++              <div className="grid grid-cols-2 gap-4 text-sm">
++                <div className="font-medium text-gray-500">月份</div>
++                <div>{balance.month}</div>
++                <div className="font-medium text-gray-500">总额度</div>
++                <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.quota)}</div>
++                <div className="font-medium text-gray-500">已使用</div>
++                <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.cost)}</div>
++                <div className="font-medium text-gray-500">剩余额度</div>
++                <div className={`font-semibold ${balance.balance < balance.quota * 0.2 ? 'text-red-600' : 'text-green-600'}`}>
++                  {new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.balance)}
++                </div>
++              </div>
++              <div className={`text-sm mt-4 p-2 rounded ${balance.balance < balance.quota * 0.2 ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`}>
++                {balance.balance < balance.quota * 0.2 ? (
++                  <p className="flex items-center"><AlertCircle className="h-4 w-4 mr-2" />余额不足，请考虑增加额度</p>
++                ) : (
++                  <p>余额充足</p>
++                )}
++              </div>
++            </div>
++          )}
++        </div>
++        <div className="flex justify-end">
++          <Button onClick={onClose}>关闭</Button>
++        </div>
++      </DialogContent>
++    </Dialog>
++  );
++};
 ```
 
+Now, let's update the API key columns to add a button for viewing the balance:
 
-
-
-```
-File: web/src/components/apikey/apikey-coloumn.tsx
-1 'use client'
-2 
-3 import React, {ReactNode, useEffect, useRef, useState} from "react"
-4 import {ColumnDef} from "@tanstack/react-table"
-5 import {ApikeyInfo} from "@/lib/types/openapi"
-6 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
-7 import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} from "./apikey-dialog"
-8 import {HoverContext} from "@/components/ui/data-table";
-9 import {Badge} from "@/components/ui/badge"
-10 import {Button} from "@/components/ui/button"
-11 import {Copy} from 'lucide-react'
-12 import {useToast} from "@/hooks/use-toast";
-13 import {safety_apply_url} from "@/config";
-14 
-15 interface EditableCellProps {
-16     content: ReactNode;
-17     dialogComponent: (isOpen: boolean, onClose: () => void) => React.ReactElement;
-18     positionCalc: string;
-19     rowId: string;
-20 }
-21 
-22 const EditableCell: React.FC<EditableCellProps> = ({ content, dialogComponent, positionCalc, rowId }) => {
-23     const hoveredRowId = React.useContext(HoverContext);
-24     const [isDialogOpen, setIsDialogOpen] = useState(false);
-25     const contentRef = useRef<HTMLSpanElement>(null);
-26     const [iconPosition, setIconPosition] = useState(0);
-27 
-28     useEffect(() => {
-29         if (contentRef.current) {
-30             const contentWidth = contentRef.current.offsetWidth;
-31             setIconPosition(contentWidth / 2 + 5);
-32         }
-33     }, [content]);
-34 
-35     const showButton = hoveredRowId === rowId || isDialogOpen;
-36 
-37     return (
-38         <div className="relative flex justify-center items-center w-full">
-39             <span ref={contentRef} className="font-medium">{content}</span>
-40             {showButton && (
-41                 <div style={{ position: 'absolute', left: `calc(${positionCalc} + ${iconPosition}px)` }}>
-42                     {dialogComponent(isDialogOpen, () => setIsDialogOpen(!isDialogOpen))}
-43                 </div>
-44             )}
-45         </div>
-46     );
-47 };
-48 
-49 
-50 const RemarkCell = ({ value }: { value: string }) => {
-51     const remark = value || '/'
-52     return (
-53         <TooltipProvider>
-54             <Tooltip>
-55                 <TooltipTrigger asChild>
-56                     <div className="truncate max-w-xs cursor-help">{remark}</div>
-57                 </TooltipTrigger>
-58                 <TooltipContent side="bottom" className="w-64 break-words">
-59                     <p>{remark}</p>
-60                 </TooltipContent>
-61             </Tooltip>
-62         </TooltipProvider>
-63     )
-64 }
-65 
-66 const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey : string) => void }) => {
-67     const { toast } = useToast();
-68     const copyToClipboard = () => {
-69         navigator.clipboard.writeText(code).then(() => {
-70             toast({ title: "复制成功", description: "API Key编码复制成功。" })
-71         });
-72     };
-73 
-74     return (
-75         <div className="flex flex-wrap justify-end gap-2">
-76             <Button onClick={copyToClipboard} variant="ghost" size="icon" className="p-0 focus:ring-0">
-77                 <TooltipProvider>
-78                     <Tooltip>
-79                         <TooltipTrigger asChild>
-80                             <div>
-81                                 <Copy className="h-4 w-4" />
-82                                 <span className="sr-only">复制ak code</span>
-83                             </div>
-84                         </TooltipTrigger>
-85                         <TooltipContent>
-86                             <p>复制ak code</p>
-87                         </TooltipContent>
-88                     </Tooltip>
-89                 </TooltipProvider>
-90             </Button>
-91             <DeleteDialog code={code} refresh={refresh}/>
-92             <ResetDialog code={code} showApikey={showApikey}/>
-93         </div>
-94     )
-95 }
-96 
-97 function getSafetyLevel(level: number) : string {
-98     switch (level) {
-99         case 10:
-100             return "极低";
-101         case 20:
-102             return "低";
-103         case 30:
-104             return "中";
-105         case 40:
-106             return "高";
-107         default:
-108             return "N/A";
-109     }
-110 }
-111 
-112 export const ApikeyColumns = (refresh: () => void, showApikey: (apikey : string) => void): ColumnDef<ApikeyInfo>[] => [
-113     {
-114         accessorKey: "akDisplay",
-115         header: "AK",
-116         cell: ({row}) =>
-117             (<div className="font-mono text-sm">
-118                 {row.original.akDisplay}
-119             </div>)
-120         ,
-121     },
-122     {
-123         accessorKey: "name",
-124         header: "名称",
-125         cell: ({row}) => (
-126             <EditableCell
-127                 content={row.original.name}
-128                 dialogComponent={(isOpen, onClose) => (
-129                     <RenameDialog
-130                         code={row.original.code}
-131                         origin={row.original.name}
-132                         refresh={refresh}
-133                         isOpen={isOpen}
-134                         onClose={onClose}
-135                     />
-136                 )}
-137                 positionCalc="50%"
-138                 rowId={row.id}
-139             />
-140         ),
-141     },
-142     {
-143         accessorKey: "serviceId",
-144         header:
-145             "服务名",
-146         cell:
-147             ({row}) => <div>{row.getValue("serviceId")}</div>,
-148     },
-149     {
-150         accessorKey: "safetyLevel",
-151         header: "安全等级",
-152         cell: ({row}) => {
-153             const level = row.original.safetyLevel as number;
-154             let color = "bg-green-100 text-green-800";
-155             if (level == 1) {
-156                 color = "bg-yellow-100 text-yellow-800";
-157             }
-158             if (level == 0) {
-159                 color = "bg-red-100 text-red-800";
-160             }
-161 
-162             return (
-163                 safety_apply_url ?
-164                 <EditableCell
-165                     content={<Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
-166                 </Badge>}
-167                     dialogComponent={(isOpen, onClose) => (
-168                         <CertifyDialog
-169                             code={row.original.code}
-170                             refresh={refresh}
-171                             isOpen={isOpen}
-172                             onClose={onClose}
-173                         />
-174                     )}
-175                     positionCalc="60%"
-176                     rowId={row.id}
-177                 /> : <Badge className={`${color} capitalize`}>{getSafetyLevel(level)}
-178                     </Badge>
-179             );
-180         },
-181     },
-182     {
-183         accessorKey: "monthQuota",
-184         header: "每月额度",
-185         cell: ({row}) => {
-186             const formatted = new Intl.NumberFormat("zh-CN", {
-187                 style: "currency",
-188                 currency: "CNY",
-189             }).format(row.original.monthQuota);
-190 
-191             return (
-192                 <EditableCell
-193                     content={formatted}
-194                     dialogComponent={(isOpen, onClose) => (
-195                         <QuotaDialog
-196                             code={row.original.code}
-197                             origin={row.original.monthQuota}
-198                             refresh={refresh}
-199                             isOpen={isOpen}
-200                             onClose={onClose}
-201                         />
-202                     )}
-203                     positionCalc="50%"
-204                     rowId={row.id}
-205                 />
-206             );
-207         }
-208     },
-209     {
-210         accessorKey: "remark",
-211         header: "备注",
-212         cell: ({row}) => <RemarkCell value={row.original.remark}/>,
-213     },
-214     {
-215         id: "actions",
-216         header: "",
-217         cell: ({row}) => (
-218             <ActionCell code={row.original.code} refresh={refresh} showApikey={showApikey}/>
-219         ),
-220     },
-221 ]
-222
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -11,6 +11,7 @@ import {Button} from "@/components/ui/button"
+ import {Copy} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
++import { ApiKeyBalanceDialog } from "./apikey-balance";
+ 
+ interface EditableCellProps {
+     content: ReactNode;
+@@ -63,14 +64,17 @@ const RemarkCell = ({ value }: { value: string }) => {
+     )
+ }
+ 
+-const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey : string) => void }) => {
++const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey: string) => void }) => {
+     const { toast } = useToast();
++    const [showBalance, setShowBalance] = useState(false);
++    
+     const copyToClipboard = () => {
+         navigator.clipboard.writeText(code).then(() => {
+             toast({ title: "复制成功", description: "API Key编码复制成功。" })
+         });
+     };
+ 
++    
+     return (
+         <div className="flex flex-wrap justify-end gap-2">
+             <Button onClick={copyToClipboard} variant="ghost" size="icon" className="p-0 focus:ring-0">
+@@ -90,6 +94,29 @@ const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => 
+             </Button>
+             <DeleteDialog code={code} refresh={refresh}/>
+             <ResetDialog code={code} showApikey={showApikey}/>
++            <Button 
++                onClick={() => setShowBalance(true)} 
++                variant="ghost" 
++                size="icon" 
++                className="p-0 focus:ring-0"
++            >
++                <TooltipProvider>
++                    <Tooltip>
++                        <TooltipTrigger asChild>
++                            <div>
++                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wallet">
++                                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
++                                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
++                                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
++                                </svg>
++                                <span className="sr-only">查看余额</span>
++                            </div>
++                        </TooltipTrigger>
++                        <TooltipContent>查看余额</TooltipContent>
++                    </Tooltip>
++                </TooltipProvider>
++            </Button>
++            <ApiKeyBalanceDialog code={code} isOpen={showBalance} onClose={() => setShowBalance(false)} />
+         </div>
+     )
+ }
 ```
 
+Let's also add a balance indicator in the main API key page to show the balance status at a glance:
 
-
-
-```
-File: web/src/lib/api/apikey.ts
-1 import { ApikeyInfo, Page} from "@/lib/types/openapi";
-2 import { openapi } from '@/lib/api/openapi';
-3 
-4 export async function getApikeyInfos(page: number, ownerCode: number | null, search: string | null): Promise<Page<ApikeyInfo> | null> {
-5     try {
-6         const response = await openapi.get<Page<ApikeyInfo>>(`/console/apikey/page`, {
-7             params: { status: 'active', ownerType:'person', ownerCode: ownerCode, searchParam: search, page }
-8         });
-9         return response.data;
-10     } catch (error) {
-11         console.error('Error fetching api:', error);
-12         throw error;
-13     }
-14 }
-15 
-16 export async function applyApikey(ownerCode: string, ownerName: string): Promise<string> {
-17     const response = await openapi.post<string>(`/console/apikey/apply`,
-18         {ownerType:'person', ownerCode: ownerCode, ownerName: ownerName, monthQuota: 50});
-19     return response.data;
-20 }
-21 
-22 export async function deleteApikey(code: string): Promise<boolean> {
-23     const response = await openapi.post<boolean>(`/console/apikey/inactivate`, { code });
-24     return response.data ?? false;
-25 }
-26 
-27 export async function resetApikey(code: string): Promise<string | null> {
-28     const response = await openapi.post<string>(`/console/apikey/reset`, { code });
-29     return response.data || null;
-30 }
-31 
-32 export async function updateCertify(code: string, certifyCode: string): Promise<boolean> {
-33     const response = await openapi.post<boolean>('/console/apikey/certify', { code, certifyCode });
-34     return response.data ?? false;
-35 }
-36 
-37 export async function updateQuota(code: string, monthQuota: number): Promise<boolean> {
-38     const response = await openapi.post<boolean>('/console/apikey/quota/update', { code, monthQuota });
-39     return response.data ?? false;
-40 }
-41 
-42 export async function rename(code: string, name: string): Promise<boolean> {
-43     const response = await openapi.post<boolean>('/console/apikey/rename', { code, name });
-44     return response.data ?? false;
-45 }
-46
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button"
+ import {Copy, Wallet} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
+-import { ApiKeyBalanceDialog } from "./apikey-balance";
++import {ApiKeyBalanceDialog, ApiKeyBalanceIndicator} from "./apikey-balance";
+ 
+ interface EditableCellProps {
+     content: ReactNode;
+@@ -206,6 +206,12 @@ export const ApikeyColumns = (refresh: () => void, showApikey: (apikey : string)
+             );
+         }
+     },
++    {
++        accessorKey: "code",
++        header: "余额状态",
++        cell: ({row}) => 
++            <ApiKeyBalanceIndicator code={row.original.code} />
++    },
+     {
+         accessorKey: "remark",
+         header: "备注",
 ```
 
+Now let's update our balance component to add the indicator:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -9,7 +9,7 @@ import {
+   DialogTitle,
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
+-import { CircleDollarSign, AlertCircle } from 'lucide-react';
++import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+   code: string;
+@@ -17,6 +17,56 @@ interface ApiKeyBalanceDialogProps {
+   onClose: () => void;
+ }
+ 
++interface ApiKeyBalanceIndicatorProps {
++  code: string;
++}
++
++export const ApiKeyBalanceIndicator: React.FC<ApiKeyBalanceIndicatorProps> = ({ code }) => {
++  const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
++  const [loading, setLoading] = useState<boolean>(true);
++  const [error, setError] = useState<boolean>(false);
++
++  useEffect(() => {
++    if (code) {
++      setLoading(true);
++      setError(false);
++      getApiKeyBalance(code)
++        .then((data) => {
++          if (data) {
++            setBalance(data);
++          } else {
++            setError(true);
++          }
++        })
++        .catch(() => {
++          setError(true);
++        })
++        .finally(() => {
++          setLoading(false);
++        });
++    }
++  }, [code]);
++
++  if (loading) {
++    return <div className="flex justify-center"><div className="h-5 w-5 animate-pulse bg-gray-200 rounded-full"></div></div>;
++  }
++
++  if (error || !balance) {
++    return <Badge variant="outline" className="bg-gray-100 text-gray-500">未知</Badge>;
++  }
++
++  const usagePercentage = (balance.cost / balance.quota) * 100;
++  
++  if (usagePercentage >= 80) {
++    return (
++      <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
++        <AlertCircle className="h-3 w-3" /> 余额紧张 ({Math.round(usagePercentage)}%)
++      </Badge>
++    );
++  }
++  
++  return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> 余额充足</Badge>;
++};
++
+ export const ApiKeyBalanceDialog: React.FC<ApiKeyBalanceDialogProps> = ({ 
+   code, 
+   isOpen, 
+```
+
+Let's make sure the Badge component is imported:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -9,6 +9,7 @@ import {
+   DialogTitle,
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
++import { Badge } from '@/components/ui/badge';
+ import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+```
+
+Let's update the import in the apikey-column.tsx file to use the Wallet icon:
+
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -8,7 +8,7 @@ import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} fro
+ import {HoverContext} from "@/components/ui/data-table";
+ import {Badge} from "@/components/ui/badge"
+ import {Button} from "@/components/ui/button"
+-import {Copy} from 'lucide-react'
++import {Copy, Wallet} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
+ import {ApiKeyBalanceDialog, ApiKeyBalanceIndicator} from "./apikey-balance";
+@@ -104,15 +104,7 @@ const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () =>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <div>
+-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wallet">
+-                                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+-                                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+-                                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+-                                </svg>
+-                                <span className="sr-only">查看余额</span>
+-                            </div>
+-                        </TooltipTrigger>
+-                        <TooltipContent>查看余额</TooltipContent>
++                                <Wallet className="h-4 w-4" />
++                                <span className="sr-only">查看余额</span>
++                            </div>
++                        </TooltipTrigger>
++                        <TooltipContent>查看余额</TooltipContent>
+                     </Tooltip>
+                 </TooltipProvider>
+             </Button>
+```
+
+Finally, let's add a summary component at the top of the API key page to show total balance information:
+
+```diff
+--- web/src/app/apikey/page.tsx
++++ web/src/app/apikey/page.tsx
+@@ -2,7 +2,7 @@
+ 
+ import React, { useEffect, useState } from "react"
+ import { DataTable } from "@/components/ui/data-table"
+-import { getApikeyInfos, applyApikey } from "@/lib/api/apikey"
++import { getApikeyInfos, applyApikey, getApiKeyBalance } from "@/lib/api/apikey"
+ import { ApikeyColumns } from "@/components/apikey/apikey-coloumn"
+ import { ApikeyInfo } from "@/lib/types/openapi"
+ import { ClientHeader } from "@/components/user/client-header"
+@@ -20,6 +20,7 @@ import {
+     DialogHeader,
+     DialogTitle,
+ } from "@/components/ui/dialog"
++import { ApiKeyBalanceSummary } from "@/components/apikey/apikey-balance"
+ 
+ const ApikeyPage: React.FC = () => {
+     const [page, setPage] = useState<number>(1)
+@@ -140,6 +141,12 @@ const ApikeyPage: React.FC = () => {
+             <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                 <div className="p-6">
+                     <div className="mb-4 flex justify-between items-center">
++                        <div className="flex-1">
++                            {data && data.length > 0 && (
++                                <ApiKeyBalanceSummary apikeys={data} />
++                            )}
++                        </div>
++                        <div className="flex gap-4">
+                         <form onSubmit={handleSearchSubmit} className="relative">
+                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                             <Input
+@@ -154,6 +161,7 @@ const ApikeyPage: React.FC = () => {
+                             <Plus className="h-4 w-4 mr-2" />
+                             创建 API Key
+                         </Button>
++                        </div>
+                     </div>
+ 
+                     {isLoading ? (
+```
+
+Let's add the ApiKeyBalanceSummary component to apikey-balance.tsx:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -1,6 +1,7 @@
+ import React, { useState, useEffect } from 'react';
+ import { getApiKeyBalance } from '@/lib/api/apikey';
+ import { ApiKeyBalance } from '@/lib/types/apikey-balance';
++import { ApikeyInfo } from '@/lib/types/openapi';
+ import {
+   Dialog,
+   DialogContent,
+@@ -10,7 +11,7 @@ import {
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
+ import { Badge } from '@/components/ui/badge';
+-import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
++import { CircleDollarSign, AlertCircle, CheckCircle2, Wallet } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+   code: string;
+@@ -67,6 +68,70 @@ export const ApiKeyBalanceIndicator: React.FC<ApiKeyBalanceIndicatorProps> = ({
+   return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> 余额充足</Badge>;
+ };
+ 
++interface ApiKeyBalanceSummaryProps {
++  apikeys: ApikeyInfo[];
++}
++
++export const ApiKeyBalanceSummary: React.FC<ApiKeyBalanceSummaryProps> = ({ apikeys }) => {
++  const [balances, setBalances] = useState<ApiKeyBalance[]>([]);
++  const [loading, setLoading] = useState<boolean>(true);
++
++  useEffect(() => {
++    if (apikeys && apikeys.length > 0) {
++      setLoading(true);
++      Promise.all(
++        apikeys.map(apikey => getApiKeyBalance(apikey.code))
++      ).then(results => {
++        setBalances(results.filter(result => result !== null) as ApiKeyBalance[]);
++      }).finally(() => {
++        setLoading(false);
++      });
++    }
++  }, [apikeys]);
++
++  if (loading) {
++    return <div className="h-10 animate-pulse bg-gray-100 rounded-md w-full"></div>;
++  }
++
++  if (balances.length === 0) {
++    return null;
++  }
++
++  const totalQuota = balances.reduce((sum, balance) => sum + balance.quota, 0);
++  const totalUsed = balances.reduce((sum, balance) => sum
 
 
 
 # 用户需求
 
-在apikey管理页面中支持查看当月的余额
+ApiKeyBalanceSummary
+这个页面组件没有实现完成
