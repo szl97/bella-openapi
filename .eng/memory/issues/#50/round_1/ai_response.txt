@@ -1,0 +1,522 @@
+I'll implement the functionality to display the current month's balance for API keys on the API key management page. This will involve creating both backend and frontend components to fetch, calculate, and display this information.
+
+Let's start by analyzing what we need to implement:
+
+1. Backend: Add an endpoint to fetch the current month's API key cost and remaining balance
+2. Frontend: Update the API key management page to display this information
+
+Let's begin with the implementation:
+
+```diff
+--- api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java
++++ api/server/src/main/java/com/ke/bella/openapi/console/ApikeyConsoleController.java
+@@ -12,6 +12,7 @@ import org.apache.commons.collections4.CollectionUtils;
+ import org.apache.commons.lang3.StringUtils;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.util.Assert;
++import org.springframework.web.bind.annotation.GetMapping;
+ import org.springframework.web.bind.annotation.PathVariable;
+ import org.springframework.web.bind.annotation.PostMapping;
+ import org.springframework.web.bind.annotation.RequestBody;
+@@ -20,6 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
+ import org.springframework.web.bind.annotation.RestController;
+ 
+ import java.util.List;
++import java.util.Map;
++import java.util.HashMap;
++import java.math.BigDecimal;
++import com.ke.bella.openapi.utils.DateTimeUtils;
+ 
+ @BellaAPI
+ @RestController
+@@ -103,6 +108,19 @@ public class ApikeyConsoleController {
+         return apikeyService.queryBillingsByAkCode(akCode);
+     }
+ 
++    @GetMapping("/balance/{akCode}")
++    public Map<String, Object> getApiKeyBalance(@PathVariable String akCode) {
++        String currentMonth = DateTimeUtils.getCurrentMonth();
++        BigDecimal monthCost = apikeyService.loadCost(akCode, currentMonth);
++        ApikeyInfo apiKeyInfo = apikeyService.queryByCode(akCode, true);
++        Map<String, Object> result = new HashMap<>();
++        result.put("akCode", akCode);
++        result.put("month", currentMonth);
++        result.put("cost", monthCost);
++        result.put("quota", apiKeyInfo != null ? apiKeyInfo.getMonthQuota() : BigDecimal.ZERO);
++        result.put("balance", apiKeyInfo != null ? apiKeyInfo.getMonthQuota().subtract(monthCost) : BigDecimal.ZERO);
++        return result;
++    }
++
+     @GetMapping("/fetchByCode")
+     public ApikeyInfo fetchByCode(@RequestParam("code") String code, @RequestParam(value = "onlyActive", required = false) boolean onlyActive) {
+         return apikeyService.queryByCode(code, onlyActive);
+```
+
+Now, let's create a new file for the API type and function to retrieve the balance:
+
+```diff
+--- /dev/null
++++ web/src/lib/types/apikey-balance.ts
+@@ -0,0 +1,8 @@
++export interface ApiKeyBalance {
++  akCode: string;
++  month: string;
++  cost: number;
++  quota: number;
++  balance: number;
++}
++
+```
+
+Let's update the API functions to add the new endpoint:
+
+```diff
+--- web/src/lib/api/apikey.ts
++++ web/src/lib/api/apikey.ts
+@@ -1,5 +1,6 @@
+ import { ApikeyInfo, Page} from "@/lib/types/openapi";
+ import { openapi } from '@/lib/api/openapi';
++import { ApiKeyBalance } from "@/lib/types/apikey-balance";
+ 
+ export async function getApikeyInfos(page: number, ownerCode: number | null, search: string | null): Promise<Page<ApikeyInfo> | null> {
+     try {
+@@ -43,3 +44,12 @@ export async function rename(code: string, name: string): Promise<boolean> {
+     const response = await openapi.post<boolean>('/console/apikey/rename', { code, name });
+     return response.data ?? false;
+ }
++
++export async function getApiKeyBalance(code: string): Promise<ApiKeyBalance | null> {
++    try {
++        const response = await openapi.get<ApiKeyBalance>(`/console/apikey/balance/${code}`);
++        return response.data;
++    } catch (error) {
++        console.error('Error fetching apikey balance:', error);
++        return null;
++    }
++}
+```
+
+Now, let's create a component to display the API key balance:
+
+```diff
+--- /dev/null
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -0,0 +1,70 @@
++import React, { useState, useEffect } from 'react';
++import { getApiKeyBalance } from '@/lib/api/apikey';
++import { ApiKeyBalance } from '@/lib/types/apikey-balance';
++import {
++  Dialog,
++  DialogContent,
++  DialogDescription,
++  DialogHeader,
++  DialogTitle,
++} from "@/components/ui/dialog";
++import { Button } from '@/components/ui/button';
++import { CircleDollarSign, AlertCircle } from 'lucide-react';
++
++interface ApiKeyBalanceDialogProps {
++  code: string;
++  isOpen: boolean;
++  onClose: () => void;
++}
++
++export const ApiKeyBalanceDialog: React.FC<ApiKeyBalanceDialogProps> = ({ 
++  code, 
++  isOpen, 
++  onClose 
++}) => {
++  const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
++  const [loading, setLoading] = useState<boolean>(false);
++  const [error, setError] = useState<string | null>(null);
++
++  useEffect(() => {
++    if (isOpen && code) {
++      setLoading(true);
++      setError(null);
++      getApiKeyBalance(code)
++        .then((data) => {
++          if (data) {
++            setBalance(data);
++          } else {
++            setError('无法获取余额信息');
++          }
++        })
++        .catch(err => {
++          console.error('Failed to fetch balance:', err);
++          setError('获取余额信息时发生错误');
++        })
++        .finally(() => {
++          setLoading(false);
++        });
++    }
++  }, [isOpen, code]);
++
++  return (
++    <Dialog open={isOpen} onOpenChange={onClose}>
++      <DialogContent className="sm:max-w-md">
++        <DialogHeader>
++          <DialogTitle>API Key 余额详情</DialogTitle>
++          <DialogDescription>当前月份的使用情况和剩余额度</DialogDescription>
++        </DialogHeader>
++        <div className="py-4">
++          {loading ? (
++            <div className="flex justify-center items-center p-8">
++              <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
++            </div>
++          ) : error ? (
++            <div className="flex items-center justify-center text-red-500 p-4"><AlertCircle className="h-5 w-5 mr-2" />{error}</div>
++          ) : balance && (
++            <div className="space-y-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
++              <div className="grid grid-cols-2 gap-4 text-sm">
++                <div className="font-medium text-gray-500">月份</div>
++                <div>{balance.month}</div>
++                <div className="font-medium text-gray-500">总额度</div>
++                <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.quota)}</div>
++                <div className="font-medium text-gray-500">已使用</div>
++                <div>{new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.cost)}</div>
++                <div className="font-medium text-gray-500">剩余额度</div>
++                <div className={`font-semibold ${balance.balance < balance.quota * 0.2 ? 'text-red-600' : 'text-green-600'}`}>
++                  {new Intl.NumberFormat("zh-CN", { style: "currency", currency: "CNY" }).format(balance.balance)}
++                </div>
++              </div>
++              <div className={`text-sm mt-4 p-2 rounded ${balance.balance < balance.quota * 0.2 ? 'bg-red-50 text-red-800' : 'bg-green-50 text-green-800'}`}>
++                {balance.balance < balance.quota * 0.2 ? (
++                  <p className="flex items-center"><AlertCircle className="h-4 w-4 mr-2" />余额不足，请考虑增加额度</p>
++                ) : (
++                  <p>余额充足</p>
++                )}
++              </div>
++            </div>
++          )}
++        </div>
++        <div className="flex justify-end">
++          <Button onClick={onClose}>关闭</Button>
++        </div>
++      </DialogContent>
++    </Dialog>
++  );
++};
+```
+
+Now, let's update the API key columns to add a button for viewing the balance:
+
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -11,6 +11,7 @@ import {Button} from "@/components/ui/button"
+ import {Copy} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
++import { ApiKeyBalanceDialog } from "./apikey-balance";
+ 
+ interface EditableCellProps {
+     content: ReactNode;
+@@ -63,14 +64,17 @@ const RemarkCell = ({ value }: { value: string }) => {
+     )
+ }
+ 
+-const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey : string) => void }) => {
++const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => void, showApikey: (apikey: string) => void }) => {
+     const { toast } = useToast();
++    const [showBalance, setShowBalance] = useState(false);
++    
+     const copyToClipboard = () => {
+         navigator.clipboard.writeText(code).then(() => {
+             toast({ title: "复制成功", description: "API Key编码复制成功。" })
+         });
+     };
+ 
++    
+     return (
+         <div className="flex flex-wrap justify-end gap-2">
+             <Button onClick={copyToClipboard} variant="ghost" size="icon" className="p-0 focus:ring-0">
+@@ -90,6 +94,29 @@ const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () => 
+             </Button>
+             <DeleteDialog code={code} refresh={refresh}/>
+             <ResetDialog code={code} showApikey={showApikey}/>
++            <Button 
++                onClick={() => setShowBalance(true)} 
++                variant="ghost" 
++                size="icon" 
++                className="p-0 focus:ring-0"
++            >
++                <TooltipProvider>
++                    <Tooltip>
++                        <TooltipTrigger asChild>
++                            <div>
++                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wallet">
++                                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
++                                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
++                                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
++                                </svg>
++                                <span className="sr-only">查看余额</span>
++                            </div>
++                        </TooltipTrigger>
++                        <TooltipContent>查看余额</TooltipContent>
++                    </Tooltip>
++                </TooltipProvider>
++            </Button>
++            <ApiKeyBalanceDialog code={code} isOpen={showBalance} onClose={() => setShowBalance(false)} />
+         </div>
+     )
+ }
+```
+
+Let's also add a balance indicator in the main API key page to show the balance status at a glance:
+
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -11,7 +11,7 @@ import {Button} from "@/components/ui/button"
+ import {Copy, Wallet} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
+-import { ApiKeyBalanceDialog } from "./apikey-balance";
++import {ApiKeyBalanceDialog, ApiKeyBalanceIndicator} from "./apikey-balance";
+ 
+ interface EditableCellProps {
+     content: ReactNode;
+@@ -206,6 +206,12 @@ export const ApikeyColumns = (refresh: () => void, showApikey: (apikey : string)
+             );
+         }
+     },
++    {
++        accessorKey: "code",
++        header: "余额状态",
++        cell: ({row}) => 
++            <ApiKeyBalanceIndicator code={row.original.code} />
++    },
+     {
+         accessorKey: "remark",
+         header: "备注",
+```
+
+Now let's update our balance component to add the indicator:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -9,7 +9,7 @@ import {
+   DialogTitle,
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
+-import { CircleDollarSign, AlertCircle } from 'lucide-react';
++import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+   code: string;
+@@ -17,6 +17,56 @@ interface ApiKeyBalanceDialogProps {
+   onClose: () => void;
+ }
+ 
++interface ApiKeyBalanceIndicatorProps {
++  code: string;
++}
++
++export const ApiKeyBalanceIndicator: React.FC<ApiKeyBalanceIndicatorProps> = ({ code }) => {
++  const [balance, setBalance] = useState<ApiKeyBalance | null>(null);
++  const [loading, setLoading] = useState<boolean>(true);
++  const [error, setError] = useState<boolean>(false);
++
++  useEffect(() => {
++    if (code) {
++      setLoading(true);
++      setError(false);
++      getApiKeyBalance(code)
++        .then((data) => {
++          if (data) {
++            setBalance(data);
++          } else {
++            setError(true);
++          }
++        })
++        .catch(() => {
++          setError(true);
++        })
++        .finally(() => {
++          setLoading(false);
++        });
++    }
++  }, [code]);
++
++  if (loading) {
++    return <div className="flex justify-center"><div className="h-5 w-5 animate-pulse bg-gray-200 rounded-full"></div></div>;
++  }
++
++  if (error || !balance) {
++    return <Badge variant="outline" className="bg-gray-100 text-gray-500">未知</Badge>;
++  }
++
++  const usagePercentage = (balance.cost / balance.quota) * 100;
++  
++  if (usagePercentage >= 80) {
++    return (
++      <Badge className="bg-red-100 text-red-800 flex items-center gap-1">
++        <AlertCircle className="h-3 w-3" /> 余额紧张 ({Math.round(usagePercentage)}%)
++      </Badge>
++    );
++  }
++  
++  return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> 余额充足</Badge>;
++};
++
+ export const ApiKeyBalanceDialog: React.FC<ApiKeyBalanceDialogProps> = ({ 
+   code, 
+   isOpen, 
+```
+
+Let's make sure the Badge component is imported:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -9,6 +9,7 @@ import {
+   DialogTitle,
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
++import { Badge } from '@/components/ui/badge';
+ import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+```
+
+Let's update the import in the apikey-column.tsx file to use the Wallet icon:
+
+```diff
+--- web/src/components/apikey/apikey-coloumn.tsx
++++ web/src/components/apikey/apikey-coloumn.tsx
+@@ -8,7 +8,7 @@ import {CertifyDialog, DeleteDialog, QuotaDialog, RenameDialog, ResetDialog} fro
+ import {HoverContext} from "@/components/ui/data-table";
+ import {Badge} from "@/components/ui/badge"
+ import {Button} from "@/components/ui/button"
+-import {Copy} from 'lucide-react'
++import {Copy, Wallet} from 'lucide-react'
+ import {useToast} from "@/hooks/use-toast";
+ import {safety_apply_url} from "@/config";
+ import {ApiKeyBalanceDialog, ApiKeyBalanceIndicator} from "./apikey-balance";
+@@ -104,15 +104,7 @@ const ActionCell = ({code, refresh, showApikey}: { code: string, refresh: () =>
+                     <Tooltip>
+                         <TooltipTrigger asChild>
+                             <div>
+-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-wallet">
+-                                    <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+-                                    <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+-                                    <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+-                                </svg>
+-                                <span className="sr-only">查看余额</span>
+-                            </div>
+-                        </TooltipTrigger>
+-                        <TooltipContent>查看余额</TooltipContent>
++                                <Wallet className="h-4 w-4" />
++                                <span className="sr-only">查看余额</span>
++                            </div>
++                        </TooltipTrigger>
++                        <TooltipContent>查看余额</TooltipContent>
+                     </Tooltip>
+                 </TooltipProvider>
+             </Button>
+```
+
+Finally, let's add a summary component at the top of the API key page to show total balance information:
+
+```diff
+--- web/src/app/apikey/page.tsx
++++ web/src/app/apikey/page.tsx
+@@ -2,7 +2,7 @@
+ 
+ import React, { useEffect, useState } from "react"
+ import { DataTable } from "@/components/ui/data-table"
+-import { getApikeyInfos, applyApikey } from "@/lib/api/apikey"
++import { getApikeyInfos, applyApikey, getApiKeyBalance } from "@/lib/api/apikey"
+ import { ApikeyColumns } from "@/components/apikey/apikey-coloumn"
+ import { ApikeyInfo } from "@/lib/types/openapi"
+ import { ClientHeader } from "@/components/user/client-header"
+@@ -20,6 +20,7 @@ import {
+     DialogHeader,
+     DialogTitle,
+ } from "@/components/ui/dialog"
++import { ApiKeyBalanceSummary } from "@/components/apikey/apikey-balance"
+ 
+ const ApikeyPage: React.FC = () => {
+     const [page, setPage] = useState<number>(1)
+@@ -140,6 +141,12 @@ const ApikeyPage: React.FC = () => {
+             <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                 <div className="p-6">
+                     <div className="mb-4 flex justify-between items-center">
++                        <div className="flex-1">
++                            {data && data.length > 0 && (
++                                <ApiKeyBalanceSummary apikeys={data} />
++                            )}
++                        </div>
++                        <div className="flex gap-4">
+                         <form onSubmit={handleSearchSubmit} className="relative">
+                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                             <Input
+@@ -154,6 +161,7 @@ const ApikeyPage: React.FC = () => {
+                             <Plus className="h-4 w-4 mr-2" />
+                             创建 API Key
+                         </Button>
++                        </div>
+                     </div>
+ 
+                     {isLoading ? (
+```
+
+Let's add the ApiKeyBalanceSummary component to apikey-balance.tsx:
+
+```diff
+--- web/src/components/apikey/apikey-balance.tsx
++++ web/src/components/apikey/apikey-balance.tsx
+@@ -1,6 +1,7 @@
+ import React, { useState, useEffect } from 'react';
+ import { getApiKeyBalance } from '@/lib/api/apikey';
+ import { ApiKeyBalance } from '@/lib/types/apikey-balance';
++import { ApikeyInfo } from '@/lib/types/openapi';
+ import {
+   Dialog,
+   DialogContent,
+@@ -10,7 +11,7 @@ import {
+ } from "@/components/ui/dialog";
+ import { Button } from '@/components/ui/button';
+ import { Badge } from '@/components/ui/badge';
+-import { CircleDollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
++import { CircleDollarSign, AlertCircle, CheckCircle2, Wallet } from 'lucide-react';
+ 
+ interface ApiKeyBalanceDialogProps {
+   code: string;
+@@ -67,6 +68,70 @@ export const ApiKeyBalanceIndicator: React.FC<ApiKeyBalanceIndicatorProps> = ({
+   return <Badge className="bg-green-100 text-green-800 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> 余额充足</Badge>;
+ };
+ 
++interface ApiKeyBalanceSummaryProps {
++  apikeys: ApikeyInfo[];
++}
++
++export const ApiKeyBalanceSummary: React.FC<ApiKeyBalanceSummaryProps> = ({ apikeys }) => {
++  const [balances, setBalances] = useState<ApiKeyBalance[]>([]);
++  const [loading, setLoading] = useState<boolean>(true);
++
++  useEffect(() => {
++    if (apikeys && apikeys.length > 0) {
++      setLoading(true);
++      Promise.all(
++        apikeys.map(apikey => getApiKeyBalance(apikey.code))
++      ).then(results => {
++        setBalances(results.filter(result => result !== null) as ApiKeyBalance[]);
++      }).finally(() => {
++        setLoading(false);
++      });
++    }
++  }, [apikeys]);
++
++  if (loading) {
++    return <div className="h-10 animate-pulse bg-gray-100 rounded-md w-full"></div>;
++  }
++
++  if (balances.length === 0) {
++    return null;
++  }
++
++  const totalQuota = balances.reduce((sum, balance) => sum + balance.quota, 0);
++  const totalUsed = balances.reduce((sum, balance) => sum

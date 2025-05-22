@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { DataTable } from "@/components/ui/data-table"
-import { getApikeyInfos, applyApikey } from "@/lib/api/apikey"
+import { getApikeyInfos, applyApikey, getApiKeyBalance } from "@/lib/api/apikey"
 import { ApikeyColumns } from "@/components/apikey/apikey-coloumn"
 import { ApikeyInfo } from "@/lib/types/openapi"
 import { ClientHeader } from "@/components/user/client-header"
@@ -20,6 +20,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
+import { ApiKeyBalanceSummary } from "@/components/apikey/apikey-balance"
 
 const ApikeyPage: React.FC = () => {
     const [page, setPage] = useState<number>(1)
@@ -140,6 +141,12 @@ const ApikeyPage: React.FC = () => {
             <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="p-6">
                     <div className="mb-4 flex justify-between items-center">
+                        <div className="flex-1">
+                            {data && data.length > 0 && (
+                                <ApiKeyBalanceSummary apikeys={data} />
+                            )}
+                        </div>
+                        <div className="flex gap-4">
                         <form onSubmit={handleSearchSubmit} className="relative">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                             <Input
@@ -154,6 +161,7 @@ const ApikeyPage: React.FC = () => {
                             <Plus className="h-4 w-4 mr-2" />
                             创建 API Key
                         </Button>
+                        </div>
                     </div>
 
                     {isLoading ? (
